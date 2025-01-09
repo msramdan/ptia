@@ -16,12 +16,15 @@
         <div class="row">
             <div class="col-md-6 img-holder">
                 <div class="bg"
-                    style="background: rgb(245,245,245); background: radial-gradient(circle, rgb(54, 167, 251) 0%, rgb(0, 147, 255) 100%);">
+                    style="background: rgb(235, 245, 255);
+                           background: radial-gradient(circle, rgb(60, 130, 200) 0%, rgb(40, 90, 150) 100%);">
                 </div>
                 <div
                     style="width:100%;height:100%;z-index:0;top:0;left:0;position:fixed;background:url('https://registrasi.bpkp.go.id/ptia/assets/temalogin/images/pattern-3.svg') no-repeat center bottom fixed;background-size: cover;">
                 </div>
             </div>
+
+
             <div class="col-md-6 form-holder">
                 <div class="form-content">
                     <div class="form-items p-4" style="border-radius:10px;">
