@@ -8,19 +8,21 @@ use Spatie\Permission\Models\{Role, Permission};
 
 class RoleAndPermissionSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
-    public function run(): void
+    public function run()
     {
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
-        $roleAdmin = Role::create(['name' => 'admin']);
+        $roleAdmin = Role::create(
+            [
+                'name' => 'Super Admin'
+            ]
+        );
 
         foreach (config('permission.permissions') as $permission) {
             foreach ($permission['access'] as $access) {
                 Permission::create(['name' => $access]);
             }
         }
+        $roleAdmin->givePermissionTo(Permission::all());
     }
 }
