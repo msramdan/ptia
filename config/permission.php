@@ -207,5 +207,5 @@ return [
         ],
         ['group' => 'aspeks', 'access' => ['aspek view', 'aspek create', 'aspek edit', 'aspek delete']],
         ['group' => 'indikator persepsis', 'access' => ['indikator persepsi view']],
-    ],
-];
+  ['group' => 'pesan was', 'access' => ['pesan wa view', 'pesan wa create', 'pesan wa edit', 'pesan wa delete']], 
+		],];

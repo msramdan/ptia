@@ -114,7 +114,8 @@ return [
         'header' => 'Master',
         'permissions' => [
             'aspek view',
-            'indikator persepsi view'
+            'indikator persepsi view',
+            'pesan wa view'
         ],
         'menus' => [
             [
@@ -124,7 +125,8 @@ return [
                 'permission' => null,
                 'permissions' => [
                     'aspek view',
-                    'indikator persepsi view'
+                    'indikator persepsi view',
+                    'pesan wa view'
                 ],
                 'submenus' => [
                     [
@@ -136,6 +138,11 @@ return [
                         'title' => 'Indikator Persepsi',
                         'route' => '/indikator-persepsi',
                         'permission' => 'indikator persepsi view'
+                    ],
+                    [
+                        'title' => 'Default Pesan Wa',
+                        'route' => '/pesan-wa',
+                        'permission' => 'pesan wa view'
                     ]
                 ]
             ]
