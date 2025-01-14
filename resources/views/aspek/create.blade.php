@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', __('Edit Aspek'))
+@section('title', __('Create Aspek'))
 
 @section('content')
     <div class="page-heading">
@@ -9,7 +9,7 @@
                 <div class="col-12 col-md-8 order-md-1 order-last">
                     <h3>{{ __('Aspek') }}</h3>
                     <p class="text-subtitle text-muted">
-                        {{ __('Edit a aspek.') }}
+                        {{ __('Create a new aspek.') }}
                     </p>
                 </div>
 
@@ -18,29 +18,30 @@
                         <a href="/">{{ __('Dashboard') }}</a>
                     </li>
                     <li class="breadcrumb-item">
-                        <a href="{{ route('aspeks.index') }}">{{ __('Aspek') }}</a>
+                        <a href="{{ route('aspek.index') }}">{{ __('Aspek') }}</a>
                     </li>
                     <li class="breadcrumb-item active" aria-current="page">
-                        {{ __('Edit') }}
+                        {{ __('Create') }}
                     </li>
                 </x-breadcrumb>
             </div>
         </div>
 
         <section class="section">
+
             <div class="row">
                 <div class="col-md-12">
                     <div class="card">
                         <div class="card-body">
-                            <form action="{{ route('aspeks.update', $aspek->id) }}" method="POST">
+                            <form action="{{ route('aspek.store') }}" method="POST">
                                 @csrf
-                                @method('PUT')
+                                @method('POST')
 
-                                @include('aspeks.include.form')
+                                @include('aspek.include.form')
 
-                                <a href="{{ route('aspeks.index') }}" class="btn btn-secondary">{{ __('Back') }}</a>
+                                <a href="{{ route('aspek.index') }}" class="btn btn-secondary">{{ __('Back') }}</a>
 
-                                <button type="submit" class="btn btn-primary">{{ __('Update') }}</button>
+                                <button type="submit" class="btn btn-primary">{{ __('Save') }}</button>
                             </form>
                         </div>
                     </div>

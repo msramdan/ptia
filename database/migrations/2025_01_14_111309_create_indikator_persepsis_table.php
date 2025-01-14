@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('aspek', function (Blueprint $table) {
+        Schema::create('indikator_persepsi', function (Blueprint $table) {
             $table->id();
-            $table->enum('level', ['3', '4']);
-			$table->string('aspek', 255);
-			$table->integer('urutan');
+            $table->foreignId('aspek_id')->constrained('aspek')->restrictOnUpdate()->cascadeOnDelete();
+            $table->enum('indikator_persepsi', ['1', '2', '3', '4']);
+            $table->enum('kriteria_persepsi', ['Sangat tidak setuju', 'Tidak setuju', 'Setuju', 'Sangat setuju']);
             $table->timestamps();
         });
     }
@@ -25,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('aspek');
+        Schema::dropIfExists('indikator_persepsi');
     }
 };

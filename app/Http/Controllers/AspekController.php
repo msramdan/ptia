@@ -37,12 +37,12 @@ class AspekController extends Controller implements HasMiddleware
                     $levelText = $user->level === '3' ? 'Level 3' : 'Level 4';
                     return '<span class="badge bg-info">' . $levelText . '</span>';
                 })
-                ->addColumn('action', 'aspeks.include.action')
+                ->addColumn('action', 'aspek.include.action')
                 ->rawColumns(['level', 'action'])
                 ->toJson();
         }
 
-        return view('aspeks.index');
+        return view('aspek.index');
     }
 
     /**
@@ -50,7 +50,7 @@ class AspekController extends Controller implements HasMiddleware
      */
     public function create(): View
     {
-        return view('aspeks.create');
+        return view('aspek.create');
     }
 
     /**
@@ -61,7 +61,7 @@ class AspekController extends Controller implements HasMiddleware
 
         Aspek::create($request->validated());
 
-        return to_route('aspeks.index')->with('success', __('The aspek was created successfully.'));
+        return to_route('aspek.index')->with('success', __('The aspek was created successfully.'));
     }
 
     /**
@@ -69,7 +69,7 @@ class AspekController extends Controller implements HasMiddleware
      */
     public function show(Aspek $aspek): View
     {
-        return view('aspeks.show', compact('aspek'));
+        return view('aspek.show', compact('aspek'));
     }
 
     /**
@@ -77,7 +77,7 @@ class AspekController extends Controller implements HasMiddleware
      */
     public function edit(Aspek $aspek): View
     {
-        return view('aspeks.edit', compact('aspek'));
+        return view('aspek.edit', compact('aspek'));
     }
 
     /**
@@ -88,7 +88,7 @@ class AspekController extends Controller implements HasMiddleware
 
         $aspek->update($request->validated());
 
-        return to_route('aspeks.index')->with('success', __('The aspek was updated successfully.'));
+        return to_route('aspek.index')->with('success', __('The aspek was updated successfully.'));
     }
 
     /**
@@ -99,9 +99,9 @@ class AspekController extends Controller implements HasMiddleware
         try {
             $aspek->delete();
 
-            return to_route('aspeks.index')->with('success', __('The aspek was deleted successfully.'));
+            return to_route('aspek.index')->with('success', __('The aspek was deleted successfully.'));
         } catch (\Exception $e) {
-            return to_route('aspeks.index')->with('error', __("The aspek can't be deleted because it's related to another table."));
+            return to_route('aspek.index')->with('error', __("The aspek can't be deleted because it's related to another table."));
         }
     }
 }

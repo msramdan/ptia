@@ -66,7 +66,7 @@
                                     @if (empty($menu['submenus']))
                                         @can($menu['permission'])
                                             <li class="sidebar-item{{ is_active_menu($menu['route']) }}">
-                                                <a href="{{ route(str($menu['route'])->remove('/')->singular()->plural() . '.index') }}"
+                                                <a href="{{ route(str($menu['route'])->remove('/') . '.index') }}"
                                                     class="sidebar-link">
                                                     {!! $menu['icon'] !!}
                                                     <span>{{ __($menu['title']) }}</span>
@@ -85,7 +85,7 @@
                                                         @can($submenu['permission'])
                                                             <li class="submenu-item{{ is_active_menu($submenu['route']) }}">
                                                                 <a
-                                                                    href="{{ route(str($submenu['route'])->remove('/')->singular()->plural() . '.index') }}">
+                                                                    href="{{ route(str($submenu['route'])->remove('/') . '.index') }}">
                                                                     {{ __($submenu['title']) }}
                                                                 </a>
                                                             </li>

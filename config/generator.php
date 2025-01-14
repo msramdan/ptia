@@ -110,54 +110,61 @@ return [
      * This code below always changes when you use a generator, and maybe you must format the code.
      */
     "sidebars" => [
-        [
-            'header' => 'Master',
-            'permissions' => [
-                'aspek view'
-            ],
-            'menus' => [
-                [
-                    'title' => 'Master Data',
-                    'icon' => '<i class="bi bi-collection-fill"></i>',
-                    'route' => null,
-                    'permission' => null,
-                    'permissions' => [
-                        'aspek view'
+    [
+        'header' => 'Master',
+        'permissions' => [
+            'aspek view',
+            'indikator persepsi view'
+        ],
+        'menus' => [
+            [
+                'title' => 'Master Data',
+                'icon' => '<i class="bi bi-collection-fill"></i>',
+                'route' => null,
+                'permission' => null,
+                'permissions' => [
+                    'aspek view',
+                    'indikator persepsi view'
+                ],
+                'submenus' => [
+                    [
+                        'title' => 'Aspek',
+                        'route' => '/aspek',
+                        'permission' => 'aspek view'
                     ],
-                    'submenus' => [
-                        [
-                            'title' => 'Aspek',
-                            'route' => '/aspeks',
-                            'permission' => 'aspek view'
-                        ]
+                    [
+                        'title' => 'Indikator Persepsi',
+                        'route' => '/indikator-persepsi',
+                        'permission' => 'indikator persepsi view'
                     ]
                 ]
             ]
+        ]
+    ],
+    [
+        'header' => 'Users',
+        'permissions' => [
+            'user view',
+            'role & permission view'
         ],
-        [
-            'header' => 'Users',
-            'permissions' => [
-                'user view',
-                'role & permission view'
+        'menus' => [
+            [
+                'title' => 'Users',
+                'icon' => '<i class="bi bi-people-fill"></i>',
+                'route' => '/users',
+                'permission' => 'user view',
+                'permissions' => [],
+                'submenus' => []
             ],
-            'menus' => [
-                [
-                    'title' => 'Users',
-                    'icon' => '<i class="bi bi-people-fill"></i>',
-                    'route' => '/users',
-                    'permission' => 'user view',
-                    'permissions' => [],
-                    'submenus' => []
-                ],
-                [
-                    'title' => 'Roles & permissions',
-                    'icon' => '<i class="bi bi-person-check-fill"></i>',
-                    'route' => '/roles',
-                    'permission' => 'role & permission view',
-                    'permissions' => [],
-                    'submenus' => []
-                ]
+            [
+                'title' => 'Roles & permissions',
+                'icon' => '<i class="bi bi-person-check-fill"></i>',
+                'route' => '/roles',
+                'permission' => 'role & permission view',
+                'permissions' => [],
+                'submenus' => []
             ]
         ]
     ]
+]
 ];

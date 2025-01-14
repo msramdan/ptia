@@ -1,18 +1,18 @@
 <td>
-    @can('aspek view')
-        <a href="{{ route('aspeks.show', $model->id) }}" class="btn btn-outline-success btn-sm">
+    @can('indikator persepsi view')
+        <a href="{{ route('indikator-persepsi.show', $model->id) }}" class="btn btn-outline-success btn-sm">
             <i class="fa fa-eye"></i>
         </a>
     @endcan
 
-    @can('aspek edit')
-        <a href="{{ route('aspeks.edit', $model->id) }}" class="btn btn-outline-primary btn-sm">
+    @can('indikator persepsi edit')
+        <a href="{{ route('indikator-persepsi.edit', $model->id) }}" class="btn btn-outline-primary btn-sm">
             <i class="fa fa-pencil-alt"></i>
         </a>
     @endcan
 
-    @can('aspek delete')
-        <form action="{{ route('aspeks.destroy', $model->id) }}" method="post" class="d-inline"
+    @can('indikator persepsi delete')
+        <form action="{{ route('indikator-persepsi.destroy', $model->id) }}" method="post" class="d-inline"
             onsubmit="return confirm('Are you sure to delete this record?')">
             @csrf
             @method('delete')

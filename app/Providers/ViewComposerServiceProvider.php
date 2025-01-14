@@ -27,5 +27,14 @@ class ViewComposerServiceProvider extends ServiceProvider
                 Role::select('id', 'name')->get()
             );
         });
-    }
+  
+
+		View::composer(['indikator-persepsis.create', 'indikator-persepsis.edit'], function ($view) {
+            return $view->with(
+                'aspeks',
+                \App\Models\Aspek::select('id', 'level')->get()
+            );
+        });
+
+	}
 }

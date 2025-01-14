@@ -50,6 +50,6 @@ class AspekSeeder extends Seeder
             ],
         ];
 
-        DB::table('aspeks')->insert($data);
+        DB::table('aspek')->insert($data);
     }
 }

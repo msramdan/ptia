@@ -18,7 +18,7 @@
                         <a href="/">{{ __('Dashboard') }}</a>
                     </li>
                     <li class="breadcrumb-item">
-                        <a href="{{ route('aspeks.index') }}">{{ __('Aspek') }}</a>
+                        <a href="{{ route('aspek.index') }}">{{ __('Aspek') }}</a>
                     </li>
                     <li class="breadcrumb-item active" aria-current="page">
                         {{ __('Detail') }}
@@ -57,7 +57,7 @@
                                 </table>
                             </div>
 
-                            <a href="{{ route('aspeks.index') }}" class="btn btn-secondary">{{ __('Back') }}</a>
+                            <a href="{{ route('aspek.index') }}" class="btn btn-secondary">{{ __('Back') }}</a>
                         </div>
                     </div>
                 </div>

@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Aspek extends Model
+class IndikatorPersepsi extends Model
 {
     use HasFactory;
 
@@ -14,14 +14,14 @@ class Aspek extends Model
      *
      * @var string
      */
-    protected $table = 'aspek';
+    protected $table = 'indikator_persepsi';
 
     /**
      * The attributes that are mass assignable.
      *
      * @var string[]
      */
-    protected $fillable = ['level', 'aspek', 'urutan'];
+    protected $fillable = ['aspek_id', 'indikator_persepsi', 'kriteria_persepsi'];
 
     /**
      * Get the attributes that should be cast.
@@ -30,8 +30,13 @@ class Aspek extends Model
      */
     protected function casts(): array
     {
-        return ['aspek' => 'string', 'urutan' => 'integer', 'created_at' => 'datetime:Y-m-d H:i:s', 'updated_at' => 'datetime:Y-m-d H:i:s'];
+        return ['created_at' => 'datetime:Y-m-d H:i:s', 'updated_at' => 'datetime:Y-m-d H:i:s'];
     }
 
+
+	public function aspek(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+	{
+		return $this->belongsTo(\App\Models\Aspek::class);
+	}
 
 }
