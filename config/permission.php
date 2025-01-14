@@ -192,7 +192,6 @@ return [
             'group' => 'users',
             'access' => [
                 'user view',
-                'user create',
                 'user edit',
                 'user delete',
             ]
@@ -206,11 +205,6 @@ return [
                 'role & permission delete',
             ]
         ],
-        [
-            'group' => 'tests',
-            'access' => [
-                'test view',
-            ]
-        ],
+        ['group' => 'aspeks', 'access' => ['aspek view', 'aspek create', 'aspek edit', 'aspek delete']],
     ],
 ];

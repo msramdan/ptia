@@ -111,46 +111,53 @@ return [
      */
     "sidebars" => [
         [
-            "header" => "Main",
-            "permissions" => ["test view"],
-            "menus" => [
-                [
-                    "title" => "Main Data",
-                    "icon" => '<i class="bi bi-collection-fill"></i>',
-                    "route" => null,
-                    "permission" => null,
-                    "permissions" => ["test view"],
-                    "submenus" => [
-                        [
-                            "title" => "Tests",
-                            "route" => "/tests",
-                            "permission" => "test view",
-                        ],
-                    ],
-                ],
+            'header' => 'Master',
+            'permissions' => [
+                'aspek view'
             ],
+            'menus' => [
+                [
+                    'title' => 'Master Data',
+                    'icon' => '<i class="bi bi-collection-fill"></i>',
+                    'route' => null,
+                    'permission' => null,
+                    'permissions' => [
+                        'aspek view'
+                    ],
+                    'submenus' => [
+                        [
+                            'title' => 'Aspek',
+                            'route' => '/aspeks',
+                            'permission' => 'aspek view'
+                        ]
+                    ]
+                ]
+            ]
         ],
         [
-            "header" => "Users",
-            "permissions" => ["user view", "role & permission view"],
-            "menus" => [
-                [
-                    "title" => "Users",
-                    "icon" => '<i class="bi bi-people-fill"></i>',
-                    "route" => "/users",
-                    "permission" => "user view",
-                    "permissions" => [],
-                    "submenus" => [],
-                ],
-                [
-                    "title" => "Roles & permissions",
-                    "icon" => '<i class="bi bi-person-check-fill"></i>',
-                    "route" => "/roles",
-                    "permission" => "role & permission view",
-                    "permissions" => [],
-                    "submenus" => [],
-                ],
+            'header' => 'Users',
+            'permissions' => [
+                'user view',
+                'role & permission view'
             ],
-        ],
-    ],
+            'menus' => [
+                [
+                    'title' => 'Users',
+                    'icon' => '<i class="bi bi-people-fill"></i>',
+                    'route' => '/users',
+                    'permission' => 'user view',
+                    'permissions' => [],
+                    'submenus' => []
+                ],
+                [
+                    'title' => 'Roles & permissions',
+                    'icon' => '<i class="bi bi-person-check-fill"></i>',
+                    'route' => '/roles',
+                    'permission' => 'role & permission view',
+                    'permissions' => [],
+                    'submenus' => []
+                ]
+            ]
+        ]
+    ]
 ];

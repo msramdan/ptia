@@ -7,7 +7,7 @@ use Spatie\Permission\Models\Role;
 use Yajra\DataTables\Facades\DataTables;
 use App\Generators\Services\ImageService;
 use Illuminate\Routing\Controllers\{HasMiddleware, Middleware};
-use App\Http\Requests\Users\{StoreUserRequest, UpdateUserRequest};
+use App\Http\Requests\Users\{UpdateUserRequest};
 use Illuminate\Support\Facades\DB;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
@@ -18,7 +18,6 @@ class UserController extends Controller implements HasMiddleware
     public function __construct(public ImageService $imageService, public string $avatarPath = '')
     {
         $this->avatarPath = storage_path('app/public/uploads/avatars/');
-
     }
 
     /**
@@ -28,7 +27,6 @@ class UserController extends Controller implements HasMiddleware
     {
         return [
             new Middleware('permission:user view', only: ['index', 'show']),
-            new Middleware('permission:user create', only: ['create', 'store']),
             new Middleware('permission:user edit', only: ['edit', 'update']),
             new Middleware('permission:user delete', only: ['destroy']),
         ];
@@ -49,41 +47,12 @@ class UserController extends Controller implements HasMiddleware
                     if (!$user->avatar) {
                         return 'https://via.placeholder.com/350?text=No+Image+Avaiable';
                     }
-
                     return asset('storage/uploads/avatars/' . $user->avatar);
                 })
                 ->toJson();
         }
 
         return view('users.index');
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create(): View
-    {
-        return view('users.create');
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StoreUserRequest $request): RedirectResponse
-    {
-        return DB::transaction(function () use ($request) {
-            $validated = $request->validated();
-            $validated['avatar'] = $this->imageService->upload(name: 'avatar', path: $this->avatarPath);
-            $validated['password'] = bcrypt($request->password);
-
-            $user = User::create($validated);
-
-            $role = Role::select('id', 'name')->find($request->role);
-
-            $user->assignRole($role->name);
-
-            return to_route('users.index')->with('success', __('The user was created successfully.'));
-        });
     }
 
     /**
