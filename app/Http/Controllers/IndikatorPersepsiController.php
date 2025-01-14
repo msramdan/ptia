@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\IndikatorPersepsi;
-use App\Http\Requests\IndikatorPersepsis\{StoreIndikatorPersepsiRequest, UpdateIndikatorPersepsiRequest};
+use App\Http\Requests\indikatorPersepsi\{StoreIndikatorPersepsiRequest, UpdateIndikatorPersepsiRequest};
 use Illuminate\Contracts\View\View;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Http\{JsonResponse, RedirectResponse};
 use Illuminate\Routing\Controllers\{HasMiddleware, Middleware};
+use Illuminate\Support\Facades\DB;
+
 
 class IndikatorPersepsiController extends Controller implements HasMiddleware
 {
@@ -30,12 +32,21 @@ class IndikatorPersepsiController extends Controller implements HasMiddleware
     public function index(): View|JsonResponse
     {
         if (request()->ajax()) {
-            $indikatorPersepsis = IndikatorPersepsi::with(['aspek:id,level']);
+            $indikatorPersepsi = DB::table('indikator_persepsi')
+                ->join('aspek', 'indikator_persepsi.aspek_id', '=', 'aspek.id')
+                ->select([
+                    'indikator_persepsi.id',
+                    'aspek.aspek as aspek',
+                    'indikator_persepsi.indikator_persepsi',
+                    'indikator_persepsi.kriteria_persepsi',
+                ]);
 
-            return DataTables::of($indikatorPersepsis)
-                ->addColumn('aspek', function ($row) {
-                    return $row?->aspek?->level ?? '';
-                })->addColumn('action', 'indikator-persepsis.include.action')
+            return DataTables::of($indikatorPersepsi)
+                ->addColumn('indikator_persepsi', function ($row) {
+                    return '<span class="badge bg-danger">' . $row->indikator_persepsi . '</span>';
+                })
+                ->rawColumns(['indikator_persepsi', 'action'])
+                ->addColumn('action', 'indikator-persepsi.include.action')
                 ->toJson();
         }
 
@@ -68,7 +79,7 @@ class IndikatorPersepsiController extends Controller implements HasMiddleware
     {
         $indikatorPersepsi->load(['aspek:id,level']);
 
-		return view('indikator-persepsi.show', compact('indikatorPersepsi'));
+        return view('indikator-persepsi.show', compact('indikatorPersepsi'));
     }
 
     /**
@@ -78,7 +89,7 @@ class IndikatorPersepsiController extends Controller implements HasMiddleware
     {
         $indikatorPersepsi->load(['aspek:id,level']);
 
-		return view('indikator-persepsi.edit', compact('indikatorPersepsi'));
+        return view('indikator-persepsi.edit', compact('indikatorPersepsi'));
     }
 
     /**

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\IndikatorPersepsis;
+namespace App\Http\Requests\indikatorPersepsi;
 
 use Illuminate\Foundation\Http\FormRequest;
 

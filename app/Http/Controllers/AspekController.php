@@ -33,8 +33,8 @@ class AspekController extends Controller implements HasMiddleware
             $aspeks = Aspek::query();
 
             return DataTables::of($aspeks)
-                ->addColumn('level', function ($user) {
-                    $levelText = $user->level === '3' ? 'Level 3' : 'Level 4';
+                ->addColumn('level', function ($row) {
+                    $levelText = $row->level === '3' ? 'Level 3' : 'Level 4';
                     return '<span class="badge bg-info">' . $levelText . '</span>';
                 })
                 ->addColumn('action', 'aspek.include.action')

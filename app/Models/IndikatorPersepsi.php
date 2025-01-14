@@ -32,11 +32,4 @@ class IndikatorPersepsi extends Model
     {
         return ['created_at' => 'datetime:Y-m-d H:i:s', 'updated_at' => 'datetime:Y-m-d H:i:s'];
     }
-
-
-	public function aspek(): \Illuminate\Database\Eloquent\Relations\BelongsTo
-	{
-		return $this->belongsTo(\App\Models\Aspek::class);
-	}
-
 }
