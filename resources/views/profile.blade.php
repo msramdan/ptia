@@ -22,7 +22,7 @@
         <section class="section mt-4">
             <div class="row">
                 <div class="col-md-12">
-                    <x-alert></x-alert>
+
                 </div>
             </div>
 

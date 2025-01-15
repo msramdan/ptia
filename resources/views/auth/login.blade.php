@@ -5,10 +5,15 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BPKP PTIA</title>
+    <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Custom Styles -->
     <link rel="stylesheet" href="https://registrasi.bpkp.go.id/ptia/assets/temalogin/css/iofrm-style.css">
     <link rel="stylesheet" href="https://registrasi.bpkp.go.id/ptia/assets/temalogin/css/iofrm-theme22.css">
+    <!-- Toastr CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
 </head>
 
 <body>
@@ -24,7 +29,6 @@
                 </div>
             </div>
 
-
             <div class="col-md-6 form-holder">
                 <div class="form-content">
                     <div class="form-items p-4" style="border-radius:10px;">
@@ -33,16 +37,7 @@
                                 class="img-fluid" alt="Logo PTIA">
                         </div>
 
-                        {{-- @if ($errors->any())
-                            <div class="alert alert-danger text-center" role="alert">
-                                <ul class="list-unstyled mb-0">
-                                    @foreach ($errors->all() as $error)
-                                        <li><strong>{{ $error }}</strong></li>
-                                    @endforeach
-                                </ul>
-                            </div>
-                        @endif --}}
-
+                        <!-- Login Form -->
                         <form method="POST" action="{{ route('login') }}" id="form" class="mt-3">
                             @csrf
                             <div class="mb-3">
@@ -72,14 +67,31 @@
             </div>
         </div>
     </div>
+
+    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- jQuery -->
     <script src="https://registrasi.bpkp.go.id/ptia/assets/temalogin/js/jquery.min.js"></script>
-    <script src="https://registrasi.bpkp.go.id/ptia/assets/temaalus/dist/js/m_login3.js"></script>
-    <script src="https://registrasi.bpkp.go.id/ptia/assets/temalogin/js/main.js"></script>
-    <script src='https://www.google.com/recaptcha/api.js'></script>
+    <!-- Toastr JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <!-- SweetAlert -->
     <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <!-- Custom Scripts -->
     <script>
         $(document).ready(function() {
+            // Show error notifications if there are any
+            @if ($errors->any())
+                @foreach ($errors->all() as $error)
+                    toastr.error("{{ $error }}", "Error", {
+                        closeButton: true,
+                        progressBar: true,
+                        positionClass: "toast-top-right",
+                        timeOut: 5000,
+                    });
+                @endforeach
+            @endif
+
+            // Toggle password visibility
             $('.toggle-password').on('click', function() {
                 const passwordField = $('#password');
                 const type = passwordField.attr('type') === 'password' ? 'text' : 'password';
