@@ -1,6 +1,6 @@
-<div class="row mb-2">
-	<div class="col-md-6">
-	<p>Nilai Post Test</p>
+<div class="row mb-2" style="border: 1px solid #ddd; border-radius: 8px; padding: 15px;">
+    <div class="col-md-6">
+        <p>Nilai Post Test</p>
         <div class="form-check mb-2">
             <input class="form-check-input @error('nilai_post_test') is-invalid @enderror" type="radio" name="nilai_post_test" id="turun" value="Turun" {{ isset($kriteriaResponden) && $kriteriaResponden?->nilai_post_test == 'Turun' ? 'checked' : (old('nilai_post_test') == 'Turun' ? 'checked' : '') }} required>
             <label class="form-check-label" for="turun">
@@ -34,7 +34,7 @@
                 </span>
             @enderror
         </div>
-	</div>
+    </div>
     <div class="col-md-6">
         <div class="form-group">
             <label for="nilai-pre-test-minimal">{{ __('Nilai Pre Test Minimal') }}</label>
