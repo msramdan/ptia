@@ -28,10 +28,7 @@
 
             {{-- Profile --}}
             <div class="row">
-                <div class="col-md-3">
-                    <h4>{{ __('Profile') }}</h4>
-                </div>
-                <div class="col-md-9">
+                <div class="col-md-6">
                     <div class="card">
                         <div class="card-body">
                             <form action="{{ route('user-profile-information.update') }}" method="POST"
@@ -41,7 +38,7 @@
 
                                 <div class="form-group">
                                     <label for="email">{{ __('E-mail Address') }}</label>
-                                    <input type="email" name="email"
+                                    <input type="email" name="email" readonly
                                         class="form-control @error('email', 'updateProfileInformation') is-invalid @enderror"
                                         id="email" placeholder="{{ __('E-mail Address') }}"
                                         value="{{ old('email') ?? auth()?->user()?->email }}" required>
@@ -55,7 +52,7 @@
 
                                 <div class="form-group">
                                     <label for="name">{{ __('Name') }}</label>
-                                    <input type="text" name="name"
+                                    <input type="text" name="name" readonly
                                         class="form-control  @error('name', 'updateProfileInformation') is-invalid @enderror"
                                         id="name" placeholder="{{ __('Name') }}"
                                         value="{{ old('name') ?? auth()?->user()?->name }}" required>
@@ -67,26 +64,17 @@
                                 </div>
 
                                 <div class="row">
-                                    <div class="col-md-1">
+                                    <div class="col-md-4">
                                         <div class="avatar avatar-xl mb-3">
                                             @if (!auth()?->user()?->avatar)
-                                                <img src="https://www.gravatar.com/avatar/{{ md5(strtolower(trim(auth()?->user()?->email))) }}&s=500"
-                                                    alt="Avatar">
+                                                <img class="img-thumbnail" src="https://www.gravatar.com/avatar/{{ md5(strtolower(trim(auth()?->user()?->email))) }}&s=500">
                                             @else
-                                                {{-- storage --}}
-                                                <img src="{{ asset('storage/uploads/avatars/' . auth()?->user()?->avatar) }}"
-                                                    alt="Avatar">
-
-                                                {{-- public --}}
-                                                {{-- <img src="{{ asset('/uploads/avatars/' . auth()?->user()?->avatar) }}" alt="Avatar" > --}}
-
-                                                {{-- s3 --}}
-                                                {{-- <img src="{{ \Illuminate\Support\Facades\Storage::disk('s3')->url('avatars/' . auth()?->user()?->avatar) }}" alt="Avatar" > --}}
+                                                <img class="img-thumbnail" src="{{ asset('storage/uploads/avatars/' . auth()?->user()?->avatar) }}" style="width: 150px;height: 150px;border-radius: 5%;">
                                             @endif
                                         </div>
                                     </div>
 
-                                    <div class="col-md-11">
+                                    <div class="col-md-8">
                                         <div class="form-group">
                                             <label for="avatar">{{ __('Avatar') }}</label>
                                             <input type="file" name="avatar"
@@ -103,59 +91,6 @@
                                 </div>
 
                                 <button type="submit" class="btn btn-primary">{{ __('Update Profile') }}</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {{-- Password --}}
-            <div class="row">
-                <div class="col-md-12">
-                    <hr class="mb-5">
-                </div>
-
-                <div class="col-md-3">
-                    <h4>{{ __('Change Password') }}</h4>
-                </div>
-
-                <div class="col-md-9">
-                    <div class="card">
-                        <div class="card-body">
-                            <form method="POST" action="{{ route('user-password.update') }}">
-                                @csrf
-                                @method('put')
-                                <div class="form-group">
-                                    <label for="password">{{ __('Current Password') }}</label>
-                                    <input type="password" name="current_password"
-                                        class="form-control @error('current_password', 'updatePassword') is-invalid @enderror"
-                                        id="password" placeholder="Current Password" required>
-                                    @error('current_password', 'updatePassword')
-                                        <span class="text-danger">
-                                            {{ $message }}
-                                        </span>
-                                    @enderror
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="password">{{ __('New Password') }}</label>
-                                    <input type="password" name="password"
-                                        class="form-control @error('password', 'updatePassword') is-invalid @enderror"
-                                        id="password" placeholder="New Password" required>
-                                    @error('password', 'updatePassword')
-                                        <span class="text-danger">
-                                            {{ $message }}
-                                        </span>
-                                    @enderror
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="password_confirmation">{{ __('Confirm Password') }}</label>
-                                    <input type="password" class="form-control" id="password_confirmation"
-                                        name="password_confirmation" placeholder="Confirm Password" required>
-                                </div>
-
-                                <button type="submit" class="btn btn-primary">{{ __('Change Password') }}</button>
                             </form>
                         </div>
                     </div>

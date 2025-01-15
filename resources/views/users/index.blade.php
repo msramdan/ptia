@@ -111,7 +111,7 @@
                     searchable: false,
                     render: function(data, type, full, meta) {
                         return `<div class="avatar">
-                            <img src="${data}" alt="avatar">
+                            <img src="${data}" alt="avatar" style="width: 50px;height: 50px;border-radius: 5%;">
                         </div>`;
                     }
                 },

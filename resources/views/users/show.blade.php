@@ -29,7 +29,7 @@
 
         <section class="section">
             <div class="row">
-                <div class="col-md-12">
+                <div class="col-md-6">
                     <div class="card">
                         <div class="card-body">
                             <div class="table-responsive">
@@ -56,11 +56,6 @@
                                     <tr>
                                         <td class="fw-bold">{{ __('Role') }}</td>
                                         <td>{{ $user->getRoleNames()->toArray() !== [] ? $user->getRoleNames()[0] : '-' }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="fw-bold">{{ __('Email verified at') }}</td>
-                                        <td>{{ $user->email_verified_at ? $user->email_verified_at->format('Y-m-d H:i:s') : '-' }}
-                                        </td>
                                     </tr>
                                     <tr>
                                         <td class="fw-bold">{{ __('Created at') }}</td>
