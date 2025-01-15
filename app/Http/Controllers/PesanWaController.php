@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\PesanWa;
-use App\Http\Requests\PesanWas\{StorePesanWaRequest, UpdatePesanWaRequest};
+use App\Http\Requests\PesanWas\{UpdatePesanWaRequest};
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\{RedirectResponse};
 use Illuminate\Routing\Controllers\{HasMiddleware, Middleware};

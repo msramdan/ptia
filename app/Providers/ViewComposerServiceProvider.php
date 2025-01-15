@@ -36,5 +36,12 @@ class ViewComposerServiceProvider extends ServiceProvider
             );
         });
 
+		View::composer(['bobot-aspeks.create', 'bobot-aspeks.edit'], function ($view) {
+            return $view->with(
+                'aspeks',
+                \App\Models\Aspek::select('id')->get()
+            );
+        });
+
 	}
 }

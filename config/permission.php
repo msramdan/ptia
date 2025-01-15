@@ -205,7 +205,9 @@ return [
                 'role & permission delete',
             ]
         ],
-        ['group' => 'aspeks', 'access' => ['aspek view', 'aspek create', 'aspek edit', 'aspek delete']],
-        ['group' => 'indikator persepsis', 'access' => ['indikator persepsi view']],
-  ['group' => 'pesan was', 'access' => ['pesan wa view', 'pesan wa create', 'pesan wa edit', 'pesan wa delete']], 
-		],];
+        ['group' => 'aspek', 'access' => ['aspek view', 'aspek create', 'aspek edit', 'aspek delete']],
+        ['group' => 'indikator persepsi', 'access' => ['indikator persepsi view']],
+        ['group' => 'pesan wa', 'access' => ['pesan wa view', 'pesan wa create', 'pesan wa edit', 'pesan wa delete']],
+        ['group' => 'bobot aspek', 'access' => ['bobot aspek view', 'bobot aspek edit']],
+    ],
+];

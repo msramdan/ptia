@@ -16,5 +16,5 @@ Route::middleware(['auth', 'web'])->group(function () {
 
 Route::resource('aspek', App\Http\Controllers\AspekController::class)->middleware('auth');
 Route::resource('indikator-persepsi', App\Http\Controllers\IndikatorPersepsiController::class)->middleware('auth');
-
 Route::resource('pesan-wa', App\Http\Controllers\PesanWaController::class)->middleware('auth');
+Route::resource('bobot-aspek', App\Http\Controllers\BobotAspekController::class)->middleware('auth');
