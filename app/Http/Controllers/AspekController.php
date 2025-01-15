@@ -8,6 +8,7 @@ use Illuminate\Contracts\View\View;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Http\{JsonResponse, RedirectResponse};
 use Illuminate\Routing\Controllers\{HasMiddleware, Middleware};
+use Illuminate\Support\Facades\DB;
 
 class AspekController extends Controller implements HasMiddleware
 {
@@ -58,9 +59,25 @@ class AspekController extends Controller implements HasMiddleware
      */
     public function store(StoreAspekRequest $request): RedirectResponse
     {
+        $aspek = Aspek::create($request->validated());
+        $indikatorPersepsi = [
+            ['indikator_persepsi' => '1', 'kriteria_persepsi' => 'Sangat tidak setuju'],
+            ['indikator_persepsi' => '2', 'kriteria_persepsi' => 'Tidak setuju'],
+            ['indikator_persepsi' => '3', 'kriteria_persepsi' => 'Setuju'],
+            ['indikator_persepsi' => '4', 'kriteria_persepsi' => 'Sangat setuju'],
+        ];
 
-        Aspek::create($request->validated());
-
+        $data = [];
+        foreach ($indikatorPersepsi as $indikator) {
+            $data[] = [
+                'aspek_id' => $aspek->id,
+                'indikator_persepsi' => $indikator['indikator_persepsi'],
+                'kriteria_persepsi' => $indikator['kriteria_persepsi'],
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+        }
+        DB::table('indikator_persepsi')->insert($data);
         return to_route('aspek.index')->with('success', __('The aspek was created successfully.'));
     }
 
