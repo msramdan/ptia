@@ -23,15 +23,17 @@ class KriteriaRespondenController extends Controller implements HasMiddleware
 
     public function index(): View
     {
-        $kriteriaResponden = KriteriaResponden::findOrFail(1)->first();
+        $kriteriaResponden = KriteriaResponden::findOrFail(1);
+        $kriteriaResponden->nilai_post_test = json_decode($kriteriaResponden->nilai_post_test, true);
         return view('kriteria-responden.edit', compact('kriteriaResponden'));
     }
 
-
     public function update(UpdateKriteriaRespondenRequest $request, KriteriaResponden $kriteriaResponden): RedirectResponse
     {
+        $data = $request->validated();
+        $data['nilai_post_test'] = $data['nilai_post_test'] ?? [];
 
-        $kriteriaResponden->update($request->validated());
+        $kriteriaResponden->update($data);
 
         return to_route('kriteria-responden.index')->with('success', __('The kriteria responden was updated successfully.'));
     }

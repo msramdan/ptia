@@ -13,10 +13,10 @@ return new class extends Migration
     {
         Schema::create('kriteria_responden', function (Blueprint $table) {
             $table->id();
-            $table->enum('nilai_post_test', ['Turun', 'Tetap', 'Naik']);
-			$table->float('nilai_pre_test_minimal');
-			$table->float('nilai_post_test_minimal');
-			$table->float('nilai_kenaikan_pre_post');
+            $table->json('nilai_post_test'); // Mengganti enum menjadi JSON untuk mendukung banyak nilai
+            $table->float('nilai_pre_test_minimal');
+            $table->float('nilai_post_test_minimal');
+            $table->float('nilai_kenaikan_pre_post');
             $table->timestamps();
         });
     }
