@@ -1,4 +1,4 @@
-<table class="table table-bordered table-striped table-xs">
+<table class="table table-bordered table-xs">
     <tbody>
         <tr style="background: #234673">
             <th width="5%" colspan="2"></th>

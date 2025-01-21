@@ -68,7 +68,7 @@
                                 </table>
                             </div>
 
-                            <a href="{{ url()->previous() }}" class="btn btn-secondary">{{ __('Back') }}</a>
+                            <a href="{{ url()->previous() }}" class="btn btn-secondary"><i class="fa fa-arrow-left" aria-hidden="true"></i> {{ __('Back') }}</a>
                         </div>
                     </div>
                 </div>

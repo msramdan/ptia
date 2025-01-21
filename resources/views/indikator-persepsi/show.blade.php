@@ -58,7 +58,7 @@
                             </div>
 
                             <a href="{{ route('indikator-persepsi.index') }}"
-                                class="btn btn-secondary">{{ __('Back') }}</a>
+                                class="btn btn-secondary"><i class="fa fa-arrow-left" aria-hidden="true"></i> {{ __('Back') }}</a>
                         </div>
                     </div>
                 </div>

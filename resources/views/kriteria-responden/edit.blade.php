@@ -34,7 +34,7 @@
                                 @method('PUT')
 
                                 @include('kriteria-responden.include.form')
-                                <button type="submit" class="btn btn-primary">{{ __('Update') }}</button>
+                                <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> {{ __('Update') }}</button>
                             </form>
                         </div>
                     </div>
