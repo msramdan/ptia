@@ -110,82 +110,87 @@ return [
      * This code below always changes when you use a generator, and maybe you must format the code.
      */
     "sidebars" => [
-    [
-        'header' => 'Master',
-        'permissions' => [
-            'aspek view',
-            'indikator persepsi view',
-            'pesan wa view',
-            'bobot aspek view',
-            'kriteria responden view'
+        [
+            'header' => 'Master',
+            'permissions' => [
+                'aspek view',
+                'indikator persepsi view',
+                'pesan wa view',
+                'bobot aspek view',
+                'kriteria responden view'
+            ],
+            'menus' => [
+                [
+                    'title' => 'Master Data',
+                    'icon' => '<i class="bi bi-collection-fill"></i>',
+                    'route' => [
+                        'aspek*',
+                        'indikator-persepsi*',
+                        'bobot-aspek*',
+                        'kriteria-responden*',
+                        'pesan-wa*'
+                    ],
+                    'permissions' => [
+                        'aspek view',
+                        'indikator persepsi view',
+                        'pesan wa view',
+                        'bobot aspek view',
+                        'kriteria responden view'
+                    ],
+                    'submenus' => [
+                        [
+                            'title' => 'Aspek',
+                            'route' => '/aspek',
+                            'permission' => 'aspek view'
+                        ],
+                        [
+                            'title' => 'Indikator Persepsi',
+                            'route' => '/indikator-persepsi',
+                            'permission' => 'indikator persepsi view'
+                        ],
+                        [
+                            'title' => 'Bobot Aspek',
+                            'route' => '/bobot-aspek',
+                            'permission' => 'bobot aspek view'
+                        ],
+                        [
+                            'title' => 'Kriteria Responden',
+                            'route' => '/kriteria-responden',
+                            'permission' => 'kriteria responden view'
+                        ],
+                        [
+                            'title' => 'Pesan Wa',
+                            'route' => '/pesan-wa',
+                            'permission' => 'pesan wa view'
+                        ],
+                    ]
+                ]
+            ]
         ],
-        'menus' => [
-            [
-                'title' => 'Master Data',
-                'icon' => '<i class="bi bi-collection-fill"></i>',
-                'route' => null,
-                'permission' => null,
-                'permissions' => [
-                    'aspek view',
-                    'indikator persepsi view',
-                    'pesan wa view',
-                    'bobot aspek view',
-                    'kriteria responden view'
+        [
+            'header' => 'Users',
+            'permissions' => [
+                'user view',
+                'role & permission view'
+            ],
+            'menus' => [
+                [
+                    'title' => 'Users',
+                    'icon' => '<i class="bi bi-people-fill"></i>',
+                    'route' => '/users',
+                    'permission' => 'user view',
+                    'permissions' => [],
+                    'submenus' => []
                 ],
-                'submenus' => [
-                    [
-                        'title' => 'Aspek',
-                        'route' => '/aspek',
-                        'permission' => 'aspek view'
-                    ],
-                    [
-                        'title' => 'Indikator Persepsi',
-                        'route' => '/indikator-persepsi',
-                        'permission' => 'indikator persepsi view'
-                    ],
-                    [
-                        'title' => 'Bobot Aspek',
-                        'route' => '/bobot-aspek',
-                        'permission' => 'bobot aspek view'
-                    ],
-                    [
-                        'title' => 'Kriteria Responden',
-                        'route' => '/kriteria-responden',
-                        'permission' => 'kriteria responden view'
-                    ],
-                    [
-                        'title' => 'Pesan Wa',
-                        'route' => '/pesan-wa',
-                        'permission' => 'pesan wa view'
-                    ],
+                [
+                    'title' => 'Roles & permissions',
+                    'icon' => '<i class="bi bi-person-check-fill"></i>',
+                    'route' => '/roles',
+                    'permission' => 'role & permission view',
+                    'permissions' => [],
+                    'submenus' => []
                 ]
             ]
         ]
-    ],
-    [
-        'header' => 'Users',
-        'permissions' => [
-            'user view',
-            'role & permission view'
-        ],
-        'menus' => [
-            [
-                'title' => 'Users',
-                'icon' => '<i class="bi bi-people-fill"></i>',
-                'route' => '/users',
-                'permission' => 'user view',
-                'permissions' => [],
-                'submenus' => []
-            ],
-            [
-                'title' => 'Roles & permissions',
-                'icon' => '<i class="bi bi-person-check-fill"></i>',
-                'route' => '/roles',
-                'permission' => 'role & permission view',
-                'permissions' => [],
-                'submenus' => []
-            ]
-        ]
     ]
-]
 ];

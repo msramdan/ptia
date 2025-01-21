@@ -28,12 +28,17 @@
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/"
-        }
+        },
+        "files": [
+            "app/Helpers/GeneralHelper.php"
+        ]
+
     },
     "autoload-dev": {
         "psr-4": {
             "Tests\\": "tests/"
         }
+
     },
     "scripts": {
         "post-autoload-dump": [

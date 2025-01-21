@@ -79,7 +79,7 @@
                                                 {!! $menu['icon'] !!}
                                                 <span>{{ __($menu['title']) }}</span>
                                             </a>
-                                            <ul class="submenu">
+                                            <ul class="submenu {{ is_active_submenu($menu['route']) }}">
                                                 @canany($menu['permissions'])
                                                     @foreach ($menu['submenus'] as $submenu)
                                                         @can($submenu['permission'])

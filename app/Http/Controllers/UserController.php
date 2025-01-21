@@ -45,7 +45,7 @@ class UserController extends Controller implements HasMiddleware
                 ->addColumn('role', fn($row) => $row->getRoleNames()->toArray() !== [] ? $row->getRoleNames()[0] : '-')
                 ->addColumn('avatar', function ($user) {
                     if (!$user->avatar) {
-                        return 'https://via.placeholder.com/350?text=No+Image+Avaiable';
+                        return 'https://www.gravatar.com/avatar/' . md5(strtolower(trim($user->email))) . '?s=500';
                     }
                     return asset('storage/uploads/avatars/' . $user->avatar);
                 })
