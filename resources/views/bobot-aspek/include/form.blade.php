@@ -2,13 +2,13 @@
     <tbody>
         <tr style="background: #234673">
             <th width="5%" colspan="3"></th>
-            <th width="7%" style="text-align:center;color:#fff;">Bobot</th>
-            <th width="7%" style="text-align:center;color:#fff;">Aksi</th>
+            <th width="15%" style="text-align:center;color:#fff;">Bobot</th>
         </tr>
         <tr style="background: #1a375e;color:#fff;">
             <th width="5%">A</th>
             <th colspan="2">LEVEL 3 (Data Primer)</th>
-            <th colspan="2" id="bobot_total_3" style="background-color: green;"><span style="color:#000;">100</span>
+            <th colspan="2" id="bobot_total_3" style="background-color: green;">
+                <span style="color:#fff;">100</span>
             </th>
         </tr>
 
@@ -21,43 +21,49 @@
             <th></th>
             <th width="5%">a.</th>
             <th>Kemampuan Membagikan Keilmuan</th>
-            <th>7.62%</th>
-            <th><a href="javascript:" onclick="btn_modal_edit(19,272,1,3)" data-toggle="tooltip" data-placement="bottom"
-                    title="" class="btn btn-primary btn-sm" data-original-title="Edit"><i
-                        class="fa fa-pencil-alt"></i></a></th>
+            <th>
+                <div class="input-group mb-3">
+                    <input type="number" step="0.01" class="form-control form-control-sm" style="width: 70px;" value="7.62" />
+                    <span class="input-group-text">%</span>
+                </div>
+            </th>
         </tr>
 
         <tr>
             <th></th>
             <th width="5%">b.</th>
             <th>Kemampuan Implementasi Keilmuan</th>
-            <th>24.41%</th>
-            <th><a href="javascript:" onclick="btn_modal_edit(20,272,1,3)" data-toggle="tooltip" data-placement="bottom"
-                    title="" class="btn btn-primary btn-sm" data-original-title="Edit"><i
-                        class="fa fa-pencil-alt"></i></a></th>
+            <th>
+                <div class="input-group mb-3">
+                    <input type="number" step="0.01" class="form-control form-control-sm" style="width: 70px;" value="24.41" />
+                    <span class="input-group-text">%</span>
+                </div>
+            </th>
         </tr>
 
         <tr>
             <th></th>
             <th width="5%">c.</th>
             <th>Motivasi</th>
-            <th>8.94%</th>
-            <th><a href="javascript:" onclick="btn_modal_edit(21,272,1,3)" data-toggle="tooltip" data-placement="bottom"
-                    title="" class="btn btn-primary btn-sm" data-original-title="Edit"><i
-                        class="fa fa-pencil-alt"></i></a></th>
+            <th>
+                <div class="input-group mb-3">
+                    <input type="number" step="0.01" class="form-control form-control-sm" style="width: 70px;" value="8.94" />
+                    <span class="input-group-text">%</span>
+                </div>
+            </th>
         </tr>
 
         <tr>
             <th></th>
             <th width="5%">d.</th>
             <th>Kepercayaan Diri</th>
-            <th>10.48%</th>
-            <th><a href="javascript:" onclick="btn_modal_edit(22,272,1,3)" data-toggle="tooltip" data-placement="bottom"
-                    title="" class="btn btn-primary btn-sm" data-original-title="Edit"><i
-                        class="fa fa-pencil-alt"></i></a></th>
+            <th>
+                <div class="input-group mb-3">
+                    <input type="number" step="0.01" class="form-control form-control-sm" style="width: 70px;" value="10.48" />
+                    <span class="input-group-text">%</span>
+                </div>
+            </th>
         </tr>
-
-
 
         <tr style="background: #d3d3d3;">
             <th colspan="3">2. Atasan Langsung</th>
@@ -68,49 +74,55 @@
             <th></th>
             <th width="5%">a.</th>
             <th>Kemampuan Membagikan Keilmuan</th>
-            <th>7.18%</th>
-            <th><a href="javascript:" onclick="btn_modal_edit(19,272,2,3)" data-toggle="tooltip" data-placement="bottom"
-                    title="" class="btn btn-primary btn-sm" data-original-title="Edit"><i
-                        class="fa fa-pencil-alt"></i></a></th>
+            <th>
+                <div class="input-group mb-3">
+                    <input type="number" step="0.01" class="form-control form-control-sm" style="width: 70px;" value="7.18" />
+                    <span class="input-group-text">%</span>
+                </div>
+            </th>
         </tr>
 
         <tr>
             <th></th>
             <th width="5%">b.</th>
             <th>Kemampuan Implementasi Keilmuan</th>
-            <th>23.04%</th>
-            <th><a href="javascript:" onclick="btn_modal_edit(20,272,2,3)" data-toggle="tooltip" data-placement="bottom"
-                    title="" class="btn btn-primary btn-sm" data-original-title="Edit"><i
-                        class="fa fa-pencil-alt"></i></a></th>
+            <th>
+                <div class="input-group mb-3">
+                    <input type="number" step="0.01" class="form-control form-control-sm" style="width: 70px;" value="23.04" />
+                    <span class="input-group-text">%</span>
+                </div>
+            </th>
         </tr>
 
         <tr>
             <th></th>
             <th width="5%">c.</th>
             <th>Motivasi</th>
-            <th>8.44%</th>
-            <th><a href="javascript:" onclick="btn_modal_edit(21,272,2,3)" data-toggle="tooltip" data-placement="bottom"
-                    title="" class="btn btn-primary btn-sm" data-original-title="Edit"><i
-                        class="fa fa-pencil-alt"></i></a></th>
+            <th>
+                <div class="input-group mb-3">
+                    <input type="number" step="0.01" class="form-control form-control-sm" style="width: 70px;" value="8.44" />
+                    <span class="input-group-text">%</span>
+                </div>
+            </th>
         </tr>
 
         <tr>
             <th></th>
             <th width="5%">d.</th>
             <th>Kepercayaan Diri</th>
-            <th>9.89%</th>
-            <th><a href="javascript:" onclick="btn_modal_edit(22,272,2,3)" data-toggle="tooltip" data-placement="bottom"
-                    title="" class="btn btn-primary btn-sm" data-original-title="Edit"><i
-                        class="fa fa-pencil-alt"></i></a></th>
+            <th>
+                <div class="input-group mb-3">
+                    <input type="number" step="0.01" class="form-control form-control-sm" style="width: 70px;" value="9.89" />
+                    <span class="input-group-text">%</span>
+                </div>
+            </th>
         </tr>
-
-
 
         <tr style="background: #1a375e">
             <th style="color:#fff;">B</th>
             <th colspan="2" style="color:#fff;">LEVEL 4 (Data Primer &amp; Sekunder)</th>
-            <th colspan="2" id="bobot_total_4" style="background-color: green;"><span
-                    style="color:#000;">100</span>
+            <th colspan="2" id="bobot_total_4" style="background-color: green;">
+                <span style="color:#fff;">100</span>
             </th>
         </tr>
         <tr style="background: #ebecbe;">
@@ -126,13 +138,13 @@
             <th></th>
             <th width="5%">e.</th>
             <th>Hasil Pelatihan</th>
-            <th>37.95%</th>
-            <th><a href="javascript:" onclick="btn_modal_edit(23,272,1,4)" data-toggle="tooltip"
-                    data-placement="bottom" title="" class="btn btn-primary btn-sm"
-                    data-original-title="Edit"><i class="fa fa-pencil-alt"></i></a></th>
+            <th>
+                <div class="input-group mb-3">
+                    <input type="number" step="0.01" class="form-control form-control-sm" style="width: 70px;" value="37.95" />
+                    <span class="input-group-text">%</span>
+                </div>
+            </th>
         </tr>
-
-
 
         <tr style="background: #d3d3d3;">
             <th colspan="3">2. Atasan Langsung</th>
@@ -142,12 +154,13 @@
             <th></th>
             <th width="5%">e.</th>
             <th>Hasil Pelatihan</th>
-            <th>35.82%</th>
-            <th><a href="javascript:" onclick="btn_modal_edit(23,272,2,4)" data-toggle="tooltip"
-                    data-placement="bottom" title="" class="btn btn-primary btn-sm"
-                    data-original-title="Edit"><i class="fa fa-pencil-alt"></i></a></th>
+            <th>
+                <div class="input-group mb-3">
+                    <input type="number" step="0.01" class="form-control form-control-sm" style="width: 70px;" value="35.82" />
+                    <span class="input-group-text">%</span>
+                </div>
+            </th>
         </tr>
-
 
         <tr style="background: #ebecbe;">
             <th colspan="3">Data Sekunder: Capaian Kinerja</th>
@@ -158,12 +171,12 @@
             <th></th>
             <th>a.</th>
             <th>Hasil Pelatihan</th>
-            <th>26.23%</th>
-            <th><a href="javascript:" onclick="btn_modal_edit(999,272,2,4)" data-toggle="tooltip"
-                    data-placement="bottom" title="" class="btn btn-primary btn-sm"
-                    data-original-title="Edit"><i class="fa fa-pencil-alt"></i></a></th>
+            <th>
+                <div class="input-group mb-3">
+                    <input type="number" step="0.01" class="form-control form-control-sm" style="width: 70px;" value="26.23" />
+                    <span class="input-group-text">%</span>
+                </div>
+            </th>
         </tr>
-
-
     </tbody>
 </table>
