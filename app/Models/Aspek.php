@@ -34,4 +34,5 @@ class Aspek extends Model
     }
 
 
+
 }

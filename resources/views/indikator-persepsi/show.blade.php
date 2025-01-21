@@ -35,17 +35,17 @@
                             <div class="table-responsive">
                                 <table class="table table-hover table-striped">
                                     <tr>
-                    <td class="fw-bold">{{ __('Aspek') }}</td>
-                    <td>{{ $indikatorPersepsi->aspek ? $indikatorPersepsi->aspek->level : '' }}</td>
-                </tr>
-<tr>
-                    <td class="fw-bold">{{ __('Indikator Persepsi') }}</td>
-                    <td>{{ $indikatorPersepsi->indikator_persepsi }}</td>
-                </tr>
-<tr>
-                    <td class="fw-bold">{{ __('Kriteria Persepsi') }}</td>
-                    <td>{{ $indikatorPersepsi->kriteria_persepsi }}</td>
-                </tr>
+                                        <td class="fw-bold">{{ __('Aspek') }}</td>
+                                        <td>{{ $indikatorPersepsi->aspek ? $indikatorPersepsi->aspek->aspek : '' }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold">{{ __('Indikator Persepsi') }}</td>
+                                        <td>{{ $indikatorPersepsi->indikator_persepsi }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold">{{ __('Kriteria Persepsi') }}</td>
+                                        <td>{{ $indikatorPersepsi->kriteria_persepsi }}</td>
+                                    </tr>
                                     <tr>
                                         <td class="fw-bold">{{ __('Created at') }}</td>
                                         <td>{{ $indikatorPersepsi->created_at->format('Y-m-d H:i:s') }}</td>
@@ -57,7 +57,8 @@
                                 </table>
                             </div>
 
-                            <a href="{{ route('indikator-persepsi.index') }}" class="btn btn-secondary">{{ __('Back') }}</a>
+                            <a href="{{ route('indikator-persepsi.index') }}"
+                                class="btn btn-secondary">{{ __('Back') }}</a>
                         </div>
                     </div>
                 </div>

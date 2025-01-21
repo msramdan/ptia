@@ -77,7 +77,7 @@ class IndikatorPersepsiController extends Controller implements HasMiddleware
      */
     public function show(IndikatorPersepsi $indikatorPersepsi): View
     {
-        $indikatorPersepsi->load(['aspek:id,level']);
+        $indikatorPersepsi->load(['aspek:id,aspek']);
 
         return view('indikator-persepsi.show', compact('indikatorPersepsi'));
     }
