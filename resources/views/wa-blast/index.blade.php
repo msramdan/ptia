@@ -162,21 +162,18 @@
 
     <script>
         $(document).on('click', '.set-aktif-btn', function() {
-            var sessionId = $(this).data('id'); // Get session ID from the data-id attribute
-
-            // Show SweetAlert confirmation dialog in Bahasa Indonesia
+            var sessionId = $(this).data('id');
             Swal.fire({
-                title: 'Apakah Anda yakin?',
-                text: "Apakah Anda ingin mengaktifkan sesi ini?",
+                title: 'Are you sure?',
+                text: "Do you want to set this session as Aktif?",
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonText: 'Ya, Aktifkan!',
-                cancelButtonText: 'Tidak, Batal'
+                confirmButtonText: 'Yes, set Aktif!',
+                cancelButtonText: 'No, cancel'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // If user confirmed, call the AJAX request
                     $.ajax({
-                        url: '/update-session-status', // Your controller route
+                        url: '/update-session-status',
                         type: 'POST',
                         data: {
                             _token: '{{ csrf_token() }}',
@@ -187,11 +184,10 @@
                             if (response.success) {
                                 $('tr[data-id="' + sessionId + '"]').find('.status-column')
                                     .text('Aktif');
-                                Swal.fire('Diperbarui!', 'Sesi ini telah diaktifkan.',
-                                    'success');
+                                Swal.fire('Updated!', 'The session is now active.', 'success');
                                 location.reload();
                             } else {
-                                Swal.fire('Gagal!', 'Terjadi masalah saat memperbarui sesi.',
+                                Swal.fire('Error!', 'There was an issue updating the session.',
                                     'error');
                             }
                         }

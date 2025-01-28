@@ -29,7 +29,7 @@ class SingleSenderController extends Controller implements HasMiddleware
         if ($activeSession) {
             return view('single-sender.create', ['activeSession' => $activeSession]);
         } else {
-            return to_route('wa-blast.index')->with('error', __('tidak ada sesi WhatsApp yang aktif'));
+            return to_route('wa-blast.index')->with('error', __('No active WhatsApp session found.'));
         }
     }
 
