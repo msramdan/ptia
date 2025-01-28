@@ -34,7 +34,7 @@
                 {{-- <div class="col-md-12">
                     <div class="card">
                         <div class="card-body">
-                            
+
                         </div>
                     </div>
                 </div> --}}
@@ -48,7 +48,9 @@
                                         <tr>
                                             <th>{{ __('Session Name') }}</th>
                                             <th>{{ __('Whatsapp Number') }}</th>
+                                            <th>{{ __('Api Key') }}</th>
                                             <th>{{ __('Status') }}</th>
+                                            <th>{{ __('Is Aktif') }}</th>
                                             <th>{{ __('Action') }}</th>
                                         </tr>
                                     </thead>
@@ -101,6 +103,7 @@
 @push('js')
     <script type="text/javascript" src="https://cdn.datatables.net/v/bs5/dt-1.12.0/datatables.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         $(document).ready(function() {
             @if (session('success'))
@@ -136,8 +139,16 @@
                     name: 'whatsapp_number',
                 },
                 {
+                    data: 'api_key',
+                    name: 'api_key',
+                },
+                {
                     data: 'status',
                     name: 'status',
+                },
+                {
+                    data: 'is_aktif',
+                    name: 'is_aktif',
                 },
                 {
                     data: 'action',
@@ -146,6 +157,47 @@
                     searchable: false
                 }
             ],
+        });
+    </script>
+
+    <script>
+        $(document).on('click', '.set-aktif-btn', function() {
+            var sessionId = $(this).data('id'); // Get session ID from the data-id attribute
+
+            // Show SweetAlert confirmation dialog in Bahasa Indonesia
+            Swal.fire({
+                title: 'Apakah Anda yakin?',
+                text: "Apakah Anda ingin mengaktifkan sesi ini?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Aktifkan!',
+                cancelButtonText: 'Tidak, Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // If user confirmed, call the AJAX request
+                    $.ajax({
+                        url: '/update-session-status', // Your controller route
+                        type: 'POST',
+                        data: {
+                            _token: '{{ csrf_token() }}',
+                            id: sessionId,
+                            is_aktif: 'Yes'
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                $('tr[data-id="' + sessionId + '"]').find('.status-column')
+                                    .text('Aktif');
+                                Swal.fire('Diperbarui!', 'Sesi ini telah diaktifkan.',
+                                    'success');
+                                location.reload();
+                            } else {
+                                Swal.fire('Gagal!', 'Terjadi masalah saat memperbarui sesi.',
+                                    'error');
+                            }
+                        }
+                    });
+                }
+            });
         });
     </script>
 @endpush

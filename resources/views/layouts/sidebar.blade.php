@@ -14,16 +14,8 @@
         </div>
         <div class="sidebar-menu">
             <ul class="menu">
-                {{-- <li class="sidebar-item{{ request()->is('/') || request()->is('dashboard') ? ' active' : '' }}">
-                    
-                </li> --}}
-
                 <div id="server-status"></div>
-
-
-
-
-
+                <hr>
                 @auth
                     <li class="sidebar-item{{ request()->is('/') || request()->is('dashboard') ? ' active' : '' }}">
                         <a class="sidebar-link" href="/">

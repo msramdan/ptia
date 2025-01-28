@@ -18,7 +18,8 @@ return new class extends Migration
             $table->enum('status', ['CONNECTED', 'STOPPED']);
             $table->text('webhook')->nullable();
             $table->string('api_key');
-            $table->foreignId('user_id')->nullable()->constrained()->onDelete('set null'); // Menambahkan user_id
+            $table->foreignId('user_id')->nullable()->constrained()->onDelete('set null');
+            $table->enum('is_aktif', ['Yes', 'No'])->default('No');
             $table->timestamps();
         });
     }

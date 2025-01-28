@@ -8,6 +8,7 @@ use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Http\{JsonResponse, RedirectResponse};
 use Illuminate\Routing\Controllers\{HasMiddleware, Middleware};
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class WaBlastController extends Controller implements HasMiddleware
 {
@@ -77,4 +78,38 @@ class WaBlastController extends Controller implements HasMiddleware
             return to_route('wa-blast.index')->with('error', __("The wa blast can't be deleted because it's related to another table."));
         }
     }
+
+    public function updateSessionStatus(Request $request)
+    {
+        $request->validate([
+            'id' => 'required|exists:sessions,id',
+            'is_aktif' => 'required|in:Yes,No',
+        ]);
+
+        DB::beginTransaction();
+
+        try {
+            if ($request->is_aktif == 'Yes') {
+                DB::table('sessions')->update(['is_aktif' => 'No']);
+            }
+
+            $updated = DB::table('sessions')
+                         ->where('id', $request->id)
+                         ->update(['is_aktif' => $request->is_aktif]);
+
+            DB::commit();
+
+            if ($updated) {
+                return response()->json(['success' => true]);
+            }
+
+            return response()->json(['success' => false, 'message' => 'Session not found or not updated.'], 404);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => 'An error occurred while updating the session.'], 500);
+        }
+    }
+
+
 }
