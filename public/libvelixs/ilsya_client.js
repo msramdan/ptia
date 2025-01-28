@@ -14,13 +14,11 @@ class IlsyaClient {
 
     init() {
         if (this.device_status == 'CONNECTED') {
-            console.log('auto start');
             this.startSession()
         }
 
         // emit from server
         this.socket.on('servervelixs', (res) => {
-            console.log(res.code_message);
             if (res.session_id == this.session) {
                 switch (res.code_message) {
                     case 'qr200':

@@ -117,7 +117,6 @@
 @endsection
 
 @push('css')
-    {{-- meta device --}}
     <meta name="device_id" content="{{ $waBlast->id }}">
     <meta name="device_status" content="{{ $waBlast->status }}">
 @endpush
@@ -127,6 +126,7 @@
 
     <script>
         var ilsya_client = new IlsyaClient(socket);
+
         ilsya_client.init();
 
         $(document).on('click', ".startbutton", function(e) {
