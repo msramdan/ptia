@@ -57,6 +57,7 @@ class WaBlastController extends Controller implements HasMiddleware
             'session_name' => $validated['session_name'],
             'status' => 'STOPPED',
             'api_key' => $apiKey,
+            'user_id' => auth()->id(),
         ]);
         return to_route('wa-blast.index')->with('success', __('The wa blast was created successfully.'));
     }

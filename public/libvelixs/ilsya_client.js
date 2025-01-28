@@ -20,6 +20,7 @@ class IlsyaClient {
 
         // emit from server
         this.socket.on('servervelixs', (res) => {
+            console.log(res.code_message);
             if (res.session_id == this.session) {
                 switch (res.code_message) {
                     case 'qr200':
@@ -49,11 +50,6 @@ class IlsyaClient {
                         }, 3000);
                         break
                     default:
-                        // if (res.message) {
-                        //     msg = res.message
-                        // } else {
-                        //     msg = 'Something went wrong'
-                        // }
                         this.content.html(`<div class="d-block"><div class="d-block"><div class="text-muted" id="status-waiting">....</div></div></div><div class="d-block"><div class="text-center" style="position: absolute; right: 0; bottom: 30px; left: 0;"><button class="btn btn-primary refresh-page">REFRESH PAGE</button></div></div>`)
                         break
                 }

@@ -115,3 +115,45 @@
         </section>
     </div>
 @endsection
+
+@push('css')
+    {{-- meta device --}}
+    <meta name="device_id" content="{{ $waBlast->id }}">
+    <meta name="device_status" content="{{ $waBlast->status }}">
+@endpush
+
+@push('js')
+    <script src=" {{ asset('libvelixs') }}/ilsya_client.js"></script>
+
+    <script>
+        var ilsya_client = new IlsyaClient(socket);
+        ilsya_client.init();
+
+        $(document).on('click', ".startbutton", function(e) {
+            e.preventDefault()
+            $(this).attr('disabled', true)
+            $("#status-waiting").html('WAITING FOR SERVER RESPONSE');
+            $(this).html('<span class="spinner-grow me-1" role="status" aria-hidden="true"></span>LOADING... ')
+            ilsya_client.startSession()
+        });
+
+        $(document).on('click', ".refresh-page", function(e) {
+            e.preventDefault()
+            location.reload();
+        });
+
+        $(document).on('click', ".is-logout", function(e) {
+            e.preventDefault()
+            $(this).attr('disabled', true)
+            $("#status-waiting").html('WAITING FOR SERVER RESPONSE');
+            $(this).html('<span class="spinner-grow me-1" role="status" aria-hidden="true"></span>Loading... ')
+            ilsya_client.logout()
+
+            setTimeout(function() {
+                $(".is-logout").attr('disabled', false)
+                $(".is-logout").html('Log out')
+            }, 8000);
+        });
+    </script>
+@endpush
+
