@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Contracts\View\View;
-use Illuminate\Http\{RedirectResponse};
 use Illuminate\Routing\Controllers\{HasMiddleware, Middleware};
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 
 class SingleSenderController extends Controller implements HasMiddleware
 {
@@ -33,9 +35,27 @@ class SingleSenderController extends Controller implements HasMiddleware
         }
     }
 
-    public function store($request): RedirectResponse
+    public function store(Request $request): RedirectResponse
     {
+        $baseUrl = env('BASE_NODE', 'http://192.168.10.36:3301');
+        $payload = [
+            'api_key' =>  $request->api_key,
+            'receiver' => $request->no_wa_tujuan,
+            'data' => [
+                'message' => $request->isi_pesan,
+            ],
+        ];
 
-        return to_route('single-sender.index')->with('success', __('The single sender was created successfully.'));
+        try {
+            $response = Http::post("{$baseUrl}/api/send-message", $payload);
+
+            if ($response->successful()) {
+                return to_route('single-sender.index')->with('success', __('The single sender was sent successfully.'));
+            } else {
+                return to_route('single-sender.index')->with('error', __('The message could not be sent.'));
+            }
+        } catch (\Exception $e) {
+            return to_route('single-sender.index')->with('error', __('An error occurred while sending the message.'));
+        }
     }
 }

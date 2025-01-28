@@ -38,7 +38,12 @@
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="session_name">{{ __('Session Name') }}</label>
-                                            <input type="text" name="session_name" id="session_name" class="form-control @error('session_name') is-invalid @enderror" value="{{$activeSession->session_name}}" readonly required />
+                                            <input type="hidden" name="api_key" id="api_key"
+                                                class="form-control @error('api_key') is-invalid @enderror"
+                                                value="{{ $activeSession->api_key }}" readonly required />
+                                            <input type="text" name="session_name" id="session_name"
+                                                class="form-control @error('session_name') is-invalid @enderror"
+                                                value="{{ $activeSession->session_name }}" readonly required />
                                             @error('session_name')
                                                 <span class="text-danger">
                                                     {{ $message }}
@@ -50,7 +55,9 @@
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="no_wa_pengirim">{{ __('No Wa Pengirim') }}</label>
-                                            <input type="number" name="no_wa_pengirim" id="no_wa_pengirim" class="form-control @error('no_wa_pengirim') is-invalid @enderror" value="{{$activeSession->session_name}}" readonly required />
+                                            <input type="text" name="no_wa_pengirim" id="no_wa_pengirim"
+                                                class="form-control @error('no_wa_pengirim') is-invalid @enderror"
+                                                value="{{ $activeSession->whatsapp_number }}" readonly required />
                                             @error('no_wa_pengirim')
                                                 <span class="text-danger">
                                                     {{ $message }}
@@ -61,7 +68,10 @@
                                     <div class="col-md-12">
                                         <div class="form-group">
                                             <label for="no-wa-tujuan">{{ __('No Wa Tujuan') }}</label>
-                                            <input type="number" name="no_wa_tujuan" id="no-wa-tujuan" class="form-control @error('no_wa_tujuan') is-invalid @enderror" value="{{ isset($singleSender) ? $singleSender->no_wa_tujuan : old('no_wa_tujuan') }}" placeholder="ex: 62857xxxxxx" required />
+                                            <input type="number" name="no_wa_tujuan" id="no-wa-tujuan"
+                                                class="form-control @error('no_wa_tujuan') is-invalid @enderror"
+                                                value="{{ isset($singleSender) ? $singleSender->no_wa_tujuan : old('no_wa_tujuan') }}"
+                                                placeholder="ex: 62857xxxxxx" required />
                                             @error('no_wa_tujuan')
                                                 <span class="text-danger">
                                                     {{ $message }}
@@ -72,7 +82,8 @@
                                     <div class="col-md-12">
                                         <div class="form-group">
                                             <label for="isi-pesan">{{ __('Isi Pesan') }}</label>
-                                            <textarea name="isi_pesan" rows="10" id="isi-pesan" class="form-control @error('isi_pesan') is-invalid @enderror" placeholder="{{ __('Isi Pesan') }}" required>{{ isset($singleSender) ? $singleSender->isi_pesan : old('isi_pesan') }}</textarea>
+                                            <textarea name="isi_pesan" rows="10" id="isi-pesan" class="form-control @error('isi_pesan') is-invalid @enderror"
+                                                placeholder="{{ __('Isi Pesan') }}" required>{{ isset($singleSender) ? $singleSender->isi_pesan : old('isi_pesan') }}</textarea>
                                             @error('isi_pesan')
                                                 <span class="text-danger">
                                                     {{ $message }}
@@ -81,7 +92,8 @@
                                         </div>
                                     </div>
                                 </div>
-                                <button type="submit" class="btn btn-primary"><i class="fa fa-paper-plane" aria-hidden="true"></i> {{ __('Kirim') }}</button>
+                                <button type="submit" class="btn btn-primary"><i class="fa fa-paper-plane"
+                                        aria-hidden="true"></i> {{ __('Kirim') }}</button>
                             </form>
                         </div>
                     </div>
@@ -90,3 +102,31 @@
         </section>
     </div>
 @endsection
+
+@push('css')
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+@endpush
+@push('js')
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            @if (session('success'))
+                toastr.success("{{ session('success') }}", "Success", {
+                    closeButton: true,
+                    progressBar: true,
+                    positionClass: "toast-top-right",
+                    timeOut: 5000,
+                });
+            @endif
+
+            @if (session('error'))
+                toastr.error("{{ session('error') }}", "Error", {
+                    closeButton: true,
+                    progressBar: true,
+                    positionClass: "toast-top-right",
+                    timeOut: 5000,
+                });
+            @endif
+        });
+    </script>
+@endpush
