@@ -181,7 +181,7 @@ return [
                     ],
                     'submenus' => [
                         [
-                            'title' => 'Default Pesan',
+                            'title' => 'Pesan WA',
                             'route' => '/pesan-wa',
                             'permission' => 'pesan wa view'
                         ],
