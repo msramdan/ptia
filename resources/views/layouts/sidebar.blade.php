@@ -14,6 +14,16 @@
         </div>
         <div class="sidebar-menu">
             <ul class="menu">
+                {{-- <li class="sidebar-item{{ request()->is('/') || request()->is('dashboard') ? ' active' : '' }}">
+                    
+                </li> --}}
+
+                <div id="server-status"></div>
+
+
+
+
+
                 @auth
                     <li class="sidebar-item{{ request()->is('/') || request()->is('dashboard') ? ' active' : '' }}">
                         <a class="sidebar-link" href="/">
@@ -55,8 +65,7 @@
                                                     @foreach ($menu['submenus'] as $submenu)
                                                         @can($submenu['permission'])
                                                             <li class="submenu-item{{ is_active_menu($submenu['route']) }}">
-                                                                <a
-                                                                    href="{{ route(str($submenu['route'])->remove('/') . '.index') }}">
+                                                                <a href="{{ route(str($submenu['route'])->remove('/') . '.index') }}">
                                                                     {{ __($submenu['title']) }}
                                                                 </a>
                                                             </li>

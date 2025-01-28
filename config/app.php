@@ -54,6 +54,14 @@ return [
 
     'url' => env('APP_URL', 'http://localhost'),
 
+    'base_node' => env('BASE_NODE', 'http://localhost:5570'),
+
+    'attemp_socket' => env('ATTEMP_SOCKET', 10),
+
+    'socket_default' => (bool) env('SOCKET_DEFAULT', false),
+
+
+
     /*
     |--------------------------------------------------------------------------
     | Application Timezone

@@ -209,5 +209,7 @@ return [
         ['group' => 'indikator persepsi', 'access' => ['indikator persepsi view']],
         ['group' => 'pesan wa', 'access' => ['pesan wa view', 'pesan wa create', 'pesan wa edit', 'pesan wa delete']],
         ['group' => 'bobot aspek', 'access' => ['bobot aspek view', 'bobot aspek edit']],
-  ['group' => 'kriteria respondens', 'access' => ['kriteria responden view', 'kriteria responden create', 'kriteria responden edit', 'kriteria responden delete']], 
-		],];
+        ['group' => 'kriteria respondens', 'access' => ['kriteria responden view', 'kriteria responden create', 'kriteria responden edit', 'kriteria responden delete']],
+        ['group' => 'wa blast', 'access' => ['wa blast view', 'wa blast create', 'wa blast edit', 'wa blast delete']],
+    ],
+];

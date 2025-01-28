@@ -1,54 +1,54 @@
 @extends('layouts.app')
 
-@section('title', __('Indikator Persepsi'))
+@section('title', __('Wa Blast'))
 
-@push('css')
-    <style>
-        .text-center {
-            text-align: center;
-        }
-    </style>
-@endpush
 @section('content')
     <div class="page-heading">
         <div class="page-title">
             <div class="row">
                 <div class="col-12 col-md-8 order-md-1 order-last">
-                    <h3>{{ __('Indikator Persepsi') }}</h3>
+                    <h3>{{ __('Wa Blast') }}</h3>
                     <p class="text-subtitle text-muted">
-                        {{ __('Below is a list of all indikator Persepsi.') }}
+                        {{ __('Below is a list of all wa Blast.') }}
                     </p>
                 </div>
                 <x-breadcrumb>
                     <li class="breadcrumb-item"><a href="/">{{ __('Dashboard') }}</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">{{ __('Indikator Persepsi') }}</li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ __('Wa Blast') }}</li>
                 </x-breadcrumb>
             </div>
         </div>
 
         <section class="section">
-
-
-            @can('indikator persepsi create')
+            @can('wa blast create')
                 <div class="d-flex justify-content-end">
-                    <a href="{{ route('indikator-persepsi.create') }}" class="btn btn-primary mb-3">
+                    <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal"
+                        data-bs-target="#createWaBlastModal">
                         <i class="fas fa-plus"></i>
-                        {{ __('Create a new indikator persepsi') }}
-                    </a>
+                        {{ __('Create a new wa blast') }}
+                    </button>
                 </div>
             @endcan
 
             <div class="row">
+                {{-- <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-body">
+                            
+                        </div>
+                    </div>
+                </div> --}}
+
                 <div class="col-md-12">
                     <div class="card">
                         <div class="card-body">
                             <div class="table-responsive p-1">
-                                <table class="table table-striped" id="data-table" width="100%">
+                                <table class="table table-striped datatables-basic" id="data-table" width="100%">
                                     <thead>
                                         <tr>
-                                            <th>{{ __('Aspek') }}</th>
-                                            <th>{{ __('Indikator Persepsi') }}</th>
-                                            <th>{{ __('Kriteria Persepsi') }}</th>
+                                            <th>{{ __('Session Name') }}</th>
+                                            <th>{{ __('Whatsapp Number') }}</th>
+                                            <th>{{ __('Status') }}</th>
                                             <th>{{ __('Action') }}</th>
                                         </tr>
                                     </thead>
@@ -59,6 +59,34 @@
                 </div>
             </div>
         </section>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="createWaBlastModal" tabindex="-1" aria-labelledby="createWaBlastModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form action="{{ route('wa-blast.store') }}" method="POST">
+                    @csrf
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="createWaBlastModalLabel">{{ __('Create a new Wa Blast') }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="session_name" class="form-label">{{ __('Session Name') }}</label>
+                            <input type="text" name="session_name" id="session_name" class="form-control"
+                                placeholder="{{ __('Enter session name') }}" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary"
+                            data-bs-dismiss="modal">{{ __('Close') }}</button>
+                        <button type="submit" class="btn btn-primary">{{ __('Save') }}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 @endsection
 
@@ -98,19 +126,18 @@
         $('#data-table').DataTable({
             processing: true,
             serverSide: true,
-            ajax: "{{ route('indikator-persepsi.index') }}",
+            ajax: "{{ route('wa-blast.index') }}",
             columns: [{
-                    data: 'aspek',
-                    name: 'aspek.level'
+                    data: 'session_name',
+                    name: 'session_name',
                 },
                 {
-                    data: 'indikator_persepsi',
-                    name: 'indikator_persepsi',
-                    className: 'text-center',
+                    data: 'whatsapp_number',
+                    name: 'whatsapp_number',
                 },
                 {
-                    data: 'kriteria_persepsi',
-                    name: 'kriteria_persepsi',
+                    data: 'status',
+                    name: 'status',
                 },
                 {
                     data: 'action',

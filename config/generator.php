@@ -115,7 +115,6 @@ return [
             'permissions' => [
                 'aspek view',
                 'indikator persepsi view',
-                'pesan wa view',
                 'bobot aspek view',
                 'kriteria responden view'
             ],
@@ -127,13 +126,11 @@ return [
                         'aspek*',
                         'indikator-persepsi*',
                         'bobot-aspek*',
-                        'kriteria-responden*',
-                        'pesan-wa*'
+                        'kriteria-responden*'
                     ],
                     'permissions' => [
                         'aspek view',
                         'indikator persepsi view',
-                        'pesan wa view',
                         'bobot aspek view',
                         'kriteria responden view'
                     ],
@@ -157,12 +154,42 @@ return [
                             'title' => 'Kriteria Responden',
                             'route' => '/kriteria-responden',
                             'permission' => 'kriteria responden view'
-                        ],
+                        ]
+                    ]
+                ]
+            ]
+        ],
+
+
+        [
+            'header' => 'Wa',
+            'permissions' => [
+                'pesan wa view',
+                'wa blast view'
+            ],
+            'menus' => [
+                [
+                    'title' => 'Wa Blasting',
+                    'icon' => '<i class="bi bi-whatsapp"></i>',
+                    'route' => [
+                        'pesan-wa*',
+                        'wa-blast*'
+                    ],
+                    'permissions' => [
+                        'pesan wa view',
+                        'wa blast view'
+                    ],
+                    'submenus' => [
                         [
-                            'title' => 'Pesan Wa',
+                            'title' => 'Default Pesan',
                             'route' => '/pesan-wa',
                             'permission' => 'pesan wa view'
                         ],
+                        [
+                            'title' => 'Config Wa Blast',
+                            'route' => '/wa-blast',
+                            'permission' => 'wa blast view'
+                        ]
                     ]
                 ]
             ]
@@ -179,7 +206,7 @@ return [
                     'icon' => '<i class="bi bi-gear-fill"></i>',
                     'route' => [
                         'users*',
-                        'roles*',
+                        'roles*'
                     ],
                     'permissions' => [
                         'user view',
@@ -199,6 +226,6 @@ return [
                     ]
                 ]
             ]
-        ],
+        ]
     ]
 ];

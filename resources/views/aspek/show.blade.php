@@ -35,17 +35,17 @@
                             <div class="table-responsive">
                                 <table class="table table-hover table-striped">
                                     <tr>
-                    <td class="fw-bold">{{ __('Level') }}</td>
-                    <td>{{ $aspek->level }}</td>
-                </tr>
-<tr>
-                    <td class="fw-bold">{{ __('Aspek') }}</td>
-                    <td>{{ $aspek->aspek }}</td>
-                </tr>
-<tr>
-                    <td class="fw-bold">{{ __('Urutan') }}</td>
-                    <td>{{ $aspek->urutan }}</td>
-                </tr>
+                                        <td class="fw-bold">{{ __('Level') }}</td>
+                                        <td>{{ $aspek->level }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold">{{ __('Aspek') }}</td>
+                                        <td>{{ $aspek->aspek }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold">{{ __('Urutan') }}</td>
+                                        <td>{{ $aspek->urutan }}</td>
+                                    </tr>
                                     <tr>
                                         <td class="fw-bold">{{ __('Created at') }}</td>
                                         <td>{{ $aspek->created_at->format('Y-m-d H:i:s') }}</td>
@@ -57,7 +57,8 @@
                                 </table>
                             </div>
 
-                            <a href="{{ route('aspek.index') }}" class="btn btn-secondary"><i class="fa fa-arrow-left" aria-hidden="true"></i> {{ __('Back') }}</a>
+                            <a href="{{ route('aspek.index') }}" class="btn btn-secondary"><i class="fa fa-arrow-left"
+                                    aria-hidden="true"></i> {{ __('Back') }}</a>
                         </div>
                     </div>
                 </div>

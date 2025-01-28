@@ -25,9 +25,6 @@ class AspekController extends Controller implements HasMiddleware
         ];
     }
 
-    /**
-     * Display a listing of the resource.
-     */
     public function index(): View|JsonResponse
     {
         if (request()->ajax()) {
@@ -46,17 +43,11 @@ class AspekController extends Controller implements HasMiddleware
         return view('aspek.index');
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create(): View
     {
         return view('aspek.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(StoreAspekRequest $request): RedirectResponse
     {
         $aspek = Aspek::create($request->validated());
@@ -80,10 +71,7 @@ class AspekController extends Controller implements HasMiddleware
         DB::table('indikator_persepsi')->insert($data);
         return to_route('aspek.index')->with('success', __('The aspek was created successfully.'));
     }
-
-    /**
-     * Display the specified resource.
-     */
+    
     public function show(Aspek $aspek): View
     {
         return view('aspek.show', compact('aspek'));

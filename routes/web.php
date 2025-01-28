@@ -19,3 +19,4 @@ Route::resource('indikator-persepsi', App\Http\Controllers\IndikatorPersepsiCont
 Route::resource('pesan-wa', App\Http\Controllers\PesanWaController::class)->middleware('auth');
 Route::resource('bobot-aspek', App\Http\Controllers\BobotAspekController::class)->middleware('auth');
 Route::resource('kriteria-responden', App\Http\Controllers\KriteriaRespondenController::class)->middleware('auth');
+Route::resource('wa-blast', App\Http\Controllers\WaBlastController::class)->middleware('auth');

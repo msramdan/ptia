@@ -46,3 +46,4 @@ function is_active_submenu(string|array $route): string
 
     return '';
 }
+
