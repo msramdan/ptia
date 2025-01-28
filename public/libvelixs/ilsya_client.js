@@ -104,13 +104,13 @@ class IlsyaClient {
         }
         switch (res.type) {
             case "info":
-                this.logger.prepend(`<tr><td class="text-truncate d-flex align-items-center" style="padding: 0.35rem 1.25rem !important;"><span class="badge bg-label-info small" style="width: 7rem;"><div class="d-flex align-items-center justify-content-center"><i class="ti ti-info-circle text-info ti-xs me-1"></i><span class="small">INFO</span></div></span><span class="ms-2 small">${res.message}</span></td></tr>`);
+                this.logger.prepend(`<tr><td class="text-truncate d-flex align-items-center" style="padding: 0.35rem 1.25rem !important;"><span class="badge bg-info small" style="width: 7rem;"><div class="d-flex align-items-center justify-content-center"><i class="ti ti-info-circle text-info ti-xs me-1"></i><span class="small">INFO</span></div></span><span class="ms-2 small">${res.message}</span></td></tr>`);
                 break
             case "debug":
-                this.logger.prepend(`<tr><td class="text-truncate d-flex align-items-center" style="padding: 0.35rem 1.25rem !important;"><span class="badge bg-label-primary small" style="width: 7rem;"><div class="d-flex align-items-center justify-content-center"><i class="ti ti-prompt text-primary ti-xs me-1"></i><span class="small">DEBUG</span></div></span><span class="ms-2 small">${res.message}</span></td></tr>`)
+                this.logger.prepend(`<tr><td class="text-truncate d-flex align-items-center" style="padding: 0.35rem 1.25rem !important;"><span class="badge bg-primary small" style="width: 7rem;"><div class="d-flex align-items-center justify-content-center"><i class="ti ti-prompt text-primary ti-xs me-1"></i><span class="small">DEBUG</span></div></span><span class="ms-2 small">${res.message}</span></td></tr>`)
                 break
             case "error":
-                this.logger.prepend(`<tr><td class="text-truncate d-flex align-items-center" style="padding: 0.35rem 1.25rem !important;"><span class="badge bg-label-danger small" style="width: 7rem;"><div class="d-flex align-items-center justify-content-center"><i class="ti ti-alert-triangle text-danger ti-xs me-1"></i><span class="small">ERROR</span></div></span><span class="ms-2 small">${res.message}</span></td></tr>`)
+                this.logger.prepend(`<tr><td class="text-truncate d-flex align-items-center" style="padding: 0.35rem 1.25rem !important;"><span class="badge bg-danger small" style="width: 7rem;"><div class="d-flex align-items-center justify-content-center"><i class="ti ti-alert-triangle text-danger ti-xs me-1"></i><span class="small">ERROR</span></div></span><span class="ms-2 small">${res.message}</span></td></tr>`)
                 break
         }
     }
