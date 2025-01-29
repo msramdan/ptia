@@ -31,6 +31,7 @@ class WaBlastController extends Controller implements HasMiddleware
         if (request()->ajax()) {
             $waBlasts = WaBlast::query();
             return DataTables::of($waBlasts)
+                ->addIndexColumn()
                 ->addColumn('status', function ($row) {
                     if ($row->status == 'STOPPED') {
                         return '<span class="badge bg-danger">' . $row->status . '</span>';
@@ -94,8 +95,8 @@ class WaBlastController extends Controller implements HasMiddleware
             }
 
             $updated = DB::table('sessions')
-                         ->where('id', $request->id)
-                         ->update(['is_aktif' => $request->is_aktif]);
+                ->where('id', $request->id)
+                ->update(['is_aktif' => $request->is_aktif]);
 
             DB::commit();
 
@@ -104,12 +105,9 @@ class WaBlastController extends Controller implements HasMiddleware
             }
 
             return response()->json(['success' => false, 'message' => 'Session not found or not updated.'], 404);
-
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json(['success' => false, 'message' => 'An error occurred while updating the session.'], 500);
         }
     }
-
-
 }

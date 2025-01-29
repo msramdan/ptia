@@ -34,7 +34,15 @@ class KonversiController extends Controller implements HasMiddleware
             $konversis = Konversi::query();
 
             return DataTables::of($konversis)
+                ->addIndexColumn()
+                ->addColumn('skor', function ($row) {
+                    return '<span class="badge bg-danger">' . $row->skor . '</span>';
+                })
+                ->addColumn('konversi', function ($row) {
+                    return $row->konversi . ' %';
+                })
                 ->addColumn('action', 'konversi.include.action')
+                ->rawColumns(['skor', 'action'])
                 ->toJson();
         }
 

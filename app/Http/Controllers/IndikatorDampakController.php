@@ -34,6 +34,7 @@ class IndikatorDampakController extends Controller implements HasMiddleware
             $indikatorDampaks = IndikatorDampak::query();
 
             return DataTables::of($indikatorDampaks)
+                ->addIndexColumn()
                 ->addColumn('indikator_dampak', function ($row) {
                     return $row->nilai_minimal . ' - ' . $row->nilai_maksimal;
                 })

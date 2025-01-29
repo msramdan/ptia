@@ -46,6 +46,7 @@
                                 <table class="table table-striped" id="data-table" width="100%">
                                     <thead>
                                         <tr>
+                                            <th>#</th>
                                             <th>{{ __('Aspek') }}</th>
                                             <th>{{ __('Indikator Persepsi') }}</th>
                                             <th>{{ __('Kriteria Persepsi') }}</th>
@@ -100,6 +101,12 @@
             serverSide: true,
             ajax: "{{ route('indikator-persepsi.index') }}",
             columns: [{
+                    data: 'DT_RowIndex',
+                    name: 'DT_RowIndex',
+                    orderable: false,
+                    searchable: false,
+                },
+                {
                     data: 'aspek',
                     name: 'aspek.level'
                 },

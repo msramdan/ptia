@@ -39,6 +39,7 @@
                                 <table class="table table-striped" id="data-table" width="100%">
                                     <thead>
                                         <tr>
+                                            <th>#</th>
                                             <th>{{ __('Level') }}</th>
                                             <th>{{ __('Aspek') }}</th>
                                             <th>{{ __('Urutan') }}</th>
@@ -93,6 +94,12 @@
             serverSide: true,
             ajax: "{{ route('aspek.index') }}",
             columns: [{
+                    data: 'DT_RowIndex',
+                    name: 'DT_RowIndex',
+                    orderable: false,
+                    searchable: false,
+                },
+                {
                     data: 'level',
                     name: 'level',
                 },

@@ -41,6 +41,7 @@ class UserController extends Controller implements HasMiddleware
             $users = User::with('roles:id,name');
 
             return Datatables::of($users)
+                ->addIndexColumn()
                 ->addColumn('action', 'users.include.action')
                 ->addColumn('role', fn($row) => $row->getRoleNames()->toArray() !== [] ? $row->getRoleNames()[0] : '-')
                 ->addColumn('avatar', function ($user) {

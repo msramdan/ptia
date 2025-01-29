@@ -31,6 +31,7 @@ class AspekController extends Controller implements HasMiddleware
             $aspeks = Aspek::query();
 
             return DataTables::of($aspeks)
+                ->addIndexColumn()
                 ->addColumn('level', function ($row) {
                     $levelText = $row->level === '3' ? 'Level 3' : 'Level 4';
                     return '<span class="badge bg-info">' . $levelText . '</span>';
@@ -71,7 +72,7 @@ class AspekController extends Controller implements HasMiddleware
         DB::table('indikator_persepsi')->insert($data);
         return to_route('aspek.index')->with('success', __('The aspek was created successfully.'));
     }
-    
+
     public function show(Aspek $aspek): View
     {
         return view('aspek.show', compact('aspek'));

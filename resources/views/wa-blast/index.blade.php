@@ -46,6 +46,7 @@
                                 <table class="table table-striped datatables-basic" id="data-table" width="100%">
                                     <thead>
                                         <tr>
+                                            <th>#</th>
                                             <th>{{ __('Session Name') }}</th>
                                             <th>{{ __('Whatsapp Number') }}</th>
                                             <th>{{ __('Api Key') }}</th>
@@ -131,6 +132,12 @@
             serverSide: true,
             ajax: "{{ route('wa-blast.index') }}",
             columns: [{
+                    data: 'DT_RowIndex',
+                    name: 'DT_RowIndex',
+                    orderable: false,
+                    searchable: false,
+                },
+                {
                     data: 'session_name',
                     name: 'session_name',
                 },

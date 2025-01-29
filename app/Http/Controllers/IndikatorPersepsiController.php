@@ -42,6 +42,7 @@ class IndikatorPersepsiController extends Controller implements HasMiddleware
                 ]);
 
             return DataTables::of($indikatorPersepsi)
+                ->addIndexColumn()
                 ->addColumn('indikator_persepsi', function ($row) {
                     return '<span class="badge bg-danger">' . $row->indikator_persepsi . '</span>';
                 })
