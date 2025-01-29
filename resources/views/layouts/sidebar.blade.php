@@ -1,4 +1,4 @@
-<div id="sidebar" class="active">
+<div id="sidebar">
     <div class="sidebar-wrapper active">
         <div class="sidebar-header position-relative">
             <div class="d-flex justify-content-between align-items-center">
@@ -57,7 +57,7 @@
                                                     @foreach ($menu['submenus'] as $submenu)
                                                         @can($submenu['permission'])
                                                             <li class="submenu-item{{ is_active_menu($submenu['route']) }}">
-                                                                <a href="{{ route(str($submenu['route'])->remove('/') . '.index') }}">
+                                                                <a href="{{ route(str($submenu['route'])->remove('/') . '.index') }}"  class="submenu-link">
                                                                     {{ __($submenu['title']) }}
                                                                 </a>
                                                             </li>
@@ -73,7 +73,7 @@
                     @endif
                 @endforeach
             </ul>
+
         </div>
-        <button class="sidebar-toggler btn x"><i data-feather="x"></i></button>
     </div>
 </div>
