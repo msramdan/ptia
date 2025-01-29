@@ -212,5 +212,5 @@ return [
         ['group' => 'kriteria respondens', 'access' => ['kriteria responden view', 'kriteria responden create', 'kriteria responden edit', 'kriteria responden delete']],
         ['group' => 'wa blast', 'access' => ['wa blast view', 'wa blast create', 'wa blast delete']],
         ['group' => 'single senders', 'access' => ['single sender view', 'single sender create']],
-    ],
-];
+  ['group' => 'indikator dampaks', 'access' => ['indikator dampak view', 'indikator dampak create', 'indikator dampak edit', 'indikator dampak delete']], 
+		],];

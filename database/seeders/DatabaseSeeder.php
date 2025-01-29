@@ -14,6 +14,7 @@ class DatabaseSeeder extends Seeder
         $this->call(RoleAndPermissionSeeder::class);
         $this->call(AspekSeeder::class);
         $this->call(IndikatorPersepsiSeeder::class);
+        $this->call(IndikatorDampakSeeder::class);
         $this->call(BobotAspekSeeder::class);
         $this->call(PesanWaSeeder::class);
         $this->call(KriteriaRespondenSeeder::class);

@@ -116,7 +116,8 @@ return [
             'aspek view',
             'indikator persepsi view',
             'bobot aspek view',
-            'kriteria responden view'
+            'kriteria responden view',
+            'indikator dampak view'
         ],
         'menus' => [
             [
@@ -125,6 +126,7 @@ return [
                 'route' => [
                     'aspek*',
                     'indikator-persepsi*',
+                    'indikator-dampak*',
                     'bobot-aspek*',
                     'kriteria-responden*'
                 ],
@@ -132,7 +134,8 @@ return [
                     'aspek view',
                     'indikator persepsi view',
                     'bobot aspek view',
-                    'kriteria responden view'
+                    'kriteria responden view',
+                    'indikator dampak view'
                 ],
                 'submenus' => [
                     [
@@ -144,6 +147,11 @@ return [
                         'title' => 'Indikator Persepsi',
                         'route' => '/indikator-persepsi',
                         'permission' => 'indikator persepsi view'
+                    ],
+                    [
+                        'title' => 'Indikator Dampak',
+                        'route' => '/indikator-dampak',
+                        'permission' => 'indikator dampak view'
                     ],
                     [
                         'title' => 'Bobot Aspek',
