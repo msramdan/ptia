@@ -24,3 +24,4 @@ Route::resource('single-sender', App\Http\Controllers\SingleSenderController::cl
 Route::post('/update-session-status', [App\Http\Controllers\WaBlastController::class, 'updateSessionStatus'])->name('update.session.status');
 Route::resource('indikator-dampak', App\Http\Controllers\IndikatorDampakController::class)->middleware('auth');
 Route::resource('konversi', App\Http\Controllers\KonversiController::class)->middleware('auth');
+Route::resource('pembuatan-project', App\Http\Controllers\PembuatanProjectController::class)->middleware('auth');
