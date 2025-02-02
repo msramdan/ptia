@@ -33,6 +33,7 @@
                                             <th>{{ __('Nama Diklat') }}</th>
                                             <th>{{ __('Jenis DIklat') }}</th>
                                             <th>{{ __('Tanggal Diklat') }}</th>
+                                            <th>{{ __('Status Generate') }}</th>
                                             <th>{{ __('Action') }}</th>
                                         </tr>
                                     </thead>
@@ -112,13 +113,12 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         $(document).ready(function() {
-            // Initialize DataTable
             $('#data-table').DataTable({
                 processing: true,
                 serverSide: true,
                 ajax: function(data, callback, settings) {
                     $.ajax({
-                        url: "http://192.168.10.36:8090/api/len-kaldik?api_key=797e9aa1-be97-4dc0-ae13-3ecd304a61a3",
+                        url: "/get-kaldik-data",
                         type: "GET",
                         data: {
                             limit: data.length,
@@ -135,12 +135,19 @@
                                         var date = new Date(dateString);
                                         var year = date.getFullYear();
                                         var month = ('0' + (date
-                                            .getMonth() + 1)).slice(-
-                                            2); // Month is 0-indexed
+                                        .getMonth() + 1)).slice(-2);
                                         var day = ('0' + date.getDate())
                                             .slice(-2);
                                         return `${year}-${month}-${day}`;
                                     }
+
+                                    // Menambahkan status generate
+                                    var statusGenerateClass = item
+                                        .status_generate === 'SUDAH' ?
+                                        'btn-success' : 'btn-danger';
+                                    var statusGenerateText = item
+                                        .status_generate === 'SUDAH' ?
+                                        'SUDAH' : 'BELUM';
 
                                     return {
                                         kaldikID: item.kaldikID,
@@ -148,23 +155,23 @@
                                         biayaName: item.biayaName,
                                         diklatTypeName: item.diklatTypeName,
                                         dateRange: `${formatDate(item.startDate)} s/d ${formatDate(item.endDate)}`,
+                                        statusGenerate: `<button class="btn ${statusGenerateClass} btn-sm">${statusGenerateText}</button>`,
                                         actions: `<td class="text-center">
-        <a href="javascript:" onclick="generateProject(${item.kaldikID}, '${item.kaldikDesc.replace(/'/g, "\\'")}')" data-bs-toggle="tooltip" data-bs-placement="top" title="Generate Project" class="btn btn-sm btn-icon btn-success mr-1">
-            <i class="fas fa-cogs"></i>
-        </a>
-        <a href="javascript:" onclick="modalDetail(${item.kaldikID})" data-bs-toggle="tooltip" data-bs-placement="top" title="Lihat Data Diklat" class="btn btn-sm btn-icon btn-primary mr-1">
-            <i class="fas fa-info-circle"></i>
-        </a>
-        <a href="javascript:" onclick="modalPeserta(${item.kaldikID})" data-bs-toggle="tooltip" data-bs-placement="top" title="Data Peserta" class="btn btn-sm btn-icon btn-danger">
-            <i class="fas fa-users"></i>
-        </a>
-    </td>`
+                                <a href="javascript:" onclick="generateProject(${item.kaldikID}, '${item.kaldikDesc.replace(/'/g, "\\'")}')" data-bs-toggle="tooltip" data-bs-placement="top" title="Generate Project" class="btn btn-sm btn-icon btn-success mr-1">
+                                    <i class="fas fa-cogs"></i>
+                                </a>
+                                <a href="javascript:" onclick="modalDetail(${item.kaldikID})" data-bs-toggle="tooltip" data-bs-placement="top" title="Lihat Data Diklat" class="btn btn-sm btn-icon btn-primary mr-1">
+                                    <i class="fas fa-info-circle"></i>
+                                </a>
+                                <a href="javascript:" onclick="modalPeserta(${item.kaldikID})" data-bs-toggle="tooltip" data-bs-placement="top" title="Data Peserta" class="btn btn-sm btn-icon btn-danger">
+                                    <i class="fas fa-users"></i>
+                                </a>
+                            </td>`
                                     };
                                 })
                             });
                             $('[data-bs-toggle="tooltip"]').tooltip();
                         }
-
                     });
                 },
                 columns: [{
@@ -188,13 +195,17 @@
                         data: "dateRange"
                     },
                     {
+                        data: "statusGenerate"
+                    },
+                    {
                         data: "actions"
                     }
                 ]
             });
+
         });
 
-        function generateProject(kaldikID,kaldikDesc) {
+        function generateProject(kaldikID, kaldikDesc) {
             Swal.fire({
                 title: "Confirmation",
                 text: "Are you sure you want to generate a project for this Diklat?",

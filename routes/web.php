@@ -25,4 +25,6 @@ Route::post('/update-session-status', [App\Http\Controllers\WaBlastController::c
 Route::resource('indikator-dampak', App\Http\Controllers\IndikatorDampakController::class)->middleware('auth');
 Route::resource('konversi', App\Http\Controllers\KonversiController::class)->middleware('auth');
 Route::resource('pembuatan-project', App\Http\Controllers\PembuatanProjectController::class)->middleware('auth');
+Route::get('/get-kaldik-data', [App\Http\Controllers\PembuatanProjectController::class, 'getKaldikData']);
 Route::resource('project', App\Http\Controllers\ProjectController::class)->middleware('auth');
+

@@ -50,6 +50,17 @@ class ProjectController extends Controller implements HasMiddleware
             'kaldikID'   => 'required|numeric',
             'kaldikDesc' => 'required|string',
         ]);
+
+        // Cek apakah kaldikID sudah ada di dalam tabel
+        $existingProject = DB::table('project')->where('kaldikID', $data['kaldikID'])->first();
+
+        if ($existingProject) {
+            return response()->json([
+                'status'  => false,
+                'message' => "Project with Kaldik ID {$data['kaldikID']} already exists in project management.",
+            ], 409);
+        }
+
         $id = (string) Str::uuid();
         $kode_project = Str::upper(Str::random(8));
 
@@ -61,13 +72,16 @@ class ProjectController extends Controller implements HasMiddleware
             'created_at'   => now(),
             'updated_at'   => now(),
         ];
+
         DB::table('project')->insert($insertData);
+
         return response()->json([
             'status'  => true,
             'message' => 'Project created successfully',
             'data'    => $insertData,
         ]);
     }
+
 
     public function destroy(Project $project): RedirectResponse
     {

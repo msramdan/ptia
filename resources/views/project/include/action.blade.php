@@ -1,6 +1,6 @@
 <td>
     @can('project print')
-        <a href="#" class="btn btn-outline-primary btn-sm">
+        <a href="#" class="btn btn-outline-secondary btn-sm">
             <i class="fa fa-print"></i>
         </a>
     @endcan
