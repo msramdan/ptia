@@ -31,7 +31,6 @@
                                             <th>{{ __('Kode Diklat') }}</th>
                                             <th>{{ __('Nama Diklat') }}</th>
                                             <th>{{ __('Jenis DIklat') }}</th>
-                                            <th>{{ __('Biaya') }}</th>
                                             <th>{{ __('Tanggal Diklat') }}</th>
                                             <th>{{ __('Action') }}</th>
                                         </tr>
@@ -168,9 +167,6 @@
                     },
                     {
                         data: "kaldikDesc"
-                    },
-                    {
-                        data: "biayaName"
                     },
                     {
                         data: "diklatTypeName"
