@@ -28,11 +28,8 @@
                                 <table class="table table-striped" id="data-table" width="100%">
                                     <thead>
                                         <tr>
-                                            <th>{{ __('Jenis Diklat') }}</th>
                                             <th>{{ __('Kode Diklat') }}</th>
                                             <th>{{ __('Nama Diklat') }}</th>
-                                            <th>{{ __('Tanggal Diklat') }}</th>
-                                            <th>{{ __('Action') }}</th>
                                         </tr>
                                     </thead>
                                 </table>
@@ -57,34 +54,35 @@
         integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/v/bs5/dt-1.12.0/datatables.min.js"></script>
-    <script>
-        $('#data-table').DataTable({
-            processing: true,
-            serverSide: true,
-            ajax: "{{ route('pembuatan-project.index') }}",
-            columns: [{
-                    data: 'jenis_diklat',
-                    name: 'jenis_diklat',
+<script>
+$(document).ready(function() {
+    $('#data-table').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: function(data, callback, settings) {
+            $.ajax({
+                url: "http://192.168.10.36:8090/api/len-kaldik?api_key=797e9aa1-be97-4dc0-ae13-3ecd304a61a3",
+                type: "GET",
+                data: {
+                    limit: data.length,
+                    page: (data.start / data.length) + 1,
+                    search: data.search.value
                 },
-                {
-                    data: 'kode_diklat',
-                    name: 'kode_diklat',
-                },
-                {
-                    data: 'nama_diklat',
-                    name: 'nama_diklat',
-                },
-                {
-                    data: 'tanggal_diklat',
-                    name: 'tanggal_diklat',
-                },
-                {
-                    data: 'action',
-                    name: 'action',
-                    orderable: false,
-                    searchable: false
+                success: function(response) {
+                    callback({
+                        recordsTotal: response.total,
+                        recordsFiltered: response.total,
+                        data: response.data
+                    });
                 }
-            ],
-        });
-    </script>
+            });
+        },
+        columns: [
+            { data: "kaldikID" },
+            { data: "kaldikDesc" }
+        ]
+    });
+});
+
+</script>
 @endpush
