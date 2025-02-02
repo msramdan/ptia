@@ -30,6 +30,10 @@
                                         <tr>
                                             <th>{{ __('Kode Diklat') }}</th>
                                             <th>{{ __('Nama Diklat') }}</th>
+                                            <th>{{ __('Jenis DIklat') }}</th>
+                                            <th>{{ __('Biaya') }}</th>
+                                            <th>{{ __('Tanggal Diklat') }}</th>
+                                            <th>{{ __('Action') }}</th>
                                         </tr>
                                     </thead>
                                 </table>
@@ -39,6 +43,57 @@
                 </div>
             </div>
         </section>
+    </div>
+
+    <!-- Modal Detail Diklat -->
+    <div class="modal fade" id="modalDetailDiklat" tabindex="-1" aria-labelledby="modalDetailDiklatLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalDetailDiklatLabel">{{ __('Detail Diklat') }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-bordered" id="detailDiklatTable">
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('Close') }}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Peserta Diklat -->
+    <div class="modal fade" id="modalPesertaDiklat" tabindex="-1" aria-labelledby="modalPesertaDiklatLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalPesertaDiklatLabel">{{ __('Peserta Diklat') }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-bordered" id="pesertaDiklatTable">
+                        <thead>
+                            <tr>
+                                <th>{{ __('Nama Peserta') }}</th>
+                                <th>{{ __('Email') }}</th>
+                                <th>{{ __('No. Telepon') }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('Close') }}</button>
+                </div>
+            </div>
+        </div>
     </div>
 @endsection
 
@@ -54,35 +109,177 @@
         integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/v/bs5/dt-1.12.0/datatables.min.js"></script>
-<script>
-$(document).ready(function() {
-    $('#data-table').DataTable({
-        processing: true,
-        serverSide: true,
-        ajax: function(data, callback, settings) {
-            $.ajax({
-                url: "http://192.168.10.36:8090/api/len-kaldik?api_key=797e9aa1-be97-4dc0-ae13-3ecd304a61a3",
-                type: "GET",
-                data: {
-                    limit: data.length,
-                    page: (data.start / data.length) + 1,
-                    search: data.search.value
-                },
-                success: function(response) {
-                    callback({
-                        recordsTotal: response.total,
-                        recordsFiltered: response.total,
-                        data: response.data
+    <script>
+        $(document).ready(function() {
+            // Initialize DataTable
+            $('#data-table').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: function(data, callback, settings) {
+                    $.ajax({
+                        url: "http://192.168.10.36:8090/api/len-kaldik?api_key=797e9aa1-be97-4dc0-ae13-3ecd304a61a3",
+                        type: "GET",
+                        data: {
+                            limit: data.length,
+                            page: (data.start / data.length) + 1,
+                            search: data.search.value
+                        },
+                        success: function(response) {
+                            callback({
+                                recordsTotal: response.total,
+                                recordsFiltered: response.total,
+                                data: response.data.map(function(item) {
+                                    // Function to format date in Y-m-d format
+                                    function formatDate(dateString) {
+                                        var date = new Date(dateString);
+                                        var year = date.getFullYear();
+                                        var month = ('0' + (date
+                                            .getMonth() + 1)).slice(-
+                                            2); // Month is 0-indexed
+                                        var day = ('0' + date.getDate())
+                                            .slice(-2);
+                                        return `${year}-${month}-${day}`;
+                                    }
+
+                                    return {
+                                        kaldikID: item.kaldikID,
+                                        kaldikDesc: item.kaldikDesc,
+                                        biayaName: item.biayaName,
+                                        diklatTypeName: item.diklatTypeName,
+                                        dateRange: `${formatDate(item.startDate)} s/d ${formatDate(item.endDate)}`,
+                                        actions: `<td class="text-center">
+                    <a href="javascript:" onclick="modalDetail(${item.kaldikID})" data-bs-toggle="tooltip" data-bs-placement="top" title="Lihat Data Diklat" class="btn btn-sm btn-icon btn-primary mr-1">
+                        <i class="fas fa-info-circle"></i>
+                    </a>
+                    <a href="javascript:" onclick="modalPeserta(${item.kaldikID})" data-bs-toggle="tooltip" data-bs-placement="top" title="Data Peserta" class="btn btn-sm btn-icon btn-danger">
+                        <i class="fas fa-users"></i>
+                    </a>
+                </td>`
+                                    };
+                                })
+                            });
+                            $('[data-bs-toggle="tooltip"]').tooltip();
+                        }
+
                     });
+                },
+                columns: [{
+                        data: "kaldikID"
+                    },
+                    {
+                        data: "kaldikDesc"
+                    },
+                    {
+                        data: "biayaName"
+                    },
+                    {
+                        data: "diklatTypeName"
+                    },
+                    {
+                        data: "dateRange"
+                    },
+                    {
+                        data: "actions"
+                    }
+                ]
+            });
+        });
+
+        // Modal Detail Diklat - Fetch Data with AJAX
+        function modalDetail(kaldikID) {
+            $.ajax({
+                url: `http://192.168.10.36:8090/api/len-kaldik/${kaldikID}?api_key=797e9aa1-be97-4dc0-ae13-3ecd304a61a3`,
+                type: "GET",
+                success: function(response) {
+                    var tableBody = $('#detailDiklatTable tbody');
+                    tableBody.empty();
+                    var data = response.data;
+
+                    function formatDate(dateString) {
+                        if (dateString) {
+                            var date = new Date(dateString);
+                            var year = date.getFullYear();
+                            var month = ('0' + (date.getMonth() + 1)).slice(-2); // Month is 0-indexed
+                            var day = ('0' + date.getDate()).slice(-2);
+                            return `${year}-${month}-${day}`;
+                        }
+                        return '-';
+                    }
+
+                    tableBody.append(`
+                        <tr>
+                            <td>{{ __('Kode Diklat') }}</td>
+                            <td>${data.kaldikID}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ __('Nama Diklat') }}</td>
+                            <td>${data.kaldikDesc}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ __('Jenis Diklat') }}</td>
+                            <td>${data.diklatTypeName}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ __('Biaya') }}</td>
+                            <td>${data.biayaName}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ __('Tanggal Diklat') }}</td>
+                            <td>${formatDate(data.startDate)} s/d ${formatDate(data.endDate)}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ __('Lokasi') }}</td>
+                            <td>${data.tempatName}</td>
+                        </tr>
+                    `);
+                    if (data.tgl_mulai_el && data.tgl_selesai_el) {
+                        tableBody.append(`
+                        <tr>
+                            <td>{{ __('Tanggal Elearning') }}</td>
+                            <td>${formatDate(data.tgl_mulai_el)} s/d ${formatDate(data.tgl_selesai_el)}</td>
+                        </tr>
+                    `);
+                    }
+
+                    if (data.tgl_mulai_tm && data.tgl_selesai_tm) {
+                        tableBody.append(`
+                        <tr>
+                            <td>{{ __('Tanggal Tatap Muka') }}</td>
+                            <td>${formatDate(data.tgl_mulai_tm)} s/d ${formatDate(data.tgl_selesai_tm)}</td>
+                        </tr>
+                    `);
+                    }
+                    $('#modalDetailDiklat').modal('show');
                 }
             });
-        },
-        columns: [
-            { data: "kaldikID" },
-            { data: "kaldikDesc" }
-        ]
-    });
-});
+        }
 
-</script>
+
+        // Modal Peserta - Fetch Peserta Data with AJAX
+        function modalPeserta(kaldikID) {
+            $.ajax({
+                url: `http://192.168.10.36:8090/api/kaldik-peserta/${kaldikID}?api_key=797e9aa1-be97-4dc0-ae13-3ecd304a61a3`,
+                type: "GET",
+                success: function(response) {
+                    var tableBody = $('#pesertaDiklatTable tbody');
+                    tableBody.empty();
+                    var pesertaData = response.data;
+
+                    // Populate the peserta table with the participant's details
+                    $.each(pesertaData, function(index, peserta) {
+                        tableBody.append(`
+                            <tr>
+                                <td>${peserta.name}</td>
+                                <td>${peserta.email}</td>
+                                <td>${peserta.phone}</td>
+                            </tr>
+                        `);
+                    });
+
+                    // Show the modal
+                    $('#modalPesertaDiklat').modal('show');
+                }
+            });
+        }
+    </script>
 @endpush
