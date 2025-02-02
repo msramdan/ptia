@@ -28,6 +28,7 @@
                                 <table class="table table-striped" id="data-table" width="100%">
                                     <thead>
                                         <tr>
+                                            <th>#</th>
                                             <th>{{ __('Kode Diklat') }}</th>
                                             <th>{{ __('Nama Diklat') }}</th>
                                             <th>{{ __('Jenis DIklat') }}</th>
@@ -167,6 +168,14 @@
                     });
                 },
                 columns: [{
+                        data: null,
+                        render: function(data, type, row, meta) {
+                            return meta.row + meta.settings._iDisplayStart + 1;
+                        },
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
                         data: "kaldikID"
                     },
                     {

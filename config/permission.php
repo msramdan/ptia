@@ -214,6 +214,7 @@ return [
         ['group' => 'single sender', 'access' => ['single sender view', 'single sender create']],
         ['group' => 'indikator dampak', 'access' => ['indikator dampak view', 'indikator dampak create', 'indikator dampak edit', 'indikator dampak delete']],
         ['group' => 'konversi', 'access' => ['konversi view', 'konversi create', 'konversi edit', 'konversi delete']],
-        ['group' => 'pembuatan projects', 'access' => ['pembuatan project view', 'pembuatan project create']],
+        ['group' => 'pembuatan projects', 'access' => ['pembuatan project view', 'generate project']],
+        ['group' => 'management project', 'access' => ['project view', 'project print', 'project delete']],
     ],
 ];

@@ -219,78 +219,36 @@ return [
     [
         'header' => 'Persiapan',
         'permissions' => [
-            'pembuatan project view'
+            'pembuatan project view',
+            'project view'
         ],
         'menus' => [
             [
                 'title' => 'Persiapan',
                 'icon' => '<i class="bi bi-folder"></i>',
                 'route' => [
-                    'pembuatan-project*'
+                    'pembuatan-project*',
+                    'project*'
                 ],
                 'permissions' => [
-                    'pembuatan project view'
+                    'pembuatan project view',
+                    'project view'
                 ],
                 'submenus' => [
                     [
                         'title' => 'Pembuatan Project',
                         'route' => '/pembuatan-project',
                         'permission' => 'pembuatan project view'
+                    ],
+                    [
+                        'title' => 'Management Project',
+                        'route' => '/project',
+                        'permission' => 'project view'
                     ]
                 ]
             ]
         ]
     ],
-    // [
-    //     'header' => 'Pelaksanaan',
-    //     'permissions' => [
-    //         'role & permission view'
-    //     ],
-    //     'menus' => [
-    //         [
-    //             'title' => 'Pelaksanaan',
-    //             'icon' => '<i class="bi bi-folder"></i>',
-    //             'route' => [
-    //                 'roles*'
-    //             ],
-    //             'permissions' => [
-    //                 'role & permission view'
-    //             ],
-    //             'submenus' => [
-    //                 [
-    //                     'title' => 'Roles & permissions',
-    //                     'route' => '/roles',
-    //                     'permission' => 'role & permission view'
-    //                 ]
-    //             ]
-    //         ]
-    //     ]
-    // ],
-    // [
-    //     'header' => 'Hasil Evaluasi',
-    //     'permissions' => [
-    //         'role & permission view'
-    //     ],
-    //     'menus' => [
-    //         [
-    //             'title' => 'Hasil Evaluasi',
-    //             'icon' => '<i class="bi bi-folder"></i>',
-    //             'route' => [
-    //                 'roles*'
-    //             ],
-    //             'permissions' => [
-    //                 'role & permission view'
-    //             ],
-    //             'submenus' => [
-    //                 [
-    //                     'title' => 'Roles & permissions',
-    //                     'route' => '/roles',
-    //                     'permission' => 'role & permission view'
-    //                 ]
-    //             ]
-    //         ]
-    //     ]
-    // ],
     [
         'header' => 'Utilities',
         'permissions' => [
