@@ -108,6 +108,7 @@
         integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/v/bs5/dt-1.12.0/datatables.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         $(document).ready(function() {
             // Initialize DataTable
@@ -147,13 +148,16 @@
                                         diklatTypeName: item.diklatTypeName,
                                         dateRange: `${formatDate(item.startDate)} s/d ${formatDate(item.endDate)}`,
                                         actions: `<td class="text-center">
-                    <a href="javascript:" onclick="modalDetail(${item.kaldikID})" data-bs-toggle="tooltip" data-bs-placement="top" title="Lihat Data Diklat" class="btn btn-sm btn-icon btn-primary mr-1">
-                        <i class="fas fa-info-circle"></i>
-                    </a>
-                    <a href="javascript:" onclick="modalPeserta(${item.kaldikID})" data-bs-toggle="tooltip" data-bs-placement="top" title="Data Peserta" class="btn btn-sm btn-icon btn-danger">
-                        <i class="fas fa-users"></i>
-                    </a>
-                </td>`
+        <a href="javascript:" onclick="generateProject(${item.kaldikID})" data-bs-toggle="tooltip" data-bs-placement="top" title="Generate Project" class="btn btn-sm btn-icon btn-success mr-1">
+            <i class="fas fa-cogs"></i>
+        </a>
+        <a href="javascript:" onclick="modalDetail(${item.kaldikID})" data-bs-toggle="tooltip" data-bs-placement="top" title="Lihat Data Diklat" class="btn btn-sm btn-icon btn-primary mr-1">
+            <i class="fas fa-info-circle"></i>
+        </a>
+        <a href="javascript:" onclick="modalPeserta(${item.kaldikID})" data-bs-toggle="tooltip" data-bs-placement="top" title="Data Peserta" class="btn btn-sm btn-icon btn-danger">
+            <i class="fas fa-users"></i>
+        </a>
+    </td>`
                                     };
                                 })
                             });
@@ -180,6 +184,42 @@
                 ]
             });
         });
+
+        function generateProject(kaldikID) {
+            Swal.fire({
+                title: "Confirmation",
+                text: "Are you sure you want to generate a project for this Diklat?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Yes, Generate!",
+                cancelButtonText: "No, Cancel",
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: `http://192.168.10.36:8090/api/generate-project/${kaldikID}`,
+                        type: "POST",
+                        success: function(response) {
+                            Swal.fire({
+                                title: "Success!",
+                                text: "Project has been successfully created!",
+                                icon: "success",
+                                timer: 2000,
+                                showConfirmButton: false
+                            });
+                        },
+                        error: function() {
+                            Swal.fire({
+                                title: "Error!",
+                                text: "An error occurred while creating the project.",
+                                icon: "error"
+                            });
+                        }
+                    });
+                }
+            });
+        }
+
 
         // Modal Detail Diklat - Fetch Data with AJAX
         function modalDetail(kaldikID) {
