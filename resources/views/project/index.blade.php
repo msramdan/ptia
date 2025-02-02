@@ -41,7 +41,8 @@
                                         <tr>
                                             <th>#</th>
                                             <th>{{ __('Kode Project') }}</th>
-                                            <th>{{ __('Diklat') }}</th>
+                                            <th>{{ __('Kode Diklat') }}</th>
+                                            <th>{{ __('Nama Diklat') }}</th>
                                             <th>{{ __('Action') }}</th>
                                         </tr>
                                     </thead>
@@ -84,8 +85,12 @@
                     name: 'kode_project',
                 },
                 {
-                    data: 'diklat',
-                    name: 'diklat',
+                    data: 'kaldikID',
+                    name: 'kaldikID',
+                },
+                {
+                    data: 'kaldikDesc',
+                    name: 'kaldikDesc',
                 },
                 {
                     data: 'action',

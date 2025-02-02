@@ -8,6 +8,8 @@ use Illuminate\Contracts\View\View;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Http\{JsonResponse, RedirectResponse};
 use Illuminate\Routing\Controllers\{HasMiddleware, Middleware};
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class ProjectController extends Controller implements HasMiddleware
 {
@@ -34,10 +36,7 @@ class ProjectController extends Controller implements HasMiddleware
             $projects = Project::query();
 
             return DataTables::of($projects)
-            ->addIndexColumn()
-                ->addColumn('diklat', function ($row) {
-                    return $row->kaldikID .' - '. $row->kaldikDesc;
-                })
+                ->addIndexColumn()
                 ->addColumn('action', 'project.include.action')
                 ->toJson();
         }
@@ -45,12 +44,29 @@ class ProjectController extends Controller implements HasMiddleware
         return view('project.index');
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request)
     {
+        $data = $request->validate([
+            'kaldikID'   => 'required|numeric',
+            'kaldikDesc' => 'required|string',
+        ]);
+        $id = (string) Str::uuid();
+        $kode_project = Str::upper(Str::random(8));
 
-        Project::create($request->validated());
-
-        return to_route('project.index')->with('success', __('The project was created successfully.'));
+        $insertData = [
+            'id'           => $id,
+            'kode_project' => $kode_project,
+            'kaldikID'     => $data['kaldikID'],
+            'kaldikDesc'   => $data['kaldikDesc'],
+            'created_at'   => now(),
+            'updated_at'   => now(),
+        ];
+        DB::table('project')->insert($insertData);
+        return response()->json([
+            'status'  => true,
+            'message' => 'Project created successfully',
+            'data'    => $insertData,
+        ]);
     }
 
     public function destroy(Project $project): RedirectResponse

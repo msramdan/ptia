@@ -149,7 +149,7 @@
                                         diklatTypeName: item.diklatTypeName,
                                         dateRange: `${formatDate(item.startDate)} s/d ${formatDate(item.endDate)}`,
                                         actions: `<td class="text-center">
-        <a href="javascript:" onclick="generateProject(${item.kaldikID})" data-bs-toggle="tooltip" data-bs-placement="top" title="Generate Project" class="btn btn-sm btn-icon btn-success mr-1">
+        <a href="javascript:" onclick="generateProject(${item.kaldikID}, '${item.kaldikDesc.replace(/'/g, "\\'")}')" data-bs-toggle="tooltip" data-bs-placement="top" title="Generate Project" class="btn btn-sm btn-icon btn-success mr-1">
             <i class="fas fa-cogs"></i>
         </a>
         <a href="javascript:" onclick="modalDetail(${item.kaldikID})" data-bs-toggle="tooltip" data-bs-placement="top" title="Lihat Data Diklat" class="btn btn-sm btn-icon btn-primary mr-1">
@@ -194,7 +194,7 @@
             });
         });
 
-        function generateProject(kaldikID) {
+        function generateProject(kaldikID,kaldikDesc) {
             Swal.fire({
                 title: "Confirmation",
                 text: "Are you sure you want to generate a project for this Diklat?",
@@ -206,7 +206,14 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        url: `http://192.168.10.36:8090/api/generate-project/${kaldikID}`,
+                        url: "{{ route('project.store') }}",
+                        data: {
+                            kaldikID: kaldikID,
+                            kaldikDesc: kaldikDesc
+                        },
+                        headers: {
+                            'X-CSRF-TOKEN': "{{ csrf_token() }}"
+                        },
                         type: "POST",
                         success: function(response) {
                             Swal.fire({
@@ -217,13 +224,19 @@
                                 showConfirmButton: false
                             });
                         },
-                        error: function() {
+                        error: function(xhr) {
+                            let errorMessage = "An error occurred while creating the project.";
+
+                            if (xhr.responseJSON && xhr.responseJSON.message) {
+                                errorMessage = xhr.responseJSON.message;
+                            }
                             Swal.fire({
                                 title: "Error!",
-                                text: "An error occurred while creating the project.",
+                                text: errorMessage,
                                 icon: "error"
                             });
                         }
+
                     });
                 }
             });
