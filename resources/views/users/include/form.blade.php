@@ -55,10 +55,8 @@
                         src="https://www.gravatar.com/avatar/{{ md5(strtolower(trim($user->email))) }}&s=450"
                         alt="avatar">
                 @else
-                    <img class="img-thumbnail" src="{{ asset("storage/uploads/avatars/$user->avatar") }}" style="width: 150px;height: 150px;border-radius: 5%;">
-
-
-
+                    <img class="img-thumbnail" src="{{ asset("storage/uploads/avatars/$user->avatar") }}"
+                        style="width: 150px;height: 150px;border-radius: 5%;">
                 @endif
             </div>
         </div>

@@ -135,7 +135,7 @@
                                         var date = new Date(dateString);
                                         var year = date.getFullYear();
                                         var month = ('0' + (date
-                                        .getMonth() + 1)).slice(-2);
+                                            .getMonth() + 1)).slice(-2);
                                         var day = ('0' + date.getDate())
                                             .slice(-2);
                                         return `${year}-${month}-${day}`;
@@ -233,6 +233,8 @@
                                 icon: "success",
                                 timer: 2000,
                                 showConfirmButton: false
+                            }).then(() => {
+                                location.reload(); // Reload halaman setelah sukses
                             });
                         },
                         error: function(xhr) {
@@ -247,7 +249,6 @@
                                 icon: "error"
                             });
                         }
-
                     });
                 }
             });

@@ -20,8 +20,6 @@
         </div>
 
         <section class="section">
-            <x-alert></x-alert>
-
             @can('project create')
                 <div class="d-flex justify-content-end">
                     <a href="{{ route('project.create') }}" class="btn btn-primary mb-3">
@@ -40,9 +38,12 @@
                                     <thead>
                                         <tr>
                                             <th>#</th>
-                                            <th>{{ __('Kode Project') }}</th>
+                                            <th>{{ __('Generate By') }}</th>
                                             <th>{{ __('Kode Diklat') }}</th>
                                             <th>{{ __('Nama Diklat') }}</th>
+                                            <th class="text-center">{{ __('Peserta') }}</th>
+                                            <th class="text-center">{{ __('Kuesioner') }}</th>
+                                            <th class="text-center">{{ __('Bobot') }}</th>
                                             <th>{{ __('Action') }}</th>
                                         </tr>
                                     </thead>
@@ -61,6 +62,7 @@
         integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs5/dt-1.12.0/datatables.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
 @endpush
 
 @push('js')
@@ -68,21 +70,45 @@
         integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/v/bs5/dt-1.12.0/datatables.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            @if (session('success'))
+                toastr.success("{{ session('success') }}", "Success", {
+                    closeButton: true,
+                    progressBar: true,
+                    positionClass: "toast-top-right",
+                    timeOut: 5000,
+                });
+            @endif
+
+            @if (session('error'))
+                toastr.error("{{ session('error') }}", "Error", {
+                    closeButton: true,
+                    progressBar: true,
+                    positionClass: "toast-top-right",
+                    timeOut: 5000,
+                });
+            @endif
+        });
+    </script>
+
     <script>
         $('#data-table').DataTable({
             processing: true,
             serverSide: true,
             ajax: "{{ route('project.index') }}",
-            columns: [
-                {
+            columns: [{
                     data: 'DT_RowIndex',
                     name: 'DT_RowIndex',
                     orderable: false,
                     searchable: false,
                 },
                 {
-                    data: 'kode_project',
-                    name: 'kode_project',
+                    data: 'user',
+                    name: 'user',
+                    orderable: false,
+                    searchable: false,
                 },
                 {
                     data: 'kaldikID',
@@ -91,6 +117,25 @@
                 {
                     data: 'kaldikDesc',
                     name: 'kaldikDesc',
+                },
+
+                {
+                    data: 'peserta',
+                    name: 'peserta',
+                    orderable: false,
+                    searchable: false,
+                },
+                {
+                    data: 'kuesioner',
+                    name: 'kuesioner',
+                    orderable: false,
+                    searchable: false,
+                },
+                {
+                    data: 'bobot',
+                    name: 'bobot',
+                    orderable: false,
+                    searchable: false,
                 },
                 {
                     data: 'action',

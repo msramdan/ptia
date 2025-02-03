@@ -11,12 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('project', function (Blueprint $table) {
+        Schema::create('project_kriteria_responden', function (Blueprint $table) {
             $table->id();
-            $table->string('kode_project')->nullable();
-            $table->bigInteger('kaldikID');
-            $table->text('kaldikDesc');
-            $table->foreignId('user_id')->constrained('users')->restrictOnDelete(); // Relasi ke users
+            $table->foreignId('project_id')->constrained('project')->restrictOnUpdate()->cascadeOnDelete();
+			$table->json('nilai_post_test');
+			$table->double('nilai_pre_test_minimal');
+			$table->double('nilai_post_test_minimal');
+			$table->double('nilai_kenaikan_pre_post');
             $table->timestamps();
         });
     }
@@ -26,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('project');
+        Schema::dropIfExists('project_kriteria_responden');
     }
 };
