@@ -38,7 +38,7 @@
                                     <thead>
                                         <tr>
                                             <th>#</th>
-                                            <th>{{ __('Generate By') }}</th>
+                                            <th>{{ __('Dibuat Oleh') }}</th>
                                             <th>{{ __('Kode Diklat') }}</th>
                                             <th>{{ __('Nama Diklat') }}</th>
                                             <th class="text-center">{{ __('Peserta') }}</th>

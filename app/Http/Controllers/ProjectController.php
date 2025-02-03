@@ -34,8 +34,8 @@ class ProjectController extends Controller implements HasMiddleware
     {
         if (request()->ajax()) {
             $projects = DB::table('project')
-            ->join('users', 'project.user_id', '=', 'users.id')
-            ->select('project.*', 'users.name as user_name', 'users.email', 'users.avatar');
+                ->join('users', 'project.user_id', '=', 'users.id')
+                ->select('project.*', 'users.name as user_name', 'users.email', 'users.avatar');
 
             return DataTables::of($projects)
                 ->addIndexColumn()
@@ -159,6 +159,58 @@ class ProjectController extends Controller implements HasMiddleware
                 'updated_at'              => now(),
             ]);
 
+            // STEP 1: Ambil 5 data pertama dari tabel aspek
+            $aspekList = DB::table('aspek')->limit(5)->get();
+
+            if ($aspekList->isEmpty()) {
+                throw new \Exception("No aspek data found.");
+            }
+
+            // Daftar pertanyaan sesuai aspek ID
+            $pertanyaanList = [
+                1 => "Saya termotivasi untuk terlibat secara aktif dalam setiap penugasan yang relevan dengan pelatihan ini.",
+                2 => "Saya percaya diri untuk terlibat secara aktif dalam setiap kegiatan yang relevan dengan pelatihan ini.",
+                3 => "Setelah mengikuti pelatihan, saya berbagi pengetahuan yang telah saya peroleh selama pelatihan kepada rekan-rekan kerja saya melalui kegiatan pelatihan di kantor sendiri, FGD, sharing session, atau bentuk knowledge sharing lainnya.",
+                4 => "Saya mampu menerapkan ilmu yang telah saya peroleh selama Pelatihan Pajak Terapan Brevet A dan B Tahun 2024 bagi Pegawai BPKP Tahun 2024 bagi Pegawai BPKP pada setiap penugasan yang relevan.",
+                5 => "Implementasi hasil pelatihan ini berdampak positif dalam meningkatkan pengelolaan keuangan negara."
+            ];
+
+            // STEP 2: Buat array untuk batch insert ke project_kuesioner
+            $kuesionerData = [];
+
+            foreach ($aspekList as $aspek) {
+                // Tentukan kriteria berdasarkan nilai field `aspek`
+                $kriteria = ($aspek->aspek === "Kemampuan Membagikan Keilmuan") ? 'Skor Persepsi' : 'Delta Skor Persepsi';
+
+                // Cek apakah aspek_id ada di daftar pertanyaan
+                $pertanyaan = $pertanyaanList[$aspek->id] ?? "Pertanyaan default untuk aspek ID {$aspek->id}";
+
+                // Data untuk Alumni
+                $kuesionerData[] = [
+                    'project_id'  => $projectId,
+                    'aspek_id'    => $aspek->id,
+                    'kriteria'    => $kriteria,
+                    'remark'      => 'Alumni',
+                    'pertanyaan'  => $pertanyaan,
+                    'created_at'  => now(),
+                    'updated_at'  => now(),
+                ];
+
+                // Data untuk Atasan
+                $kuesionerData[] = [
+                    'project_id'  => $projectId,
+                    'aspek_id'    => $aspek->id,
+                    'kriteria'    => $kriteria,
+                    'remark'      => 'Atasan',
+                    'pertanyaan'  => $pertanyaan,
+                    'created_at'  => now(),
+                    'updated_at'  => now(),
+                ];
+            }
+
+            // STEP 3: Insert batch ke project_kuesioner
+            DB::table('project_kuesioner')->insert($kuesionerData);
+
             // Commit transaksi jika semua proses sukses
             DB::commit();
 
@@ -181,6 +233,7 @@ class ProjectController extends Controller implements HasMiddleware
             ], 500);
         }
     }
+
 
 
     public function destroy($id): RedirectResponse
