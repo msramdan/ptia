@@ -61,11 +61,9 @@ class ProjectController extends Controller implements HasMiddleware
             ], 409);
         }
 
-        $id = (string) Str::uuid();
         $kode_project = Str::upper(Str::random(8));
 
         $insertData = [
-            'id'           => $id,
             'kode_project' => $kode_project,
             'kaldikID'     => $data['kaldikID'],
             'kaldikDesc'   => $data['kaldikDesc'],
