@@ -207,12 +207,12 @@
 
         function generateProject(kaldikID, kaldikDesc) {
             Swal.fire({
-                title: "Confirmation",
-                text: "Are you sure you want to generate a project for this Diklat?",
+                title: "Konfirmasi",
+                text: "Apakah Anda yakin ingin membuat project untuk Diklat ini?",
                 icon: "warning",
                 showCancelButton: true,
-                confirmButtonText: "Yes, Generate!",
-                cancelButtonText: "No, Cancel",
+                confirmButtonText: "Ya, Buat!",
+                cancelButtonText: "Tidak, Batal",
                 reverseButtons: true
             }).then((result) => {
                 if (result.isConfirmed) {
@@ -228,23 +228,23 @@
                         type: "POST",
                         success: function(response) {
                             Swal.fire({
-                                title: "Success!",
-                                text: "Project has been successfully created!",
+                                title: "Berhasil!",
+                                text: "Project berhasil dibuat!",
                                 icon: "success",
                                 timer: 2000,
                                 showConfirmButton: false
                             }).then(() => {
-                                location.reload(); // Reload halaman setelah sukses
+                                location.reload(); // Muat ulang halaman setelah sukses
                             });
                         },
                         error: function(xhr) {
-                            let errorMessage = "An error occurred while creating the project.";
+                            let errorMessage = "Terjadi kesalahan saat membuat project.";
 
                             if (xhr.responseJSON && xhr.responseJSON.message) {
                                 errorMessage = xhr.responseJSON.message;
                             }
                             Swal.fire({
-                                title: "Error!",
+                                title: "Kesalahan!",
                                 text: errorMessage,
                                 icon: "error"
                             });
@@ -253,6 +253,7 @@
                 }
             });
         }
+
 
 
         // Modal Detail Diklat - Fetch Data with AJAX

@@ -125,34 +125,37 @@ class ProjectController extends Controller implements HasMiddleware
             'kaldikDesc' => 'required|string',
         ]);
 
-        // Mulai transaksi database
         DB::beginTransaction();
 
         try {
-            // Cek apakah kaldikID sudah ada di dalam tabel project
             $existingProject = DB::table('project')->where('kaldikID', $data['kaldikID'])->first();
 
             if ($existingProject) {
                 return response()->json([
                     'status'  => false,
-                    'message' => "Project with Kaldik ID {$data['kaldikID']} already exists in project management.",
+                    'message' => "Kaldik ID {$data['kaldikID']} sudah ada dalam manajemen project.",
+
                 ], 409);
             }
 
             $kode_project = Str::upper(Str::random(8));
-            $userId = auth()->id();
+            $user = auth()->user();
+
+            if (!$user) {
+                throw new \Exception("User is not authenticated.");
+            }
 
             // 1. Insert ke tabel project
             $projectId = DB::table('project')->insertGetId([
                 'kode_project'  => $kode_project,
                 'kaldikID'      => $data['kaldikID'],
                 'kaldikDesc'    => $data['kaldikDesc'],
-                'user_id'       => $userId, // Simpan ID user yang login
+                'user_id'       => $user->id,
                 'created_at'    => now(),
                 'updated_at'    => now(),
             ]);
 
-            // 2. Insert data ke table kriteria_responden
+            // 2. Insert data ke tabel kriteria_responden
             $kriteriaResponden = DB::table('kriteria_responden')->first();
 
             if (!$kriteriaResponden) {
@@ -169,20 +172,35 @@ class ProjectController extends Controller implements HasMiddleware
                 'updated_at'              => now(),
             ]);
 
-            // 3. Insert data ke table project_pesan_wa
+            // 3. Insert data ke tabel project_pesan_wa
             $pesanWa = DB::table('pesan_wa')->first();
 
             if (!$pesanWa) {
-                throw new \Exception("Config pesan WA tidak di temukan");
+                throw new \Exception("Config pesan WA tidak ditemukan");
             }
 
+            // Ganti placeholder dengan nilai yang sesuai
+            $textPesanAlumni = str_replace(
+                ['{params_judul_diklat}', '{params_wa_pic}', '{params_pic}'],
+                [$data['kaldikDesc'], $user->phone, $user->name],
+                $pesanWa->text_pesan_alumni
+            );
+
+            $textPesanAtasan = str_replace(
+                ['{params_judul_diklat}', '{params_wa_pic}', '{params_pic}'],
+                [$data['kaldikDesc'], $user->phone, $user->name],
+                $pesanWa->text_pesan_atasan
+            );
+
             DB::table('project_pesan_wa')->insert([
-                'project_id'              => $projectId,
-                'text_pesan_alumni'       => $pesanWa->text_pesan_alumni,
-                'text_pesan_atasan'       => $pesanWa->text_pesan_atasan,
-                'created_at'              => now(),
-                'updated_at'              => now(),
+                'project_id'        => $projectId,
+                'text_pesan_alumni' => $textPesanAlumni,
+                'text_pesan_atasan' => $textPesanAtasan,
+                'created_at'        => now(),
+                'updated_at'        => now(),
             ]);
+
+
 
             // 4. Ambil 5 data pertama dari tabel aspek
             $aspekList = DB::table('aspek')->limit(5)->get();
@@ -247,7 +265,7 @@ class ProjectController extends Controller implements HasMiddleware
 
             return response()->json([
                 'status'  => true,
-                'message' => 'Project created successfully',
+                'message' => 'Project berhasil dibuat',
                 'data'    => [
                     'kode_project' => $kode_project,
                     'kaldikID'     => $data['kaldikID'],
@@ -260,7 +278,7 @@ class ProjectController extends Controller implements HasMiddleware
 
             return response()->json([
                 'status'  => false,
-                'message' => 'Failed to create project: ' . $e->getMessage(),
+                'message' => 'Gagal membuat project: ' . $e->getMessage(),
             ], 500);
         }
     }
@@ -271,14 +289,15 @@ class ProjectController extends Controller implements HasMiddleware
             $deleted = DB::table('project')->where('id', $id)->delete();
 
             if ($deleted) {
-                return to_route('project.index')->with('success', __('The project was deleted successfully.'));
+                return to_route('project.index')->with('success', __('Project berhasil dihapus.'));
             } else {
-                return to_route('project.index')->with('error', __("The project was not found or couldn't be deleted."));
+                return to_route('project.index')->with('error', __("Project tidak ditemukan atau tidak dapat dihapus."));
             }
         } catch (\Exception $e) {
-            return to_route('project.index')->with('error', __("The project can't be deleted because it's related to another table."));
+            return to_route('project.index')->with('error', __("Project tidak dapat dihapus karena terkait dengan tabel lain."));
         }
     }
+
 
     public function showKuesioner($id, $remark)
     {
