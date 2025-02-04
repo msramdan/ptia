@@ -18,10 +18,14 @@ use App\Http\Controllers\{
     ProjectController
 };
 
-Route::get('/', fn() => view('welcome'));
+
+Route::get('/', function () {
+    return view('welcome');
+});
 
 Route::middleware(['auth', 'web'])->group(function () {
-    Route::get('/dashboard', fn() => view('dashboard'))->name('dashboard');
+    Route::get('/', fn () => view('dashboard'));
+    Route::get('/dashboard', fn () => view('dashboard'));
     Route::get('/profile', ProfileController::class)->name('profile');
 
     Route::resources([
