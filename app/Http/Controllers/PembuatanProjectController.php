@@ -32,34 +32,31 @@ class PembuatanProjectController extends Controller implements HasMiddleware
 
     public function getKaldikData(Request $request)
     {
-        // Ambil data dari API sumber (seperti sebelumnya)
-        $response = \Http::get("http://192.168.10.36:8090/api/len-kaldik", [
-            'api_key' => '797e9aa1-be97-4dc0-ae13-3ecd304a61a3',
+        $apiUrl = config('services.pusdiklatwas.endpoint') . "/len-kaldik";
+        $apiToken = config('services.pusdiklatwas.api_token');
+
+        $response = \Http::get($apiUrl, [
+            'api_key' => $apiToken,
             'limit' => $request->limit,
             'page' => $request->page,
             'search' => $request->search
         ]);
 
-        // Ambil data yang sudah di-fetch dari API
-        $data = $response->json()['data'];
+        $data = $response->json()['data'] ?? [];
 
-        // Ambil semua KaldikID dari data yang ada
         $kaldikIDs = collect($data)->pluck('kaldikID')->toArray();
 
-        // Cek status generate di database dengan KaldikID
         $existingProjects = DB::table('project')
             ->whereIn('kaldikID', $kaldikIDs)
             ->pluck('kaldikID')->toArray();
 
-        // Tambahkan status generate ke setiap item
         $dataWithStatus = collect($data)->map(function ($item) use ($existingProjects) {
-            $status = in_array($item['kaldikID'], $existingProjects) ? 'SUDAH' : 'BELUM';
-            $item['status_generate'] = $status;
+            $item['status_generate'] = in_array($item['kaldikID'], $existingProjects) ? 'SUDAH' : 'BELUM';
             return $item;
         });
 
         return response()->json([
-            'total' => $response->json()['total'],
+            'total' => $response->json()['total'] ?? 0,
             'data' => $dataWithStatus,
         ]);
     }

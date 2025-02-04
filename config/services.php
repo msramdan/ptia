@@ -14,6 +14,11 @@ return [
     |
     */
 
+    'pusdiklatwas' => [
+        'endpoint' => env('ENDPOINT_PUSDIKLATWAS'),
+        'api_token' => env('API_TOKEN_PUSDIKLATWAS'),
+    ],
+
     'postmark' => [
         'token' => env('POSTMARK_TOKEN'),
     ],
