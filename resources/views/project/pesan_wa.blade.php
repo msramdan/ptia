@@ -14,12 +14,9 @@
                 </div>
 
                 <x-breadcrumb>
-                    <li class="breadcrumb-item">
-                        <a href="/">{{ __('Dashboard') }}</a>
-                    </li>
-                    <li class="breadcrumb-item active">
-                        {{ __('Pesan Wa') }}
-                    </li>
+                    <li class="breadcrumb-item"><a href="/">{{ __('Dashboard') }}</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('project.index') }}">{{ __('Management Project') }}</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ __('Pesan Wa') }}</li>
                 </x-breadcrumb>
             </div>
         </div>
@@ -29,7 +26,28 @@
                 <div class="col-md-12">
                     <div class="card">
                         <div class="card-body">
-                            <form action="{{ route('pesan-wa.update', $pesanWa->id) }}" method="POST">
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td><strong>Kode Diklat</strong></td>
+                                    <td>: {{ $project->kaldikID ?? '-' }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Nama Diklat</strong></td>
+                                    <td>: {{ $project->kaldikDesc ?? '-' }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Dibuat Oleh</strong></td>
+                                    <td>: {{ $project->user_name ?? '-' }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <form action="" method="POST">
                                 @csrf
                                 @method('PUT')
 
@@ -61,7 +79,9 @@
                                         </div>
                                     </div>
                                 </div>
-
+                                <a href="{{ route('project.index') }}" class="btn btn-secondary">
+                                    <i class="fas fa-arrow-left"></i> {{ __('kembali') }}
+                                </a>
                                 <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i>
                                     {{ __('Update') }}</button>
                             </form>

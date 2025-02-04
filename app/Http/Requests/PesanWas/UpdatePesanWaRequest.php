@@ -20,7 +20,8 @@ class UpdatePesanWaRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'text_pesan' => 'required|string',
+            'text_pesan_alumni' => 'required|string',
+            'text_pesan_atasan' => 'required|string',
         ];
     }
 }

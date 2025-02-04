@@ -98,7 +98,6 @@
                                 <a href="{{ route('project.index') }}" class="btn btn-secondary">
                                     <i class="fas fa-arrow-left"></i> {{ __('kembali') }}
                                 </a>
-
                                 <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> {{ __('Submit') }}</button>
                             </form>
 

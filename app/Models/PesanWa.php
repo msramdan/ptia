@@ -21,7 +21,7 @@ class PesanWa extends Model
      *
      * @var string[]
      */
-    protected $fillable = ['text_pesan'];
+    protected $fillable = ['text_pesan_alumni','text_pesan_atasan'];
 
     /**
      * Get the attributes that should be cast.
@@ -30,7 +30,7 @@ class PesanWa extends Model
      */
     protected function casts(): array
     {
-        return ['text_pesan' => 'string', 'created_at' => 'datetime:Y-m-d H:i:s', 'updated_at' => 'datetime:Y-m-d H:i:s'];
+        return ['text_pesan_alumni' => 'string','text_pesan_atasan' => 'string', 'created_at' => 'datetime:Y-m-d H:i:s', 'updated_at' => 'datetime:Y-m-d H:i:s'];
     }
 
 

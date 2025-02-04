@@ -85,7 +85,7 @@ class ProjectController extends Controller implements HasMiddleware
                 })
 
                 ->addColumn('wa', function ($row) {
-                    $editWa = route('responden.show', ['id' => $row->id]);
+                    $editWa = route('pesan.wa.show', ['id' => $row->id]);
                     return '
                         <div class="text-center">
                             <a href="' . $editWa . '"
@@ -142,7 +142,7 @@ class ProjectController extends Controller implements HasMiddleware
             $kode_project = Str::upper(Str::random(8));
             $userId = auth()->id();
 
-            // Insert ke tabel project
+            // 1. Insert ke tabel project
             $projectId = DB::table('project')->insertGetId([
                 'kode_project'  => $kode_project,
                 'kaldikID'      => $data['kaldikID'],
@@ -152,14 +152,13 @@ class ProjectController extends Controller implements HasMiddleware
                 'updated_at'    => now(),
             ]);
 
-            // Ambil data pertama dari tabel kriteria_responden
+            // 2. Insert data ke table kriteria_responden
             $kriteriaResponden = DB::table('kriteria_responden')->first();
 
             if (!$kriteriaResponden) {
                 throw new \Exception("No kriteria responden data found.");
             }
 
-            // Insert ke tabel project_kriteria_responden
             DB::table('project_kriteria_responden')->insert([
                 'project_id'              => $projectId,
                 'nilai_post_test'         => $kriteriaResponden->nilai_post_test,
@@ -170,7 +169,22 @@ class ProjectController extends Controller implements HasMiddleware
                 'updated_at'              => now(),
             ]);
 
-            // STEP 1: Ambil 5 data pertama dari tabel aspek
+            // 3. Insert data ke table project_pesan_wa
+            $pesanWa = DB::table('pesan_wa')->first();
+
+            if (!$pesanWa) {
+                throw new \Exception("Config pesan WA tidak di temukan");
+            }
+
+            DB::table('project_pesan_wa')->insert([
+                'project_id'              => $projectId,
+                'text_pesan_alumni'       => $pesanWa->text_pesan_alumni,
+                'text_pesan_atasan'       => $pesanWa->text_pesan_atasan,
+                'created_at'              => now(),
+                'updated_at'              => now(),
+            ]);
+
+            // 4. Ambil 5 data pertama dari tabel aspek
             $aspekList = DB::table('aspek')->limit(5)->get();
 
             if ($aspekList->isEmpty()) {
@@ -367,5 +381,19 @@ class ProjectController extends Controller implements HasMiddleware
             ->first();
 
         return view('project.responden', compact('project', 'kriteriaResponden'));
+    }
+
+    public function showPesanWa($id)
+    {
+        $project = DB::table('project')
+            ->join('users', 'project.user_id', '=', 'users.id')
+            ->select('project.*', 'users.name as user_name')
+            ->where('project.id', $id)
+            ->first();
+
+        $pesanWa = DB::table('project_pesan_wa')
+            ->where('project_pesan_wa.project_id', $id)
+            ->first();
+        return view('project.pesan_wa', compact('project', 'pesanWa'));
     }
 }

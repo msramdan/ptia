@@ -59,6 +59,8 @@ Route::middleware(['auth', 'web'])->group(function () {
         Route::delete('/delete/{id}', 'deleteKuesioner')->name('kuesioner.delete');
         // Peserta
         Route::get('/show-responden/{id}', 'showResponden')->name('responden.show');
+        //pesat wa
+        Route::get('/show-pesan-wa/{id}', 'showPesanWa')->name('pesan.wa.show');
     });
 
 });
