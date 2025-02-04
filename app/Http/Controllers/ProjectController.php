@@ -65,15 +65,8 @@ class ProjectController extends Controller implements HasMiddleware
                     $editResponden = route('responden.show', ['id' => $row->id]);
                     return '
                         <div class="text-center">
-                            <a href="javascript:void(0);" onclick="peserta_view(' . $row->id . ')"
-                               class="btn btn-sm btn-info"
-                               style="width: 160px; background: #17a2b8; border-color: #17a2b8;"
-                               data-toggle="tooltip" data-placement="left" title="Lihat Daftar Responden">
-                                <i class="fas fa-eye"></i> Daftar Responden
-                            </a>
-                            <br><hr style="margin: 5px;">
                             <a href="' . $editResponden . '" class="btn btn-sm btn-warning"
-                               style="width: 160px; background: #ffc107; border-color: #ffc107;"
+                               style="width: 140px; background: #ffc107; border-color: #ffc107;"
                                data-toggle="tooltip" data-placement="left" title="Atur Responden">
                                 <i class="fas fa-users-cog"></i> Atur Responden
                             </a>
@@ -82,14 +75,28 @@ class ProjectController extends Controller implements HasMiddleware
                 ->addColumn('bobot', function ($row) {
                     return '
                         <div class="text-center">
-                            <a href="javascript:void(0);" onclick="bobot_edit(' . $row->id . ')"
+                            <a href="#"
                                class="btn btn-sm btn-danger"
-                               style="width: 120px; background: #dc3545; border-color: #dc3545;"
+                               style="width: 140px;"
                                data-toggle="tooltip" data-placement="left" title="Atur Bobot">
-                                <i class="fas fa-balance-scale"></i> Atur Bobot
+                                <i class="fas fa-balance-scale"></i> Atur Botot
                             </a>
                         </div>';
                 })
+
+                ->addColumn('wa', function ($row) {
+                    $editWa = route('responden.show', ['id' => $row->id]);
+                    return '
+                        <div class="text-center">
+                            <a href="' . $editWa . '"
+                               class="btn btn-sm btn-success"
+                               style="width: 140px;"
+                               data-toggle="tooltip" data-placement="left" title="Atur Pesan">
+                                <i class="fab fa-whatsapp"></i> Atur Pesan
+                            </a>
+                        </div>';
+                })
+
                 ->addColumn('user', function ($row) {
                     $avatar = $row->avatar
                         ? asset("storage/uploads/avatars/$row->avatar")
@@ -103,7 +110,7 @@ class ProjectController extends Controller implements HasMiddleware
                         </div>';
                 })
                 ->addColumn('action', 'project.include.action')
-                ->rawColumns(['kuesioner', 'peserta', 'bobot', 'user', 'action'])
+                ->rawColumns(['kuesioner', 'peserta', 'bobot', 'user', 'wa', 'action'])
                 ->toJson();
         }
 

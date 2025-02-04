@@ -42,8 +42,9 @@
                                             <th>{{ __('Kode Diklat') }}</th>
                                             <th>{{ __('Nama Diklat') }}</th>
                                             <th class="text-center">{{ __('Peserta') }}</th>
-                                            <th class="text-center">{{ __('Kuesioner') }}</th>
                                             <th class="text-center">{{ __('Bobot') }}</th>
+                                            <th class="text-center">{{ __('Pesan WA') }}</th>
+                                            <th class="text-center">{{ __('Kuesioner') }}</th>
                                             <th>{{ __('Action') }}</th>
                                         </tr>
                                     </thead>
@@ -126,14 +127,20 @@
                     searchable: false,
                 },
                 {
-                    data: 'kuesioner',
-                    name: 'kuesioner',
+                    data: 'bobot',
+                    name: 'bobot',
                     orderable: false,
                     searchable: false,
                 },
                 {
-                    data: 'bobot',
-                    name: 'bobot',
+                    data: 'wa',
+                    name: 'wa',
+                    orderable: false,
+                    searchable: false,
+                },
+                {
+                    data: 'kuesioner',
+                    name: 'kuesioner',
                     orderable: false,
                     searchable: false,
                 },
