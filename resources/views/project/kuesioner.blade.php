@@ -142,10 +142,10 @@
                     <div class="card">
                         <div class="card-body">
                             <div class="mb-3">
-                                <a href="{{ route('project.index') }}" class="btn btn-sm btn-secondary">
+                                <a href="{{ route('project.index') }}" class="btn btn-secondary">
                                     <i class="fas fa-arrow-left"></i> {{ __('kembali') }}
                                 </a>
-                                <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addModal">
+                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal">
                                     <i class="fas fa-plus"></i> {{ __('Tambah data') }}
                                 </button>
                             </div>
