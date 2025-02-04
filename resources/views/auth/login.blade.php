@@ -13,12 +13,16 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
 </head>
 <style>
+    .recaptcha-wrapper {
+        display: inline-block;
+        max-width: 100%;
+        overflow: hidden;
+    }
+
     @media (max-width: 576px) {
-        .g-recaptcha {
+        .recaptcha-wrapper {
             transform: scale(0.9);
-            /* Sesuaikan skala */
             transform-origin: center;
-            /* Pusatkan posisi */
         }
     }
 </style>
@@ -58,9 +62,10 @@
                                     style="top: 50%; right: 10px; transform: translateY(-50%); cursor: pointer; color: #6c757d;"></i>
                             </div>
 
-                            <div class="mb-3">
-                                {!! NoCaptcha::display() !!}
-                                {!! NoCaptcha::renderJs() !!}
+                            <div class="mb-3 text-center">
+                                <div class="recaptcha-wrapper">
+                                    {!! NoCaptcha::display() !!}
+                                </div>
                             </div>
                             <div class="d-grid">
                                 <button type="submit" class="btn btn-primary">Login</button>
