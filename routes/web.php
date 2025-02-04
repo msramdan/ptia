@@ -24,8 +24,8 @@ Route::get('/', function () {
 });
 
 Route::middleware(['auth', 'web'])->group(function () {
-    Route::get('/', fn () => view('dashboard'));
-    Route::get('/dashboard', fn () => view('dashboard'));
+    Route::get('/', fn() => view('dashboard'));
+    Route::get('/dashboard', fn() => view('dashboard'));
     Route::get('/profile', ProfileController::class)->name('profile');
 
     Route::resources([
@@ -61,6 +61,7 @@ Route::middleware(['auth', 'web'])->group(function () {
         Route::get('/show-responden/{id}', 'showResponden')->name('responden.show');
         //pesat wa
         Route::get('/show-pesan-wa/{id}', 'showPesanWa')->name('pesan.wa.show');
+        //Bobot
+        Route::get('/show-bobot/{id}', 'showBobot')->name('bobot.show');
     });
-
 });

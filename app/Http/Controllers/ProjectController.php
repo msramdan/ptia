@@ -73,9 +73,10 @@ class ProjectController extends Controller implements HasMiddleware
                         </div>';
                 })
                 ->addColumn('bobot', function ($row) {
+                    $editBobot = route('bobot.show', ['id' => $row->id]);
                     return '
                         <div class="text-center">
-                            <a href="#"
+                             <a href="' . $editBobot . '"
                                class="btn btn-sm btn-danger"
                                style="width: 140px;"
                                data-toggle="tooltip" data-placement="left" title="Atur Bobot">
@@ -179,7 +180,6 @@ class ProjectController extends Controller implements HasMiddleware
                 throw new \Exception("Config pesan WA tidak ditemukan");
             }
 
-            // Ganti placeholder dengan nilai yang sesuai
             $textPesanAlumni = str_replace(
                 ['{params_judul_diklat}', '{params_wa_pic}', '{params_pic}'],
                 [$data['kaldikDesc'], $user->phone, $user->name],
@@ -200,9 +200,33 @@ class ProjectController extends Controller implements HasMiddleware
                 'updated_at'        => now(),
             ]);
 
+            // 4.Insert data ke table project_bobot
+            // Ambil semua data dari tabel bobot_aspek dan join dengan tabel aspek
+            $dataBobot = DB::table('bobot_aspek')
+                ->join('aspek', 'bobot_aspek.aspek_id', '=', 'aspek.id')
+                ->select('bobot_aspek.aspek_id', 'bobot_aspek.bobot_alumni', 'bobot_aspek.bobot_atasan_langsung', 'aspek.level', 'aspek.aspek')
+                ->get();
 
+            if ($dataBobot->isEmpty()) {
+                throw new \Exception("No bobot aspek found.");
+            }
 
-            // 4. Ambil 5 data pertama dari tabel aspek
+            // Insert data ke tabel project_bobot
+            $insertData = $dataBobot->map(function ($item) use ($projectId) {
+                return [
+                    'project_id' => $projectId,
+                    'aspek_id' => $item->aspek_id,
+                    'level' => $item->level,
+                    'aspek' => $item->aspek,
+                    'bobot_alumni' => $item->bobot_alumni,
+                    'bobot_atasan_langsung' => $item->bobot_atasan_langsung,
+                ];
+            })->toArray();
+
+            // Insert batch ke project_bobot
+            DB::table('project_bobot')->insert($insertData);
+
+            // 5. Insert data ke table project_kuesioner
             $aspekList = DB::table('aspek')->limit(5)->get();
 
             if ($aspekList->isEmpty()) {
@@ -221,7 +245,7 @@ class ProjectController extends Controller implements HasMiddleware
                 5 => "Implementasi hasil pelatihan ini berdampak positif dalam meningkatkan pengelolaan keuangan negara."
             ];
 
-            // STEP 2: Buat array untuk batch insert ke project_kuesioner
+            // Buat array untuk batch insert ke project_kuesioner
             $kuesionerData = [];
 
             foreach ($aspekList as $aspek) {
@@ -256,7 +280,7 @@ class ProjectController extends Controller implements HasMiddleware
                 ];
             }
 
-            // STEP 3: Insert batch ke project_kuesioner
+            // Insert batch ke project_kuesioner
             DB::table('project_kuesioner')->insert($kuesionerData);
 
 
@@ -414,5 +438,24 @@ class ProjectController extends Controller implements HasMiddleware
             ->where('project_pesan_wa.project_id', $id)
             ->first();
         return view('project.pesan_wa', compact('project', 'pesanWa'));
+    }
+
+    public function showBobot($id)
+    {
+        $project = DB::table('project')
+            ->join('users', 'project.user_id', '=', 'users.id')
+            ->select('project.*', 'users.name as user_name')
+            ->where('project.id', $id)
+            ->first();
+
+        $bobotAspek = DB::table('bobot_aspek')
+            ->join('aspek', 'bobot_aspek.aspek_id', '=', 'aspek.id')
+            ->select('bobot_aspek.*', 'aspek.aspek as aspek_nama', 'aspek.level')
+            ->get();
+
+        $level3 = $bobotAspek->where('level', 3);
+        $level4 = $bobotAspek->where('level', 4);
+
+        return view('project.bobot', compact('project', 'level3', 'level4'));
     }
 }
