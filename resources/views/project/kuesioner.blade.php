@@ -9,7 +9,7 @@
                 <div class="col-12 col-md-8 order-md-1 order-last">
                     <h3>{{ __('Kuesioner') }}</h3>
                     <p class="text-subtitle text-muted">
-                        {{ __('Below is the list of questionnaires from the projec') }}
+                        {{ __('Berikut adalah daftar kuesioner dari project.') }}
                     </p>
                 </div>
                 <x-breadcrumb>
@@ -116,7 +116,6 @@
                 <div class="col-md-12">
                     <div class="card">
                         <div class="card-body">
-                            <h5 class="card-title">Informasi Proyek</h5>
                             <table class="table table-borderless">
                                 <tr>
                                     <td><strong>Kode Diklat</strong></td>

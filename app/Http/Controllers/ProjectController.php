@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\KriteriaResponden;
 use App\Models\Project;
 use Illuminate\Http\Request;
 use Illuminate\Contracts\View\View;
@@ -61,6 +62,7 @@ class ProjectController extends Controller implements HasMiddleware
                 })
 
                 ->addColumn('peserta', function ($row) {
+                    $editResponden = route('responden.show', ['id' => $row->id]);
                     return '
                         <div class="text-center">
                             <a href="javascript:void(0);" onclick="peserta_view(' . $row->id . ')"
@@ -70,8 +72,7 @@ class ProjectController extends Controller implements HasMiddleware
                                 <i class="fas fa-eye"></i> Daftar Responden
                             </a>
                             <br><hr style="margin: 5px;">
-                            <a href="javascript:void(0);" onclick="peserta_edit(' . $row->id . ')"
-                               class="btn btn-sm btn-warning"
+                            <a href="' . $editResponden . '" class="btn btn-sm btn-warning"
                                style="width: 160px; background: #ffc107; border-color: #ffc107;"
                                data-toggle="tooltip" data-placement="left" title="Atur Responden">
                                 <i class="fas fa-users-cog"></i> Atur Responden
@@ -334,4 +335,16 @@ class ProjectController extends Controller implements HasMiddleware
         return back()->with('success', 'Kuesioner berhasil ditambahkan!');
     }
 
+    public function showResponden($id)
+    {
+        $kriteriaResponden = KriteriaResponden::findOrFail(1);
+        $kriteriaResponden->nilai_post_test = json_decode($kriteriaResponden->nilai_post_test, true);
+
+        $project = DB::table('project')
+            ->join('users', 'project.user_id', '=', 'users.id')
+            ->select('project.*', 'users.name as user_name')
+            ->where('project.id', $id)
+            ->first();
+        return view('project.responden', compact('project','kriteriaResponden'));
+    }
 }

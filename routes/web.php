@@ -29,9 +29,12 @@ Route::get('/get-kaldik-data', [App\Http\Controllers\PembuatanProjectController:
 Route::resource('project', App\Http\Controllers\ProjectController::class)->middleware('auth');
 
 Route::prefix('project/kuesioner')->group(function () {
+    // kuesioner
     Route::get('/show/{id}/{remark}', [App\Http\Controllers\ProjectController::class, 'showKuesioner'])->name('kuesioner.show');
     Route::post('/store', [App\Http\Controllers\ProjectController::class, 'tambahKuesioner'])->name('kuesioner.store');
     Route::get('/edit/{id}', [App\Http\Controllers\ProjectController::class, 'editKuesioner'])->name('kuesioner.edit');
     Route::post('/update/{id}', [App\Http\Controllers\ProjectController::class, 'saveKuesioner'])->name('kuesioner.update');
     Route::delete('/delete/{id}', [App\Http\Controllers\ProjectController::class, 'deleteKuesioner'])->name('kuesioner.delete');
+    // peserta
+    Route::get('/show-responden/{id}/', [App\Http\Controllers\ProjectController::class, 'showResponden'])->name('responden.show');
 });
