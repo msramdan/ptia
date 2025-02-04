@@ -14,7 +14,9 @@ return new class extends Migration
         Schema::create('project_kuesioner', function (Blueprint $table) {
             $table->id();
             $table->foreignId('project_id')->constrained('project')->restrictOnUpdate()->cascadeOnDelete();
-			$table->foreignId('aspek_id')->constrained('aspek')->restrictOnUpdate()->restrictOnDelete();
+            $table->char('aspek_id', 20);
+            $table->enum('level', ['3', '4']);
+            $table->string('aspek', 255);
 			$table->enum('kriteria', ['Skor Persepsi', 'Delta Skor Persepsi']);
             $table->enum('remark', ['Alumni', 'Atasan']);
 			$table->text('pertanyaan');

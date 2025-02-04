@@ -260,6 +260,8 @@ class ProjectController extends Controller implements HasMiddleware
                 $kuesionerData[] = [
                     'project_id'  => $projectId,
                     'aspek_id'    => $aspek->id,
+                    'level'    => $aspek->level,
+                    'aspek'    => $aspek->aspek,
                     'kriteria'    => $kriteria,
                     'remark'      => 'Alumni',
                     'pertanyaan'  => $pertanyaanAlumni,
@@ -272,6 +274,8 @@ class ProjectController extends Controller implements HasMiddleware
                 $kuesionerData[] = [
                     'project_id'  => $projectId,
                     'aspek_id'    => $aspek->id,
+                    'level'    => $aspek->level,
+                    'aspek'    => $aspek->aspek,
                     'kriteria'    => $kriteria,
                     'remark'      => 'Atasan',
                     'pertanyaan'  => $pertanyaanAtasan,
