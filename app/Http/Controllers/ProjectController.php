@@ -40,16 +40,18 @@ class ProjectController extends Controller implements HasMiddleware
             return DataTables::of($projects)
                 ->addIndexColumn()
                 ->addColumn('kuesioner', function ($row) {
+                    $editAlumniUrl = route('kuesioner.show', ['id' => $row->id, 'remark' => 'Alumni']);
+                    $editAtasanUrl = route('kuesioner.show', ['id' => $row->id, 'remark' => 'Atasan']);
                     return '
                         <div class="text-center">
-                            <a href="javascript:void(0);" onclick="quis_edit(' . $row->id . ', 1)"
+                            <a href="' . $editAlumniUrl . '"
                                class="btn btn-sm btn-primary"
                                style="width: 100px; background: #007bff; border-color: #007bff;"
                                data-toggle="tooltip" data-placement="left" title="Alumni: Ubah Kuesioner">
                                 <i class="fas fa-clipboard-list"></i> Alumni
                             </a>
                             <br><hr style="margin: 5px;">
-                            <a href="javascript:void(0);" onclick="quis_edit(' . $row->id . ', 2)"
+                            <a href="' . $editAtasanUrl . '"
                                class="btn btn-sm btn-secondary"
                                style="width: 100px; background: #6c757d; border-color: #6c757d;"
                                data-toggle="tooltip" data-placement="left" title="Atasan Langsung: Ubah Kuesioner">
@@ -57,6 +59,7 @@ class ProjectController extends Controller implements HasMiddleware
                             </a>
                         </div>';
                 })
+
                 ->addColumn('peserta', function ($row) {
                     return '
                         <div class="text-center">
@@ -234,8 +237,6 @@ class ProjectController extends Controller implements HasMiddleware
         }
     }
 
-
-
     public function destroy($id): RedirectResponse
     {
         try {
@@ -250,4 +251,87 @@ class ProjectController extends Controller implements HasMiddleware
             return to_route('project.index')->with('error', __("The project can't be deleted because it's related to another table."));
         }
     }
+
+    public function showKuesioner($id, $remark)
+    {
+        $project = DB::table('project')
+            ->join('users', 'project.user_id', '=', 'users.id')
+            ->select('project.*', 'users.name as user_name')
+            ->where('project.id', $id)
+            ->first();
+
+        $kuesioners = DB::table('project_kuesioner')
+            ->join('aspek', 'project_kuesioner.aspek_id', '=', 'aspek.id')
+            ->select(
+                'project_kuesioner.*',
+                'aspek.aspek as aspek_nama'
+            )
+            ->where('project_kuesioner.project_id', $id)
+            ->where('project_kuesioner.remark', $remark)
+            ->get();
+
+        $aspeks = DB::table('aspek')->select('id', 'aspek')->get();
+
+        return view('project.kuesioner', compact('project', 'kuesioners', 'remark', 'aspeks'));
+    }
+
+
+    public function editKuesioner($id)
+    {
+        $kuesioner = DB::table('project_kuesioner')->where('id', $id)->first();
+        return response()->json($kuesioner);
+    }
+
+
+    public function updateKuesioner($id)
+    {
+        $kuesioner = DB::table('project_kuesioner')->where('id', $id)->first();
+
+        return view('project.edit_kuesioner', compact('kuesioner'));
+    }
+
+    public function saveKuesioner(Request $request, $id)
+    {
+        DB::table('project_kuesioner')
+            ->where('id', $id)
+            ->update([
+                'aspek_id' => $request->aspek,
+                'kriteria' => $request->kriteria,
+                'pertanyaan' => $request->pertanyaan,
+                'updated_at' => now(),
+            ]);
+
+        return back()->with('success', 'Kuesioner berhasil diperbarui!');
+    }
+
+    public function deleteKuesioner($id)
+    {
+        DB::table('project_kuesioner')->where('id', $id)->delete();
+        return response()->json(['success' => 'Kuesioner berhasil dihapus']);
+    }
+
+    public function tambahKuesioner(Request $request)
+    {
+        $validated = $request->validate([
+            'project_id' => 'required',
+            'remark' => 'required',
+            'aspek' => 'required',
+            'kriteria' => 'required|string',
+            'pertanyaan' => 'required|string',
+        ]);
+
+        // Menggunakan query builder untuk menyimpan data
+        DB::table('project_kuesioner')->insert([
+            'project_id' => $validated['project_id'],
+            'aspek_id' => $validated['aspek'],
+            'remark' => $validated['remark'],
+            'kriteria' => $validated['kriteria'],
+            'pertanyaan' => $validated['pertanyaan'],
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return back()->with('success', 'Kuesioner berhasil ditambahkan!');
+    }
+
 }
