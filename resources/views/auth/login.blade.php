@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="https://registrasi.bpkp.go.id/ptia/assets/temalogin/css/iofrm-theme22.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
 </head>
+
 <style>
     .recaptcha-wrapper {
         display: inline-block;
@@ -61,12 +62,13 @@
                                 <i class="fa fa-eye position-absolute toggle-password"
                                     style="top: 50%; right: 10px; transform: translateY(-50%); cursor: pointer; color: #6c757d;"></i>
                             </div>
-
                             <div class="mb-3 text-center">
                                 <div class="recaptcha-wrapper">
                                     {!! NoCaptcha::display() !!}
+                                    {!! NoCaptcha::renderJs() !!}
                                 </div>
                             </div>
+
                             <div class="d-grid">
                                 <button type="submit" class="btn btn-primary">Login</button>
                             </div>
