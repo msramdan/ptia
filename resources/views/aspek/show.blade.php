@@ -58,7 +58,7 @@
                             </div>
 
                             <a href="{{ route('aspek.index') }}" class="btn btn-secondary"><i class="fa fa-arrow-left"
-                                    aria-hidden="true"></i> {{ __('Back') }}</a>
+                                    aria-hidden="true"></i> {{ __('Kembali') }}</a>
                         </div>
                     </div>
                 </div>

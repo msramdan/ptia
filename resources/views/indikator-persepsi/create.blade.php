@@ -39,7 +39,7 @@
 
                                 @include('indikator-persepsi.include.form')
 
-                                <a href="{{ route('indikator-persepsi.index') }}" class="btn btn-secondary"><i class="fa fa-arrow-left" aria-hidden="true"></i> {{ __('Back') }}</a>
+                                <a href="{{ route('indikator-persepsi.index') }}" class="btn btn-secondary"><i class="fa fa-arrow-left" aria-hidden="true"></i> {{ __('Kembali') }}</a>
 
                                 <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> {{ __('Save') }}</button>
                             </form>

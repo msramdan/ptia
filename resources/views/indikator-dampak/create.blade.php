@@ -39,7 +39,7 @@
 
                                 @include('indikator-dampak.include.form')
 
-                                <a href="{{ route('indikator-dampak.index') }}" class="btn btn-secondary">{{ __('Back') }}</a>
+                                <a href="{{ route('indikator-dampak.index') }}" class="btn btn-secondary">{{ __('Kembali') }}</a>
 
                                 <button type="submit" class="btn btn-primary">{{ __('Save') }}</button>
                             </form>

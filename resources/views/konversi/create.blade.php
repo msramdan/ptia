@@ -39,7 +39,7 @@
 
                                 @include('konversi.include.form')
 
-                                <a href="{{ route('konversi.index') }}" class="btn btn-secondary">{{ __('Back') }}</a>
+                                <a href="{{ route('konversi.index') }}" class="btn btn-secondary">{{ __('Kembali') }}</a>
 
                                 <button type="submit" class="btn btn-primary">{{ __('Save') }}</button>
                             </form>

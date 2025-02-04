@@ -57,7 +57,7 @@
                                 </table>
                             </div>
 
-                            <a href="{{ route('indikator-dampak.index') }}" class="btn btn-secondary">{{ __('Back') }}</a>
+                            <a href="{{ route('indikator-dampak.index') }}" class="btn btn-secondary">{{ __('Kembali') }}</a>
                         </div>
                     </div>
                 </div>

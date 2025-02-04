@@ -57,7 +57,7 @@
                                 </table>
                             </div>
 
-                            <a href="{{ route('konversi.index') }}" class="btn btn-secondary">{{ __('Back') }}</a>
+                            <a href="{{ route('konversi.index') }}" class="btn btn-secondary">{{ __('Kembali') }}</a>
                         </div>
                     </div>
                 </div>
