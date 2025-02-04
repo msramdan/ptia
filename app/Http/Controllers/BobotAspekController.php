@@ -3,10 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\BobotAspek;
-use App\Http\Requests\BobotAspeks\{UpdateBobotAspekRequest};
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\{RedirectResponse};
 use Illuminate\Routing\Controllers\{HasMiddleware, Middleware};
+use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
 
 class BobotAspekController extends Controller implements HasMiddleware
 {
@@ -21,11 +22,21 @@ class BobotAspekController extends Controller implements HasMiddleware
 
     public function index(): View
     {
-        $bobotAspek = BobotAspek::findOrFail(1)->first();
-        return view('bobot-aspek.edit', compact('bobotAspek'));
+        $bobotAspek = DB::table('bobot_aspek')
+            ->join('aspek', 'bobot_aspek.aspek_id', '=', 'aspek.id')
+            ->select('bobot_aspek.*', 'aspek.aspek as aspek_nama', 'aspek.level')
+            ->get();
+
+        // Grouping by level 3 and 4
+        $level3 = $bobotAspek->where('level', 3);
+        $level4 = $bobotAspek->where('level', 4);
+
+        return view('bobot-aspek.edit', compact('level3', 'level4'));
     }
 
-    public function update(UpdateBobotAspekRequest $request, BobotAspek $bobotAspek): RedirectResponse
+
+
+    public function update(Request $request, BobotAspek $bobotAspek): RedirectResponse
     {
 
         $bobotAspek->update($request->validated());

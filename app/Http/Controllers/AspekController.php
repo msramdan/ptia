@@ -51,27 +51,46 @@ class AspekController extends Controller implements HasMiddleware
 
     public function store(StoreAspekRequest $request): RedirectResponse
     {
-        $aspek = Aspek::create($request->validated());
-        $indikatorPersepsi = [
-            ['indikator_persepsi' => '1', 'kriteria_persepsi' => 'Sangat tidak setuju'],
-            ['indikator_persepsi' => '2', 'kriteria_persepsi' => 'Tidak setuju'],
-            ['indikator_persepsi' => '3', 'kriteria_persepsi' => 'Setuju'],
-            ['indikator_persepsi' => '4', 'kriteria_persepsi' => 'Sangat setuju'],
-        ];
+        DB::beginTransaction();
 
-        $data = [];
-        foreach ($indikatorPersepsi as $indikator) {
-            $data[] = [
+        try {
+            $aspek = Aspek::create($request->validated());
+
+            $indikatorPersepsi = [
+                ['indikator_persepsi' => '1', 'kriteria_persepsi' => 'Sangat tidak setuju'],
+                ['indikator_persepsi' => '2', 'kriteria_persepsi' => 'Tidak setuju'],
+                ['indikator_persepsi' => '3', 'kriteria_persepsi' => 'Setuju'],
+                ['indikator_persepsi' => '4', 'kriteria_persepsi' => 'Sangat setuju'],
+            ];
+
+            $dataIndikator = [];
+            foreach ($indikatorPersepsi as $indikator) {
+                $dataIndikator[] = [
+                    'aspek_id' => $aspek->id,
+                    'indikator_persepsi' => $indikator['indikator_persepsi'],
+                    'kriteria_persepsi' => $indikator['kriteria_persepsi'],
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
+            }
+            DB::table('indikator_persepsi')->insert($dataIndikator);
+
+            DB::table('bobot_aspek')->insert([
                 'aspek_id' => $aspek->id,
-                'indikator_persepsi' => $indikator['indikator_persepsi'],
-                'kriteria_persepsi' => $indikator['kriteria_persepsi'],
+                'bobot_alumni' => 0.0,
+                'bobot_atasan_langsung' => 0.0,
                 'created_at' => now(),
                 'updated_at' => now(),
-            ];
+            ]);
+
+            DB::commit();
+            return to_route('aspek.index')->with('success', __('Aspek berhasil dibuat.'));
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', __('Gagal membuat aspek: ') . $e->getMessage());
         }
-        DB::table('indikator_persepsi')->insert($data);
-        return to_route('aspek.index')->with('success', __('The aspek was created successfully.'));
     }
+
 
     public function show(Aspek $aspek): View
     {

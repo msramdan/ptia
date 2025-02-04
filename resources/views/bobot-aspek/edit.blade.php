@@ -29,7 +29,7 @@
                 <div class="col-md-8">
                     <div class="card">
                         <div class="card-body">
-                            <form action="{{ route('bobot-aspek.update', $bobotAspek->id) }}" method="POST">
+                            <form action="" method="POST">
                                 @csrf
                                 @method('PUT')
                                 @include('bobot-aspek.include.form')
