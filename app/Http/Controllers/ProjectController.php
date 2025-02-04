@@ -170,12 +170,15 @@ class ProjectController extends Controller implements HasMiddleware
                 throw new \Exception("No aspek data found.");
             }
 
-            // Daftar pertanyaan sesuai aspek ID
+            // Ambil deskripsi pelatihan dari parameter
+            $kaldikDesc = $data['kaldikDesc'] ?? 'Pelatihan Default';
+
+            // Daftar pertanyaan dengan placeholder
             $pertanyaanList = [
-                1 => "Saya termotivasi untuk terlibat secara aktif dalam setiap penugasan yang relevan dengan pelatihan ini.",
-                2 => "Saya percaya diri untuk terlibat secara aktif dalam setiap kegiatan yang relevan dengan pelatihan ini.",
-                3 => "Setelah mengikuti pelatihan, saya berbagi pengetahuan yang telah saya peroleh selama pelatihan kepada rekan-rekan kerja saya melalui kegiatan pelatihan di kantor sendiri, FGD, sharing session, atau bentuk knowledge sharing lainnya.",
-                4 => "Saya mampu menerapkan ilmu yang telah saya peroleh selama Pelatihan Pajak Terapan Brevet A dan B Tahun 2024 bagi Pegawai BPKP Tahun 2024 bagi Pegawai BPKP pada setiap penugasan yang relevan.",
+                1 => "{params_target} termotivasi untuk terlibat secara aktif dalam setiap penugasan yang relevan dengan pelatihan ini.",
+                2 => "{params_target} percaya diri untuk terlibat secara aktif dalam setiap kegiatan yang relevan dengan pelatihan ini.",
+                3 => "Setelah mengikuti pelatihan, {params_target} berbagi pengetahuan yang telah diperoleh selama pelatihan kepada rekan-rekan kerja melalui kegiatan pelatihan di kantor sendiri, FGD, sharing session, atau bentuk knowledge sharing lainnya.",
+                4 => "{params_target} mampu menerapkan ilmu yang telah diperoleh selama Pelatihan {$kaldikDesc} pada setiap penugasan yang relevan.",
                 5 => "Implementasi hasil pelatihan ini berdampak positif dalam meningkatkan pengelolaan keuangan negara."
             ];
 
@@ -187,26 +190,28 @@ class ProjectController extends Controller implements HasMiddleware
                 $kriteria = ($aspek->aspek === "Kemampuan Membagikan Keilmuan") ? 'Skor Persepsi' : 'Delta Skor Persepsi';
 
                 // Cek apakah aspek_id ada di daftar pertanyaan
-                $pertanyaan = $pertanyaanList[$aspek->id] ?? "Pertanyaan default untuk aspek ID {$aspek->id}";
+                $pertanyaanTemplate = $pertanyaanList[$aspek->id] ?? "Pertanyaan default untuk aspek ID {$aspek->id}";
 
-                // Data untuk Alumni
+                // Data untuk Alumni (ganti {params_target} → "Saya")
+                $pertanyaanAlumni = str_replace("{params_target}", "Saya", $pertanyaanTemplate);
                 $kuesionerData[] = [
                     'project_id'  => $projectId,
                     'aspek_id'    => $aspek->id,
                     'kriteria'    => $kriteria,
                     'remark'      => 'Alumni',
-                    'pertanyaan'  => $pertanyaan,
+                    'pertanyaan'  => $pertanyaanAlumni,
                     'created_at'  => now(),
                     'updated_at'  => now(),
                 ];
 
-                // Data untuk Atasan
+                // Data untuk Atasan (ganti {params_target} → "Alumni")
+                $pertanyaanAtasan = str_replace("{params_target}", "Alumni", $pertanyaanTemplate);
                 $kuesionerData[] = [
                     'project_id'  => $projectId,
                     'aspek_id'    => $aspek->id,
                     'kriteria'    => $kriteria,
                     'remark'      => 'Atasan',
-                    'pertanyaan'  => $pertanyaan,
+                    'pertanyaan'  => $pertanyaanAtasan,
                     'created_at'  => now(),
                     'updated_at'  => now(),
                 ];
@@ -214,6 +219,7 @@ class ProjectController extends Controller implements HasMiddleware
 
             // STEP 3: Insert batch ke project_kuesioner
             DB::table('project_kuesioner')->insert($kuesionerData);
+
 
             // Commit transaksi jika semua proses sukses
             DB::commit();
@@ -355,5 +361,4 @@ class ProjectController extends Controller implements HasMiddleware
 
         return view('project.responden', compact('project', 'kriteriaResponden'));
     }
-
 }
