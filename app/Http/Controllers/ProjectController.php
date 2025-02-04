@@ -337,7 +337,14 @@ class ProjectController extends Controller implements HasMiddleware
 
     public function showResponden($id)
     {
-        $kriteriaResponden = KriteriaResponden::findOrFail(1);
+        $kriteriaResponden = DB::table('project_kriteria_responden')
+            ->where('project_id', $id)
+            ->first();
+
+        if (!$kriteriaResponden) {
+            abort(404, 'Kriteria Responden tidak ditemukan');
+        }
+
         $kriteriaResponden->nilai_post_test = json_decode($kriteriaResponden->nilai_post_test, true);
 
         $project = DB::table('project')
@@ -345,6 +352,8 @@ class ProjectController extends Controller implements HasMiddleware
             ->select('project.*', 'users.name as user_name')
             ->where('project.id', $id)
             ->first();
-        return view('project.responden', compact('project','kriteriaResponden'));
+
+        return view('project.responden', compact('project', 'kriteriaResponden'));
     }
+
 }
