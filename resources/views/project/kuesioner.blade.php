@@ -147,7 +147,7 @@
                                     <i class="fas fa-arrow-left"></i> {{ __('kembali') }}
                                 </a>
                                 <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addModal">
-                                    <i class="fas fa-plus"></i> {{ __('Tambah') }}
+                                    <i class="fas fa-plus"></i> {{ __('Tambah data') }}
                                 </button>
                             </div>
 

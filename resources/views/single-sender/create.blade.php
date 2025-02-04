@@ -9,7 +9,7 @@
                 <div class="col-12 col-md-8 order-md-1 order-last">
                     <h3>{{ __('Single Sender') }}</h3>
                     <p class="text-subtitle text-muted">
-                        {{ __('Create a new single Sender.') }}
+                        {{ __('Tambah data single Sender.') }}
                     </p>
                 </div>
 

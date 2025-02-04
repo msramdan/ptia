@@ -9,7 +9,7 @@
                 <div class="col-12 col-md-8 order-md-1 order-last">
                     <h3>{{ __('Wa Blast') }}</h3>
                     <p class="text-subtitle text-muted">
-                        {{ __('Below is a list of all wa Blast.') }}
+                        {{ __('Berikut adalah daftar semua wa Blast.') }}
                     </p>
                 </div>
                 <x-breadcrumb>
@@ -25,7 +25,7 @@
                     <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal"
                         data-bs-target="#createWaBlastModal">
                         <i class="fas fa-plus"></i>
-                        {{ __('Create a new wa blast') }}
+                        {{ __('Tambah data wa blast') }}
                     </button>
                 </div>
             @endcan
@@ -72,7 +72,7 @@
                 <form action="{{ route('wa-blast.store') }}" method="POST">
                     @csrf
                     <div class="modal-header">
-                        <h5 class="modal-title" id="createWaBlastModalLabel">{{ __('Create a new Wa Blast') }}</h5>
+                        <h5 class="modal-title" id="createWaBlastModalLabel">{{ __('Tambah data Wa Blast') }}</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">

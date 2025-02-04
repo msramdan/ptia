@@ -9,7 +9,7 @@
                 <div class="col-12 col-md-8 order-md-1 order-last">
                     <h3>{{ __('Indikator Dampak') }}</h3>
                     <p class="text-subtitle text-muted">
-                        {{ __('Edit a indikator dampak.') }}
+                        {{ __('Edit data indikator dampak.') }}
                     </p>
                 </div>
 

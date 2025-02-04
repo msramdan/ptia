@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', __('Edit Aspek'))
+@section('title', __('Edit dataspek'))
 
 @section('content')
     <div class="page-heading">
@@ -9,7 +9,7 @@
                 <div class="col-12 col-md-8 order-md-1 order-last">
                     <h3>{{ __('Aspek') }}</h3>
                     <p class="text-subtitle text-muted">
-                        {{ __('Edit a aspek.') }}
+                        {{ __('Edit data aspek.') }}
                     </p>
                 </div>
 

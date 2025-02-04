@@ -9,7 +9,7 @@
                 <div class="col-12 col-md-8 order-md-1 order-last">
                     <h3>{{ __('Pembuatan Project') }}</h3>
                     <p class="text-subtitle text-muted">
-                        {{ __('Below is a list of all pembuatan Project.') }}
+                        {{ __('Berikut adalah daftar semua pembuatan Project.') }}
                     </p>
                 </div>
                 <x-breadcrumb>
