@@ -14,19 +14,38 @@
                 </div>
 
                 <x-breadcrumb>
-                    <li class="breadcrumb-item">
-                        <a href="/">{{ __('Dashboard') }}</a>
-                    </li>
-                    <li class="breadcrumb-item active">
-                        {{ __('Bobot Aspek') }}
-                    </li>
+                    <li class="breadcrumb-item"><a href="/">{{ __('Dashboard') }}</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('project.index') }}">{{ __('Management Project') }}</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ __('Bobot Aspek') }}</li>
                 </x-breadcrumb>
+
             </div>
         </div>
 
         <section class="section">
             <div class="row">
-                <div class="col-md-8">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td><strong>Kode Diklat</strong></td>
+                                    <td>: {{ $project->kaldikID ?? '-' }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Nama Diklat</strong></td>
+                                    <td>: {{ $project->kaldikDesc ?? '-' }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Dibuat Oleh</strong></td>
+                                    <td>: {{ $project->user_name ?? '-' }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-12">
                     <div class="card">
                         <div class="card-body">
                             <form action="" method="POST">
