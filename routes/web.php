@@ -1,40 +1,59 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\{
+    ProfileController,
+    UserController,
+    RoleAndPermissionController,
+    AspekController,
+    IndikatorPersepsiController,
+    PesanWaController,
+    BobotAspekController,
+    KriteriaRespondenController,
+    WaBlastController,
+    SingleSenderController,
+    IndikatorDampakController,
+    KonversiController,
+    ProjectController,
+    PembuatanProjectController
+};
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', fn () => view('welcome'));
 
 Route::middleware(['auth', 'web'])->group(function () {
-    Route::get('/', fn () => view('dashboard'));
-    Route::get('/dashboard', fn () => view('dashboard'));
-    Route::get('/profile', App\Http\Controllers\ProfileController::class)->name('profile');
-    Route::resource('users', App\Http\Controllers\UserController::class);
-    Route::resource('roles', App\Http\Controllers\RoleAndPermissionController::class);
-});
+    Route::view('/dashboard', 'dashboard')->name('dashboard');
+    Route::get('/profile', ProfileController::class)->name('profile');
 
-Route::resource('aspek', App\Http\Controllers\AspekController::class)->middleware('auth');
-Route::resource('indikator-persepsi', App\Http\Controllers\IndikatorPersepsiController::class)->middleware('auth');
-Route::resource('pesan-wa', App\Http\Controllers\PesanWaController::class)->middleware('auth');
-Route::resource('bobot-aspek', App\Http\Controllers\BobotAspekController::class)->middleware('auth');
-Route::resource('kriteria-responden', App\Http\Controllers\KriteriaRespondenController::class)->middleware('auth');
-Route::resource('wa-blast', App\Http\Controllers\WaBlastController::class)->middleware('auth');
-Route::resource('single-sender', App\Http\Controllers\SingleSenderController::class)->middleware('auth');
-Route::post('/update-session-status', [App\Http\Controllers\WaBlastController::class, 'updateSessionStatus'])->name('update.session.status');
-Route::resource('indikator-dampak', App\Http\Controllers\IndikatorDampakController::class)->middleware('auth');
-Route::resource('konversi', App\Http\Controllers\KonversiController::class)->middleware('auth');
-Route::resource('pembuatan-project', App\Http\Controllers\PembuatanProjectController::class)->middleware('auth');
-Route::get('/get-kaldik-data', [App\Http\Controllers\PembuatanProjectController::class, 'getKaldikData']);
-Route::resource('project', App\Http\Controllers\ProjectController::class)->middleware('auth');
+    Route::resources([
+        'users'               => UserController::class,
+        'roles'               => RoleAndPermissionController::class,
+        'aspek'               => AspekController::class,
+        'indikator-persepsi'  => IndikatorPersepsiController::class,
+        'pesan-wa'            => PesanWaController::class,
+        'bobot-aspek'         => BobotAspekController::class,
+        'kriteria-responden'  => KriteriaRespondenController::class,
+        'wa-blast'            => WaBlastController::class,
+        'single-sender'       => SingleSenderController::class,
+        'indikator-dampak'    => IndikatorDampakController::class,
+        'konversi'            => KonversiController::class,
+        'project'             => ProjectController::class,
+        'pembuatan-project'   => PembuatanProjectController::class,
+    ]);
 
-Route::prefix('project/kuesioner')->group(function () {
-    // kuesioner
-    Route::get('/show/{id}/{remark}', [App\Http\Controllers\ProjectController::class, 'showKuesioner'])->name('kuesioner.show');
-    Route::post('/store', [App\Http\Controllers\ProjectController::class, 'tambahKuesioner'])->name('kuesioner.store');
-    Route::get('/edit/{id}', [App\Http\Controllers\ProjectController::class, 'editKuesioner'])->name('kuesioner.edit');
-    Route::post('/update/{id}', [App\Http\Controllers\ProjectController::class, 'saveKuesioner'])->name('kuesioner.update');
-    Route::delete('/delete/{id}', [App\Http\Controllers\ProjectController::class, 'deleteKuesioner'])->name('kuesioner.delete');
-    // peserta
-    Route::get('/show-responden/{id}/', [App\Http\Controllers\ProjectController::class, 'showResponden'])->name('responden.show');
+    Route::post('/update-session-status', [WaBlastController::class, 'updateSessionStatus'])
+        ->name('update.session.status');
+
+    Route::prefix('get-kaldik-data')->group(function () {
+        Route::get('/', [PembuatanProjectController::class, 'getKaldikData'])->name('kaldik.index');
+        Route::get('/detail/{kaldikID}', [PembuatanProjectController::class, 'getDetail'])->name('kaldik.detail');
+    });
+
+    Route::prefix('project/kuesioner')->name('kuesioner.')->group(function () {
+        Route::get('/show/{id}/{remark}', [ProjectController::class, 'showKuesioner'])->name('show');
+        Route::post('/store', [ProjectController::class, 'tambahKuesioner'])->name('store');
+        Route::get('/edit/{id}', [ProjectController::class, 'editKuesioner'])->name('edit');
+        Route::post('/update/{id}', [ProjectController::class, 'saveKuesioner'])->name('update');
+        Route::delete('/delete/{id}', [ProjectController::class, 'deleteKuesioner'])->name('delete');
+        Route::get('/show-responden/{id}', [ProjectController::class, 'showResponden'])->name('responden.show');
+    });
 });

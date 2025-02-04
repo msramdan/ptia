@@ -60,4 +60,22 @@ class PembuatanProjectController extends Controller implements HasMiddleware
             'data' => $dataWithStatus,
         ]);
     }
+
+    public function getDetail($kaldikID)
+    {
+        $apiUrl = env('ENDPOINT_PUSDIKLATWAS') . "/len-kaldik/{$kaldikID}";
+        $apiToken = env('API_TOKEN_PUSDIKLATWAS');
+
+        $response = \Http::get($apiUrl, [
+            'api_key' => $apiToken
+        ]);
+
+        if ($response->successful()) {
+            return response()->json($response->json());
+        }
+
+        return response()->json([
+            'message' => 'Gagal mengambil data dari API'
+        ], $response->status());
+    }
 }

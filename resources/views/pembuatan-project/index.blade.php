@@ -258,7 +258,7 @@
         // Modal Detail Diklat - Fetch Data with AJAX
         function modalDetail(kaldikID) {
             $.ajax({
-                url: `http://192.168.10.36:8090/api/len-kaldik/${kaldikID}?api_key=797e9aa1-be97-4dc0-ae13-3ecd304a61a3`,
+                url: `/get-kaldik-data/detail/${kaldikID}`,
                 type: "GET",
                 success: function(response) {
                     var tableBody = $('#detailDiklatTable tbody');
