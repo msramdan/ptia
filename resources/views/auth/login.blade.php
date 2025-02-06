@@ -5,7 +5,14 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Halaman login - {{ env('APP_NAME') }}</title>
-        <link rel="shortcut icon" href="{{ asset('mazer') }}/icon.png" type="image/x-icon" />
+    @php
+        $settingApp = get_setting();
+    @endphp
+
+    @if ($settingApp?->favicon)
+        <link rel="shortcut icon" href="{{ asset('storage/uploads/favicons/' . $settingApp->favicon) }}"
+            type="image/x-icon">
+    @endif
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="https://registrasi.bpkp.go.id/ptia/assets/temalogin/css/iofrm-style.css">
@@ -29,11 +36,16 @@
             <div class="col-md-6 form-holder">
                 <div class="form-content">
                     <div class="form-items p-4" style="border-radius:10px;">
-                        <div class="text-center">
-                            <img src="https://registrasi.bpkp.go.id/ptia/assets/logo/logo_ptia_login.png"
-                                class="img-fluid" alt="Logo PTIA">
-                        </div>
 
+                        <div class="text-center">
+                            @if (!$settingApp || !$settingApp->logo_login)
+                                <img src="https://placehold.co/350x200?text=No+Image+Available" class="img-fluid"
+                                    alt="{{ $settingApp->nama_aplikasi }}">
+                            @else
+                                <img src="{{ asset('storage/uploads/logo-logins/' . $settingApp->logo_login) }}"
+                                    class="img-fluid" alt="{{ $settingApp->nama_aplikasi }}">
+                            @endif
+                        </div>
                         <!-- Login Form -->
                         <form method="POST" action="{{ route('login') }}" id="form" class="mt-3">
                             @csrf

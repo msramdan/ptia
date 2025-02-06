@@ -3,11 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Setting;
-use App\Http\Requests\Settings\{StoreSettingRequest, UpdateSettingRequest};
+use App\Http\Requests\Settings\{ UpdateSettingRequest};
 use Illuminate\Contracts\View\View;
-use Yajra\DataTables\Facades\DataTables;
 use App\Generators\Services\ImageService;
-use Illuminate\Http\{JsonResponse, RedirectResponse};
+use Illuminate\Http\{RedirectResponse};
 use Illuminate\Routing\Controllers\{HasMiddleware, Middleware};
 
 class SettingController extends Controller implements HasMiddleware

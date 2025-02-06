@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Facades\DB;
+
 function is_active_submenu(string|array $route): string
 {
     $activeClass = ' submenu-open';
@@ -47,3 +49,7 @@ function is_active_submenu(string|array $route): string
     return '';
 }
 
+function get_setting()
+{
+    return DB::table('setting')->first();
+}
