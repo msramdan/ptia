@@ -249,9 +249,6 @@ class ProjectController extends Controller implements HasMiddleware
             $kuesionerData = [];
 
             foreach ($aspekList as $aspek) {
-                // Tentukan kriteria berdasarkan nilai field `aspek`
-                $kriteria = ($aspek->aspek === "Kemampuan Membagikan Keilmuan") ? 'Skor Persepsi' : 'Delta Skor Persepsi';
-
                 // Cek apakah aspek_id ada di daftar pertanyaan
                 $pertanyaanTemplate = $pertanyaanList[$aspek->id] ?? "Pertanyaan default untuk aspek ID {$aspek->id}";
 
@@ -260,9 +257,9 @@ class ProjectController extends Controller implements HasMiddleware
                 $kuesionerData[] = [
                     'project_id'  => $projectId,
                     'aspek_id'    => $aspek->id,
-                    'level'    => $aspek->level,
-                    'aspek'    => $aspek->aspek,
-                    'kriteria'    => $kriteria,
+                    'level'       => $aspek->level,
+                    'aspek'       => $aspek->aspek,
+                    'kriteria'    => $aspek->kriteria,
                     'remark'      => 'Alumni',
                     'pertanyaan'  => $pertanyaanAlumni,
                     'created_at'  => now(),
@@ -274,9 +271,9 @@ class ProjectController extends Controller implements HasMiddleware
                 $kuesionerData[] = [
                     'project_id'  => $projectId,
                     'aspek_id'    => $aspek->id,
-                    'level'    => $aspek->level,
-                    'aspek'    => $aspek->aspek,
-                    'kriteria'    => $kriteria,
+                    'level'       => $aspek->level,
+                    'aspek'       => $aspek->aspek,
+                    'kriteria'    => $aspek->kriteria,
                     'remark'      => 'Atasan',
                     'pertanyaan'  => $pertanyaanAtasan,
                     'created_at'  => now(),

@@ -42,6 +42,7 @@
                                             <th>#</th>
                                             <th>{{ __('Level') }}</th>
                                             <th>{{ __('Aspek') }}</th>
+                                            <th>{{ __('Kriteria') }}</th>
                                             <th>{{ __('Urutan') }}</th>
                                             <th>{{ __('Action') }}</th>
                                         </tr>
@@ -106,6 +107,10 @@
                 {
                     data: 'aspek',
                     name: 'aspek',
+                },
+                {
+                    data: 'kriteria',
+                    name: 'kriteria',
                 },
                 {
                     data: 'urutan',

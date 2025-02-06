@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->enum('level', ['3', '4']);
 			$table->string('aspek', 255);
+            $table->enum('kriteria', ['Skor Persepsi', 'Delta Skor Persepsi']);
 			$table->integer('urutan');
             $table->timestamps();
         });

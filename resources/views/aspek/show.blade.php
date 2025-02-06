@@ -43,6 +43,10 @@
                                         <td>{{ $aspek->aspek }}</td>
                                     </tr>
                                     <tr>
+                                        <td class="fw-bold">{{ __('Kriteria') }}</td>
+                                        <td>{{ $aspek->kriteria }}</td>
+                                    </tr>
+                                    <tr>
                                         <td class="fw-bold">{{ __('Urutan') }}</td>
                                         <td>{{ $aspek->urutan }}</td>
                                     </tr>

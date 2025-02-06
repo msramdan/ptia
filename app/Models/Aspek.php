@@ -21,7 +21,7 @@ class Aspek extends Model
      *
      * @var string[]
      */
-    protected $fillable = ['level', 'aspek', 'urutan'];
+    protected $fillable = ['level', 'aspek', 'urutan','kriteria'];
 
     /**
      * Get the attributes that should be cast.
@@ -30,7 +30,7 @@ class Aspek extends Model
      */
     protected function casts(): array
     {
-        return ['aspek' => 'string', 'urutan' => 'integer', 'created_at' => 'datetime:Y-m-d H:i:s', 'updated_at' => 'datetime:Y-m-d H:i:s'];
+        return ['aspek' => 'string','kriteria' => 'string', 'urutan' => 'integer', 'created_at' => 'datetime:Y-m-d H:i:s', 'updated_at' => 'datetime:Y-m-d H:i:s'];
     }
 
 

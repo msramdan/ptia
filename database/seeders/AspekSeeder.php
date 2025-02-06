@@ -16,6 +16,7 @@ class AspekSeeder extends Seeder
             [
                 'level' => '3',
                 'aspek' => 'Motivasi',
+                'kriteria' => 'Delta Skor Persepsi',
                 'urutan' => 1,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -23,6 +24,7 @@ class AspekSeeder extends Seeder
             [
                 'level' => '3',
                 'aspek' => 'Kepercayaan Diri',
+                'kriteria' => 'Delta Skor Persepsi',
                 'urutan' => 2,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -30,6 +32,7 @@ class AspekSeeder extends Seeder
             [
                 'level' => '3',
                 'aspek' => 'Kemampuan Membagikan Keilmuan',
+                'kriteria' => 'Skor Persepsi',
                 'urutan' => 3,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -37,6 +40,7 @@ class AspekSeeder extends Seeder
             [
                 'level' => '3',
                 'aspek' => 'Kemampuan Implementasi Keilmuan',
+                'kriteria' => 'Delta Skor Persepsi',
                 'urutan' => 4,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -44,6 +48,7 @@ class AspekSeeder extends Seeder
             [
                 'level' => '4',
                 'aspek' => 'Hasil Pelatihan',
+                'kriteria' => 'Delta Skor Persepsi',
                 'urutan' => 5,
                 'created_at' => now(),
                 'updated_at' => now(),

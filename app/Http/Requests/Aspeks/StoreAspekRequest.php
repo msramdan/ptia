@@ -22,6 +22,7 @@ class StoreAspekRequest extends FormRequest
         return [
             'level' => 'required|in:3,4',
 			'aspek' => 'required|string|max:255',
+            'kriteria' => 'required|in:Skor Persepsi,Delta Skor Persepsi',
 			'urutan' => 'required|numeric',
         ];
     }
