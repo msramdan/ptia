@@ -262,7 +262,8 @@ return [
                     'icon' => '<i class="bi bi-gear-fill"></i>',
                     'route' => [
                         'users*',
-                        'roles*'
+                        'roles*',
+                        'setting*'
                     ],
                     'permissions' => [
                         'user view',
