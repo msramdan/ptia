@@ -23,23 +23,32 @@
 
     @foreach(config('permission.permissions') as $permission)
         <div class="col-md-3">
-            <div class="card border">
-                <div class="card-content">
-                    <div class="card-body">
-                        <h4 class="card-title">{{ ucwords($permission['group']) }}</h4>
-                        @foreach ($permission['access'] as $access)
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="{{ str()->slug($access) }}"
-                                    name="permissions[]" value="{{ $access }}"
-                                    {{ isset($role) && $role->hasPermissionTo($access) ? 'checked' : '' }}/>
-                                <label class="form-check-label" for="{{ str()->slug($access) }}">
-                                    {{ ucwords(__($access)) }}
-                                </label>
-                            </div>
-                        @endforeach
+            <div class="card" style="border: 1px solid #ddd; border-radius: 8px; box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);">
+                <div class="card-header" style="background-color: #f8f9fa; padding: 10px; border-bottom: 1px solid #ddd;">
+                    <div class="form-check">
+                        <input class="form-check-input group-checkbox" type="checkbox" id="group_{{ str()->slug($permission['group']) }}"
+                            data-group="{{ str()->slug($permission['group']) }}">
+                        <label class="form-check-label" for="group_{{ str()->slug($permission['group']) }}">
+                            <h5 style="margin: 0; font-weight: bold; color: #333;">{{ ucwords($permission['group']) }}</h5>
+                        </label>
                     </div>
                 </div>
+                <div class="card-body" style="padding: 10px;height:140px">
+                    @foreach ($permission['access'] as $access)
+                        <div class="form-check" style="margin-bottom: 5px;">
+                            <input class="form-check-input permission-checkbox" type="checkbox"
+                                name="permissions[]" id="{{ str()->slug($access) }}"
+                                value="{{ $access }}" data-group="{{ str()->slug($permission['group']) }}"
+                                {{ isset($role) && $role->hasPermissionTo($access) ? 'checked' : '' }}>
+                            <label class="form-check-label" for="{{ str()->slug($access) }}"
+                                style="font-weight: 500; color: #555;">
+                                {{ ucwords(__($access)) }}
+                            </label>
+                        </div>
+                    @endforeach
+                </div>
             </div>
+
         </div>
     @endforeach
 </div>
