@@ -52,3 +52,33 @@
         </div>
     @endforeach
 </div>
+@push('js')
+    <script>$(document).ready(function () {
+        // Saat grup checkbox diklik, ceklis semua checkbox dalam grup tersebut
+        $('.group-checkbox').on('change', function () {
+            let group = $(this).data('group');
+            let isChecked = $(this).prop('checked');
+
+            $(`.permission-checkbox[data-group="${group}"]`).prop('checked', isChecked);
+        });
+
+        // Saat halaman dimuat, cek apakah semua permission dalam grup sudah tercentang
+        $('.group-checkbox').each(function () {
+            let group = $(this).data('group');
+            let allPermissions = $(`.permission-checkbox[data-group="${group}"]`);
+            let allChecked = allPermissions.length > 0 && allPermissions.filter(':checked').length === allPermissions.length;
+
+            $(this).prop('checked', allChecked);
+        });
+
+        // Jika semua permission dalam grup dicentang/dicek manual, grup harus otomatis tercentang
+        $('.permission-checkbox').on('change', function () {
+            let group = $(this).data('group');
+            let allPermissions = $(`.permission-checkbox[data-group="${group}"]`);
+            let allChecked = allPermissions.length > 0 && allPermissions.filter(':checked').length === allPermissions.length;
+
+            $(`.group-checkbox[data-group="${group}"]`).prop('checked', allChecked);
+        });
+    });
+    </script>
+@endpush
