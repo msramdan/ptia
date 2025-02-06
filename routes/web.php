@@ -65,3 +65,5 @@ Route::middleware(['auth', 'web'])->group(function () {
         Route::get('/show-bobot/{id}', 'showBobot')->name('bobot.show');
     });
 });
+
+Route::resource('setting', App\Http\Controllers\SettingController::class)->middleware('auth');

@@ -216,5 +216,6 @@ return [
         ['group' => 'konversi', 'access' => ['konversi view', 'konversi create', 'konversi edit', 'konversi delete']],
         ['group' => 'pembuatan projects', 'access' => ['pembuatan project view', 'generate project']],
         ['group' => 'management project', 'access' => ['project view', 'project print', 'project delete']],
+        ['group' => 'setting', 'access' => ['setting view', 'setting create', 'setting edit', 'setting delete']],
     ],
 ];

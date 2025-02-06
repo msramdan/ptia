@@ -16,14 +16,12 @@ class PesanWaController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
+            'auth',
             new Middleware('permission:pesan wa view', only: ['index']),
             new Middleware('permission:pesan wa edit', only: ['update']),
         ];
     }
 
-    /**
-     * Display a listing of the resource.
-     */
     public function index(): View
     {
         $pesanWa = PesanWa::findOrFail(1)->first();

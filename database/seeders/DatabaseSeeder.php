@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
         $this->call(BobotAspekSeeder::class);
         $this->call(PesanWaSeeder::class);
         $this->call(KriteriaRespondenSeeder::class);
+        $this->call(SettingSeeder::class);
     }
 }
 
