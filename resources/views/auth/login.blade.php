@@ -38,10 +38,7 @@
                     <div class="form-items p-4" style="border-radius:10px;">
 
                         <div class="text-center">
-                            @if (!$settingApp || !$settingApp->logo_login)
-                                <img src="https://placehold.co/350x200?text=No+Image+Available" class="img-fluid"
-                                    alt="{{ $settingApp->nama_aplikasi }}">
-                            @else
+                            @if ($settingApp?->logo_login)
                                 <img src="{{ asset('storage/uploads/logo-logins/' . $settingApp->logo_login) }}"
                                     class="img-fluid" alt="{{ $settingApp->nama_aplikasi }}">
                             @endif

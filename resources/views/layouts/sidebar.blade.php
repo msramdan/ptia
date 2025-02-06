@@ -4,12 +4,8 @@
             <div class="d-flex justify-content-between align-items-center">
                 <div class="logo">
                     <a href="/">
-                        @if (!$settingApp || !$settingApp->logo)
-                            <img src="https://placehold.co/350x200?text=No+Image+Available" alt="{{$settingApp->nama_aplikasi}}"
-                                style="height: 60px">
-                        @else
-                            <img src="{{ asset('storage/uploads/logos/' . $settingApp->logo) }}" alt="{{$settingApp->nama_aplikasi}}"
-                                style="height: 60px">
+                        @if ($settingApp?->logo)
+                            <img src="{{ asset('storage/uploads/logos/' . $settingApp->logo) }}" alt="{{$settingApp->nama_aplikasi}}" style="height: 60px">
                         @endif
                     </a>
                 </div>
