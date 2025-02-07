@@ -167,7 +167,7 @@
                                                 <td>{{ $index + 1 }}</td>
                                                 <td>{{ $kuesioner->aspek_nama ?? '-' }}</td>
                                                 <td>{{ $kuesioner->kriteria ?? '-' }}</td>
-                                                <td>{{ $kuesioner->pertanyaan ?? '-' }}</td>
+                                                <td>{!! $kuesioner->pertanyaan ?? '-' !!}</td>
                                                 <td>
                                                     <div class="d-flex gap-2">
                                                         <button onclick="openEditModal({{ $kuesioner->id }})"

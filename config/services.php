@@ -19,6 +19,11 @@ return [
         'api_token' => env('API_TOKEN_PUSDIKLATWAS'),
     ],
 
+    'tna' => [
+        'endpoint' => env('ENDPOINT_TNA', 'http://localhost:8000/api'),
+        'api_token' => env('API_TOKEN_TNA', ''),
+    ],
+
     'postmark' => [
         'token' => env('POSTMARK_TOKEN'),
     ],

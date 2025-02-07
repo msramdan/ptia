@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\KriteriaResponden;
-use App\Models\Project;
 use Illuminate\Http\Request;
 use Illuminate\Contracts\View\View;
 use Yajra\DataTables\Facades\DataTables;
@@ -11,6 +9,7 @@ use Illuminate\Http\{JsonResponse, RedirectResponse};
 use Illuminate\Routing\Controllers\{HasMiddleware, Middleware};
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Http;
 
 class ProjectController extends Controller implements HasMiddleware
 {
@@ -36,8 +35,9 @@ class ProjectController extends Controller implements HasMiddleware
         if (request()->ajax()) {
             $projects = DB::table('project')
                 ->join('users', 'project.user_id', '=', 'users.id')
-                ->select('project.*', 'users.name as user_name', 'users.email', 'users.avatar');
-
+                ->select('project.*', 'users.name as user_name', 'users.email', 'users.avatar')
+                ->orderBy('project.id', 'desc') // Urutkan berdasarkan ID secara descending
+                ->get();
             return DataTables::of($projects)
                 ->addIndexColumn()
                 ->addColumn('kuesioner', function ($row) {
@@ -236,14 +236,37 @@ class ProjectController extends Controller implements HasMiddleware
             // Ambil deskripsi pelatihan dari parameter
             $kaldikDesc = $data['kaldikDesc'] ?? 'Pelatihan Default';
 
+            $apiUrl = config('services.tna.endpoint') . "/pengajuan-kap";
+            $apiKey = config('services.tna.api_token');
+            $kodePembelajaran = "20250020218";
+
+            // Hit API untuk mendapatkan indikator kinerja
+            $response = Http::get($apiUrl, [
+                'api_key' => $apiKey,
+                'kode_pembelajaran' => $kodePembelajaran,
+            ]);
+
+            $indikatorText = "kinerja organisasi";
+
+            if ($response->successful() && isset($response['data']['indikatorKinerja'])) {
+                $indikatorList = array_column($response['data']['indikatorKinerja'], 'indikator_kinerja');
+
+                if (!empty($indikatorList)) {
+                    // Tambahkan strip di setiap indikator dan gunakan <br> sebagai pemisah
+                    $indikatorList = array_map(fn($item) => "- " . trim($item), $indikatorList);
+                    $indikatorText = ":<br>" . implode("<br>", $indikatorList);
+                }
+            }
+
             // Daftar pertanyaan dengan placeholder
             $pertanyaanList = [
                 1 => "{params_target} termotivasi untuk terlibat secara aktif dalam setiap penugasan yang relevan dengan pelatihan ini.",
                 2 => "{params_target} percaya diri untuk terlibat secara aktif dalam setiap kegiatan yang relevan dengan pelatihan ini.",
                 3 => "Setelah mengikuti pelatihan, {params_target} berbagi pengetahuan yang telah diperoleh selama pelatihan kepada rekan-rekan kerja melalui kegiatan pelatihan di kantor sendiri, FGD, sharing session, atau bentuk knowledge sharing lainnya.",
                 4 => "{params_target} mampu menerapkan ilmu yang telah diperoleh selama Pelatihan {$kaldikDesc} pada setiap penugasan yang relevan.",
-                5 => "Implementasi hasil pelatihan ini berdampak positif dalam meningkatkan pengelolaan keuangan negara."
+                5 => "Implementasi hasil pelatihan ini berdampak positif dalam meningkatkan{$indikatorText}"
             ];
+
 
             // Buat array untuk batch insert ke project_kuesioner
             $kuesionerData = [];
