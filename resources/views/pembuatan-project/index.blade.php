@@ -68,10 +68,9 @@
         </div>
     </div>
 
-    <!-- Modal Peserta Diklat -->
     <div class="modal fade" id="modalPesertaDiklat" tabindex="-1" aria-labelledby="modalPesertaDiklatLabel"
         aria-hidden="true">
-        <div class="modal-dialog modal-lg">
+        <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="modalPesertaDiklatLabel">{{ __('Peserta Diklat') }}</h5>
@@ -82,11 +81,14 @@
                         <thead>
                             <tr>
                                 <th>{{ __('Nama Peserta') }}</th>
-                                <th>{{ __('Email') }}</th>
+                                <th>{{ __('NIP') }}</th>
                                 <th>{{ __('No. Telepon') }}</th>
+                                <th>{{ __('Jabatan') }}</th>
+                                <th>{{ __('Unit') }}</th>
                             </tr>
                         </thead>
                         <tbody>
+                            <!-- Data will be populated here -->
                         </tbody>
                     </table>
                 </div>
@@ -328,29 +330,40 @@
 
         // Modal Peserta - Fetch Peserta Data with AJAX
         function modalPeserta(kaldikID) {
-            $.ajax({
-                url: `http://192.168.10.36:8090/api/kaldik-peserta/${kaldikID}?api_key=797e9aa1-be97-4dc0-ae13-3ecd304a61a3`,
-                type: "GET",
-                success: function(response) {
-                    var tableBody = $('#pesertaDiklatTable tbody');
-                    tableBody.empty();
-                    var pesertaData = response.data;
+    // Initialize DataTable
+    var table = $('#pesertaDiklatTable').DataTable({
+        processing: true,
+        serverSide: true,
+        destroy: true, // Ensure the table is reinitialized every time the modal is opened
+        ajax: {
+            url: `/get-kaldik-data/peserta/${kaldikID}`,
+            type: "GET",
+            data: function(d) {
+                // Pass DataTable's internal parameters (pagination, search, etc.)
+                d.page = (d.start / d.length) + 1; // Calculate current page
+                d.limit = d.length; // Number of records per page
+                d.search = d.search.value; // Current search query
+            },
+            dataSrc: function(response) {
+                // Format the response data to DataTable's expected format
+                return response.data; // Directly return the 'data' array from the response
+            },
+            error: function(xhr, status, error) {
+                alert("Gagal mengambil data peserta!");
+            }
+        },
+        columns: [
+            { data: 'pesertaNama' },
+            { data: 'pesertaNIP' },
+            { data: 'pesertaTelepon' },
+            { data: 'jabatanFullName' },
+            { data: 'unitName' }
+        ]
+    });
 
-                    // Populate the peserta table with the participant's details
-                    $.each(pesertaData, function(index, peserta) {
-                        tableBody.append(`
-                            <tr>
-                                <td>${peserta.name}</td>
-                                <td>${peserta.email}</td>
-                                <td>${peserta.phone}</td>
-                            </tr>
-                        `);
-                    });
+    // Show the modal after the table has been initialized
+    $('#modalPesertaDiklat').modal('show');
+}
 
-                    // Show the modal
-                    $('#modalPesertaDiklat').modal('show');
-                }
-            });
-        }
     </script>
 @endpush

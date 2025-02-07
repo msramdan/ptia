@@ -52,6 +52,7 @@ Route::middleware(['auth', 'web'])->group(function () {
     Route::prefix('get-kaldik-data')->controller(PembuatanProjectController::class)->group(function () {
         Route::get('/', 'getKaldikData')->name('kaldik.index');
         Route::get('/detail/{kaldikID}', 'getDetail')->name('kaldik.detail');
+        Route::get('/peserta/{kaldikID}', 'getPeserta')->name('peserta.diklat');
     });
 
     Route::prefix('project/kuesioner')->controller(ProjectController::class)->group(function () {

@@ -78,4 +78,45 @@ class PembuatanProjectController extends Controller implements HasMiddleware
             'message' => 'Gagal mengambil data dari API'
         ], $response->status());
     }
+
+    public function getPeserta(Request $request, $kaldikID)
+    {
+        // Get the necessary parameters from the request
+        $limit = $request->input('limit', 10); // Default limit is 10 if not provided
+        $page = $request->input('page', 1); // Default page is 1 if not provided
+        $search = $request->input('search', ''); // Default search query is an empty string if not provided
+
+        // Prepare the API URL and Token
+        $apiUrl = env('ENDPOINT_PUSDIKLATWAS') . "/len-peserta-diklat/{$kaldikID}";
+        $apiToken = env('API_TOKEN_PUSDIKLATWAS');
+
+        // Make the API request
+        $response = \Http::get($apiUrl, [
+            'api_key' => $apiToken,
+            'limit' => $limit,
+            'page' => $page,
+            'search' => $search
+        ]);
+
+        // Check if the response is successful
+        if ($response->successful()) {
+            $data = $response->json();
+
+            // Return the data in the format that DataTables expects
+            return response()->json([
+                'data' => $data['data'], // The actual data to display in DataTable
+                'recordsTotal' => $data['total'], // Total number of records (without filtering)
+                'recordsFiltered' => $data['total'], // Total number of records (after filtering)
+                'draw' => $request->input('draw') // DataTable draw counter (to prevent errors)
+            ]);
+        }
+
+        // If the request fails, return an error response
+        return response()->json([
+            'message' => 'Gagal mengambil data dari API'
+        ], $response->status());
+    }
+
+
+
 }
