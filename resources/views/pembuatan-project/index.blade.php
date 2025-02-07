@@ -85,6 +85,8 @@
                                 <th>{{ __('No. Telepon') }}</th>
                                 <th>{{ __('Jabatan') }}</th>
                                 <th>{{ __('Unit') }}</th>
+                                <th>{{ __('Nilai Pre-Test') }}</th>
+                                <th>{{ __('Nilai Post-Test') }}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -357,7 +359,9 @@
             { data: 'pesertaNIP' },
             { data: 'pesertaTelepon' },
             { data: 'jabatanFullName' },
-            { data: 'unitName' }
+            { data: 'unitName' },
+            { data: 'pesertaNilaiPreTest' },
+            { data: 'pesertaNilaiPostTest' }
         ]
     });
 
