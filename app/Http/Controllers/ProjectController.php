@@ -41,8 +41,8 @@ class ProjectController extends Controller implements HasMiddleware
             return DataTables::of($projects)
                 ->addIndexColumn()
                 ->addColumn('kuesioner', function ($row) {
-                    $editAlumniUrl = route('kuesioner.show', ['id' => $row->id, 'remark' => 'Alumni']);
-                    $editAtasanUrl = route('kuesioner.show', ['id' => $row->id, 'remark' => 'Atasan']);
+                    $editAlumniUrl = route('project.kuesioner.show', ['id' => $row->id, 'remark' => 'Alumni']);
+                    $editAtasanUrl = route('project.kuesioner.show', ['id' => $row->id, 'remark' => 'Atasan']);
                     return '
                         <div class="text-center">
                             <a href="' . $editAlumniUrl . '"
@@ -62,7 +62,7 @@ class ProjectController extends Controller implements HasMiddleware
                 })
 
                 ->addColumn('peserta', function ($row) {
-                    $editResponden = route('responden.show', ['id' => $row->id]);
+                    $editResponden = route('project.responden.show', ['id' => $row->id]);
                     return '
                         <div class="text-center">
                             <a href="' . $editResponden . '" class="btn btn-sm btn-warning"
@@ -73,7 +73,7 @@ class ProjectController extends Controller implements HasMiddleware
                         </div>';
                 })
                 ->addColumn('bobot', function ($row) {
-                    $editBobot = route('bobot.show', ['id' => $row->id]);
+                    $editBobot = route('project.bobot.show', ['id' => $row->id]);
                     return '
                         <div class="text-center">
                              <a href="' . $editBobot . '"
@@ -86,7 +86,7 @@ class ProjectController extends Controller implements HasMiddleware
                 })
 
                 ->addColumn('wa', function ($row) {
-                    $editWa = route('pesan.wa.show', ['id' => $row->id]);
+                    $editWa = route('project.pesan.wa.show', ['id' => $row->id]);
                     return '
                         <div class="text-center">
                             <a href="' . $editWa . '"
@@ -156,7 +156,7 @@ class ProjectController extends Controller implements HasMiddleware
                 'updated_at'    => now(),
             ]);
 
-            // 2. Insert data ke tabel kriteria_responden
+            // 2. Insert data ke tabel project_kriteria_responden
             $kriteriaResponden = DB::table('kriteria_responden')->first();
 
             if (!$kriteriaResponden) {
@@ -201,7 +201,6 @@ class ProjectController extends Controller implements HasMiddleware
             ]);
 
             // 4.Insert data ke table project_bobot_aspek
-            // Ambil semua data dari tabel bobot_aspek dan join dengan tabel aspek
             $dataBobot = DB::table('bobot_aspek')
                 ->join('aspek', 'bobot_aspek.aspek_id', '=', 'aspek.id')
                 ->select('bobot_aspek.aspek_id', 'bobot_aspek.bobot_alumni', 'bobot_aspek.bobot_atasan_langsung', 'aspek.level', 'aspek.aspek')
@@ -226,7 +225,21 @@ class ProjectController extends Controller implements HasMiddleware
             // Insert batch ke project_bobot_aspek
             DB::table('project_bobot_aspek')->insert($insertData);
 
-            // 5. Insert data ke table project_kuesioner
+            // 5.insert data ke table project_bobot_aspek_sekunder
+            $dataBobotSekunder = DB::table('bobot_aspek_sekunder')->first();
+
+            if (!$dataBobotSekunder) {
+                throw new \Exception("No bobot aspek sekunder found.");
+            }
+
+            DB::table('project_bobot_aspek_sekunder')->insert([
+                'project_id' => $projectId,
+                'bobot_aspek_sekunder' => $dataBobotSekunder->bobot_aspek_sekunder,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            // 6. Insert data ke table project_kuesioner
             $aspekList = DB::table('aspek')->limit(5)->get();
 
             if ($aspekList->isEmpty()) {
@@ -238,7 +251,7 @@ class ProjectController extends Controller implements HasMiddleware
 
             $apiUrl = config('services.tna.endpoint') . "/pengajuan-kap";
             $apiKey = config('services.tna.api_token');
-            $kodePembelajaran = "20250020218";
+            $kodePembelajaran = $data['kaldikID'];
 
             // Hit API untuk mendapatkan indikator kinerja
             $response = Http::get($apiUrl, [
@@ -264,7 +277,7 @@ class ProjectController extends Controller implements HasMiddleware
                 2 => "{params_target} percaya diri untuk terlibat secara aktif dalam setiap kegiatan yang relevan dengan pelatihan ini.",
                 3 => "Setelah mengikuti pelatihan, {params_target} berbagi pengetahuan yang telah diperoleh selama pelatihan kepada rekan-rekan kerja melalui kegiatan pelatihan di kantor sendiri, FGD, sharing session, atau bentuk knowledge sharing lainnya.",
                 4 => "{params_target} mampu menerapkan ilmu yang telah diperoleh selama Pelatihan {$kaldikDesc} pada setiap penugasan yang relevan.",
-                5 => "Implementasi hasil pelatihan ini berdampak positif dalam meningkatkan{$indikatorText}"
+                5 => "Implementasi hasil pelatihan ini berdampak positif dalam meningkatkan {$indikatorText}"
             ];
 
 
@@ -370,7 +383,6 @@ class ProjectController extends Controller implements HasMiddleware
         return view('project.kuesioner', compact('project', 'kuesioners', 'remark', 'aspeks'));
     }
 
-
     public function editKuesioner($id)
     {
         $kuesioner = DB::table('project_kuesioner')->where('id', $id)->first();
@@ -472,14 +484,20 @@ class ProjectController extends Controller implements HasMiddleware
             ->where('project.id', $id)
             ->first();
 
-        $bobotAspek = DB::table('bobot_aspek')
-            ->join('aspek', 'bobot_aspek.aspek_id', '=', 'aspek.id')
-            ->select('bobot_aspek.*', 'aspek.aspek as aspek_nama', 'aspek.level')
+        $bobotAspek = DB::table('project_bobot_aspek')
+            ->join('aspek', 'project_bobot_aspek.aspek_id', '=', 'aspek.id')
+            ->select('project_bobot_aspek.*', 'aspek.aspek as aspek_nama', 'aspek.level')
+            ->where('project_bobot_aspek.project_id', $id)
             ->get();
+
+        $dataSecondary = DB::table('project_bobot_aspek_sekunder')
+            ->select('project_bobot_aspek_sekunder.*')
+            ->where('project_bobot_aspek_sekunder.project_id', $id)
+            ->first();
 
         $level3 = $bobotAspek->where('level', 3);
         $level4 = $bobotAspek->where('level', 4);
 
-        return view('project.bobot', compact('project', 'level3', 'level4'));
+        return view('project.bobot', compact('project', 'level3', 'level4','dataSecondary'));
     }
 }

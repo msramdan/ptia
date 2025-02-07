@@ -71,18 +71,13 @@ class BobotAspekController extends Controller implements HasMiddleware
                 }
             }
 
-            // **Update Secondary Data**
-            // if ($request->has('dataSecondary')) {
-            //     foreach ($request->dataSecondary as $data) {
-            //         if (!empty($data['id'])) {
-            //             DB::table('bobot_aspek')->where('id', $data['id'])->update([
-            //                 'bobot_alumni' => $data['bobot_alumni'] ?? 0,
-            //                 'bobot_atasan_langsung' => $data['bobot_atasan_langsung'] ?? 0,
-            //                 'updated_at' => now()
-            //             ]);
-            //         }
-            //     }
-            // }
+            // Update bobot_aspek_sekunder
+            if ($request->has('bobot_aspek_sekunder_id') && !empty($request->bobot_aspek_sekunder_id)) {
+                DB::table('bobot_aspek_sekunder')->where('id', $request->bobot_aspek_sekunder_id)->update([
+                    'bobot_aspek_sekunder' => $request->bobot_aspek_sekunder ?? 0,
+                    'updated_at' => now()
+                ]);
+            }
         });
 
         return redirect()->back()->with('success', 'Bobot aspek berhasil diperbarui.');

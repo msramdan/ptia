@@ -74,8 +74,7 @@
                                                         <input type="number" step="0.01"
                                                             class="form-control form-control-sm level3-alumni"
                                                             name="level3[{{ $index }}][bobot_alumni]"
-                                                            value="{{ $bobot->bobot_alumni }}"
-                                                            oninput="calculateTotal()" />
+                                                            value="{{ $bobot->bobot_alumni }}" oninput="calculateTotal()" />
                                                         <span class="input-group-text">%</span>
                                                     </div>
                                                 </td>
@@ -112,7 +111,7 @@
                                         </tr>
                                         @foreach ($level4 as $index => $bobot)
                                             <tr>
-                                                <td>{{ $bobot->aspek_nama ?? 'Tidak Ada Nama' }}</td>
+                                                <td>Data Primer : {{ $bobot->aspek_nama ?? 'Tidak Ada Nama' }}</td>
                                                 <td>
                                                     <input type="hidden" name="level4[{{ $index }}][id]"
                                                         value="{{ $bobot->id }}">
@@ -139,35 +138,21 @@
                                         @endforeach
 
                                         <!-- Tambahan Data Sekunder -->
-                                        @foreach ($dataSecondary as $index => $secondary)
-                                            <tr>
-                                                <td>Data Sekunder : Hasil Pelatihan</td>
-                                                <td>
-                                                    <input type="hidden" name="dataSecondary[{{ $index }}][id]"
-                                                        value="{{ $secondary->id }}">
-                                                    <div class="input-group">
-                                                        <input type="number" step="0.01"
-                                                            class="form-control form-control-sm level4-alumni"
-                                                            name="dataSecondary[{{ $index }}][bobot_alumni]"
-                                                            value="{{ $secondary->bobot_alumni ?? 0 }}"
-                                                            oninput="calculateTotal()" />
-                                                        <span class="input-group-text">%</span>
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                    <div class="input-group">
-                                                        <input type="number" step="0.01"
-                                                            class="form-control form-control-sm level4-atasan"
-                                                            name="dataSecondary[{{ $index }}][bobot_atasan_langsung]"
-                                                            value="{{ $secondary->bobot_atasan_langsung ?? 0 }}"
-                                                            oninput="calculateTotal()" />
-                                                        <span class="input-group-text">%</span>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        @endforeach
-
-
+                                        <tr>
+                                            <td>Data Sekunder : Hasil Pelatihan</td>
+                                            <td colspan="2">
+                                                <input type="hidden" name="bobot_aspek_sekunder_id"
+                                                    value="{{ $dataSecondary->id }}">
+                                                <div class="input-group">
+                                                    <input type="number" step="0.01"
+                                                        class="form-control form-control-sm level4-alumni"
+                                                        name="bobot_aspek_sekunder"
+                                                        value="{{ $dataSecondary->bobot_aspek_sekunder ?? 0 }}"
+                                                        oninput="calculateTotal()" />
+                                                    <span class="input-group-text">%</span>
+                                                </div>
+                                            </td>
+                                        </tr>
 
                                         <tr>
                                             <td></td>

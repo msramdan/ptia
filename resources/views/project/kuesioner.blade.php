@@ -72,7 +72,7 @@
                         <h5 class="modal-title" id="addModalLabel">Add Kuesioner</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <form id="addForm" method="POST" action="{{ route('kuesioner.store') }}">
+                    <form id="addForm" method="POST" action="{{ route('project.kuesioner.store') }}">
                         @csrf
                         <div class="modal-body">
                             <input type="hidden" name="remark" value="{{$remark}}" readonly>

@@ -56,16 +56,17 @@ Route::middleware(['auth', 'web'])->group(function () {
 
     Route::prefix('project/kuesioner')->controller(ProjectController::class)->group(function () {
         // Kuesioner
-        Route::get('/show/{id}/{remark}', 'showKuesioner')->name('kuesioner.show');
-        Route::post('/store', 'tambahKuesioner')->name('kuesioner.store');
-        Route::get('/edit/{id}', 'editKuesioner')->name('kuesioner.edit');
-        Route::post('/update/{id}', 'saveKuesioner')->name('kuesioner.update');
-        Route::delete('/delete/{id}', 'deleteKuesioner')->name('kuesioner.delete');
+        Route::get('/show/{id}/{remark}', 'showKuesioner')->name('project.kuesioner.show');
+        Route::post('/store', 'tambahKuesioner')->name('project.kuesioner.store');
+        Route::get('/edit/{id}', 'editKuesioner')->name('project.kuesioner.edit');
+        Route::post('/update/{id}', 'saveKuesioner')->name('project.kuesioner.update');
+        Route::delete('/delete/{id}', 'deleteKuesioner')->name('project.kuesioner.delete');
         // Peserta
-        Route::get('/show-responden/{id}', 'showResponden')->name('responden.show');
+        Route::get('/show-responden/{id}', 'showResponden')->name('project.responden.show');
         //pesat wa
-        Route::get('/show-pesan-wa/{id}', 'showPesanWa')->name('pesan.wa.show');
+        Route::get('/show-pesan-wa/{id}', 'showPesanWa')->name('project.pesan.wa.show');
         //Bobot
-        Route::get('/show-bobot/{id}', 'showBobot')->name('bobot.show');
+        Route::get('/show-bobot/{id}', 'showBobot')->name('project.bobot.show');
+        Route::get('/update-bobot/{id}', 'showBobot')->name('project.bobot.update');
     });
 });
