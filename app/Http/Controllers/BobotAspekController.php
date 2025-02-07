@@ -23,7 +23,7 @@ class BobotAspekController extends Controller implements HasMiddleware
     public function index(): View
     {
         $bobotAspek = DB::table('bobot_aspek')
-            ->join('aspek', 'bobot_aspek.aspek_id', '=', 'aspek.id')
+            ->leftJoin('aspek', 'bobot_aspek.aspek_id', '=', 'aspek.id')
             ->select('bobot_aspek.*', 'aspek.aspek as aspek_nama', 'aspek.level')
             ->get();
 
@@ -31,16 +31,60 @@ class BobotAspekController extends Controller implements HasMiddleware
         $level3 = $bobotAspek->where('level', 3);
         $level4 = $bobotAspek->where('level', 4);
 
-        return view('bobot-aspek.edit', compact('level3', 'level4'));
+        $dataSecondary = DB::table('bobot_aspek_sekunder')
+            ->select('bobot_aspek_sekunder.*')
+            ->first();
+
+        return view('bobot-aspek.edit', compact('level3', 'level4', 'dataSecondary'));
     }
 
 
 
-    public function update(Request $request, BobotAspek $bobotAspek): RedirectResponse
+
+    public function update(Request $request): RedirectResponse
     {
 
-        $bobotAspek->update($request->validated());
+        DB::transaction(function () use ($request) {
+            // Update Level 3
+            if ($request->has('level3')) {
+                foreach ($request->level3 as $data) {
+                    if (!empty($data['id'])) {
+                        DB::table('bobot_aspek')->where('id', $data['id'])->update([
+                            'bobot_alumni' => $data['bobot_alumni'] ?? 0,
+                            'bobot_atasan_langsung' => $data['bobot_atasan_langsung'] ?? 0,
+                            'updated_at' => now()
+                        ]);
+                    }
+                }
+            }
 
-        return to_route('bobot-aspek.index')->with('success', __('The bobot aspek was updated successfully.'));
+            // Update Level 4
+            if ($request->has('level4')) {
+                foreach ($request->level4 as $data) {
+                    if (!empty($data['id'])) {
+                        DB::table('bobot_aspek')->where('id', $data['id'])->update([
+                            'bobot_alumni' => $data['bobot_alumni'] ?? 0,
+                            'bobot_atasan_langsung' => $data['bobot_atasan_langsung'] ?? 0,
+                            'updated_at' => now()
+                        ]);
+                    }
+                }
+            }
+
+            // **Update Secondary Data**
+            // if ($request->has('dataSecondary')) {
+            //     foreach ($request->dataSecondary as $data) {
+            //         if (!empty($data['id'])) {
+            //             DB::table('bobot_aspek')->where('id', $data['id'])->update([
+            //                 'bobot_alumni' => $data['bobot_alumni'] ?? 0,
+            //                 'bobot_atasan_langsung' => $data['bobot_atasan_langsung'] ?? 0,
+            //                 'updated_at' => now()
+            //             ]);
+            //         }
+            //     }
+            // }
+        });
+
+        return redirect()->back()->with('success', 'Bobot aspek berhasil diperbarui.');
     }
 }

@@ -200,7 +200,7 @@ class ProjectController extends Controller implements HasMiddleware
                 'updated_at'        => now(),
             ]);
 
-            // 4.Insert data ke table project_bobot
+            // 4.Insert data ke table project_bobot_aspek
             // Ambil semua data dari tabel bobot_aspek dan join dengan tabel aspek
             $dataBobot = DB::table('bobot_aspek')
                 ->join('aspek', 'bobot_aspek.aspek_id', '=', 'aspek.id')
@@ -211,7 +211,7 @@ class ProjectController extends Controller implements HasMiddleware
                 throw new \Exception("No bobot aspek found.");
             }
 
-            // Insert data ke tabel project_bobot
+            // Insert data ke tabel project_bobot_aspek
             $insertData = $dataBobot->map(function ($item) use ($projectId) {
                 return [
                     'project_id' => $projectId,
@@ -223,8 +223,8 @@ class ProjectController extends Controller implements HasMiddleware
                 ];
             })->toArray();
 
-            // Insert batch ke project_bobot
-            DB::table('project_bobot')->insert($insertData);
+            // Insert batch ke project_bobot_aspek
+            DB::table('project_bobot_aspek')->insert($insertData);
 
             // 5. Insert data ke table project_kuesioner
             $aspekList = DB::table('aspek')->limit(5)->get();

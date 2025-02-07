@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
         $this->call(IndikatorDampakSeeder::class);
         $this->call(KonversiSeeder::class);
         $this->call(BobotAspekSeeder::class);
+        $this->call(BobotAspekSecondarySeeder::class);
         $this->call(PesanWaSeeder::class);
         $this->call(KriteriaRespondenSeeder::class);
         $this->call(SettingSeeder::class);

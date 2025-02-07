@@ -15,7 +15,8 @@ use App\Http\Controllers\{
     IndikatorDampakController,
     KonversiController,
     PembuatanProjectController,
-    ProjectController
+    ProjectController,
+    SettingController
 };
 
 
@@ -34,7 +35,6 @@ Route::middleware(['auth', 'web'])->group(function () {
         'aspek' => AspekController::class,
         'indikator-persepsi' => IndikatorPersepsiController::class,
         'pesan-wa' => PesanWaController::class,
-        'bobot-aspek' => BobotAspekController::class,
         'kriteria-responden' => KriteriaRespondenController::class,
         'wa-blast' => WaBlastController::class,
         'single-sender' => SingleSenderController::class,
@@ -42,7 +42,11 @@ Route::middleware(['auth', 'web'])->group(function () {
         'konversi' => KonversiController::class,
         'project' => ProjectController::class,
         'pembuatan-project' => PembuatanProjectController::class,
+        'setting' => SettingController::class,
     ]);
+
+    Route::get('/bobot-aspek', [BobotAspekController::class, 'index'])->name('bobot-aspek.index');
+    Route::put('/bobot-aspek', [BobotAspekController::class, 'update'])->name('bobot-aspek.update');
 
     Route::post('/update-session-status', [WaBlastController::class, 'updateSessionStatus'])->name('update.session.status');
     Route::prefix('get-kaldik-data')->controller(PembuatanProjectController::class)->group(function () {
@@ -65,5 +69,3 @@ Route::middleware(['auth', 'web'])->group(function () {
         Route::get('/show-bobot/{id}', 'showBobot')->name('bobot.show');
     });
 });
-
-Route::resource('setting', App\Http\Controllers\SettingController::class)->middleware('auth');
