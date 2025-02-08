@@ -58,8 +58,8 @@ class ProjectController extends Controller implements HasMiddleware
                         </div>';
                 })
 
-                ->addColumn('peserta', function ($row) {
-                    $editResponden = route('project.peserta.show', ['id' => $row->id]);
+                ->addColumn('responden', function ($row) {
+                    $editResponden = route('project.responden.show', ['id' => $row->id]);
                     return '
                         <div class="text-center">
                             <a href="' . $editResponden . '" class="btn btn-sm btn-warning"
@@ -108,7 +108,7 @@ class ProjectController extends Controller implements HasMiddleware
                         </div>';
                 })
                 ->addColumn('action', 'project.include.action')
-                ->rawColumns(['kuesioner', 'peserta', 'bobot', 'user', 'wa', 'action'])
+                ->rawColumns(['kuesioner', 'responden', 'bobot', 'user', 'wa', 'action'])
                 ->toJson();
         }
 
@@ -169,7 +169,50 @@ class ProjectController extends Controller implements HasMiddleware
                 'updated_at'              => now(),
             ]);
 
-            // 3. Insert data ke table project_peserta
+            // 3. Insert data ke tabel project_responden dari API
+            $apiUrl = config('services.pusdiklatwas.endpoint') . "/len-peserta-diklat/{$data['kaldikID']}";
+            $apiToken = config('services.pusdiklatwas.api_token');
+
+            $response = Http::get($apiUrl, [
+                'api_key' => $apiToken,
+                'is_pagination' => 'No',
+            ]);
+
+            if ($response->failed()) {
+                throw new \Exception("Gagal mengambil data responden dari API.");
+            }
+
+            $respondenData = $response->json();
+
+            if (!isset($respondenData['data']) || !is_array($respondenData['data'])) {
+                throw new \Exception("Format data responden dari API tidak valid.");
+            }
+
+            $insertData = [];
+
+            foreach ($respondenData['data'] as $responden) {
+                $insertData[] = [
+                    'project_id'              => $projectId,
+                    'peserta_id' => $responden['pesertaID'],
+                    'nama' => $responden['pesertaNama'],
+                    'nip' => $responden['pesertaNIP'],
+                    'telepon' => $responden['pesertaTelepon'],
+                    'jabatan' => trim($responden['jabatanFullName']),
+                    'unit' => $responden['unitName'],
+                    'nilai_pre_test' => $responden['pesertaNilaiPreTest'],
+                    'nilai_post_test' => $responden['pesertaNilaiPostTest'],
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
+            }
+
+            // Insert batch untuk efisiensi
+            if (!empty($insertData)) {
+                DB::table('project_responden')->insert($insertData);
+            }
+
+
+
 
             // 4. Insert data ke tabel project_pesan_wa
             $pesanWa = DB::table('pesan_wa')->first();
@@ -420,7 +463,7 @@ class ProjectController extends Controller implements HasMiddleware
         return back()->with('success', 'Kuesioner berhasil ditambahkan!');
     }
 
-    public function showPeserta($id)
+    public function showResponden($id)
     {
         $kriteriaResponden = DB::table('project_kriteria_responden')
             ->where('project_id', $id)
@@ -495,7 +538,7 @@ class ProjectController extends Controller implements HasMiddleware
         $level3 = $bobotAspek->where('level', 3);
         $level4 = $bobotAspek->where('level', 4);
 
-        return view('project.bobot', compact('project', 'level3', 'level4','dataSecondary'));
+        return view('project.bobot', compact('project', 'level3', 'level4', 'dataSecondary'));
     }
 
     public function updateBobot(Request $request)

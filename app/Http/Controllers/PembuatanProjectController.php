@@ -63,8 +63,8 @@ class PembuatanProjectController extends Controller implements HasMiddleware
 
     public function getDetail($kaldikID)
     {
-        $apiUrl = env('ENDPOINT_PUSDIKLATWAS') . "/len-kaldik/{$kaldikID}";
-        $apiToken = env('API_TOKEN_PUSDIKLATWAS');
+        $apiUrl = config('services.pusdiklatwas.endpoint') . "/len-kaldik/{$kaldikID}";
+        $apiToken = config('services.pusdiklatwas.api_token');
 
         $response = \Http::get($apiUrl, [
             'api_key' => $apiToken
@@ -87,12 +87,13 @@ class PembuatanProjectController extends Controller implements HasMiddleware
         $search = $request->input('search', ''); // Default search query is an empty string if not provided
 
         // Prepare the API URL and Token
-        $apiUrl = env('ENDPOINT_PUSDIKLATWAS') . "/len-peserta-diklat/{$kaldikID}";
-        $apiToken = env('API_TOKEN_PUSDIKLATWAS');
+        $apiUrl =config('services.pusdiklatwas.endpoint') . "/len-peserta-diklat/{$kaldikID}";
+        $apiToken = config('services.pusdiklatwas.api_token');
 
         // Make the API request
         $response = \Http::get($apiUrl, [
             'api_key' => $apiToken,
+            'is_pagination' => 'Yes',
             'limit' => $limit,
             'page' => $page,
             'search' => $search

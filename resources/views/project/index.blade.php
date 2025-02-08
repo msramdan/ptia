@@ -41,7 +41,7 @@
                                             <th>{{ __('Dibuat Oleh') }}</th>
                                             <th>{{ __('Kode Diklat') }}</th>
                                             <th>{{ __('Nama Diklat') }}</th>
-                                            <th class="text-center">{{ __('Peserta') }}</th>
+                                            <th class="text-center">{{ __('Responden') }}</th>
                                             <th class="text-center">{{ __('Bobot') }}</th>
                                             <th class="text-center">{{ __('Pesan WA') }}</th>
                                             <th class="text-center">{{ __('Kuesioner') }}</th>
@@ -121,8 +121,8 @@
                 },
 
                 {
-                    data: 'peserta',
-                    name: 'peserta',
+                    data: 'responden',
+                    name: 'responden',
                     orderable: false,
                     searchable: false,
                 },

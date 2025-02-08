@@ -62,8 +62,8 @@ Route::middleware(['auth', 'web'])->group(function () {
         Route::get('/kuesioner/edit/{id}', 'editKuesioner')->name('project.kuesioner.edit');
         Route::post('/kuesioner/update/{id}', 'saveKuesioner')->name('project.kuesioner.update');
         Route::delete('/kuesioner/delete/{id}', 'deleteKuesioner')->name('project.kuesioner.delete');
-        // Peserta
-        Route::get('/peserta/show/{id}', 'showPeserta')->name('project.peserta.show');
+        // responden
+        Route::get('/responden/show/{id}', 'showResponden')->name('project.responden.show');
         //pesat wa
         Route::get('/pesan-wa/show/{id}', 'showPesanWa')->name('project.pesan.wa.show');
         Route::put('/pesan-wa/update/{id}', 'updatePesanWa')->name('project.pesan.wa.update');
