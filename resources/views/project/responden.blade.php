@@ -33,12 +33,17 @@
                                     <div class="col-md-6 mb-2">
                                         <p>Nilai Post Test</p>
                                         @php
-                                            $selectedNilaiPostTest = old('nilai_post_test', $kriteriaResponden->nilai_post_test ?? []);
+                                            $selectedNilaiPostTest = old(
+                                                'nilai_post_test',
+                                                $kriteriaResponden->nilai_post_test ?? [],
+                                            );
                                         @endphp
                                         @foreach (['Turun', 'Tetap', 'Naik'] as $option)
                                             <div class="form-check mb-2">
-                                                <input class="form-check-input @error('nilai_post_test') is-invalid @enderror" type="checkbox"
-                                                    name="nilai_post_test[]" id="{{ strtolower($option) }}" value="{{ $option }}"
+                                                <input
+                                                    class="form-check-input @error('nilai_post_test') is-invalid @enderror"
+                                                    type="checkbox" name="nilai_post_test[]" id="{{ strtolower($option) }}"
+                                                    value="{{ $option }}"
                                                     {{ in_array($option, $selectedNilaiPostTest) ? 'checked' : '' }}>
                                                 <label class="form-check-label" for="{{ strtolower($option) }}">
                                                     {{ $option }}
@@ -68,8 +73,10 @@
                                     </div>
                                     <div class="col-md-6 mb-2">
                                         <div class="form-group">
-                                            <label for="nilai-post-test-minimal">{{ __('Nilai Post Test Minimal') }}</label>
-                                            <input type="number" name="nilai_post_test_minimal" id="nilai-post-test-minimal"
+                                            <label
+                                                for="nilai-post-test-minimal">{{ __('Nilai Post Test Minimal') }}</label>
+                                            <input type="number" name="nilai_post_test_minimal"
+                                                id="nilai-post-test-minimal"
                                                 class="form-control @error('nilai_post_test_minimal') is-invalid @enderror"
                                                 value="{{ isset($kriteriaResponden) ? $kriteriaResponden->nilai_post_test_minimal : old('nilai_post_test_minimal') }}"
                                                 placeholder="{{ __('Nilai Post Test Minimal') }}" required />
@@ -82,8 +89,10 @@
                                     </div>
                                     <div class="col-md-6 mb-2">
                                         <div class="form-group">
-                                            <label for="nilai-kenaikan-pre-post">{{ __('Nilai Kenaikan Pre Post') }}</label>
-                                            <input type="number" name="nilai_kenaikan_pre_post" id="nilai-kenaikan-pre-post"
+                                            <label
+                                                for="nilai-kenaikan-pre-post">{{ __('Nilai Kenaikan Pre Post') }}</label>
+                                            <input type="number" name="nilai_kenaikan_pre_post"
+                                                id="nilai-kenaikan-pre-post"
                                                 class="form-control @error('nilai_kenaikan_pre_post') is-invalid @enderror"
                                                 value="{{ isset($kriteriaResponden) ? $kriteriaResponden->nilai_kenaikan_pre_post : old('nilai_kenaikan_pre_post') }}"
                                                 placeholder="{{ __('Nilai Kenaikan Pre Post') }}" required />
@@ -98,7 +107,8 @@
                                 <a href="{{ route('project.index') }}" class="btn btn-secondary">
                                     <i class="fas fa-arrow-left"></i> {{ __('kembali') }}
                                 </a>
-                                <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> {{ __('Submit') }}</button>
+                                <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i>
+                                    {{ __('Submit') }}</button>
                             </form>
 
                         </div>
@@ -116,7 +126,9 @@
                                             <th>#</th>
                                             <th>{{ __('Nama peserta') }}</th>
                                             <th>{{ __('NIP') }}</th>
-                                            <th>{{ __('Nilai Pre Test') }}</th>
+                                            <th>{{ __('No.Telepon') }}</th>
+                                            <th>{{ __('Jabatan') }}</th>
+                                            <th>{{ __('Unit') }}</th>
                                             <th>{{ __('Nilai Post Test') }}</th>
                                             <th>{{ __('Nilai Kenaikan Pre Post') }}</th>
                                         </tr>
@@ -172,4 +184,55 @@
             @endif
         });
     </script>
+    <script>
+        $(document).ready(function() {
+            var projectId = @json($project->id);
+            $('#data-table').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url: "{{ route('project.responden.show', ':id') }}".replace(':id', projectId),
+                    data: function(d) {
+                    }
+                },
+                columns: [
+                    {
+                        data: 'DT_RowIndex',
+                        name: 'DT_RowIndex',
+                        orderable: false,
+                        searchable: false,
+                    },
+                    {
+                        data: 'nama',
+                        name: 'nama',
+                    },
+                    {
+                        data: 'nip',
+                        name: 'nip',
+                    },
+                    {
+                        data: 'telepon',
+                        name: 'telepon',
+                    },
+                    {
+                        data: 'jabatan',
+                        name: 'jabatan',
+                    },
+                    {
+                        data: 'unit',
+                        name: 'unit',
+                    },
+                    {
+                        data: 'nilai_pre_test',
+                        name: 'nilai_pre_test',
+                    },
+                    {
+                        data: 'nilai_post_test',
+                        name: 'nilai_post_test',
+                    },
+                ],
+            });
+        });
+    </script>
+
 @endpush

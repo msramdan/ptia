@@ -108,7 +108,7 @@ class ProjectController extends Controller implements HasMiddleware
                         </div>';
                 })
                 ->addColumn('action', 'project.include.action')
-                ->rawColumns(['kuesioner', 'responden', 'bobot', 'user', 'wa','action'])
+                ->rawColumns(['kuesioner', 'responden', 'bobot', 'user', 'wa', 'action'])
                 ->toJson();
         }
 
@@ -460,8 +460,18 @@ class ProjectController extends Controller implements HasMiddleware
         return back()->with('success', 'Kuesioner berhasil ditambahkan!');
     }
 
-    public function showResponden($id)
+    public function showResponden($id): View|JsonResponse
     {
+        if (request()->ajax()) {
+            $respondens = DB::table('project_responden')
+                ->where('project_id', $id)
+                ->get();
+
+            return DataTables::of($respondens)
+                ->addIndexColumn()
+                ->toJson();
+        }
+
         $kriteriaResponden = DB::table('project_kriteria_responden')
             ->where('project_id', $id)
             ->first();
@@ -480,6 +490,7 @@ class ProjectController extends Controller implements HasMiddleware
 
         return view('project.responden', compact('project', 'kriteriaResponden'));
     }
+
 
     public function showPesanWa($id)
     {
