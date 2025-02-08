@@ -107,7 +107,8 @@ class ProjectController extends Controller implements HasMiddleware
                             <span>' . e($row->user_name) . '</span>
                         </div>';
                 })
-                ->rawColumns(['kuesioner', 'responden', 'bobot', 'user', 'wa'])
+                ->addColumn('action', 'project.include.action')
+                ->rawColumns(['kuesioner', 'responden', 'bobot', 'user', 'wa','action'])
                 ->toJson();
         }
 
