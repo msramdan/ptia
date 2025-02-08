@@ -107,8 +107,7 @@ class ProjectController extends Controller implements HasMiddleware
                             <span>' . e($row->user_name) . '</span>
                         </div>';
                 })
-                ->addColumn('action', 'project.include.action')
-                ->rawColumns(['kuesioner', 'responden', 'bobot', 'user', 'wa', 'action'])
+                ->rawColumns(['kuesioner', 'responden', 'bobot', 'user', 'wa'])
                 ->toJson();
         }
 
@@ -210,9 +209,6 @@ class ProjectController extends Controller implements HasMiddleware
             if (!empty($insertData)) {
                 DB::table('project_responden')->insert($insertData);
             }
-
-
-
 
             // 4. Insert data ke tabel project_pesan_wa
             $pesanWa = DB::table('pesan_wa')->first();

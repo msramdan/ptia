@@ -220,6 +220,25 @@
                 reverseButtons: true
             }).then((result) => {
                 if (result.isConfirmed) {
+                    // Tampilkan indikator loading
+                    const loadingSwal = Swal.fire({
+                        title: "Sedang generate project",
+                        html: `
+                    <div style="width: 100%; text-align: center;">
+                        <div class="progress" style="width: 100%; height: 20px;">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: 100%"></div>
+                        </div>
+                    </div>
+                `,
+                        showConfirmButton: false,
+                        willOpen: () => {
+                            // Pastikan animasi loading berjalan
+                            $(".progress-bar").css("width", "100%");
+                        },
+                        allowOutsideClick: false,
+                        allowEscapeKey: false
+                    });
+
                     $.ajax({
                         url: "{{ route('project.store') }}",
                         data: {
@@ -231,6 +250,7 @@
                         },
                         type: "POST",
                         success: function(response) {
+                            loadingSwal.close(); // Tutup loading
                             Swal.fire({
                                 title: "Berhasil!",
                                 text: "Project berhasil dibuat!",
@@ -242,8 +262,8 @@
                             });
                         },
                         error: function(xhr) {
+                            loadingSwal.close(); // Tutup loading
                             let errorMessage = "Terjadi kesalahan saat membuat project.";
-
                             if (xhr.responseJSON && xhr.responseJSON.message) {
                                 errorMessage = xhr.responseJSON.message;
                             }
@@ -257,8 +277,6 @@
                 }
             });
         }
-
-
 
         // Modal Detail Diklat - Fetch Data with AJAX
         function modalDetail(kaldikID) {
@@ -332,42 +350,54 @@
 
         // Modal Peserta - Fetch Peserta Data with AJAX
         function modalPeserta(kaldikID) {
-    // Initialize DataTable
-    var table = $('#pesertaDiklatTable').DataTable({
-        processing: true,
-        serverSide: true,
-        destroy: true, // Ensure the table is reinitialized every time the modal is opened
-        ajax: {
-            url: `/get-kaldik-data/peserta/${kaldikID}`,
-            type: "GET",
-            data: function(d) {
-                // Pass DataTable's internal parameters (pagination, search, etc.)
-                d.page = (d.start / d.length) + 1; // Calculate current page
-                d.limit = d.length; // Number of records per page
-                d.search = d.search.value; // Current search query
-            },
-            dataSrc: function(response) {
-                // Format the response data to DataTable's expected format
-                return response.data; // Directly return the 'data' array from the response
-            },
-            error: function(xhr, status, error) {
-                alert("Gagal mengambil data peserta!");
-            }
-        },
-        columns: [
-            { data: 'pesertaNama' },
-            { data: 'pesertaNIP' },
-            { data: 'pesertaTelepon' },
-            { data: 'jabatanFullName' },
-            { data: 'unitName' },
-            { data: 'pesertaNilaiPreTest' },
-            { data: 'pesertaNilaiPostTest' }
-        ]
-    });
+            // Initialize DataTable
+            var table = $('#pesertaDiklatTable').DataTable({
+                processing: true,
+                serverSide: true,
+                destroy: true, // Ensure the table is reinitialized every time the modal is opened
+                ajax: {
+                    url: `/get-kaldik-data/peserta/${kaldikID}`,
+                    type: "GET",
+                    data: function(d) {
+                        // Pass DataTable's internal parameters (pagination, search, etc.)
+                        d.page = (d.start / d.length) + 1; // Calculate current page
+                        d.limit = d.length; // Number of records per page
+                        d.search = d.search.value; // Current search query
+                    },
+                    dataSrc: function(response) {
+                        // Format the response data to DataTable's expected format
+                        return response.data; // Directly return the 'data' array from the response
+                    },
+                    error: function(xhr, status, error) {
+                        alert("Gagal mengambil data peserta!");
+                    }
+                },
+                columns: [{
+                        data: 'pesertaNama'
+                    },
+                    {
+                        data: 'pesertaNIP'
+                    },
+                    {
+                        data: 'pesertaTelepon'
+                    },
+                    {
+                        data: 'jabatanFullName'
+                    },
+                    {
+                        data: 'unitName'
+                    },
+                    {
+                        data: 'pesertaNilaiPreTest'
+                    },
+                    {
+                        data: 'pesertaNilaiPostTest'
+                    }
+                ]
+            });
 
-    // Show the modal after the table has been initialized
-    $('#modalPesertaDiklat').modal('show');
-}
-
+            // Show the modal after the table has been initialized
+            $('#modalPesertaDiklat').modal('show');
+        }
     </script>
 @endpush
