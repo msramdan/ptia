@@ -27,9 +27,6 @@ class ProjectController extends Controller implements HasMiddleware
         ];
     }
 
-    /**
-     * Display a listing of the resource.
-     */
     public function index(): View|JsonResponse
     {
         if (request()->ajax()) {
@@ -118,7 +115,6 @@ class ProjectController extends Controller implements HasMiddleware
         return view('project.index');
     }
 
-
     public function store(Request $request)
     {
         $data = $request->validate([
@@ -173,7 +169,9 @@ class ProjectController extends Controller implements HasMiddleware
                 'updated_at'              => now(),
             ]);
 
-            // 3. Insert data ke tabel project_pesan_wa
+            // 3. Insert data ke table project_peserta
+
+            // 4. Insert data ke tabel project_pesan_wa
             $pesanWa = DB::table('pesan_wa')->first();
 
             if (!$pesanWa) {
@@ -200,7 +198,7 @@ class ProjectController extends Controller implements HasMiddleware
                 'updated_at'        => now(),
             ]);
 
-            // 4.Insert data ke table project_bobot_aspek
+            // 5.Insert data ke table project_bobot_aspek
             $dataBobot = DB::table('bobot_aspek')
                 ->join('aspek', 'bobot_aspek.aspek_id', '=', 'aspek.id')
                 ->select('bobot_aspek.aspek_id', 'bobot_aspek.bobot_alumni', 'bobot_aspek.bobot_atasan_langsung', 'aspek.level', 'aspek.aspek')
@@ -210,7 +208,6 @@ class ProjectController extends Controller implements HasMiddleware
                 throw new \Exception("No bobot aspek found.");
             }
 
-            // Insert data ke tabel project_bobot_aspek
             $insertData = $dataBobot->map(function ($item) use ($projectId) {
                 return [
                     'project_id' => $projectId,
@@ -221,11 +218,9 @@ class ProjectController extends Controller implements HasMiddleware
                     'bobot_atasan_langsung' => $item->bobot_atasan_langsung,
                 ];
             })->toArray();
-
-            // Insert batch ke project_bobot_aspek
             DB::table('project_bobot_aspek')->insert($insertData);
 
-            // 5.insert data ke table project_bobot_aspek_sekunder
+            // 6.insert data ke table project_bobot_aspek_sekunder
             $dataBobotSekunder = DB::table('bobot_aspek_sekunder')->first();
 
             if (!$dataBobotSekunder) {
@@ -239,21 +234,19 @@ class ProjectController extends Controller implements HasMiddleware
                 'updated_at' => now(),
             ]);
 
-            // 6. Insert data ke table project_kuesioner
+            // 7. Insert data ke table project_kuesioner
             $aspekList = DB::table('aspek')->limit(5)->get();
 
             if ($aspekList->isEmpty()) {
                 throw new \Exception("No aspek data found.");
             }
 
-            // Ambil deskripsi pelatihan dari parameter
             $kaldikDesc = $data['kaldikDesc'] ?? 'Pelatihan Default';
 
             $apiUrl = config('services.tna.endpoint') . "/pengajuan-kap";
             $apiKey = config('services.tna.api_token');
             $kodePembelajaran = $data['kaldikID'];
 
-            // Hit API untuk mendapatkan indikator kinerja
             $response = Http::get($apiUrl, [
                 'api_key' => $apiKey,
                 'kode_pembelajaran' => $kodePembelajaran,
@@ -271,7 +264,6 @@ class ProjectController extends Controller implements HasMiddleware
                 }
             }
 
-            // Daftar pertanyaan dengan placeholder
             $pertanyaanList = [
                 1 => "{params_target} termotivasi untuk terlibat secara aktif dalam setiap penugasan yang relevan dengan pelatihan ini.",
                 2 => "{params_target} percaya diri untuk terlibat secara aktif dalam setiap kegiatan yang relevan dengan pelatihan ini.",
@@ -280,15 +272,10 @@ class ProjectController extends Controller implements HasMiddleware
                 5 => "Implementasi hasil pelatihan ini berdampak positif dalam meningkatkan {$indikatorText}"
             ];
 
-
-            // Buat array untuk batch insert ke project_kuesioner
             $kuesionerData = [];
 
             foreach ($aspekList as $aspek) {
-                // Cek apakah aspek_id ada di daftar pertanyaan
                 $pertanyaanTemplate = $pertanyaanList[$aspek->id] ?? "Pertanyaan default untuk aspek ID {$aspek->id}";
-
-                // Data untuk Alumni (ganti {params_target} → "Saya")
                 $pertanyaanAlumni = str_replace("{params_target}", "Saya", $pertanyaanTemplate);
                 $kuesionerData[] = [
                     'project_id'  => $projectId,
@@ -302,7 +289,6 @@ class ProjectController extends Controller implements HasMiddleware
                     'updated_at'  => now(),
                 ];
 
-                // Data untuk Atasan (ganti {params_target} → "Alumni")
                 $pertanyaanAtasan = str_replace("{params_target}", "Alumni", $pertanyaanTemplate);
                 $kuesionerData[] = [
                     'project_id'  => $projectId,
@@ -316,12 +302,8 @@ class ProjectController extends Controller implements HasMiddleware
                     'updated_at'  => now(),
                 ];
             }
-
-            // Insert batch ke project_kuesioner
             DB::table('project_kuesioner')->insert($kuesionerData);
 
-
-            // Commit transaksi jika semua proses sukses
             DB::commit();
 
             return response()->json([
@@ -334,7 +316,6 @@ class ProjectController extends Controller implements HasMiddleware
                 ],
             ]);
         } catch (\Exception $e) {
-            // Rollback transaksi jika terjadi error
             DB::rollBack();
 
             return response()->json([
@@ -358,7 +339,6 @@ class ProjectController extends Controller implements HasMiddleware
             return to_route('project.index')->with('error', __("Project tidak dapat dihapus karena terkait dengan tabel lain."));
         }
     }
-
 
     public function showKuesioner($id, $remark)
     {
@@ -388,7 +368,6 @@ class ProjectController extends Controller implements HasMiddleware
         $kuesioner = DB::table('project_kuesioner')->where('id', $id)->first();
         return response()->json($kuesioner);
     }
-
 
     public function updateKuesioner($id)
     {
