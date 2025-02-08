@@ -38,9 +38,6 @@ class BobotAspekController extends Controller implements HasMiddleware
         return view('bobot-aspek.edit', compact('level3', 'level4', 'dataSecondary'));
     }
 
-
-
-
     public function update(Request $request): RedirectResponse
     {
 

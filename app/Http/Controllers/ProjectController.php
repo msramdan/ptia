@@ -62,7 +62,7 @@ class ProjectController extends Controller implements HasMiddleware
                 })
 
                 ->addColumn('peserta', function ($row) {
-                    $editResponden = route('project.responden.show', ['id' => $row->id]);
+                    $editResponden = route('project.peserta.show', ['id' => $row->id]);
                     return '
                         <div class="text-center">
                             <a href="' . $editResponden . '" class="btn btn-sm btn-warning"
@@ -441,7 +441,7 @@ class ProjectController extends Controller implements HasMiddleware
         return back()->with('success', 'Kuesioner berhasil ditambahkan!');
     }
 
-    public function showResponden($id)
+    public function showPeserta($id)
     {
         $kriteriaResponden = DB::table('project_kriteria_responden')
             ->where('project_id', $id)
@@ -494,7 +494,6 @@ class ProjectController extends Controller implements HasMiddleware
         return back()->with($updated ? 'success' : 'error', $updated ? 'Pesan WA berhasil diperbarui!' : 'Pesan WA gagal diperbarui!');
     }
 
-
     public function showBobot($id)
     {
         $project = DB::table('project')
@@ -518,5 +517,46 @@ class ProjectController extends Controller implements HasMiddleware
         $level4 = $bobotAspek->where('level', 4);
 
         return view('project.bobot', compact('project', 'level3', 'level4','dataSecondary'));
+    }
+
+    public function updateBobot(Request $request)
+    {
+        DB::transaction(function () use ($request) {
+            // Update Level 3
+            if ($request->has('level3')) {
+                foreach ($request->level3 as $data) {
+                    if (!empty($data['id'])) {
+                        DB::table('project_bobot_aspek')->where('id', $data['id'])->update([
+                            'bobot_alumni' => $data['bobot_alumni'] ?? 0,
+                            'bobot_atasan_langsung' => $data['bobot_atasan_langsung'] ?? 0,
+                            'updated_at' => now()
+                        ]);
+                    }
+                }
+            }
+
+            // Update Level 4
+            if ($request->has('level4')) {
+                foreach ($request->level4 as $data) {
+                    if (!empty($data['id'])) {
+                        DB::table('project_bobot_aspek')->where('id', $data['id'])->update([
+                            'bobot_alumni' => $data['bobot_alumni'] ?? 0,
+                            'bobot_atasan_langsung' => $data['bobot_atasan_langsung'] ?? 0,
+                            'updated_at' => now()
+                        ]);
+                    }
+                }
+            }
+
+            // Update project_bobot_aspek_sekunder
+            if ($request->has('bobot_aspek_sekunder_id') && !empty($request->bobot_aspek_sekunder_id)) {
+                DB::table('project_bobot_aspek_sekunder')->where('id', $request->bobot_aspek_sekunder_id)->update([
+                    'bobot_aspek_sekunder' => $request->bobot_aspek_sekunder ?? 0,
+                    'updated_at' => now()
+                ]);
+            }
+        });
+
+        return redirect()->back()->with('success', 'Bobot aspek berhasil diperbarui.');
     }
 }

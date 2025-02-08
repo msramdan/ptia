@@ -55,21 +55,20 @@ Route::middleware(['auth', 'web'])->group(function () {
         Route::get('/peserta/{kaldikID}', 'getPeserta')->name('peserta.diklat');
     });
 
-    Route::prefix('project/kuesioner')->controller(ProjectController::class)->group(function () {
+    Route::prefix('project')->controller(ProjectController::class)->group(function () {
         // Kuesioner
-        Route::get('/show/{id}/{remark}', 'showKuesioner')->name('project.kuesioner.show');
-        Route::post('/store', 'tambahKuesioner')->name('project.kuesioner.store');
-        Route::get('/edit/{id}', 'editKuesioner')->name('project.kuesioner.edit');
-        Route::post('/update/{id}', 'saveKuesioner')->name('project.kuesioner.update');
-        Route::delete('/delete/{id}', 'deleteKuesioner')->name('project.kuesioner.delete');
+        Route::get('/kuesioner/show/{id}/{remark}', 'showKuesioner')->name('project.kuesioner.show');
+        Route::post('/kuesioner/store', 'tambahKuesioner')->name('project.kuesioner.store');
+        Route::get('/kuesioner/edit/{id}', 'editKuesioner')->name('project.kuesioner.edit');
+        Route::post('/kuesioner/update/{id}', 'saveKuesioner')->name('project.kuesioner.update');
+        Route::delete('/kuesioner/delete/{id}', 'deleteKuesioner')->name('project.kuesioner.delete');
         // Peserta
-        Route::get('/show-responden/{id}', 'showResponden')->name('project.responden.show');
+        Route::get('/peserta/show/{id}', 'showPeserta')->name('project.peserta.show');
         //pesat wa
-        Route::get('/show-pesan-wa/{id}', 'showPesanWa')->name('project.pesan.wa.show');
-        Route::put('/update-pesan-wa/{id}', 'updatePesanWa')->name('project.pesan.wa.update');
-
+        Route::get('/pesan-wa/show/{id}', 'showPesanWa')->name('project.pesan.wa.show');
+        Route::put('/pesan-wa/update/{id}', 'updatePesanWa')->name('project.pesan.wa.update');
         //Bobot
-        Route::get('/show-bobot/{id}', 'showBobot')->name('project.bobot.show');
-        Route::get('/update-bobot/{id}', 'showBobot')->name('project.bobot.update');
+        Route::get('/bobot/show/{id}', 'showBobot')->name('project.bobot.show');
+        Route::put('/bobot/update', 'updateBobot')->name('project.bobot.update');
     });
 });

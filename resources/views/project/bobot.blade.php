@@ -48,7 +48,7 @@
                 <div class="col-md-12">
                     <div class="card">
                         <div class="card-body">
-                            <form action="{{ route('bobot-aspek.update') }}" method="POST">
+                            <form action="{{route('project.bobot.update')}}" method="POST">
                                 @csrf
                                 @method('PUT')
                                 <table class="table">
