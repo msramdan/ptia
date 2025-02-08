@@ -168,6 +168,9 @@
                                         </tr>
                                     </tbody>
                                 </table>
+                                <a href="{{ route('project.index') }}" class="btn btn-secondary">
+                                    <i class="fas fa-arrow-left"></i> {{ __('kembali') }}
+                                </a>
                                 <button type="submit" id="submit-btn" class="btn btn-primary"><i
                                         class="fas fa-save"></i>
                                     Update</button>

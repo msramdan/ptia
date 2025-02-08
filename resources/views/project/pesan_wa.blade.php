@@ -47,10 +47,9 @@
                 <div class="col-md-12">
                     <div class="card">
                         <div class="card-body">
-                            <form action="" method="POST">
+                            <form action="{{ route('project.pesan.wa.update', $pesanWa->id) }}" method="POST">
                                 @csrf
                                 @method('PUT')
-
                                 <div class="row mb-2">
                                     <div class="col-md-6">
                                         <div class="form-group">

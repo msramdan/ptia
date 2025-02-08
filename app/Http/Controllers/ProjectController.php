@@ -476,6 +476,25 @@ class ProjectController extends Controller implements HasMiddleware
         return view('project.pesan_wa', compact('project', 'pesanWa'));
     }
 
+    public function updatePesanWa(Request $request, $id)
+    {
+        $request->validate([
+            'text_pesan_alumni' => 'required|string',
+            'text_pesan_atasan' => 'required|string',
+        ]);
+
+        $updated = DB::table('project_pesan_wa')
+            ->where('id', $id)
+            ->update([
+                'text_pesan_alumni' => $request->text_pesan_alumni,
+                'text_pesan_atasan' => $request->text_pesan_atasan,
+                'updated_at' => now(),
+            ]);
+
+        return back()->with($updated ? 'success' : 'error', $updated ? 'Pesan WA berhasil diperbarui!' : 'Pesan WA gagal diperbarui!');
+    }
+
+
     public function showBobot($id)
     {
         $project = DB::table('project')

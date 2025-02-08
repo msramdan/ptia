@@ -66,6 +66,8 @@ Route::middleware(['auth', 'web'])->group(function () {
         Route::get('/show-responden/{id}', 'showResponden')->name('project.responden.show');
         //pesat wa
         Route::get('/show-pesan-wa/{id}', 'showPesanWa')->name('project.pesan.wa.show');
+        Route::put('/update-pesan-wa/{id}', 'updatePesanWa')->name('project.pesan.wa.update');
+
         //Bobot
         Route::get('/show-bobot/{id}', 'showBobot')->name('project.bobot.show');
         Route::get('/update-bobot/{id}', 'showBobot')->name('project.bobot.update');
