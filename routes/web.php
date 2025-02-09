@@ -44,6 +44,11 @@ Route::middleware(['auth', 'web'])->group(function () {
         'pembuatan-project' => PembuatanProjectController::class,
         'setting' => SettingController::class,
     ]);
+    Route::prefix('penyebaran-kuesioner')->controller(PembuatanProjectController::class)->group(function () {
+        Route::get('/', 'index')->name('penyebaran-kuesioner.index');
+    });
+
+
 
     Route::get('/bobot-aspek', [BobotAspekController::class, 'index'])->name('bobot-aspek.index');
     Route::put('/bobot-aspek', [BobotAspekController::class, 'update'])->name('bobot-aspek.update');

@@ -250,6 +250,36 @@ return [
             ]
         ],
         [
+            'header' => 'Pelaksanaan',
+            'permissions' => [
+                'penyebaran kuesioner view'
+            ],
+            'menus' => [
+                [
+                    'title' => 'Pelaksanaan',
+                    'icon' => '<i class="bi bi-folder"></i>',
+                    'route' => [
+                        'penyebaran-kuesioner*'
+                    ],
+                    'permissions' => [
+                        'penyebaran kuesioner view'
+                    ],
+                    'submenus' => [
+                        [
+                            'title' => 'Penyebaran Kuesioner',
+                            'route' => '/penyebaran-kuesioner',
+                            'permission' => 'penyebaran kuesioner view'
+                        ],
+                        // [
+                        //     'title' => 'Pengumpulan Data',
+                        //     'route' => '/project',
+                        //     'permission' => 'project view'
+                        // ]
+                    ]
+                ]
+            ]
+        ],
+        [
             'header' => 'Utilities',
             'permissions' => [
                 'user view',
