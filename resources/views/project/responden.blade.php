@@ -24,10 +24,18 @@
                 <div class="col-md-12">
                     <div class="card">
                         <div class="card-body">
-                            <form action="{{ route('kriteria-responden.update', $kriteriaResponden->id) }}" method="POST">
+                            <form action="{{ route('project.responden.update', $kriteriaResponden->id) }}" method="POST">
+                                <input type="hidden" name="project_id" id="project_id"
+                                    class="form-control @error('project_id') is-invalid @enderror"
+                                    value="{{ isset($kriteriaResponden) ? $kriteriaResponden->project_id : old('project_id') }}"
+                                    required />
+                                <input type="hidden" name="kaldikID" id="kaldikID"
+                                    class="form-control @error('kaldikID') is-invalid @enderror"
+                                    value="{{ isset($kriteriaResponden) ? $project->kaldikID : old('kaldikID') }}"
+                                    required />
+
                                 @csrf
                                 @method('PUT')
-
                                 <h5>Filter Responden</h5>
                                 <div class="row mb-2" style="border: 1px solid #ddd; border-radius: 8px; padding: 15px;">
                                     <div class="col-md-6 mb-2">
@@ -162,11 +170,9 @@
                 serverSide: true,
                 ajax: {
                     url: "{{ route('project.responden.show', ':id') }}".replace(':id', projectId),
-                    data: function(d) {
-                    }
+                    data: function(d) {}
                 },
-                columns: [
-                    {
+                columns: [{
                         data: 'DT_RowIndex',
                         name: 'DT_RowIndex',
                         orderable: false,
@@ -204,5 +210,4 @@
             });
         });
     </script>
-
 @endpush

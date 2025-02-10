@@ -69,6 +69,7 @@ Route::middleware(['auth', 'web'])->group(function () {
         Route::delete('/kuesioner/delete/{id}', 'deleteKuesioner')->name('project.kuesioner.delete');
         // responden
         Route::get('/responden/show/{id}', 'showResponden')->name('project.responden.show');
+        Route::put('/responden/update/{id}', 'updateResponden')->name('project.responden.update');
         //pesat wa
         Route::get('/pesan-wa/show/{id}', 'showPesanWa')->name('project.pesan.wa.show');
         Route::put('/pesan-wa/update/{id}', 'updatePesanWa')->name('project.pesan.wa.update');

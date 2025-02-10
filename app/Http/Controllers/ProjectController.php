@@ -498,6 +498,81 @@ class ProjectController extends Controller implements HasMiddleware
         return view('project.responden', compact('project', 'kriteriaResponden'));
     }
 
+    public function updateResponden(Request $request, $id)
+    {
+        $request->validate([
+            'nilai_post_test' => 'sometimes|array',
+            'nilai_post_test.*' => 'in:Turun,Tetap,Naik',
+            'nilai_post_test_minimal' => 'required|numeric',
+        ]);
+
+        DB::beginTransaction();
+
+        try {
+            $nilai_post_test =  $request->nilai_post_test ?? [];
+            $updated = DB::table('project_kriteria_responden')
+                ->where('id', $id)
+                ->update([
+                    'nilai_post_test' => json_encode($nilai_post_test), // Simpan dalam format JSON
+                    'nilai_post_test_minimal' => $request->nilai_post_test_minimal,
+                    'updated_at' => now(),
+                ]);
+
+            // Hapus data lama di `project_responden` berdasarkan `project_id`
+            DB::table('project_responden')->where('project_id', $request->project_id)->delete();
+
+            // Hit API untuk mendapatkan data responden
+            $statusQuery = implode('&', array_map(fn($status) => 'status=' . urlencode($status), $nilai_post_test));
+            $apiUrl = config('services.pusdiklatwas.endpoint') . "/len-peserta-diklat/{$request->kaldikID}?" . http_build_query([
+                'api_key' => config('services.pusdiklatwas.api_token'),
+                'is_pagination' => 'No',
+                'post_test_minimal' => $request->nilai_post_test_minimal,
+            ]) . "&" . $statusQuery;
+
+            $response = Http::get($apiUrl);
+
+            if ($response->failed()) {
+                throw new \Exception("Gagal mengambil data responden dari API.");
+            }
+
+            $respondenData = $response->json();
+
+            if (!isset($respondenData['data']) || !is_array($respondenData['data'])) {
+                throw new \Exception("Format data responden dari API tidak valid.");
+            }
+
+            $insertData = [];
+
+            foreach ($respondenData['data'] as $responden) {
+                $insertData[] = [
+                    'project_id'         => $request->project_id,
+                    'peserta_id'         => $responden['pesertaID'],
+                    'nama'               => $responden['pesertaNama'],
+                    'nip'                => $responden['pesertaNIP'],
+                    'telepon'            => $responden['pesertaTelepon'],
+                    'jabatan'            => trim($responden['jabatanFullName']),
+                    'unit'               => $responden['unitName'],
+                    'nilai_pre_test'     => $responden['pesertaNilaiPreTest'],
+                    'nilai_post_test'    => $responden['pesertaNilaiPostTest'],
+                    'created_at'         => now(),
+                    'updated_at'         => now(),
+                ];
+            }
+
+            // Insert batch untuk efisiensi
+            if (!empty($insertData)) {
+                DB::table('project_responden')->insert($insertData);
+            }
+
+            DB::commit();
+
+            return back()->with($updated ? 'success' : 'error', $updated ? 'Kriteria responden berhasil diperbarui!' : 'Kriteria responden gagal diperbarui!');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
+
 
     public function showPesanWa($id)
     {

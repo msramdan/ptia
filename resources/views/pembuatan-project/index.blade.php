@@ -259,7 +259,7 @@
                                 timer: 2000,
                                 showConfirmButton: false
                             }).then(() => {
-                                // location.reload();
+                                location.reload();
                             });
                         },
                         error: function(xhr) {
