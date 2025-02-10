@@ -119,6 +119,7 @@ class ProjectController extends Controller implements HasMiddleware
     {
         $data = $request->validate([
             'kaldikID'   => 'required|numeric',
+            'diklatTypeName'   => 'required|string',
             'kaldikDesc' => 'required|string',
         ]);
 
@@ -153,7 +154,11 @@ class ProjectController extends Controller implements HasMiddleware
             ]);
 
             // 2. Insert data ke tabel project_kriteria_responden
-            $kriteriaResponden = DB::table('kriteria_responden')->first();
+            $kriteriaResponden = DB::table('kriteria_responden')
+                ->join('diklat_type_mapping', 'kriteria_responden.diklat_type_id', '=', 'diklat_type_mapping.diklat_type_id')
+                ->select('kriteria_responden.*')
+                ->where('diklat_type_mapping.diklatTypeName', $data['diklatTypeName'])
+                ->first();
 
             if (!$kriteriaResponden) {
                 throw new \Exception("No kriteria responden data found.");
@@ -168,13 +173,16 @@ class ProjectController extends Controller implements HasMiddleware
             ]);
 
             // 3. Insert data ke tabel project_responden dari API
-            $apiUrl = config('services.pusdiklatwas.endpoint') . "/len-peserta-diklat/{$data['kaldikID']}";
-            $apiToken = config('services.pusdiklatwas.api_token');
-
-            $response = Http::get($apiUrl, [
-                'api_key' => $apiToken,
+            // Ambil nilai status dari field JSON
+            $statusValues = json_decode($kriteriaResponden->nilai_post_test, true);
+            $statusQuery = implode('&', array_map(fn($status) => 'status=' . urlencode($status), $statusValues));
+            $apiUrl = config('services.pusdiklatwas.endpoint') . "/len-peserta-diklat/{$data['kaldikID']}?" . http_build_query([
+                'api_key' => config('services.pusdiklatwas.api_token'),
                 'is_pagination' => 'No',
-            ]);
+                'post_test_minimal' => $kriteriaResponden->nilai_post_test_minimal,
+            ]) . "&" . $statusQuery;
+
+            $response = Http::get($apiUrl);
 
             if ($response->failed()) {
                 throw new \Exception("Gagal mengambil data responden dari API.");
@@ -187,6 +195,7 @@ class ProjectController extends Controller implements HasMiddleware
             }
 
             $insertData = [];
+
 
             foreach ($respondenData['data'] as $responden) {
                 $insertData[] = [

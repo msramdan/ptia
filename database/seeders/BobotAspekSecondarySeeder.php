@@ -12,15 +12,14 @@ class BobotAspekSecondarySeeder extends Seeder
      */
     public function run(): void
     {
-        $data = [
-            [
-                'diklat_type_id' => 1,
+        foreach (range(1, 5) as $diklatTypeId) {
+            $data[] = [
+                'diklat_type_id' => $diklatTypeId,
                 'bobot_aspek_sekunder' => 26.23,
                 'created_at' => now(),
                 'updated_at' => now(),
-            ],
-        ];
-
+            ];
+        }
         DB::table('bobot_aspek_sekunder')->insert($data);
     }
 }

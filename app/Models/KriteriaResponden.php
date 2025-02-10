@@ -21,6 +21,6 @@ class KriteriaResponden extends Model
      *
      * @var string[]
      */
-    protected $fillable = ['nilai_post_test', 'nilai_post_test_minimal'];
+    protected $fillable = ['nilai_post_test', 'nilai_post_test_minimal',''];
 
 }

@@ -161,7 +161,7 @@
                                         dateRange: `${formatDate(item.startDate)} s/d ${formatDate(item.endDate)}`,
                                         statusGenerate: `<button class="btn ${statusGenerateClass} btn-sm">${statusGenerateText}</button>`,
                                         actions: `<td class="text-center">
-                                <a href="javascript:" onclick="generateProject(${item.kaldikID}, '${item.kaldikDesc.replace(/'/g, "\\'")}')" data-bs-toggle="tooltip" data-bs-placement="top" title="Generate Project" class="btn btn-sm btn-icon btn-success mr-1">
+                                <a href="javascript:" onclick="generateProject(${item.kaldikID},'${item.diklatTypeName}', '${item.kaldikDesc.replace(/'/g, "\\'")}')" data-bs-toggle="tooltip" data-bs-placement="top" title="Generate Project" class="btn btn-sm btn-icon btn-success mr-1">
                                     <i class="fas fa-cogs"></i>
                                 </a>
                                 <a href="javascript:" onclick="modalDetail(${item.kaldikID})" data-bs-toggle="tooltip" data-bs-placement="top" title="Lihat Data Diklat" class="btn btn-sm btn-icon btn-primary mr-1">
@@ -209,7 +209,7 @@
 
         });
 
-        function generateProject(kaldikID, kaldikDesc) {
+        function generateProject(kaldikID, diklatTypeName, kaldikDesc) {
             Swal.fire({
                 title: "Konfirmasi",
                 text: "Apakah Anda yakin ingin membuat project untuk Diklat ini?",
@@ -243,6 +243,7 @@
                         url: "{{ route('project.store') }}",
                         data: {
                             kaldikID: kaldikID,
+                            diklatTypeName: diklatTypeName,
                             kaldikDesc: kaldikDesc
                         },
                         headers: {
@@ -258,7 +259,7 @@
                                 timer: 2000,
                                 showConfirmButton: false
                             }).then(() => {
-                                location.reload(); // Muat ulang halaman setelah sukses
+                                // location.reload();
                             });
                         },
                         error: function(xhr) {
