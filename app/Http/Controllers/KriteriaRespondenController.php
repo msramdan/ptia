@@ -7,6 +7,7 @@ use App\Http\Requests\KriteriaRespondens\{UpdateKriteriaRespondenRequest};
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\{RedirectResponse};
 use Illuminate\Routing\Controllers\{HasMiddleware, Middleware};
+use Illuminate\Support\Facades\DB;
 
 class KriteriaRespondenController extends Controller implements HasMiddleware
 {
@@ -25,7 +26,8 @@ class KriteriaRespondenController extends Controller implements HasMiddleware
     {
         $kriteriaResponden = KriteriaResponden::findOrFail(1);
         $kriteriaResponden->nilai_post_test = json_decode($kriteriaResponden->nilai_post_test, true);
-        return view('kriteria-responden.edit', compact('kriteriaResponden'));
+        $diklatTypes = DB::table('diklat_type')->select('id', 'nama_diklat_type')->get();
+        return view('kriteria-responden.edit', compact('kriteriaResponden','diklatTypes'));
     }
 
     public function update(UpdateKriteriaRespondenRequest $request, KriteriaResponden $kriteriaResponden): RedirectResponse

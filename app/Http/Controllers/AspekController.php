@@ -40,8 +40,8 @@ class AspekController extends Controller implements HasMiddleware
                 ->rawColumns(['level', 'action'])
                 ->toJson();
         }
-
-        return view('aspek.index');
+        $diklatTypes = DB::table('diklat_type')->select('id', 'nama_diklat_type')->get();
+        return view('aspek.index', compact('diklatTypes'));
     }
 
     public function create(): View

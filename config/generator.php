@@ -270,11 +270,11 @@ return [
                             'route' => '/penyebaran-kuesioner',
                             'permission' => 'penyebaran kuesioner view'
                         ],
-                        // [
-                        //     'title' => 'Pengumpulan Data',
-                        //     'route' => '/project',
-                        //     'permission' => 'project view'
-                        // ]
+                        [
+                            'title' => 'Pengumpulan Data',
+                            'route' => '/project',
+                            'permission' => 'pengumpulan data view'
+                        ]
                     ]
                 ]
             ]

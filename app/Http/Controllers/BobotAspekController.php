@@ -34,8 +34,8 @@ class BobotAspekController extends Controller implements HasMiddleware
         $dataSecondary = DB::table('bobot_aspek_sekunder')
             ->select('bobot_aspek_sekunder.*')
             ->first();
-
-        return view('bobot-aspek.edit', compact('level3', 'level4', 'dataSecondary'));
+        $diklatTypes = DB::table('diklat_type')->select('id', 'nama_diklat_type')->get();
+        return view('bobot-aspek.edit', compact('level3', 'level4', 'dataSecondary', 'diklatTypes'));
     }
 
     public function update(Request $request): RedirectResponse

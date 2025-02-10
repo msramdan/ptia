@@ -8,6 +8,7 @@ use Illuminate\Contracts\View\View;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Http\{JsonResponse, RedirectResponse};
 use Illuminate\Routing\Controllers\{HasMiddleware, Middleware};
+use Illuminate\Support\Facades\DB;
 
 class KonversiController extends Controller implements HasMiddleware
 {
@@ -46,7 +47,8 @@ class KonversiController extends Controller implements HasMiddleware
                 ->toJson();
         }
 
-        return view('konversi.index');
+        $diklatTypes = DB::table('diklat_type')->select('id', 'nama_diklat_type')->get();
+        return view('konversi.index', compact('diklatTypes'));
     }
 
     /**

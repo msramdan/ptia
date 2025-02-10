@@ -42,6 +42,19 @@
                 <div class="col-md-12">
                     <div class="card">
                         <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-4 mb-4">
+                                    <div class="form-group">
+                                        <label for="filter_diklat_type">{{ __('Diklat Type') }}</label>
+                                        <select class="form-select" name="filter_diklat_type" id="filter_diklat_type" required>
+                                            <option value="" selected disabled>-- {{ __('All') }} --</option>
+                                            @foreach($diklatTypes as $type)
+                                                <option value="{{ $type->id }}">{{ $type->nama_diklat_type }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
                             <div class="table-responsive p-1">
                                 <table class="table table-striped" id="data-table" width="100%">
                                     <thead>

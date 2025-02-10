@@ -8,6 +8,7 @@ use Illuminate\Contracts\View\View;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Http\{JsonResponse, RedirectResponse};
 use Illuminate\Routing\Controllers\{HasMiddleware, Middleware};
+use Illuminate\Support\Facades\DB;
 
 class IndikatorDampakController extends Controller implements HasMiddleware
 {
@@ -42,7 +43,8 @@ class IndikatorDampakController extends Controller implements HasMiddleware
                 ->toJson();
         }
 
-        return view('indikator-dampak.index');
+        $diklatTypes = DB::table('diklat_type')->select('id', 'nama_diklat_type')->get();
+        return view('indikator-dampak.index', compact('diklatTypes'));
     }
 
     /**

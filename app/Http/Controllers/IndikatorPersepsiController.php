@@ -50,8 +50,8 @@ class IndikatorPersepsiController extends Controller implements HasMiddleware
                 ->addColumn('action', 'indikator-persepsi.include.action')
                 ->toJson();
         }
-
-        return view('indikator-persepsi.index');
+        $diklatTypes = DB::table('diklat_type')->select('id', 'nama_diklat_type')->get();
+        return view('indikator-persepsi.index', compact('diklatTypes'));
     }
 
     /**
