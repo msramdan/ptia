@@ -13,8 +13,9 @@ class KriteriaRespondenSeeder extends Seeder
     public function run(): void
     {
         DB::table('kriteria_responden')->insert([
-            'nilai_post_test' => json_encode(['Naik', 'Tetap']),
-            'nilai_post_test_minimal' => 50,
+            'diklat_type_id' => 1,
+            'nilai_post_test' => json_encode(['Turun']),
+            'nilai_post_test_minimal' => 10,
             'created_at' => now(),
             'updated_at' => now(),
         ]);

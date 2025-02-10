@@ -13,8 +13,11 @@ return new class extends Migration
     {
         Schema::create('bobot_aspek_sekunder', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('diklat_type_id');
             $table->float('bobot_aspek_sekunder');
             $table->timestamps();
+
+            $table->foreign('diklat_type_id')->references('id')->on('diklat_type')->onDelete('cascade');
         });
     }
     /**

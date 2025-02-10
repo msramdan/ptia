@@ -14,6 +14,7 @@ class AspekSeeder extends Seeder
     {
         $data = [
             [
+                'diklat_type_id' => 1,
                 'level' => '3',
                 'aspek' => 'Motivasi',
                 'kriteria' => 'Delta Skor Persepsi',
@@ -22,6 +23,7 @@ class AspekSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
+                'diklat_type_id' => 1,
                 'level' => '3',
                 'aspek' => 'Kepercayaan Diri',
                 'kriteria' => 'Delta Skor Persepsi',
@@ -30,6 +32,7 @@ class AspekSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
+                'diklat_type_id' => 1,
                 'level' => '3',
                 'aspek' => 'Kemampuan Membagikan Keilmuan',
                 'kriteria' => 'Skor Persepsi',
@@ -38,6 +41,7 @@ class AspekSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
+                'diklat_type_id' => 1,
                 'level' => '3',
                 'aspek' => 'Kemampuan Implementasi Keilmuan',
                 'kriteria' => 'Delta Skor Persepsi',
@@ -46,6 +50,7 @@ class AspekSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
+                'diklat_type_id' => 1,
                 'level' => '4',
                 'aspek' => 'Hasil Pelatihan',
                 'kriteria' => 'Delta Skor Persepsi',

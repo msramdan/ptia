@@ -13,10 +13,13 @@ return new class extends Migration
     {
         Schema::create('indikator_dampak', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('diklat_type_id');
             $table->float('nilai_minimal');
 			$table->float('nilai_maksimal');
 			$table->string('kriteria_dampak');
             $table->timestamps();
+
+            $table->foreign('diklat_type_id')->references('id')->on('diklat_type')->onDelete('cascade');
         });
     }
 

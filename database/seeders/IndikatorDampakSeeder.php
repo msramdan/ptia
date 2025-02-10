@@ -12,6 +12,7 @@ class IndikatorDampakSeeder extends Seeder
     {
         DB::table('indikator_dampak')->insert([
             [
+                'diklat_type_id' => 1,
                 'nilai_minimal' => 0,
                 'nilai_maksimal' => 25,
                 'kriteria_dampak' => 'Tidak berdampak',
@@ -19,6 +20,7 @@ class IndikatorDampakSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
+                'diklat_type_id' => 1,
                 'nilai_minimal' => 26,
                 'nilai_maksimal' => 50,
                 'kriteria_dampak' => 'Kurang berdampak',
@@ -26,6 +28,7 @@ class IndikatorDampakSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
+                'diklat_type_id' => 1,
                 'nilai_minimal' => 51,
                 'nilai_maksimal' => 75,
                 'kriteria_dampak' => 'Cukup berdampak',
@@ -33,6 +36,7 @@ class IndikatorDampakSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
+                'diklat_type_id' => 1,
                 'nilai_minimal' => 76,
                 'nilai_maksimal' => 100,
                 'kriteria_dampak' => 'Sangat berdampak',

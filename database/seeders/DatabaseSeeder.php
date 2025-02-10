@@ -11,6 +11,8 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        $this->call(DiklatTypeSeeder::class);
+        $this->call(DiklatTypeMappingSeeder::class);
         $this->call(RoleAndPermissionSeeder::class);
         $this->call(AspekSeeder::class);
         $this->call(IndikatorPersepsiSeeder::class);
@@ -21,8 +23,6 @@ class DatabaseSeeder extends Seeder
         $this->call(PesanWaSeeder::class);
         $this->call(KriteriaRespondenSeeder::class);
         $this->call(SettingSeeder::class);
-        $this->call(DiklatTypeSeeder::class);
-        $this->call(DiklatTypeMappingSeeder::class);
     }
 }
 

@@ -14,6 +14,7 @@ class BobotAspekSecondarySeeder extends Seeder
     {
         $data = [
             [
+                'diklat_type_id' => 1,
                 'bobot_aspek_sekunder' => 26.23,
                 'created_at' => now(),
                 'updated_at' => now(),

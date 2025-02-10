@@ -13,9 +13,12 @@ return new class extends Migration
     {
         Schema::create('kriteria_responden', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('diklat_type_id');
             $table->json('nilai_post_test'); // Mengganti enum menjadi JSON untuk mendukung banyak nilai
             $table->float('nilai_post_test_minimal');
             $table->timestamps();
+
+            $table->foreign('diklat_type_id')->references('id')->on('diklat_type')->onDelete('cascade');
         });
     }
 

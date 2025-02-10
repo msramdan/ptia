@@ -13,11 +13,14 @@ return new class extends Migration
     {
         Schema::create('aspek', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('diklat_type_id');
             $table->enum('level', ['3', '4']);
 			$table->string('aspek', 255);
             $table->enum('kriteria', ['Skor Persepsi', 'Delta Skor Persepsi']);
 			$table->integer('urutan');
             $table->timestamps();
+
+            $table->foreign('diklat_type_id')->references('id')->on('diklat_type')->onDelete('cascade');
         });
     }
 
