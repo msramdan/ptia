@@ -21,6 +21,8 @@ class DatabaseSeeder extends Seeder
         $this->call(PesanWaSeeder::class);
         $this->call(KriteriaRespondenSeeder::class);
         $this->call(SettingSeeder::class);
+        $this->call(DiklatTypeSeeder::class);
+        $this->call(DiklatTypeMappingSeeder::class);
     }
 }
 

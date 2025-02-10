@@ -162,9 +162,7 @@ class ProjectController extends Controller implements HasMiddleware
             DB::table('project_kriteria_responden')->insert([
                 'project_id'              => $projectId,
                 'nilai_post_test'         => $kriteriaResponden->nilai_post_test,
-                'nilai_pre_test_minimal'  => $kriteriaResponden->nilai_pre_test_minimal,
                 'nilai_post_test_minimal' => $kriteriaResponden->nilai_post_test_minimal,
-                'nilai_kenaikan_pre_post' => $kriteriaResponden->nilai_kenaikan_pre_post,
                 'created_at'              => now(),
                 'updated_at'              => now(),
             ]);

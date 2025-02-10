@@ -14,9 +14,7 @@ class KriteriaRespondenSeeder extends Seeder
     {
         DB::table('kriteria_responden')->insert([
             'nilai_post_test' => json_encode(['Naik', 'Tetap']),
-            'nilai_pre_test_minimal' => 50,
             'nilai_post_test_minimal' => 50,
-            'nilai_kenaikan_pre_post' => 50,
             'created_at' => now(),
             'updated_at' => now(),
         ]);

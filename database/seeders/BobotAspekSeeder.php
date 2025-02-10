@@ -16,27 +16,37 @@ class BobotAspekSeeder extends Seeder
             [
                 'aspek_id' => 1,
                 'bobot_alumni' => 8.94,
-                'bobot_atasan_langsung' => 8.44
+                'bobot_atasan_langsung' => 8.44,
+                'created_at' => now(),
+                'updated_at' => now(),
             ],
             [
                 'aspek_id' => 2,
                 'bobot_alumni' => 10.48,
-                'bobot_atasan_langsung' => 9.89
+                'bobot_atasan_langsung' => 9.89,
+                'created_at' => now(),
+                'updated_at' => now(),
             ],
             [
                 'aspek_id' => 3,
                 'bobot_alumni' => 7.62,
-                'bobot_atasan_langsung' => 7.18
+                'bobot_atasan_langsung' => 7.18,
+                'created_at' => now(),
+                'updated_at' => now(),
             ],
             [
                 'aspek_id' => 4,
                 'bobot_alumni' => 24.41,
-                'bobot_atasan_langsung' => 23.04
+                'bobot_atasan_langsung' => 23.04,
+                'created_at' => now(),
+                'updated_at' => now(),
             ],
             [
                 'aspek_id' => 5,
                 'bobot_alumni' => 37.95,
-                'bobot_atasan_langsung' => 35.82
+                'bobot_atasan_langsung' => 35.82,
+                'created_at' => now(),
+                'updated_at' => now(),
             ],
         ];
 

@@ -15,9 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('project_id')->constrained('project')->restrictOnUpdate()->cascadeOnDelete();
 			$table->json('nilai_post_test');
-			$table->double('nilai_pre_test_minimal');
 			$table->double('nilai_post_test_minimal');
-			$table->double('nilai_kenaikan_pre_post');
             $table->timestamps();
         });
     }
