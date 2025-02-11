@@ -134,7 +134,7 @@
                     },
                     {
                         data: 'nama_diklat_type',
-                        name: 'nama_diklat_type'
+                        name: 'diklat_type.nama_diklat_type'
                     },
                     {
                         data: 'level',

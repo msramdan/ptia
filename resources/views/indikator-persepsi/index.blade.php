@@ -48,8 +48,9 @@
                                         <label for="filter_diklat_type">{{ __('Diklat Type') }}</label>
                                         <select class="form-select" name="filter_diklat_type" id="filter_diklat_type">
                                             <option value="">-- {{ __('All') }} --</option>
-                                            @foreach($diklatTypes as $type)
-                                                <option value="{{ $type->id }}" {{ isset($selectedDiklatType) && $selectedDiklatType == $type->id ? 'selected' : '' }}>
+                                            @foreach ($diklatTypes as $type)
+                                                <option value="{{ $type->id }}"
+                                                    {{ isset($selectedDiklatType) && $selectedDiklatType == $type->id ? 'selected' : '' }}>
                                                     {{ $type->nama_diklat_type }}
                                                 </option>
                                             @endforeach
@@ -139,11 +140,11 @@
                     },
                     {
                         data: 'nama_diklat_type',
-                        name: 'nama_diklat_type'
+                        name: 'diklat_type.nama_diklat_type'
                     },
                     {
                         data: 'aspek',
-                        name: 'aspek'
+                        name: 'aspek.aspek'
                     },
                     {
                         data: 'indikator_persepsi',
