@@ -255,6 +255,7 @@ class ProjectController extends Controller implements HasMiddleware
             $dataBobot = DB::table('bobot_aspek')
                 ->join('aspek', 'bobot_aspek.aspek_id', '=', 'aspek.id')
                 ->select('bobot_aspek.aspek_id', 'bobot_aspek.bobot_alumni', 'bobot_aspek.bobot_atasan_langsung', 'aspek.level', 'aspek.aspek')
+                ->where('aspek.diklat_type_id', $diklatType->diklat_type_id)
                 ->get();
 
             if ($dataBobot->isEmpty()) {
@@ -274,7 +275,9 @@ class ProjectController extends Controller implements HasMiddleware
             DB::table('project_bobot_aspek')->insert($insertData);
 
             // 6.insert data ke table project_bobot_aspek_sekunder
-            $dataBobotSekunder = DB::table('bobot_aspek_sekunder')->first();
+            $dataBobotSekunder = DB::table('bobot_aspek_sekunder')
+                ->where('diklat_type_id', $diklatType->diklat_type_id)
+                ->first();
 
             if (!$dataBobotSekunder) {
                 throw new \Exception("No bobot aspek sekunder found.");
