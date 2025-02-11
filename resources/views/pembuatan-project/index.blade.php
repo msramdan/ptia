@@ -115,6 +115,8 @@
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/v/bs5/dt-1.12.0/datatables.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/locale/id.min.js"></script>
     <script>
         $(document).ready(function() {
             $('#data-table').DataTable({
@@ -152,13 +154,41 @@
                                     var statusGenerateText = item
                                         .status_generate === 'SUDAH' ?
                                         'SUDAH' : 'BELUM';
+                                    moment.locale(
+                                        'id'); // Set bahasa Indonesia
 
+                                    function formatDuration(endDate) {
+                                        const end = moment(endDate);
+                                        const now = moment();
+
+                                        if (end.isAfter(now)) {
+                                            return 'Masih berlangsung';
+                                        }
+                                        const duration = moment.duration(now
+                                            .diff(end));
+
+                                        const years = duration.years();
+                                        const months = duration.months();
+                                        const days = duration.days();
+
+                                        let result = '';
+
+                                        if (years > 0) result +=
+                                            `${years} tahun `;
+                                        if (months > 0) result +=
+                                            `${months} bulan `;
+                                        if (days > 0) result +=
+                                            `${days} hari `;
+
+                                        return result.trim() + ' yang lalu';
+                                    }
                                     return {
                                         kaldikID: item.kaldikID,
                                         kaldikDesc: item.kaldikDesc,
                                         biayaName: item.biayaName,
                                         diklatTypeName: item.diklatTypeName,
-                                        dateRange: `${formatDate(item.startDate)} s/d ${formatDate(item.endDate)}`,
+                                        dateRange: formatDuration(item
+                                            .endDate),
                                         statusGenerate: `<button class="btn ${statusGenerateClass} btn-sm">${statusGenerateText}</button>`,
                                         actions: `<td class="text-center">
                                 <a href="javascript:" onclick="generateProject(${item.kaldikID},'${item.diklatTypeName}', '${item.kaldikDesc.replace(/'/g, "\\'")}')" data-bs-toggle="tooltip" data-bs-placement="top" title="Generate Project" class="btn btn-sm btn-icon btn-success mr-1">
@@ -232,7 +262,6 @@
                 `,
                         showConfirmButton: false,
                         willOpen: () => {
-                            // Pastikan animasi loading berjalan
                             $(".progress-bar").css("width", "100%");
                         },
                         allowOutsideClick: false,

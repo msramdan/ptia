@@ -10,14 +10,54 @@ class DiklatTypeMappingSeeder extends Seeder
     public function run()
     {
         DB::table('diklat_type_mapping')->insert([
-            ['diklat_type_id' => 1, 'diklatTypeName' => 'Fungsional Auditor'],
-            ['diklat_type_id' => 2, 'diklatTypeName' => 'TS SPIP'],
-            ['diklat_type_id' => 2, 'diklatTypeName' => 'TS APIP'],
-            ['diklat_type_id' => 3, 'diklatTypeName' => 'Kedinasan'],
-            ['diklat_type_id' => 3, 'diklatTypeName' => 'Manajerial'],
-            ['diklat_type_id' => 4, 'diklatTypeName' => 'Sertifikasi Non JFA'],
-            ['diklat_type_id' => 5, 'diklatTypeName' => 'MOOC'],
-            ['diklat_type_id' => 5, 'diklatTypeName' => 'Micro Learning'],
+            [
+                'diklat_type_id' => 1,
+                'diklatTypeName' => 'Fungsional Auditor',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'diklat_type_id' => 2,
+                'diklatTypeName' => 'TS SPIP',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'diklat_type_id' => 2,
+                'diklatTypeName' => 'TS APIP',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'diklat_type_id' => 3,
+                'diklatTypeName' => 'Kedinasan',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'diklat_type_id' => 3,
+                'diklatTypeName' => 'Manajerial',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'diklat_type_id' => 4,
+                'diklatTypeName' => 'Sertifikasi Non JFA',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'diklat_type_id' => 5,
+                'diklatTypeName' => 'MOOC',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'diklat_type_id' => 5,
+                'diklatTypeName' => 'Micro Learning',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
         ]);
     }
 }
