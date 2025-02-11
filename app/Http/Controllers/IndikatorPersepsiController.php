@@ -43,6 +43,10 @@ class IndikatorPersepsiController extends Controller implements HasMiddleware
                     'diklat_type.nama_diklat_type',
                 ]);
 
+            if (!empty(request()->diklatType)) {
+                $indikatorPersepsi->where('aspek.diklat_type_id', request()->diklatType);
+            }
+
             return DataTables::of($indikatorPersepsi)
                 ->addIndexColumn()
                 ->addColumn('indikator_persepsi', function ($row) {
@@ -54,8 +58,11 @@ class IndikatorPersepsiController extends Controller implements HasMiddleware
         }
 
         $diklatTypes = DB::table('diklat_type')->select('id', 'nama_diklat_type')->get();
-        return view('indikator-persepsi.index', compact('diklatTypes'));
+        $selectedDiklatType = request()->diklatType;
+
+        return view('indikator-persepsi.index', compact('diklatTypes', 'selectedDiklatType'));
     }
+
 
     /**
      * Show the form for creating a new resource.

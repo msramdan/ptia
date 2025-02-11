@@ -46,10 +46,12 @@
                                 <div class="col-md-4 mb-4">
                                     <div class="form-group">
                                         <label for="filter_diklat_type">{{ __('Diklat Type') }}</label>
-                                        <select class="form-select" name="filter_diklat_type" id="filter_diklat_type" required>
-                                            <option value="" selected disabled>-- {{ __('All') }} --</option>
+                                        <select class="form-select" name="filter_diklat_type" id="filter_diklat_type">
+                                            <option value="">-- {{ __('All') }} --</option>
                                             @foreach($diklatTypes as $type)
-                                                <option value="{{ $type->id }}">{{ $type->nama_diklat_type }}</option>
+                                                <option value="{{ $type->id }}" {{ isset($selectedDiklatType) && $selectedDiklatType == $type->id ? 'selected' : '' }}>
+                                                    {{ $type->nama_diklat_type }}
+                                                </option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -110,40 +112,69 @@
         });
     </script>
     <script>
-        $('#data-table').DataTable({
-            processing: true,
-            serverSide: true,
-            ajax: "{{ route('indikator-persepsi.index') }}",
-            columns: [{
-                    data: 'DT_RowIndex',
-                    name: 'DT_RowIndex',
-                    orderable: false,
-                    searchable: false,
+        $(document).ready(function() {
+            // Ambil parameter diklatType dari URL jika ada
+            let urlParams = new URLSearchParams(window.location.search);
+            let diklatType = urlParams.get('diklatType');
+
+            if (diklatType) {
+                $('#filter_diklat_type').val(diklatType);
+            }
+
+            // Inisialisasi DataTables dengan parameter filter dari URL
+            let table = $('#data-table').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url: "{{ route('indikator-persepsi.index') }}",
+                    data: function(d) {
+                        d.diklatType = $('#filter_diklat_type').val() || null;
+                    }
                 },
-                {
-                    data: 'nama_diklat_type',
-                    name: 'nama_diklat_type',
-                },
-                {
-                    data: 'aspek',
-                    name: 'aspek.level'
-                },
-                {
-                    data: 'indikator_persepsi',
-                    name: 'indikator_persepsi',
-                    className: 'text-center',
-                },
-                {
-                    data: 'kriteria_persepsi',
-                    name: 'kriteria_persepsi',
-                },
-                {
-                    data: 'action',
-                    name: 'action',
-                    orderable: false,
-                    searchable: false
+                columns: [{
+                        data: 'DT_RowIndex',
+                        name: 'DT_RowIndex',
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
+                        data: 'nama_diklat_type',
+                        name: 'nama_diklat_type'
+                    },
+                    {
+                        data: 'aspek',
+                        name: 'aspek'
+                    },
+                    {
+                        data: 'indikator_persepsi',
+                        name: 'indikator_persepsi',
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'kriteria_persepsi',
+                        name: 'kriteria_persepsi'
+                    },
+                    {
+                        data: 'action',
+                        name: 'action',
+                        orderable: false,
+                        searchable: false
+                    }
+                ],
+            });
+
+            // Event handler saat filter berubah
+            $('#filter_diklat_type').change(function() {
+                let selectedValue = $(this).val();
+                let newUrl = "{{ route('indikator-persepsi.index') }}";
+
+                if (selectedValue) {
+                    newUrl += '?diklatType=' + selectedValue;
                 }
-            ],
+
+                window.history.pushState({}, '', newUrl); // Ubah URL tanpa reload
+                table.ajax.reload(); // Reload DataTables dengan filter baru
+            });
         });
     </script>
 @endpush

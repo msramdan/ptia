@@ -36,6 +36,11 @@ class IndikatorDampakController extends Controller implements HasMiddleware
                 ->join('diklat_type', 'indikator_dampak.diklat_type_id', '=', 'diklat_type.id')
                 ->select('indikator_dampak.*', 'diklat_type.nama_diklat_type');
 
+            // Tambahkan filter diklatType jika ada di request
+            if (!empty(request()->diklatType)) {
+                $indikatorDampaks->where('indikator_dampak.diklat_type_id', request()->diklatType);
+            }
+
             return DataTables::of($indikatorDampaks)
                 ->addIndexColumn()
                 ->addColumn('indikator_dampak', function ($row) {
@@ -45,10 +50,12 @@ class IndikatorDampakController extends Controller implements HasMiddleware
                 ->toJson();
         }
 
-
         $diklatTypes = DB::table('diklat_type')->select('id', 'nama_diklat_type')->get();
-        return view('indikator-dampak.index', compact('diklatTypes'));
+        $selectedDiklatType = request()->diklatType; // Ambil nilai filter dari URL
+
+        return view('indikator-dampak.index', compact('diklatTypes', 'selectedDiklatType'));
     }
+
 
     /**
      * Show the form for creating a new resource.

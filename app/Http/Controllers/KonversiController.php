@@ -39,6 +39,11 @@ class KonversiController extends Controller implements HasMiddleware
                     'diklat_type.nama_diklat_type',
                 ]);
 
+            // Tambahkan filter diklatType jika ada di request
+            if (!empty(request()->diklatType)) {
+                $konversis->where('konversi.diklat_type_id', request()->diklatType);
+            }
+
             return DataTables::of($konversis)
                 ->addIndexColumn()
                 ->addColumn('skor', function ($row) {
@@ -53,8 +58,11 @@ class KonversiController extends Controller implements HasMiddleware
         }
 
         $diklatTypes = DB::table('diklat_type')->select('id', 'nama_diklat_type')->get();
-        return view('konversi.index', compact('diklatTypes'));
+        $selectedDiklatType = request()->diklatType; // Ambil nilai filter dari URL
+
+        return view('konversi.index', compact('diklatTypes', 'selectedDiklatType'));
     }
+
 
     /**
      * Show the form for creating a new resource.
