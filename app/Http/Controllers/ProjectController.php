@@ -118,7 +118,7 @@ class ProjectController extends Controller implements HasMiddleware
     public function store(Request $request)
     {
         $data = $request->validate([
-            'kaldikID'   => 'required|numeric',
+            'kaldikID'          => 'required|numeric',
             'diklatTypeName'   => 'required|string',
             'kaldikDesc' => 'required|string',
         ]);
@@ -144,20 +144,28 @@ class ProjectController extends Controller implements HasMiddleware
             }
 
             // 1. Insert ke tabel project
+            $diklatType = DB::table('diklat_type_mapping')
+                ->where('diklatTypeName', $data['diklatTypeName'])
+                ->first();
+
+            if (!$diklatType) {
+                throw new \Exception("Type diklat tidak di temukan");
+            }
+
             $projectId = DB::table('project')->insertGetId([
-                'kode_project'  => $kode_project,
-                'kaldikID'      => $data['kaldikID'],
-                'kaldikDesc'    => $data['kaldikDesc'],
-                'user_id'       => $user->id,
-                'created_at'    => now(),
-                'updated_at'    => now(),
+                'diklat_type_id'    => $diklatType->diklat_type_id,
+                'kode_project'      => $kode_project,
+                'kaldikID'          => $data['kaldikID'],
+                'diklatTypeName'    => $data['diklatTypeName'],
+                'kaldikDesc'        => $data['kaldikDesc'],
+                'user_id'           => $user->id,
+                'created_at'        => now(),
+                'updated_at'        => now(),
             ]);
 
             // 2. Insert data ke tabel project_kriteria_responden
             $kriteriaResponden = DB::table('kriteria_responden')
-                ->join('diklat_type_mapping', 'kriteria_responden.diklat_type_id', '=', 'diklat_type_mapping.diklat_type_id')
-                ->select('kriteria_responden.*')
-                ->where('diklat_type_mapping.diklatTypeName', $data['diklatTypeName'])
+                ->where('diklat_type_id', $diklatType->diklat_type_id)
                 ->first();
 
             if (!$kriteriaResponden) {
@@ -173,7 +181,6 @@ class ProjectController extends Controller implements HasMiddleware
             ]);
 
             // 3. Insert data ke tabel project_responden dari API
-            // Ambil nilai status dari field JSON
             $statusValues = json_decode($kriteriaResponden->nilai_post_test, true);
             $statusQuery = implode('&', array_map(fn($status) => 'status=' . urlencode($status), $statusValues));
             $apiUrl = config('services.pusdiklatwas.endpoint') . "/len-peserta-diklat/{$data['kaldikID']}?" . http_build_query([
@@ -213,7 +220,6 @@ class ProjectController extends Controller implements HasMiddleware
                 ];
             }
 
-            // Insert batch untuk efisiensi
             if (!empty($insertData)) {
                 DB::table('project_responden')->insert($insertData);
             }
@@ -282,7 +288,10 @@ class ProjectController extends Controller implements HasMiddleware
             ]);
 
             // 7. Insert data ke table project_kuesioner
-            $aspekList = DB::table('aspek')->limit(5)->get();
+            $aspekList = DB::table('aspek')
+                ->where('diklat_type_id', $diklatType->diklat_type_id)
+                ->get();
+
 
             if ($aspekList->isEmpty()) {
                 throw new \Exception("No aspek data found.");
@@ -405,9 +414,53 @@ class ProjectController extends Controller implements HasMiddleware
             ->where('project_kuesioner.remark', $remark)
             ->get();
 
-        $aspeks = DB::table('aspek')->select('id', 'aspek')->get();
+        $aspeks = DB::table('aspek')
+            ->select('id', 'aspek')
+            ->where('diklat_type_id', $project->diklat_type_id)
+            ->get();
+
 
         return view('project.kuesioner', compact('project', 'kuesioners', 'remark', 'aspeks'));
+    }
+
+    public function storeKuesioner(Request $request)
+    {
+        $validated = $request->validate([
+            'project_id' => 'required',
+            'remark' => 'required',
+            'aspek' => 'required',
+            'pertanyaan' => 'required|string',
+        ]);
+
+        DB::beginTransaction();
+
+        try {
+            $dataAspek = DB::table('aspek')
+                ->where('id', $request->aspek)
+                ->first();
+
+            if (!$dataAspek) {
+                return back()->with('error', 'Aspek tidak ditemukan!');
+            }
+
+            DB::table('project_kuesioner')->insert([
+                'project_id' => $validated['project_id'],
+                'aspek_id' => $validated['aspek'],
+                'remark' => $validated['remark'],
+                'aspek' => $dataAspek->aspek,
+                'kriteria' => $dataAspek->kriteria,
+                'level' => $dataAspek->level,
+                'pertanyaan' => $validated['pertanyaan'],
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            DB::commit();
+            return back()->with('success', 'Kuesioner berhasil ditambahkan!');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
     }
 
     public function editKuesioner($id)
@@ -416,55 +469,42 @@ class ProjectController extends Controller implements HasMiddleware
         return response()->json($kuesioner);
     }
 
-    public function updateKuesioner($id)
+    public function updateKuesioner(Request $request, $id)
     {
-        $kuesioner = DB::table('project_kuesioner')->where('id', $id)->first();
+        DB::beginTransaction();
 
-        return view('project.edit_kuesioner', compact('kuesioner'));
-    }
+        try {
+            $dataAspek = DB::table('aspek')
+                ->where('id', $request->aspek)
+                ->first();
 
-    public function saveKuesioner(Request $request, $id)
-    {
-        DB::table('project_kuesioner')
-            ->where('id', $id)
-            ->update([
-                'aspek_id' => $request->aspek,
-                'kriteria' => $request->kriteria,
-                'pertanyaan' => $request->pertanyaan,
-                'updated_at' => now(),
-            ]);
+            if (!$dataAspek) {
+                return back()->with('error', 'Aspek tidak ditemukan!');
+            }
 
-        return back()->with('success', 'Kuesioner berhasil diperbarui!');
+            DB::table('project_kuesioner')
+                ->where('id', $id)
+                ->update([
+                    'aspek_id' => $request->aspek,
+                    'level' => $dataAspek->level,
+                    'kriteria' => $dataAspek->kriteria,
+                    'aspek' => $dataAspek->aspek,
+                    'pertanyaan' => $request->pertanyaan,
+                    'updated_at' => now(),
+                ]);
+
+            DB::commit();
+            return back()->with('success', 'Kuesioner berhasil diperbarui!');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
     }
 
     public function deleteKuesioner($id)
     {
         DB::table('project_kuesioner')->where('id', $id)->delete();
         return response()->json(['success' => 'Kuesioner berhasil dihapus']);
-    }
-
-    public function tambahKuesioner(Request $request)
-    {
-        $validated = $request->validate([
-            'project_id' => 'required',
-            'remark' => 'required',
-            'aspek' => 'required',
-            'kriteria' => 'required|string',
-            'pertanyaan' => 'required|string',
-        ]);
-
-        // Menggunakan query builder untuk menyimpan data
-        DB::table('project_kuesioner')->insert([
-            'project_id' => $validated['project_id'],
-            'aspek_id' => $validated['aspek'],
-            'remark' => $validated['remark'],
-            'kriteria' => $validated['kriteria'],
-            'pertanyaan' => $validated['pertanyaan'],
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-
-        return back()->with('success', 'Kuesioner berhasil ditambahkan!');
     }
 
     public function showResponden($id): View|JsonResponse
@@ -572,7 +612,6 @@ class ProjectController extends Controller implements HasMiddleware
             return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
-
 
     public function showPesanWa($id)
     {

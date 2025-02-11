@@ -63,9 +63,9 @@ Route::middleware(['auth', 'web'])->group(function () {
     Route::prefix('project')->controller(ProjectController::class)->group(function () {
         // Kuesioner
         Route::get('/kuesioner/show/{id}/{remark}', 'showKuesioner')->name('project.kuesioner.show');
-        Route::post('/kuesioner/store', 'tambahKuesioner')->name('project.kuesioner.store');
+        Route::post('/kuesioner/store', 'storeKuesioner')->name('project.kuesioner.store');
         Route::get('/kuesioner/edit/{id}', 'editKuesioner')->name('project.kuesioner.edit');
-        Route::post('/kuesioner/update/{id}', 'saveKuesioner')->name('project.kuesioner.update');
+        Route::post('/kuesioner/update/{id}', 'updateKuesioner')->name('project.kuesioner.update');
         Route::delete('/kuesioner/delete/{id}', 'deleteKuesioner')->name('project.kuesioner.delete');
         // responden
         Route::get('/responden/show/{id}', 'showResponden')->name('project.responden.show');

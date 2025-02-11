@@ -14,9 +14,11 @@ return new class extends Migration
         Schema::create('project', function (Blueprint $table) {
             $table->id();
             $table->string('kode_project')->nullable();
+            $table->foreignId('diklat_type_id')->constrained('diklat_type')->restrictOnDelete();
             $table->bigInteger('kaldikID');
+            $table->text('diklatTypeName');
             $table->text('kaldikDesc');
-            $table->foreignId('user_id')->constrained('users')->restrictOnDelete(); // Relasi ke users
+            $table->foreignId('user_id')->constrained('users')->restrictOnDelete();
             $table->timestamps();
         });
     }

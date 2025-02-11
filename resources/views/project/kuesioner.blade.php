@@ -43,14 +43,6 @@
                             </div>
 
                             <div class="mb-3">
-                                <label for="editKriteria" class="form-label">Kriteria</label>
-                                <select class="form-control" id="editKriteria" name="kriteria" required>
-                                    <option value="Delta Skor Persepsi">Delta Skor Persepsi</option>
-                                    <option value="Skor Persepsi">Skor Persepsi</option>
-                                </select>
-                            </div>
-
-                            <div class="mb-3">
                                 <label for="editPertanyaan" class="form-label">Pertanyaan</label>
                                 <textarea class="form-control" id="editPertanyaan" name="pertanyaan" required></textarea>
                             </div>
@@ -84,14 +76,6 @@
                                     @foreach ($aspeks as $aspek)
                                         <option value="{{ $aspek->id }}">{{ $aspek->aspek }}</option>
                                     @endforeach
-                                </select>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="kriteria" class="form-label">Kriteria</label>
-                                <select class="form-control" id="kriteria" name="kriteria" required>
-                                    <option value="Delta Skor Persepsi">Delta Skor Persepsi</option>
-                                    <option value="Skor Persepsi">Skor Persepsi</option>
                                 </select>
                             </div>
 
