@@ -32,7 +32,9 @@ class IndikatorDampakController extends Controller implements HasMiddleware
     public function index(): View|JsonResponse
     {
         if (request()->ajax()) {
-            $indikatorDampaks = IndikatorDampak::query();
+            $indikatorDampaks = DB::table('indikator_dampak')
+                ->join('diklat_type', 'indikator_dampak.diklat_type_id', '=', 'diklat_type.id')
+                ->select('indikator_dampak.*', 'diklat_type.nama_diklat_type');
 
             return DataTables::of($indikatorDampaks)
                 ->addIndexColumn()
@@ -42,6 +44,7 @@ class IndikatorDampakController extends Controller implements HasMiddleware
                 ->addColumn('action', 'indikator-dampak.include.action')
                 ->toJson();
         }
+
 
         $diklatTypes = DB::table('diklat_type')->select('id', 'nama_diklat_type')->get();
         return view('indikator-dampak.index', compact('diklatTypes'));

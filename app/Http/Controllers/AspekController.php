@@ -28,7 +28,9 @@ class AspekController extends Controller implements HasMiddleware
     public function index(): View|JsonResponse
     {
         if (request()->ajax()) {
-            $aspeks = Aspek::query();
+            $aspeks = DB::table('aspek')
+                ->join('diklat_type', 'aspek.diklat_type_id', '=', 'diklat_type.id')
+                ->select('aspek.*', 'diklat_type.nama_diklat_type');
 
             return DataTables::of($aspeks)
                 ->addIndexColumn()
@@ -40,9 +42,11 @@ class AspekController extends Controller implements HasMiddleware
                 ->rawColumns(['level', 'action'])
                 ->toJson();
         }
+
         $diklatTypes = DB::table('diklat_type')->select('id', 'nama_diklat_type')->get();
         return view('aspek.index', compact('diklatTypes'));
     }
+
 
     public function create(): View
     {

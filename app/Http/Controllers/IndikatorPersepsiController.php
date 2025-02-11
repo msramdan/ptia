@@ -34,11 +34,13 @@ class IndikatorPersepsiController extends Controller implements HasMiddleware
         if (request()->ajax()) {
             $indikatorPersepsi = DB::table('indikator_persepsi')
                 ->join('aspek', 'indikator_persepsi.aspek_id', '=', 'aspek.id')
+                ->join('diklat_type', 'aspek.diklat_type_id', '=', 'diklat_type.id')
                 ->select([
                     'indikator_persepsi.id',
                     'aspek.aspek as aspek',
                     'indikator_persepsi.indikator_persepsi',
                     'indikator_persepsi.kriteria_persepsi',
+                    'diklat_type.nama_diklat_type',
                 ]);
 
             return DataTables::of($indikatorPersepsi)
@@ -50,6 +52,7 @@ class IndikatorPersepsiController extends Controller implements HasMiddleware
                 ->addColumn('action', 'indikator-persepsi.include.action')
                 ->toJson();
         }
+
         $diklatTypes = DB::table('diklat_type')->select('id', 'nama_diklat_type')->get();
         return view('indikator-persepsi.index', compact('diklatTypes'));
     }

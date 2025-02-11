@@ -60,6 +60,7 @@
                                     <thead>
                                         <tr>
                                             <th>#</th>
+                                            <th>{{ __('Diklat Type') }}</th>
                                             <th>{{ __('Aspek') }}</th>
                                             <th>{{ __('Indikator Persepsi') }}</th>
                                             <th>{{ __('Kriteria Persepsi') }}</th>
@@ -118,6 +119,10 @@
                     name: 'DT_RowIndex',
                     orderable: false,
                     searchable: false,
+                },
+                {
+                    data: 'nama_diklat_type',
+                    name: 'nama_diklat_type',
                 },
                 {
                     data: 'aspek',

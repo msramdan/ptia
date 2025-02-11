@@ -32,7 +32,12 @@ class KonversiController extends Controller implements HasMiddleware
     public function index(): View|JsonResponse
     {
         if (request()->ajax()) {
-            $konversis = Konversi::query();
+            $konversis = DB::table('konversi')
+                ->join('diklat_type', 'konversi.diklat_type_id', '=', 'diklat_type.id')
+                ->select([
+                    'konversi.*',
+                    'diklat_type.nama_diklat_type',
+                ]);
 
             return DataTables::of($konversis)
                 ->addIndexColumn()

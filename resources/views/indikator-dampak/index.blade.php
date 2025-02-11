@@ -53,6 +53,7 @@
                                     <thead>
                                         <tr>
                                             <th>#</th>
+                                            <th>{{ __('Diklat Type') }}</th>
                                             <th>{{ __('Indikator Dampak (%)') }}</th>
                                             <th>{{ __('Kriteria Dampak') }}</th>
                                             <th>{{ __('Action') }}</th>
@@ -90,6 +91,10 @@
                     name: 'DT_RowIndex',
                     orderable: false,
                     searchable: false,
+                },
+                {
+                    data: 'nama_diklat_type',
+                    name: 'nama_diklat_type',
                 },
                 {
                     data: 'indikator_dampak',

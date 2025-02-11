@@ -53,6 +53,7 @@
                                     <thead>
                                         <tr>
                                             <th>#</th>
+                                            <th>{{ __('Diklat Type') }}</th>
                                             <th>{{ __('Jenis Skor') }}</th>
                                             <th>{{ __('Skor') }}</th>
                                             <th>{{ __('Konversi') }}</th>
@@ -91,6 +92,10 @@
                     name: 'DT_RowIndex',
                     orderable: false,
                     searchable: false,
+                },
+                {
+                    data: 'nama_diklat_type',
+                    name: 'nama_diklat_type',
                 },
                 {
                     data: 'jenis_skor',
