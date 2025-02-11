@@ -22,21 +22,38 @@ class BobotAspekController extends Controller implements HasMiddleware
 
     public function index(): View
     {
+        $diklatTypeId = request()->query('diklatType');
+        if (!$diklatTypeId) {
+            $firstDiklatType = DB::table('diklat_type')
+                ->select('id', 'nama_diklat_type')
+                ->first();
+            $diklatTypeId = $firstDiklatType->id;
+        }
+
+        // Fetch bobotAspek based on the diklatType
         $bobotAspek = DB::table('bobot_aspek')
             ->leftJoin('aspek', 'bobot_aspek.aspek_id', '=', 'aspek.id')
             ->select('bobot_aspek.*', 'aspek.aspek as aspek_nama', 'aspek.level')
+            ->where('aspek.diklat_type_id', $diklatTypeId)
             ->get();
 
         // Grouping by level 3 and 4
         $level3 = $bobotAspek->where('level', 3);
         $level4 = $bobotAspek->where('level', 4);
 
+        // Fetch secondary data
         $dataSecondary = DB::table('bobot_aspek_sekunder')
             ->select('bobot_aspek_sekunder.*')
+            ->where('diklat_type_id', $diklatTypeId)
             ->first();
+
+        // Fetch all diklatTypes for the dropdown
         $diklatTypes = DB::table('diklat_type')->select('id', 'nama_diklat_type')->get();
+
         return view('bobot-aspek.edit', compact('level3', 'level4', 'dataSecondary', 'diklatTypes'));
     }
+
+
 
     public function update(Request $request): RedirectResponse
     {

@@ -103,7 +103,7 @@
                                             required>
                                             @foreach ($diklatTypes as $type)
                                                 <option value="{{ $type->id }}"
-                                                    {{ old('filter_diklat_type', 1) == $type->id ? 'selected' : '' }}>
+                                                    {{ request()->query('diklatType') == $type->id ? 'selected' : '' }}>
                                                     {{ $type->nama_diklat_type }}
                                                 </option>
                                             @endforeach
@@ -198,74 +198,10 @@
     </script>
     <script>
         $(document).ready(function() {
-            let baseUrl = "{{ url('kriteria-responden') }}";
-            let diklatTypeDropdown = $('#filter_diklat_type');
-            let form = $('form'); // Form utama
-            let loadingOverlay = $('#loading-overlay'); // Loading indicator
-
-            function updateUrlParam(diklatType) {
-                let newUrl = baseUrl + "?diklatType=" + diklatType;
-                window.history.pushState({
-                    path: newUrl
-                }, '', newUrl);
-            }
-
-            function showLoading() {
-                loadingOverlay.show();
-            }
-
-            function hideLoading() {
-                loadingOverlay.hide();
-            }
-
-            function fetchKriteriaResponden(diklatTypeId) {
-                showLoading(); // Tampilkan indikator loading
-
-                $.ajax({
-                    url: baseUrl + "?diklatType=" + diklatTypeId,
-                    type: "GET",
-                    dataType: "json",
-                    success: function(data) {
-                        if (data.kriteria_responden_id) {
-                            form.attr("action", "{{ url('kriteria-responden') }}/" + data
-                                .kriteria_responden_id);
-                        }
-
-                        if (data.nilai_post_test) {
-                            $('input[type=checkbox]').prop('checked', false);
-                            data.nilai_post_test.forEach(function(val) {
-                                $('#' + val.toLowerCase()).prop('checked', true);
-                            });
-                        }
-
-                        $('#nilai-post-test-minimal').val(data.nilai_post_test_minimal);
-                    },
-                    error: function() {
-                        alert('Data tidak ditemukan');
-                    },
-                    complete: function() {
-                        hideLoading(); // Sembunyikan indikator loading setelah selesai
-                    }
-                });
-            }
-
-            // Ambil diklatType dari URL jika ada
-            let urlParams = new URLSearchParams(window.location.search);
-            let diklatTypeFromUrl = urlParams.get('diklatType');
-
-            if (diklatTypeFromUrl) {
-                diklatTypeDropdown.val(diklatTypeFromUrl).trigger('change');
-            } else {
-                let firstDiklatType = diklatTypeDropdown.val();
-                updateUrlParam(firstDiklatType);
-                fetchKriteriaResponden(firstDiklatType);
-            }
-
-            // Event saat select berubah
-            diklatTypeDropdown.on('change', function() {
-                let diklatTypeId = $(this).val();
-                updateUrlParam(diklatTypeId);
-                fetchKriteriaResponden(diklatTypeId);
+            $('#filter_diklat_type').change(function() {
+                var selectedValue = $(this).val();
+                var newUrl = '{{ url('/kriteria-responden') }}' + '?diklatType=' + selectedValue;
+                window.location.href = newUrl;
             });
         });
     </script>

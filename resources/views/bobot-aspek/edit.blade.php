@@ -33,14 +33,19 @@
                                 <div class="col-md-4 mb-4">
                                     <div class="form-group">
                                         <label for="filter_diklat_type">{{ __('Diklat Type') }}</label>
-                                        <select class="form-select" name="filter_diklat_type" id="filter_diklat_type" required>
-                                            @foreach($diklatTypes as $type)
-                                                <option value="{{ $type->id }}">{{ $type->nama_diklat_type }}</option>
+                                        <select class="form-select" name="filter_diklat_type" id="filter_diklat_type"
+                                            required>
+                                            @foreach ($diklatTypes as $type)
+                                                <option value="{{ $type->id }}"
+                                                    {{ request()->query('diklatType') == $type->id ? 'selected' : '' }}>
+                                                    {{ $type->nama_diklat_type }}
+                                                </option>
                                             @endforeach
                                         </select>
                                     </div>
                                 </div>
                             </div>
+
 
                             <form action="{{ route('bobot-aspek.update') }}" method="POST">
                                 @csrf
@@ -68,7 +73,8 @@
                                                         <input type="number" step="0.01"
                                                             class="form-control form-control-sm level3-alumni"
                                                             name="level3[{{ $index }}][bobot_alumni]"
-                                                            value="{{ $bobot->bobot_alumni }}" oninput="calculateTotal()" />
+                                                            value="{{ $bobot->bobot_alumni }}"
+                                                            oninput="calculateTotal()" />
                                                         <span class="input-group-text">%</span>
                                                     </div>
                                                 </td>
@@ -263,5 +269,15 @@
 
         // Jalankan perhitungan saat halaman dimuat
         document.addEventListener("DOMContentLoaded", calculateTotal);
+    </script>
+
+    <script>
+        $(document).ready(function() {
+            $('#filter_diklat_type').change(function() {
+                var selectedValue = $(this).val();
+                var newUrl = '{{ url('/bobot-aspek') }}' + '?diklatType=' + selectedValue;
+                window.location.href = newUrl;
+            });
+        });
     </script>
 @endpush
