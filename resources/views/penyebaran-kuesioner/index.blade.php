@@ -37,15 +37,22 @@
                                 <table class="table table-striped" id="data-table" width="100%">
                                     <thead>
                                         <tr>
-                                            <th>#</th>
-                                            <th>{{ __('Dibuat Oleh') }}</th>
-                                            <th>{{ __('Kode Diklat') }}</th>
-                                            <th>{{ __('Nama Diklat') }}</th>
-                                            <th class="text-center">{{ __('Responden') }}</th>
-                                            <th class="text-center">{{ __('Bobot') }}</th>
-                                            <th class="text-center">{{ __('Pesan WA') }}</th>
-                                            <th class="text-center">{{ __('Kuesioner') }}</th>
-                                            <th>{{ __('Action') }}</th>
+                                            <th rowspan="2">#</th>
+                                            <th rowspan="2">{{ __('Dibuat Oleh') }}</th>
+                                            <th rowspan="2">{{ __('Kode Diklat') }}</th>
+                                            <th rowspan="2">{{ __('Nama Diklat') }}</th>
+                                            <th colspan="3" class="text-center">{{ __('Alumni') }}</th>
+                                            <th colspan="3" class="text-center">{{ __('Atasan') }}</th>
+                                            <th rowspan="2">{{ __('Action') }}</th>
+                                        </tr>
+
+                                        <tr>
+                                            <th class="text-center">Responden</th>
+                                            <th class="text-center">Keterisian</th>
+                                            <th class="text-center">View Config</th>
+                                            <th class="text-center">Responden</th>
+                                            <th class="text-center">Keterisian</th>
+                                            <th class="text-center">View Config</th>
                                         </tr>
                                     </thead>
                                 </table>
@@ -98,7 +105,7 @@
         $('#data-table').DataTable({
             processing: true,
             serverSide: true,
-            ajax: "{{ route('project.index') }}",
+            ajax: "{{ route('penyebaran-kuesioner.index') }}",
             columns: [{
                     data: 'DT_RowIndex',
                     name: 'DT_RowIndex',
@@ -119,34 +126,52 @@
                     data: 'kaldikDesc',
                     name: 'kaldikDesc',
                 },
-
                 {
-                    data: 'responden',
-                    name: 'responden',
+                    data: 'responden_alumni',
+                    name: 'responden_alumni',
+                    className: 'text-center',
                     orderable: false,
-                    searchable: false,
+                    searchable: false
                 },
                 {
-                    data: 'bobot',
-                    name: 'bobot',
+                    data: 'keterisian_alumni',
+                    name: 'keterisian_alumni',
+                    className: 'text-center',
                     orderable: false,
-                    searchable: false,
+                    searchable: false
                 },
                 {
-                    data: 'wa',
-                    name: 'wa',
+                    data: 'config_alumni',
+                    name: 'config_alumni',
+                    className: 'text-center',
                     orderable: false,
-                    searchable: false,
+                    searchable: false
                 },
                 {
-                    data: 'kuesioner',
-                    name: 'kuesioner',
+                    data: 'responden_atasan',
+                    name: 'responden_atasan',
+                    className: 'text-center',
                     orderable: false,
-                    searchable: false,
+                    searchable: false
+                },
+                {
+                    data: 'keterisian_atasan',
+                    name: 'keterisian_atasan',
+                    className: 'text-center',
+                    orderable: false,
+                    searchable: false
+                },
+                {
+                    data: 'config_atasan',
+                    name: 'config_atasan',
+                    className: 'text-center',
+                    orderable: false,
+                    searchable: false
                 },
                 {
                     data: 'action',
                     name: 'action',
+                    className: 'text-center',
                     orderable: false,
                     searchable: false
                 }
