@@ -41,9 +41,9 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
                         <div class="text-center">
                              <a href="' . $editBobot . '"
                                class="btn btn-sm btn-warning"
-                               style="width: 100px;"
+                               style="width: 120px;"
                                data-toggle="tooltip" data-placement="left" title="Atur Bobot">
-                                 999 Alumni
+                                 <i class="fas fa-users"></i> 999 Alumni
                             </a>
                         </div>';
                 })
@@ -55,28 +55,30 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
                 ->addColumn('config_alumni', function ($row) {
                     $editBobot = route('project.bobot.show', ['id' => $row->id]);
                     return '
-                        <div class="text-center">
-                            <a href="' . $editBobot . '"
-                               class="btn btn-sm btn-success"
-                               data-toggle="tooltip" data-placement="left" title="Pesan WA Alumni">
-                                <i class="fab fa-whatsapp"></i>
-                            </a>
-                        </div>
-                        <div class="text-center">
-                            <a href="' . $editBobot . '"
-                               class="btn btn-sm btn-primary"
-                               data-toggle="tooltip" data-placement="left" title="Kuesioner Alumni">
-                                <i class="fa fa-file"></i>
-                            </a>
-                        </div>
-                        <div class="text-center">
-                            <a href="' . $editBobot . '"
-                               class="btn btn-sm btn-danger"
-                               data-toggle="tooltip" data-placement="left" title="Bobot Alumni">
-                                <i class="fas fa-balance-scale"></i>
-                            </a>
+                        <div class="d-flex flex-column">
+                            <div class="d-flex gap-1 mb-1">
+                                <a href="' . $editBobot . '"
+                                   class="btn btn-sm btn-success"
+                                   data-toggle="tooltip" data-placement="left" title="Pesan WA Alumni">
+                                    <i class="fab fa-whatsapp"></i>
+                                </a>
+                                <a href="' . $editBobot . '"
+                                   class="btn btn-sm btn-primary"
+                                   data-toggle="tooltip" data-placement="left" title="Kuesioner Alumni">
+                                    <i class="fa fa-file"></i>
+                                </a>
+                            </div>
+
+                            <div class="d-flex gap-1 mb-1">
+                                <a href="' . $editBobot . '"
+                                    class="btn btn-sm btn-danger"
+                                    data-toggle="tooltip" data-placement="left" title="Bobot Alumni">
+                                    <i class="fas fa-balance-scale"></i>
+                                 </a>
+                            </div>
                         </div>';
                 })
+
 
                 ->addColumn('responden_atasan', function ($row) {
                     $editBobot = route('project.bobot.show', ['id' => $row->id]);
@@ -84,9 +86,9 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
                         <div class="text-center">
                              <a href="' . $editBobot . '"
                                class="btn btn-sm btn-warning"
-                               style="width: 100px;"
+                               style="width: 120px;"
                                data-toggle="tooltip" data-placement="left" title="Atur Bobot">
-                                 999 Atasan
+                                 <i class="fas fa-users"></i> 999 Atasan
                             </a>
                         </div>';
                 })
@@ -98,19 +100,20 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
                 ->addColumn('config_atasan', function ($row) {
                     $editBobot = route('project.bobot.show', ['id' => $row->id]);
                     return '
-                    <div class="text-center">
-                        <a href="' . $editBobot . '"
-                           class="btn btn-sm btn-success"
-                           data-toggle="tooltip" data-placement="left" title="Pesan WA Atasan">
-                            <i class="fab fa-whatsapp"></i>
-                        </a>
-                    </div><div class="text-center">
-                        <a href="' . $editBobot . '"
-                           class="btn btn-sm btn-primary"
-                           data-toggle="tooltip" data-placement="left" title="Kuesioner Atasan">
-                            <i class="fa fa-file"></i>
-                        </a>
-                    </div>';
+                        <div class="text-center d-flex flex-column align-items-center">
+                            <div class="d-flex gap-1 mb-1">
+                                <a href="' . $editBobot . '"
+                                   class="btn btn-sm btn-success"
+                                   data-toggle="tooltip" data-placement="left" title="Pesan WA Alumni">
+                                    <i class="fab fa-whatsapp"></i>
+                                </a>
+                                <a href="' . $editBobot . '"
+                                   class="btn btn-sm btn-primary"
+                                   data-toggle="tooltip" data-placement="left" title="Kuesioner Alumni">
+                                    <i class="fa fa-file"></i>
+                                </a>
+                            </div>
+                        </div>';
                 })
 
 
