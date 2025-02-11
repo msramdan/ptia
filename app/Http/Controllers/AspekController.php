@@ -28,11 +28,15 @@ class AspekController extends Controller implements HasMiddleware
     public function index(): View|JsonResponse
     {
         if (request()->ajax()) {
-            $aspeks = DB::table('aspek')
+            $query = DB::table('aspek')
                 ->join('diklat_type', 'aspek.diklat_type_id', '=', 'diklat_type.id')
                 ->select('aspek.*', 'diklat_type.nama_diklat_type');
 
-            return DataTables::of($aspeks)
+            if (!empty(request()->diklatType)) {
+                $query->where('aspek.diklat_type_id', request()->diklatType);
+            }
+
+            return DataTables::of($query)
                 ->addIndexColumn()
                 ->addColumn('level', function ($row) {
                     $levelText = $row->level === '3' ? 'Level 3' : 'Level 4';
@@ -44,8 +48,13 @@ class AspekController extends Controller implements HasMiddleware
         }
 
         $diklatTypes = DB::table('diklat_type')->select('id', 'nama_diklat_type')->get();
-        return view('aspek.index', compact('diklatTypes'));
+        $selectedDiklatType = request()->diklatType; // Ambil filter dari URL
+
+        return view('aspek.index', compact('diklatTypes', 'selectedDiklatType'));
     }
+
+
+
 
 
     public function create(): View

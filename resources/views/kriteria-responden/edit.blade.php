@@ -34,7 +34,6 @@
                                     <div class="form-group">
                                         <label for="filter_diklat_type">{{ __('Diklat Type') }}</label>
                                         <select class="form-select" name="filter_diklat_type" id="filter_diklat_type" required>
-                                            <option value="" selected disabled>-- {{ __('All') }} --</option>
                                             @foreach($diklatTypes as $type)
                                                 <option value="{{ $type->id }}">{{ $type->nama_diklat_type }}</option>
                                             @endforeach

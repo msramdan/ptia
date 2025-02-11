@@ -39,9 +39,10 @@
                                 <div class="col-md-4 mb-4">
                                     <div class="form-group">
                                         <label for="filter_diklat_type">{{ __('Diklat Type') }}</label>
-                                        <select class="form-select" name="filter_diklat_type" id="filter_diklat_type" required>
-                                            <option value="" selected disabled>-- {{ __('All') }} --</option>
-                                            @foreach($diklatTypes as $type)
+                                        <select class="form-select" name="filter_diklat_type" id="filter_diklat_type"
+                                            required>
+                                            <option value="">-- {{ __('All') }} --</option>
+                                            @foreach ($diklatTypes as $type)
                                                 <option value="{{ $type->id }}">{{ $type->nama_diklat_type }}</option>
                                             @endforeach
                                         </select>
@@ -104,43 +105,73 @@
         });
     </script>
     <script>
-        $('#data-table').DataTable({
-            processing: true,
-            serverSide: true,
-            ajax: "{{ route('aspek.index') }}",
-            columns: [{
-                    data: 'DT_RowIndex',
-                    name: 'DT_RowIndex',
-                    orderable: false,
-                    searchable: false,
+        $(document).ready(function() {
+            // Ambil parameter diklatType dari URL jika ada
+            let urlParams = new URLSearchParams(window.location.search);
+            let diklatType = urlParams.get('diklatType');
+
+            if (diklatType) {
+                $('#filter_diklat_type').val(diklatType);
+            }
+
+            // Inisialisasi DataTables dengan filter diklatType dari URL
+            let table = $('#data-table').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url: "{{ route('aspek.index') }}",
+                    data: function(d) {
+                        d.diklatType = $('#filter_diklat_type').val() ||
+                        null; // Kirim null jika "All" dipilih
+                    }
                 },
-                {
-                    data: 'nama_diklat_type',
-                    name: 'nama_diklat_type',
-                },
-                {
-                    data: 'level',
-                    name: 'level',
-                },
-                {
-                    data: 'aspek',
-                    name: 'aspek',
-                },
-                {
-                    data: 'kriteria',
-                    name: 'kriteria',
-                },
-                {
-                    data: 'urutan',
-                    name: 'urutan',
-                },
-                {
-                    data: 'action',
-                    name: 'action',
-                    orderable: false,
-                    searchable: false
+                columns: [{
+                        data: 'DT_RowIndex',
+                        name: 'DT_RowIndex',
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
+                        data: 'nama_diklat_type',
+                        name: 'nama_diklat_type'
+                    },
+                    {
+                        data: 'level',
+                        name: 'level'
+                    },
+                    {
+                        data: 'aspek',
+                        name: 'aspek'
+                    },
+                    {
+                        data: 'kriteria',
+                        name: 'kriteria'
+                    },
+                    {
+                        data: 'urutan',
+                        name: 'urutan'
+                    },
+                    {
+                        data: 'action',
+                        name: 'action',
+                        orderable: false,
+                        searchable: false
+                    }
+                ],
+            });
+
+            // Event handler saat filter berubah
+            $('#filter_diklat_type').change(function() {
+                let selectedValue = $(this).val();
+                let newUrl = "{{ route('aspek.index') }}";
+
+                if (selectedValue) {
+                    newUrl += '?diklatType=' + selectedValue;
                 }
-            ],
+
+                window.history.pushState({}, '', newUrl); // Ubah URL tanpa reload
+                table.ajax.reload(); // Refresh DataTables dengan filter baru
+            });
         });
     </script>
 @endpush
