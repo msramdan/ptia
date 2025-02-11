@@ -21,7 +21,7 @@ class Konversi extends Model
      *
      * @var string[]
      */
-    protected $fillable = ['jenis_skor', 'skor', 'konversi'];
+    protected $fillable = ['jenis_skor', 'skor', 'konversi','diklat_type_id'];
 
     /**
      * Get the attributes that should be cast.

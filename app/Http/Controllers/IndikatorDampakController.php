@@ -62,7 +62,8 @@ class IndikatorDampakController extends Controller implements HasMiddleware
      */
     public function create(): View
     {
-        return view('indikator-dampak.create');
+        $diklatTypes = DB::table('diklat_type')->select('id', 'nama_diklat_type')->get();
+        return view('indikator-dampak.create', compact('diklatTypes'));
     }
 
     /**
@@ -89,7 +90,8 @@ class IndikatorDampakController extends Controller implements HasMiddleware
      */
     public function edit(IndikatorDampak $indikatorDampak): View
     {
-        return view('indikator-dampak.edit', compact('indikatorDampak'));
+        $diklatTypes = DB::table('diklat_type')->select('id', 'nama_diklat_type')->get();
+        return view('indikator-dampak.edit', compact('indikatorDampak', 'diklatTypes'));
     }
 
     /**

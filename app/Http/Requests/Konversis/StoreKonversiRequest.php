@@ -20,6 +20,7 @@ class StoreKonversiRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'diklat_type_id' => 'required',
             'jenis_skor' => 'required|string|max:255',
 			'skor' => 'required|numeric',
 			'konversi' => 'required|numeric',

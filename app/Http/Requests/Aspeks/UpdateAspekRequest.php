@@ -20,6 +20,7 @@ class UpdateAspekRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'diklat_type_id' => 'required',
             'level' => 'required|in:3,4',
 			'aspek' => 'required|string|max:255',
             'kriteria' => 'required|in:Skor Persepsi,Delta Skor Persepsi',

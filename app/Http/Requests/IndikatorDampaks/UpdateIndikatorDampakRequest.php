@@ -20,6 +20,7 @@ class UpdateIndikatorDampakRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'diklat_type_id' => 'required',
             'nilai_minimal' => 'required|numeric',
 			'nilai_maksimal' => 'required|numeric',
 			'kriteria_dampak' => 'required|string',

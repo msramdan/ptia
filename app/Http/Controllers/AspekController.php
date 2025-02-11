@@ -53,13 +53,11 @@ class AspekController extends Controller implements HasMiddleware
         return view('aspek.index', compact('diklatTypes', 'selectedDiklatType'));
     }
 
-
-
-
-
     public function create(): View
     {
-        return view('aspek.create');
+        $diklatTypes = DB::table('diklat_type')->select('id', 'nama_diklat_type')->get();
+
+        return view('aspek.create', compact('diklatTypes'));
     }
 
     public function store(StoreAspekRequest $request): RedirectResponse
@@ -115,7 +113,8 @@ class AspekController extends Controller implements HasMiddleware
      */
     public function edit(Aspek $aspek): View
     {
-        return view('aspek.edit', compact('aspek'));
+        $diklatTypes = DB::table('diklat_type')->select('id', 'nama_diklat_type')->get();
+        return view('aspek.edit', compact('aspek','diklatTypes'));
     }
 
     /**

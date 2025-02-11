@@ -69,7 +69,8 @@ class KonversiController extends Controller implements HasMiddleware
      */
     public function create(): View
     {
-        return view('konversi.create');
+        $diklatTypes = DB::table('diklat_type')->select('id', 'nama_diklat_type')->get();
+        return view('konversi.create',compact('diklatTypes'));
     }
 
     /**
@@ -96,7 +97,8 @@ class KonversiController extends Controller implements HasMiddleware
      */
     public function edit(Konversi $konversi): View
     {
-        return view('konversi.edit', compact('konversi'));
+        $diklatTypes = DB::table('diklat_type')->select('id', 'nama_diklat_type')->get();
+        return view('konversi.edit', compact('konversi','diklatTypes'));
     }
 
     /**

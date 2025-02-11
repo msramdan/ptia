@@ -21,7 +21,7 @@ class IndikatorDampak extends Model
      *
      * @var string[]
      */
-    protected $fillable = ['nilai_minimal', 'nilai_maksimal', 'kriteria_dampak'];
+    protected $fillable = ['nilai_minimal', 'nilai_maksimal', 'kriteria_dampak','diklat_type_id'];
 
     /**
      * Get the attributes that should be cast.

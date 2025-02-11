@@ -21,7 +21,7 @@ class Aspek extends Model
      *
      * @var string[]
      */
-    protected $fillable = ['level', 'aspek', 'urutan','kriteria'];
+    protected $fillable = ['level', 'aspek', 'urutan','kriteria','diklat_type_id'];
 
     /**
      * Get the attributes that should be cast.
