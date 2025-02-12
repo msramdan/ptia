@@ -151,7 +151,7 @@
 
                 Swal.fire({
                     title: 'Apakah Anda yakin?',
-                    text: `Pastikan konfigurasi proyek sudah benar sebelum melanjutkan. Apakah Anda yakin ingin mengubah status Diklat ID: ${diklatID} menjadi Pelaksanaan/Sebar Kuesioner?`,
+                    text: `Pastikan konfigurasi project sudah sesuai sebelum melanjutkan. Apakah Anda yakin ingin mengubah status Diklat ID: ${diklatID} menjadi Pelaksanaan/Sebar Kuesioner?`,
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#3085d6',
