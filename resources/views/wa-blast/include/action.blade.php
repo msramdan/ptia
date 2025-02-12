@@ -10,7 +10,7 @@
 
     @can('wa blast delete')
         <form action="{{ route('wa-blast.destroy', $model->id) }}" method="post" class="d-inline" title="Delete"
-            onsubmit="return confirm('Are you sure to delete this record?')">
+            onsubmit="return confirm('Apakah Anda yakin ingin menghapus data ini?')">
             @csrf
             @method('delete')
 

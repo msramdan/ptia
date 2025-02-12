@@ -72,6 +72,7 @@
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/v/bs5/dt-1.12.0/datatables.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         $(document).ready(function() {
             @if (session('success'))
@@ -151,6 +152,52 @@
                     searchable: false
                 }
             ],
+        });
+    </script>
+    
+    <script>
+        $(document).ready(function() {
+            // Event delegation untuk tombol Update Status
+            $(document).on('click', '.btn-update-status', function() {
+                let form = $(this).closest('form');
+                let diklatID = $(this).data('id');
+
+                Swal.fire({
+                    title: 'Apakah Anda yakin?',
+                    text: `Pastikan konfigurasi proyek sudah benar sebelum melanjutkan. Apakah Anda yakin ingin mengubah status Diklat ID: ${diklatID} menjadi Pelaksanaan/Sebar Kuesioner?`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Ya, Ubah!',
+                    cancelButtonText: 'Batal',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            });
+
+            // Event delegation untuk tombol Hapus Project
+            $(document).on('click', '.btn-delete-project', function() {
+                let form = $(this).closest('form');
+
+                Swal.fire({
+                    title: 'Apakah Anda yakin?',
+                    text: "Data project ini akan dihapus secara permanen!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Ya, Hapus!',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            });
         });
     </script>
 @endpush

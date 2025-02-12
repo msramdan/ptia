@@ -253,8 +253,10 @@
                 text: "Apakah Anda yakin ingin membuat project untuk Diklat ini?",
                 icon: "warning",
                 showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
                 confirmButtonText: "Ya, Buat!",
-                cancelButtonText: "Tidak, Batal",
+                cancelButtonText: "Batal",
                 reverseButtons: true
             }).then((result) => {
                 if (result.isConfirmed) {
