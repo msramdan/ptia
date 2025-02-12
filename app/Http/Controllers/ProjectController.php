@@ -33,7 +33,6 @@ class ProjectController extends Controller implements HasMiddleware
             $projects = DB::table('project')
                 ->join('users', 'project.user_id', '=', 'users.id')
                 ->select('project.*', 'users.name as user_name', 'users.email', 'users.avatar')
-                ->where('project.status', 'Persiapan')
                 ->orderBy('project.id', 'desc')
                 ->get();
 
@@ -689,5 +688,24 @@ class ProjectController extends Controller implements HasMiddleware
         });
 
         return redirect()->back()->with('success', 'Bobot aspek berhasil diperbarui.');
+    }
+    
+    public function updateStatus($id)
+    {
+        $project = DB::table('project')->where('id', $id)->first();
+
+        if ($project && $project->status === 'Pelaksanaan') {
+            return to_route('project.index')->with('error', __('Status sudah Pelaksanaan, tidak bisa diubah lagi.'));
+        }
+
+        $updated = DB::table('project')
+            ->where('id', $id)
+            ->update(['status' => 'Pelaksanaan']);
+
+        if ($updated) {
+            return to_route('project.index')->with('success', __('Status berhasil diperbarui menjadi Pelaksanaan.'));
+        }
+
+        return to_route('project.index')->with('error', __('Terjadi kesalahan saat mengupdate status.'));
     }
 }

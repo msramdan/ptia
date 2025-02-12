@@ -114,11 +114,11 @@
                 },
                 {
                     data: 'kaldikID',
-                    name: 'kaldikID',
+                    name: 'project.kaldikID',
                 },
                 {
                     data: 'kaldikDesc',
-                    name: 'kaldikDesc',
+                    name: 'project.kaldikDesc',
                 },
 
                 {

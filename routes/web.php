@@ -79,5 +79,8 @@ Route::middleware(['auth', 'web'])->group(function () {
         //Bobot
         Route::get('/bobot/show/{id}', 'showBobot')->name('project.bobot.show');
         Route::put('/bobot/update', 'updateBobot')->name('project.bobot.update');
+        // Update Status
+        Route::put('/update-status/{id}', 'updateStatus')->name('project.updateStatus');
     });
+    
 });
