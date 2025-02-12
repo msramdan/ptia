@@ -44,9 +44,11 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
                     // Total keterisian atasan (bandingkan dengan semua responden, tidak hanya yang nama_atasan tidak null)
                     DB::raw('SUM(CASE WHEN project_responden.status_pengisian_kuesioner_atasan = "Sudah" THEN 1 ELSE 0 END) as total_sudah_isi_atasan')
                 )
+                ->where('project.status', 'Pelaksanaan')
                 ->groupBy('project.id', 'users.name', 'users.email', 'users.avatar')
                 ->orderBy('project.id', 'desc')
                 ->get();
+
 
             return DataTables::of($projects)
                 ->addIndexColumn()

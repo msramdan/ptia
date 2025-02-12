@@ -33,8 +33,10 @@ class ProjectController extends Controller implements HasMiddleware
             $projects = DB::table('project')
                 ->join('users', 'project.user_id', '=', 'users.id')
                 ->select('project.*', 'users.name as user_name', 'users.email', 'users.avatar')
-                ->orderBy('project.id', 'desc') // Urutkan berdasarkan ID secara descending
+                ->where('project.status', 'Persiapan')
+                ->orderBy('project.id', 'desc')
                 ->get();
+
             return DataTables::of($projects)
                 ->addIndexColumn()
                 ->addColumn('kuesioner', function ($row) {
