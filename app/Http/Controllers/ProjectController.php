@@ -291,78 +291,53 @@ class ProjectController extends Controller implements HasMiddleware
             ]);
 
             // 7. Insert data ke table project_kuesioner
-            $aspekList = DB::table('aspek')
-                ->where('diklat_type_id', $diklatType->diklat_type_id)
+            $kaldikDesc = $data['kaldikDesc'] ?? 'Pelatihan Default';
+            $pertanyaanList = DB::table('kuesioner')
+                ->join('aspek', 'kuesioner.aspek_id', '=', 'aspek.id')
+                ->where('aspek.diklat_type_id', $diklatType->diklat_type_id)
+                ->select('aspek.id as aspek_id', 'aspek.level', 'aspek.aspek', 'aspek.kriteria', 'kuesioner.pertanyaan')
                 ->get();
 
-
-            if ($aspekList->isEmpty()) {
-                throw new \Exception("No aspek data found.");
-            }
-
-            $kaldikDesc = $data['kaldikDesc'] ?? 'Pelatihan Default';
-
-            $apiUrl = config('services.tna.endpoint') . "/pengajuan-kap";
-            $apiKey = config('services.tna.api_token');
-            $kodePembelajaran = $data['kaldikID'];
-
-            $response = Http::get($apiUrl, [
-                'api_key' => $apiKey,
-                'kode_pembelajaran' => $kodePembelajaran,
-            ]);
-
-            $indikatorText = "kinerja organisasi";
-
-            if ($response->successful() && isset($response['data']['indikatorKinerja'])) {
-                $indikatorList = array_column($response['data']['indikatorKinerja'], 'indikator_kinerja');
-
-                if (!empty($indikatorList)) {
-                    // Tambahkan strip di setiap indikator dan gunakan <br> sebagai pemisah
-                    $indikatorList = array_map(fn($item) => "- " . trim($item), $indikatorList);
-                    $indikatorText = ":<br>" . implode("<br>", $indikatorList);
-                }
-            }
-
-            $pertanyaanList = [
-                1 => "{params_target} termotivasi untuk terlibat secara aktif dalam setiap penugasan yang relevan dengan pelatihan ini.",
-                2 => "{params_target} percaya diri untuk terlibat secara aktif dalam setiap kegiatan yang relevan dengan pelatihan ini.",
-                3 => "Setelah mengikuti pelatihan, {params_target} berbagi pengetahuan yang telah diperoleh selama pelatihan kepada rekan-rekan kerja melalui kegiatan pelatihan di kantor sendiri, FGD, sharing session, atau bentuk knowledge sharing lainnya.",
-                4 => "{params_target} mampu menerapkan ilmu yang telah diperoleh selama Pelatihan {$kaldikDesc} pada setiap penugasan yang relevan.",
-                5 => "Implementasi hasil pelatihan ini berdampak positif dalam meningkatkan {$indikatorText}"
-            ];
-
             $kuesionerData = [];
+            foreach ($pertanyaanList as $pertanyaanItem) {
+                $pertanyaanAlumni = str_replace(
+                    ["{params_target}", "{params_kaldikDesc}"],
+                    ["Saya", $kaldikDesc],
+                    $pertanyaanItem->pertanyaan
+                );
 
-            foreach ($aspekList as $aspek) {
-                $pertanyaanTemplate = $pertanyaanList[$aspek->id] ?? "Pertanyaan default untuk aspek ID {$aspek->id}";
-                $pertanyaanAlumni = str_replace("{params_target}", "Saya", $pertanyaanTemplate);
                 $kuesionerData[] = [
                     'project_id'  => $projectId,
-                    'aspek_id'    => $aspek->id,
-                    'level'       => $aspek->level,
-                    'aspek'       => $aspek->aspek,
-                    'kriteria'    => $aspek->kriteria,
+                    'aspek_id'    => $pertanyaanItem->aspek_id,
+                    'level'       => $pertanyaanItem->level,
+                    'aspek'       => $pertanyaanItem->aspek,
+                    'kriteria'    => $pertanyaanItem->kriteria,
                     'remark'      => 'Alumni',
                     'pertanyaan'  => $pertanyaanAlumni,
                     'created_at'  => now(),
                     'updated_at'  => now(),
                 ];
 
-                $pertanyaanAtasan = str_replace("{params_target}", "Alumni", $pertanyaanTemplate);
+                $pertanyaanAtasan = str_replace(
+                    ["{params_target}", "{params_kaldikDesc}"],
+                    ["Alumni", $kaldikDesc],
+                    $pertanyaanItem->pertanyaan
+                );
+
                 $kuesionerData[] = [
                     'project_id'  => $projectId,
-                    'aspek_id'    => $aspek->id,
-                    'level'       => $aspek->level,
-                    'aspek'       => $aspek->aspek,
-                    'kriteria'    => $aspek->kriteria,
+                    'aspek_id'    => $pertanyaanItem->aspek_id,
+                    'level'       => $pertanyaanItem->level,
+                    'aspek'       => $pertanyaanItem->aspek,
+                    'kriteria'    => $pertanyaanItem->kriteria,
                     'remark'      => 'Atasan',
                     'pertanyaan'  => $pertanyaanAtasan,
                     'created_at'  => now(),
                     'updated_at'  => now(),
                 ];
             }
-            DB::table('project_kuesioner')->insert($kuesionerData);
 
+            DB::table('project_kuesioner')->insert($kuesionerData);
             DB::commit();
 
             return response()->json([
