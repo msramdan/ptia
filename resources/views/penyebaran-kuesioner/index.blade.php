@@ -115,8 +115,6 @@
                 {
                     data: 'user',
                     name: 'user',
-                    orderable: false,
-                    searchable: false,
                 },
                 {
                     data: 'kaldikID',
@@ -130,22 +128,16 @@
                     data: 'responden_alumni',
                     name: 'responden_alumni',
                     className: 'text-center',
-                    orderable: false,
-                    searchable: false
                 },
                 {
                     data: 'keterisian_alumni',
                     name: 'keterisian_alumni',
                     className: 'text-center',
-                    orderable: false,
-                    searchable: false
                 },
                 {
                     data: 'config_alumni',
                     name: 'config_alumni',
                     className: 'text-center',
-                    orderable: false,
-                    searchable: false
                 },
                 {
                     data: 'responden_atasan',
@@ -158,22 +150,16 @@
                     data: 'keterisian_atasan',
                     name: 'keterisian_atasan',
                     className: 'text-center',
-                    orderable: false,
-                    searchable: false
                 },
                 {
                     data: 'config_atasan',
                     name: 'config_atasan',
                     className: 'text-center',
-                    orderable: false,
-                    searchable: false
                 },
                 {
                     data: 'action',
                     name: 'action',
                     className: 'text-center',
-                    orderable: false,
-                    searchable: false
                 }
             ],
         });

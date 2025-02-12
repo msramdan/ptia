@@ -109,8 +109,6 @@
                 {
                     data: 'user',
                     name: 'user',
-                    orderable: false,
-                    searchable: false,
                 },
                 {
                     data: 'kaldikID',
@@ -120,36 +118,25 @@
                     data: 'kaldikDesc',
                     name: 'project.kaldikDesc',
                 },
-
                 {
                     data: 'responden',
                     name: 'responden',
-                    orderable: false,
-                    searchable: false,
                 },
                 {
                     data: 'bobot',
                     name: 'bobot',
-                    orderable: false,
-                    searchable: false,
                 },
                 {
                     data: 'wa',
                     name: 'wa',
-                    orderable: false,
-                    searchable: false,
                 },
                 {
                     data: 'kuesioner',
                     name: 'kuesioner',
-                    orderable: false,
-                    searchable: false,
                 },
                 {
                     data: 'action',
                     name: 'action',
-                    orderable: false,
-                    searchable: false
                 }
             ],
         });
