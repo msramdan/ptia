@@ -164,9 +164,9 @@
                                         if (end.isAfter(now)) {
                                             return 'Masih berlangsung';
                                         }
+
                                         const duration = moment.duration(now
                                             .diff(end));
-
                                         const years = duration.years();
                                         const months = duration.months();
                                         const days = duration.days();
@@ -180,7 +180,15 @@
                                         if (days > 0) result +=
                                             `${days} hari `;
 
-                                        return result.trim() + ' yang lalu';
+                                        const durationText = result.trim() +
+                                            ' yang lalu';
+
+                                        // Jika lebih dari 3 bulan, berikan warna merah
+                                        if (duration.asMonths() > 3) {
+                                            return `<span style="color:red">${durationText}</span>`;
+                                        }
+
+                                        return durationText;
                                     }
                                     return {
                                         kaldikID: item.kaldikID,
