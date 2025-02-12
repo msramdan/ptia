@@ -5,7 +5,7 @@
             <select class="form-select" id="diklat-type" required>
                 <option value="" selected disabled>-- {{ __('Select Diklat Type') }} --</option>
                 @foreach ($diklatTypes as $diklat)
-                    <option value="{{ $diklat->id }}" 
+                    <option value="{{ $diklat->id }}"
                         {{ isset($kuesioner) && $kuesioner->diklat_type_id == $diklat->id ? 'selected' : '' }}>
                         {{ $diklat->nama_diklat_type }}
                     </option>
@@ -36,16 +36,28 @@
         <div class="form-group">
             <label for="pertanyaan">{{ __('Pertanyaan') }}</label>
             <textarea name="pertanyaan" id="pertanyaan" class="form-control @error('pertanyaan') is-invalid @enderror"
-                placeholder="{{ __('Pertanyaan') }}" required>{{ isset($kuesioner) ? $kuesioner->pertanyaan : old('pertanyaan') }}</textarea>
+                rows="5" placeholder="{{ __('Pertanyaan') }}" required>{{ isset($kuesioner) ? $kuesioner->pertanyaan : old('pertanyaan') }}</textarea>
             @error('pertanyaan')
                 <span class="text-danger">{{ $message }}</span>
             @enderror
         </div>
     </div>
+    <div class="col-md-12 mt-2">
+        <div class="alert alert-info">
+            <strong>Keterangan Parameter:</strong>
+            <ul class="mb-0">
+                <li><code>{params_target}</code> akan otomatis digantikan dengan <strong>"Saya"</strong> atau
+                    <strong>"Alumni"</strong> di kuesioner project.</li>
+                <li><code>{params_kaldikDesc}</code> akan otomatis digantikan dengan <strong>Nama Diklat</strong> di
+                    kuesioner project.</li>
+            </ul>
+        </div>
+    </div>
+
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function() {
         const diklatTypeSelect = document.getElementById('diklat-type');
         const aspekSelect = document.getElementById('aspek-id');
 
@@ -53,12 +65,13 @@
             const selectedDiklat = diklatTypeSelect.value;
             Array.from(aspekSelect.options).forEach(option => {
                 if (option.value) {
-                    option.style.display = option.getAttribute('data-diklat') === selectedDiklat ? 'block' : 'none';
+                    option.style.display = option.getAttribute('data-diklat') === selectedDiklat ?
+                        'block' : 'none';
                 }
             });
         }
 
-        diklatTypeSelect.addEventListener('change', function () {
+        diklatTypeSelect.addEventListener('change', function() {
             filterAspek();
             aspekSelect.value = ''; // Reset pilihan aspek jika diklat type berubah
         });

@@ -232,13 +232,13 @@ class ProjectController extends Controller implements HasMiddleware
             }
 
             $textPesanAlumni = str_replace(
-                ['{params_judul_diklat}', '{params_wa_pic}', '{params_pic}'],
+                ['{params_nama_diklat}', '{params_wa_pic}', '{params_pic}'],
                 [$data['kaldikDesc'], $user->phone, $user->name],
                 $pesanWa->text_pesan_alumni
             );
 
             $textPesanAtasan = str_replace(
-                ['{params_judul_diklat}', '{params_wa_pic}', '{params_pic}'],
+                ['{params_nama_diklat}', '{params_wa_pic}', '{params_pic}'],
                 [$data['kaldikDesc'], $user->phone, $user->name],
                 $pesanWa->text_pesan_atasan
             );
@@ -301,7 +301,7 @@ class ProjectController extends Controller implements HasMiddleware
             $kuesionerData = [];
             foreach ($pertanyaanList as $pertanyaanItem) {
                 $pertanyaanAlumni = str_replace(
-                    ["{params_target}", "{params_kaldikDesc}"],
+                    ["{params_target}", "{params_nama_diklat}"],
                     ["Saya", $kaldikDesc],
                     $pertanyaanItem->pertanyaan
                 );
@@ -319,7 +319,7 @@ class ProjectController extends Controller implements HasMiddleware
                 ];
 
                 $pertanyaanAtasan = str_replace(
-                    ["{params_target}", "{params_kaldikDesc}"],
+                    ["{params_target}", "{params_nama_diklat}"],
                     ["Alumni", $kaldikDesc],
                     $pertanyaanItem->pertanyaan
                 );
