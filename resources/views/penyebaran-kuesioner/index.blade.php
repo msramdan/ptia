@@ -1,20 +1,20 @@
 @extends('layouts.app')
 
-@section('title', __('Management Project'))
+@section('title', __('Penyebaran Kuesioner'))
 
 @section('content')
     <div class="page-heading">
         <div class="page-title">
             <div class="row">
                 <div class="col-12 col-md-8 order-md-1 order-last">
-                    <h3>{{ __('Management Project') }}</h3>
+                    <h3>{{ __('Penyebaran Kuesioner') }}</h3>
                     <p class="text-subtitle text-muted">
-                        {{ __('Berikut adalah daftar semua Management Project.') }}
+                        {{ __('Berikut adalah daftar semua Penyebaran Kuesioner.') }}
                     </p>
                 </div>
                 <x-breadcrumb>
                     <li class="breadcrumb-item"><a href="/">{{ __('Dashboard') }}</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">{{ __('Management Project') }}</li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ __('Penyebaran Kuesioner') }}</li>
                 </x-breadcrumb>
             </div>
         </div>
