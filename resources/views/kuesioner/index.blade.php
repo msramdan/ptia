@@ -39,8 +39,9 @@
                                         <label for="filter_diklat_type">{{ __('Diklat Type') }}</label>
                                         <select class="form-select" name="filter_diklat_type" id="filter_diklat_type">
                                             <option value="">-- {{ __('All') }} --</option>
-                                            @foreach($diklatTypes as $type)
-                                                <option value="{{ $type->id }}" {{ isset($selectedDiklatType) && $selectedDiklatType == $type->id ? 'selected' : '' }}>
+                                            @foreach ($diklatTypes as $type)
+                                                <option value="{{ $type->id }}"
+                                                    {{ isset($selectedDiklatType) && $selectedDiklatType == $type->id ? 'selected' : '' }}>
                                                     {{ $type->nama_diklat_type }}
                                                 </option>
                                             @endforeach
@@ -48,7 +49,7 @@
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <div class="table-responsive p-1">
                                 <table class="table table-striped" id="data-table" width="100%">
                                     <thead>
@@ -75,6 +76,7 @@
         integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs5/dt-1.12.0/datatables.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
 @endpush
 
 @push('js')
@@ -82,36 +84,88 @@
         integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/v/bs5/dt-1.12.0/datatables.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script>
-        $('#data-table').DataTable({
-            processing: true,
-            serverSide: true,
-            ajax: "{{ route('kuesioner.index') }}",
-            columns: [{
-                    data: 'DT_RowIndex',
-                    name: 'DT_RowIndex',
-                    orderable: false,
-                    searchable: false
+        $(document).ready(function() {
+            @if (session('success'))
+                toastr.success("{{ session('success') }}", "Success", {
+                    closeButton: true,
+                    progressBar: true,
+                    positionClass: "toast-top-right",
+                    timeOut: 5000,
+                });
+            @endif
+
+            @if (session('error'))
+                toastr.error("{{ session('error') }}", "Error", {
+                    closeButton: true,
+                    progressBar: true,
+                    positionClass: "toast-top-right",
+                    timeOut: 5000,
+                });
+            @endif
+        });
+    </script>
+    <script>
+        $(document).ready(function() {
+            // Ambil parameter diklatType dari URL jika ada
+            let urlParams = new URLSearchParams(window.location.search);
+            let diklatType = urlParams.get('diklatType');
+
+            if (diklatType) {
+                $('#filter_diklat_type').val(diklatType);
+            }
+
+            // Inisialisasi DataTables dengan filter diklatType dari URL
+            let table = $('#data-table').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url: "{{ route('kuesioner.index') }}",
+                    data: function(d) {
+                        d.diklatType = $('#filter_diklat_type').val() ||
+                            null;
+                    }
                 },
-                {
-                    data: 'nama_diklat_type',
-                    name: 'diklat_type.nama_diklat_type'
-                },
-                {
-                    data: 'aspek',
-                    name: 'aspek.aspek'
-                },
-                {
-                    data: 'pertanyaan',
-                    name: 'pertanyaan',
-                },
-                {
-                    data: 'action',
-                    name: 'action',
-                    orderable: false,
-                    searchable: false
+                columns: [{
+                        data: 'DT_RowIndex',
+                        name: 'DT_RowIndex',
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
+                        data: 'nama_diklat_type',
+                        name: 'diklat_type.nama_diklat_type'
+                    },
+                    {
+                        data: 'aspek',
+                        name: 'aspek.aspek'
+                    },
+                    {
+                        data: 'pertanyaan',
+                        name: 'pertanyaan',
+                    },
+                    {
+                        data: 'action',
+                        name: 'action',
+                        orderable: false,
+                        searchable: false
+                    }
+                ],
+            });
+
+            // Event handler saat filter berubah
+            $('#filter_diklat_type').change(function() {
+                let selectedValue = $(this).val();
+                let newUrl = "{{ route('kuesioner.index') }}";
+
+                if (selectedValue) {
+                    newUrl += '?diklatType=' + selectedValue;
                 }
-            ],
+
+                window.history.pushState({}, '', newUrl); // Ubah URL tanpa reload
+                table.ajax.reload(); // Refresh DataTables dengan filter baru
+            });
         });
     </script>
 @endpush
