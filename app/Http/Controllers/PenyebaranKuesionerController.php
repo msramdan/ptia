@@ -36,7 +36,7 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
                 ->addIndexColumn()
 
                 ->addColumn('responden_alumni', function ($row) {
-                    $editBobot = route('project.bobot.show', ['id' => $row->id]);
+                    $editBobot = '';
                     return '
                         <div class="text-center">
                              <a href="' . $editBobot . '"
@@ -53,7 +53,7 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
                 })
 
                 ->addColumn('config_alumni', function ($row) {
-                    $editBobot = route('project.bobot.show', ['id' => $row->id]);
+                    $editBobot = '';
                     return '
                         <div class="d-flex flex-column">
                             <div class="d-flex gap-1 mb-1">
@@ -81,7 +81,7 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
 
 
                 ->addColumn('responden_atasan', function ($row) {
-                    $editBobot = route('project.bobot.show', ['id' => $row->id]);
+                    $editBobot = '';
                     return '
                         <div class="text-center">
                              <a href="' . $editBobot . '"
@@ -98,7 +98,7 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
                 })
 
                 ->addColumn('config_atasan', function ($row) {
-                    $editBobot = route('project.bobot.show', ['id' => $row->id]);
+                    $editBobot = '';
                     return '
                         <div class="text-center d-flex flex-column align-items-center">
                             <div class="d-flex gap-1 mb-1">

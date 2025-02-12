@@ -14,6 +14,7 @@ use App\Http\Controllers\{
     SingleSenderController,
     IndikatorDampakController,
     KonversiController,
+    KuesionerController,
     PembuatanProjectController,
     PenyebaranKuesionerController,
     ProjectController,
@@ -44,6 +45,7 @@ Route::middleware(['auth', 'web'])->group(function () {
         'project' => ProjectController::class,
         'pembuatan-project' => PembuatanProjectController::class,
         'setting' => SettingController::class,
+        'kuesioner' => KuesionerController::class,
     ]);
     Route::prefix('penyebaran-kuesioner')->controller(PenyebaranKuesionerController::class)->group(function () {
         Route::get('/', 'index')->name('penyebaran-kuesioner.index');

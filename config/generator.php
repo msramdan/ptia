@@ -110,215 +110,223 @@ return [
      * This code below always changes when you use a generator, and maybe you must format the code.
      */
     "sidebars" => [
-        [
-            'header' => 'Master',
-            'permissions' => [
-                'aspek view',
-                'indikator persepsi view',
-                'bobot aspek view',
-                'kriteria responden view',
-                'indikator dampak view',
-                'konversi view'
-            ],
-            'menus' => [
-                [
-                    'title' => 'Master Data',
-                    'icon' => '<i class="bi bi-collection-fill"></i>',
-                    'route' => [
-                        'aspek*',
-                        'indikator-persepsi*',
-                        'indikator-dampak*',
-                        'bobot-aspek*',
-                        'kriteria-responden*',
-                        'konversi*'
+    [
+        'header' => 'Master',
+        'permissions' => [
+            'aspek view',
+            'indikator persepsi view',
+            'bobot aspek view',
+            'kriteria responden view',
+            'indikator dampak view',
+            'konversi view',
+            'kuesioner view'
+        ],
+        'menus' => [
+            [
+                'title' => 'Master Data',
+                'icon' => '<i class="bi bi-collection-fill"></i>',
+                'route' => [
+                    'aspek*',
+                    'indikator-persepsi*',
+                    'indikator-dampak*',
+                    'bobot-aspek*',
+                    'kriteria-responden*',
+                    'konversi*',
+                    'kuesioner*'
+                ],
+                'permissions' => [
+                    'aspek view',
+                    'indikator persepsi view',
+                    'bobot aspek view',
+                    'kriteria responden view',
+                    'indikator dampak view',
+                    'konversi view',
+                    'kuesioner view'
+                ],
+                'submenus' => [
+                    [
+                        'title' => 'Aspek',
+                        'route' => '/aspek',
+                        'permission' => 'aspek view'
                     ],
-                    'permissions' => [
-                        'aspek view',
-                        'indikator persepsi view',
-                        'bobot aspek view',
-                        'kriteria responden view',
-                        'indikator dampak view',
-                        'konversi view'
+                    [
+                        'title' => 'Kuesioner',
+                        'route' => '/kuesioner',
+                        'permission' => 'kuesioner view'
                     ],
-                    'submenus' => [
-                        [
-                            'title' => 'Aspek',
-                            'route' => '/aspek',
-                            'permission' => 'aspek view'
-                        ],
-                        [
-                            'title' => 'Indikator Persepsi',
-                            'route' => '/indikator-persepsi',
-                            'permission' => 'indikator persepsi view'
-                        ],
-                        [
-                            'title' => 'Indikator Dampak',
-                            'route' => '/indikator-dampak',
-                            'permission' => 'indikator dampak view'
-                        ],
-                        [
-                            'title' => 'Konversi',
-                            'route' => '/konversi',
-                            'permission' => 'konversi view'
-                        ],
-                        [
-                            'title' => 'Bobot Aspek',
-                            'route' => '/bobot-aspek',
-                            'permission' => 'bobot aspek view'
-                        ],
-                        [
-                            'title' => 'Kriteria Responden',
-                            'route' => '/kriteria-responden',
-                            'permission' => 'kriteria responden view'
-                        ]
+                    [
+                        'title' => 'Indikator Persepsi',
+                        'route' => '/indikator-persepsi',
+                        'permission' => 'indikator persepsi view'
+                    ],
+                    [
+                        'title' => 'Indikator Dampak',
+                        'route' => '/indikator-dampak',
+                        'permission' => 'indikator dampak view'
+                    ],
+                    [
+                        'title' => 'Konversi',
+                        'route' => '/konversi',
+                        'permission' => 'konversi view'
+                    ],
+                    [
+                        'title' => 'Bobot Aspek',
+                        'route' => '/bobot-aspek',
+                        'permission' => 'bobot aspek view'
+                    ],
+                    [
+                        'title' => 'Kriteria Responden',
+                        'route' => '/kriteria-responden',
+                        'permission' => 'kriteria responden view'
+                    ],
+                ]
+            ]
+        ]
+    ],
+    [
+        'header' => 'Wa',
+        'permissions' => [
+            'pesan wa view',
+            'wa blast view',
+            'single sender view'
+        ],
+        'menus' => [
+            [
+                'title' => 'Wa Blasting',
+                'icon' => '<i class="bi bi-whatsapp"></i>',
+                'route' => [
+                    'pesan-wa*',
+                    'wa-blast*',
+                    'single-sender*'
+                ],
+                'permissions' => [
+                    'pesan wa view',
+                    'wa blast view',
+                    'single sender view'
+                ],
+                'submenus' => [
+                    [
+                        'title' => 'Pesan WA',
+                        'route' => '/pesan-wa',
+                        'permission' => 'pesan wa view'
+                    ],
+                    [
+                        'title' => 'Config Wa Blast',
+                        'route' => '/wa-blast',
+                        'permission' => 'wa blast view'
+                    ],
+                    [
+                        'title' => 'Single Sender',
+                        'route' => '/single-sender',
+                        'permission' => 'single sender view'
                     ]
                 ]
             ]
+        ]
+    ],
+    [
+        'header' => 'Persiapan',
+        'permissions' => [
+            'pembuatan project view',
+            'project view'
         ],
-        [
-            'header' => 'Wa',
-            'permissions' => [
-                'pesan wa view',
-                'wa blast view',
-                'single sender view'
-            ],
-            'menus' => [
-                [
-                    'title' => 'Wa Blasting',
-                    'icon' => '<i class="bi bi-whatsapp"></i>',
-                    'route' => [
-                        'pesan-wa*',
-                        'wa-blast*',
-                        'single-sender*'
+        'menus' => [
+            [
+                'title' => 'Persiapan',
+                'icon' => '<i class="bi bi-folder"></i>',
+                'route' => [
+                    'pembuatan-project*',
+                    'project*'
+                ],
+                'permissions' => [
+                    'pembuatan project view',
+                    'project view'
+                ],
+                'submenus' => [
+                    [
+                        'title' => 'Pembuatan Project',
+                        'route' => '/pembuatan-project',
+                        'permission' => 'pembuatan project view'
                     ],
-                    'permissions' => [
-                        'pesan wa view',
-                        'wa blast view',
-                        'single sender view'
-                    ],
-                    'submenus' => [
-                        [
-                            'title' => 'Pesan WA',
-                            'route' => '/pesan-wa',
-                            'permission' => 'pesan wa view'
-                        ],
-                        [
-                            'title' => 'Config Wa Blast',
-                            'route' => '/wa-blast',
-                            'permission' => 'wa blast view'
-                        ],
-                        [
-                            'title' => 'Single Sender',
-                            'route' => '/single-sender',
-                            'permission' => 'single sender view'
-                        ]
+                    [
+                        'title' => 'Management Project',
+                        'route' => '/project',
+                        'permission' => 'project view'
                     ]
                 ]
             ]
+        ]
+    ],
+    [
+        'header' => 'Pelaksanaan',
+        'permissions' => [
+            'penyebaran kuesioner view'
         ],
-        [
-            'header' => 'Persiapan',
-            'permissions' => [
-                'pembuatan project view',
-                'project view'
-            ],
-            'menus' => [
-                [
-                    'title' => 'Persiapan',
-                    'icon' => '<i class="bi bi-folder"></i>',
-                    'route' => [
-                        'pembuatan-project*',
-                        'project*'
+        'menus' => [
+            [
+                'title' => 'Pelaksanaan',
+                'icon' => '<i class="bi bi-folder"></i>',
+                'route' => [
+                    'penyebaran-kuesioner*'
+                ],
+                'permissions' => [
+                    'penyebaran kuesioner view'
+                ],
+                'submenus' => [
+                    [
+                        'title' => 'Penyebaran Kuesioner',
+                        'route' => '/penyebaran-kuesioner',
+                        'permission' => 'penyebaran kuesioner view'
                     ],
-                    'permissions' => [
-                        'pembuatan project view',
-                        'project view'
-                    ],
-                    'submenus' => [
-                        [
-                            'title' => 'Pembuatan Project',
-                            'route' => '/pembuatan-project',
-                            'permission' => 'pembuatan project view'
-                        ],
-                        [
-                            'title' => 'Management Project',
-                            'route' => '/project',
-                            'permission' => 'project view'
-                        ]
+                    [
+                        'title' => 'Pengumpulan Data',
+                        'route' => '/project',
+                        'permission' => 'pengumpulan data view'
                     ]
                 ]
             ]
+        ]
+    ],
+    [
+        'header' => 'Utilities',
+        'permissions' => [
+            'user view',
+            'role & permission view',
+            'setting view'
         ],
-        [
-            'header' => 'Pelaksanaan',
-            'permissions' => [
-                'penyebaran kuesioner view'
-            ],
-            'menus' => [
-                [
-                    'title' => 'Pelaksanaan',
-                    'icon' => '<i class="bi bi-folder"></i>',
-                    'route' => [
-                        'penyebaran-kuesioner*'
+        'menus' => [
+            [
+                'title' => 'Utilities',
+                'icon' => '<i class="bi bi-gear-fill"></i>',
+                'route' => [
+                    'users*',
+                    'roles*',
+                    'setting*'
+                ],
+                'permissions' => [
+                    'user view',
+                    'role & permission view',
+                    'setting view'
+                ],
+                'submenus' => [
+                    [
+                        'title' => 'Setting',
+                        'route' => '/setting',
+                        'permission' => 'setting view'
                     ],
-                    'permissions' => [
-                        'penyebaran kuesioner view'
+                    [
+                        'title' => 'User',
+                        'route' => '/users',
+                        'permission' => 'user view'
                     ],
-                    'submenus' => [
-                        [
-                            'title' => 'Penyebaran Kuesioner',
-                            'route' => '/penyebaran-kuesioner',
-                            'permission' => 'penyebaran kuesioner view'
-                        ],
-                        [
-                            'title' => 'Pengumpulan Data',
-                            'route' => '/project',
-                            'permission' => 'pengumpulan data view'
-                        ]
-                    ]
-                ]
-            ]
-        ],
-        [
-            'header' => 'Utilities',
-            'permissions' => [
-                'user view',
-                'role & permission view',
-                'setting view'
-            ],
-            'menus' => [
-                [
-                    'title' => 'Utilities',
-                    'icon' => '<i class="bi bi-gear-fill"></i>',
-                    'route' => [
-                        'users*',
-                        'roles*',
-                        'setting*'
-                    ],
-                    'permissions' => [
-                        'user view',
-                        'role & permission view',
-                        'setting view'
-                    ],
-                    'submenus' => [
-                        [
-                            'title' => 'Setting',
-                            'route' => '/setting',
-                            'permission' => 'setting view'
-                        ],
-                        [
-                            'title' => 'User',
-                            'route' => '/users',
-                            'permission' => 'user view'
-                        ],
-                        [
-                            'title' => 'Roles & permissions',
-                            'route' => '/roles',
-                            'permission' => 'role & permission view'
-                        ]
+                    [
+                        'title' => 'Roles & permissions',
+                        'route' => '/roles',
+                        'permission' => 'role & permission view'
                     ]
                 ]
             ]
         ]
     ]
+]
 ];
