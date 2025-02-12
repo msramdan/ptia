@@ -49,10 +49,10 @@
                                         <tr>
                                             <th class="text-center">Responden</th>
                                             <th class="text-center">Keterisian</th>
-                                            <th class="text-center">View Config</th>
+                                            <th class="text-center">Config</th>
                                             <th class="text-center">Responden</th>
                                             <th class="text-center">Keterisian</th>
-                                            <th class="text-center">View Config</th>
+                                            <th class="text-center">Config</th>
                                         </tr>
                                     </thead>
                                 </table>

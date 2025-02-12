@@ -29,28 +29,47 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
         if (request()->ajax()) {
             $projects = DB::table('project')
                 ->join('users', 'project.user_id', '=', 'users.id')
-                ->select('project.*', 'users.name as user_name', 'users.email', 'users.avatar')
-                ->orderBy('project.id', 'desc') // Urutkan berdasarkan ID secara descending
+                ->leftJoin('project_responden', 'project_responden.project_id', '=', 'project.id')
+                ->select(
+                    'project.*',
+                    'users.name as user_name',
+                    'users.email',
+                    'users.avatar',
+                    // Total responden (semua)
+                    DB::raw('COUNT(project_responden.id) as total_responden'),
+                    // Total yang sudah mengisi kuesioner alumni
+                    DB::raw('SUM(CASE WHEN project_responden.status_pengisian_kuesioner_alumni = "Sudah" THEN 1 ELSE 0 END) as total_sudah_isi'),
+                    // Total responden atasan (hanya yang nama_atasan tidak null)
+                    DB::raw('SUM(CASE WHEN project_responden.nama_atasan IS NOT NULL THEN 1 ELSE 0 END) as total_responden_atasan'),
+                    // Total keterisian atasan (bandingkan dengan semua responden, tidak hanya yang nama_atasan tidak null)
+                    DB::raw('SUM(CASE WHEN project_responden.status_pengisian_kuesioner_atasan = "Sudah" THEN 1 ELSE 0 END) as total_sudah_isi_atasan')
+                )
+                ->groupBy('project.id', 'users.name', 'users.email', 'users.avatar')
+                ->orderBy('project.id', 'desc')
                 ->get();
+
             return DataTables::of($projects)
                 ->addIndexColumn()
-
                 ->addColumn('responden_alumni', function ($row) {
-                    $editBobot = '';
                     return '
                         <div class="text-center">
-                             <a href="' . $editBobot . '"
+                            <a href="#"
                                class="btn btn-sm btn-warning"
                                style="width: 120px;"
                                data-toggle="tooltip" data-placement="left" title="Atur Bobot">
-                                 <i class="fas fa-users"></i> 999 Alumni
+                                <i class="fas fa-users"></i> ' . $row->total_responden . ' Alumni
                             </a>
                         </div>';
                 })
 
                 ->addColumn('keterisian_alumni', function ($row) {
-                    return '10 Alumni (100%)';
+                    $total = $row->total_responden ?: 1; // Hindari pembagian dengan nol
+                    $sudah = $row->total_sudah_isi;
+                    $persentase = round(($sudah / $total) * 100, 2);
+
+                    return "$sudah Alumni ($persentase%)";
                 })
+
 
                 ->addColumn('config_alumni', function ($row) {
                     $editBobot = '';
@@ -81,20 +100,23 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
 
 
                 ->addColumn('responden_atasan', function ($row) {
-                    $editBobot = '';
                     return '
                         <div class="text-center">
-                             <a href="' . $editBobot . '"
+                             <a href="#"
                                class="btn btn-sm btn-warning"
                                style="width: 120px;"
                                data-toggle="tooltip" data-placement="left" title="Atur Bobot">
-                                 <i class="fas fa-users"></i> 999 Atasan
+                                 <i class="fas fa-users"></i> ' . $row->total_responden_atasan . ' Atasan
                             </a>
                         </div>';
                 })
 
                 ->addColumn('keterisian_atasan', function ($row) {
-                    return '10 Atasan (50%)';
+                    $total = $row->total_responden ?: 1; // Hindari pembagian dengan nol
+                    $sudah = $row->total_sudah_isi_atasan;
+                    $persentase = round(($sudah / $total) * 100, 2);
+
+                    return "$sudah Atasan ($persentase%)";
                 })
 
                 ->addColumn('config_atasan', function ($row) {
