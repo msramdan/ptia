@@ -20,16 +20,15 @@ return new class extends Migration {
             $table->decimal('nilai_post_test', 5, 2)->nullable();
 
             $table->integer('try_send_wa_alumni')->default(0);
-            // $table->enum('status_send_wa_alumni', ['Berhasil', 'Gagal', 'Pending'])->default('Pending');
             $table->enum('status_pengisian_kuesioner_alumni', ['Sudah', 'Belum'])->default('Belum');
-            $table->timestamp('last_sent_at')->nullable();
+            $table->timestamp('last_send_alumni_at')->nullable();
             // data atasan
             $table->string('nip_atasan')->nullable();
             $table->string('nama_atasan')->nullable();
             $table->string('telepon_atasan')->nullable();
             $table->integer('try_send_wa_atasan')->default(0);
-            // $table->enum('status_send_wa_atasan', ['Berhasil', 'Gagal', 'Pending'])->default('Pending');
             $table->enum('status_pengisian_kuesioner_atasan', ['Sudah', 'Belum'])->default('Belum');
+            $table->timestamp('last_send_atasan_at')->nullable();
             $table->timestamps();
         });
     }
