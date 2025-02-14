@@ -13,17 +13,17 @@ class RespondenKuesionerController extends Controller
             $id = decryptShort($encryptedId);
             $target = decryptShort($encryptedTarget);
             if (!in_array($target, ['alumni', 'atasan'])) {
-                return response()->view('errors.404', [], 404);
+                abort(404);
             }
             $responden = DB::table('project_responden')->where('id', $id)->first();
 
             if (!$responden) {
-                return response()->view('errors.404', [], 404);
+                abort(404);
             }
 
             return view('kuesioner', compact('responden', 'target'));
         } catch (\Exception $e) {
-            return response()->view('errors.404', [], 404);
+            abort(404);
         }
     }
 

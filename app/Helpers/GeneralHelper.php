@@ -65,7 +65,7 @@ function decryptShort($string)
     $decoded = base64_decode(strtr($string, '-_', '+/'), true);
 
     if ($decoded === false) {
-        return response()->view('errors.404', [], 404);
+        abort(404);
     }
 
     return $decoded;
