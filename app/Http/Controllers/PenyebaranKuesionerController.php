@@ -74,16 +74,18 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
 
 
                 ->addColumn('config_alumni', function ($row) {
-                    $editBobot = '';
+                    $waAlumni = route('project.pesan.wa.show', ['id' => $row->id]);
+                    $kuesionerAlumni = route('project.kuesioner.show', ['id' => $row->id, 'remark' => 'Alumni']);
+                    $bobotKuesioner = route('project.bobot.show', ['id' => $row->id]);
                     return '
                         <div class="d-flex flex-column">
                             <div class="d-flex gap-1 mb-1">
-                                <a href="' . $editBobot . '"
+                                <a href="' . $waAlumni . '"
                                    class="btn btn-sm btn-success"
                                    data-toggle="tooltip" data-placement="left" title="Pesan WA Alumni">
                                     <i class="fab fa-whatsapp"></i>
                                 </a>
-                                <a href="' . $editBobot . '"
+                                <a href="' . $kuesionerAlumni . '"
                                    class="btn btn-sm btn-primary"
                                    data-toggle="tooltip" data-placement="left" title="Kuesioner Alumni">
                                     <i class="fa fa-file"></i>
@@ -91,7 +93,7 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
                             </div>
 
                             <div class="d-flex gap-1 mb-1">
-                                <a href="' . $editBobot . '"
+                                <a href="' . $bobotKuesioner . '"
                                     class="btn btn-sm btn-danger"
                                     data-toggle="tooltip" data-placement="left" title="Bobot Alumni">
                                     <i class="fas fa-balance-scale"></i>
@@ -122,16 +124,17 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
                 })
 
                 ->addColumn('config_atasan', function ($row) {
-                    $editBobot = '';
+                    $waAtasan = route('project.pesan.wa.show', ['id' => $row->id]);
+                    $kuesionerAtasan = route('project.kuesioner.show', ['id' => $row->id, 'remark' => 'Atasan']);
                     return '
                         <div class="text-center d-flex flex-column align-items-center">
                             <div class="d-flex gap-1 mb-1">
-                                <a href="' . $editBobot . '"
+                                <a href="' . $waAtasan . '"
                                    class="btn btn-sm btn-success"
                                    data-toggle="tooltip" data-placement="left" title="Pesan WA Alumni">
                                     <i class="fab fa-whatsapp"></i>
                                 </a>
-                                <a href="' . $editBobot . '"
+                                <a href="' . $kuesionerAtasan . '"
                                    class="btn btn-sm btn-primary"
                                    data-toggle="tooltip" data-placement="left" title="Kuesioner Alumni">
                                     <i class="fa fa-file"></i>
