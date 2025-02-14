@@ -13,6 +13,12 @@ class NotifikasiCronAtasanController extends Controller
 
     public function kirimNotifikasi()
     {
+        $currentHour = Carbon::now()->hour;
+        if ($currentHour < 7 || $currentHour >= 17) {
+            Log::info("Cron job dihentikan karena di luar jam kerja (07:00 - 17:00).");
+            return response()->json(['message' => 'Di luar jam kerja, cron tidak dieksekusi.'], 200);
+        }
+
         $startTime = Carbon::now()->format('Y-m-d H:i:s');
         $this->sendNotifTelegram("🚀 *Cron Job Dimulai* \n📅 Waktu Mulai: *{$startTime}* \nMengirim notifikasi ke atasan...");
         $limit = (int) env('NOTIFIKASI_LIMIT', 10);
