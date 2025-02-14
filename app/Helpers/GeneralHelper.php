@@ -57,27 +57,16 @@ function get_setting()
 
 function encryptShort($string)
 {
-    return str_replace('=', '', base64_encode(gzcompress($string, 9)));
+    return rtrim(strtr(base64_encode($string), '+/', '-_'), '=');
 }
-
 
 function decryptShort($string)
 {
-    try {
-        $decoded = base64_decode($string, true);
+    $decoded = base64_decode(strtr($string, '-_', '+/'), true);
 
-        if ($decoded === false) {
-            abort(404);
-        }
-
-        $uncompressed = @gzuncompress($decoded);
-
-        if ($uncompressed === false) {
-            abort(404);
-        }
-
-        return $uncompressed;
-    } catch (\Exception $e) {
-        abort(404);
+    if ($decoded === false) {
+        return response()->view('errors.404', [], 404);
     }
+
+    return $decoded;
 }
