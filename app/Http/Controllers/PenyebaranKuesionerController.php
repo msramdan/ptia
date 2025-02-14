@@ -53,9 +53,10 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
             return DataTables::of($projects)
                 ->addIndexColumn()
                 ->addColumn('responden_alumni', function ($row) {
+                    $showAlumni = route('penyebaran-kuesioner.responden.show', ['id' => $row->id]);
                     return '
                         <div class="text-center">
-                            <a href="#"
+                            <a href="' . $showAlumni . '"
                                class="btn btn-sm btn-warning"
                                style="width: 120px;"
                                data-toggle="tooltip" data-placement="left" title="Atur Bobot">
@@ -74,9 +75,9 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
 
 
                 ->addColumn('config_alumni', function ($row) {
-                    $waAlumni = route('project.pesan.wa.show', ['id' => $row->id]);
-                    $kuesionerAlumni = route('project.kuesioner.show', ['id' => $row->id, 'remark' => 'Alumni']);
-                    $bobotKuesioner = route('project.bobot.show', ['id' => $row->id]);
+                    $waAlumni = route('penyebaran-kuesioner.pesan.wa.show', ['id' => $row->id]);
+                    $kuesionerAlumni = route('penyebaran-kuesioner.kuesioner.show', ['id' => $row->id, 'remark' => 'Alumni']);
+                    $bobotKuesioner = route('penyebaran-kuesioner.bobot.show', ['id' => $row->id]);
                     return '
                         <div class="d-flex flex-column">
                             <div class="d-flex gap-1 mb-1">
@@ -104,9 +105,10 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
 
 
                 ->addColumn('responden_atasan', function ($row) {
+                    $showAtasan = route('penyebaran-kuesioner.responden.show', ['id' => $row->id]);
                     return '
                         <div class="text-center">
-                             <a href="#"
+                             <a href="' . $showAtasan . '"
                                class="btn btn-sm btn-warning"
                                style="width: 120px;"
                                data-toggle="tooltip" data-placement="left" title="Atur Bobot">
@@ -124,8 +126,8 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
                 })
 
                 ->addColumn('config_atasan', function ($row) {
-                    $waAtasan = route('project.pesan.wa.show', ['id' => $row->id]);
-                    $kuesionerAtasan = route('project.kuesioner.show', ['id' => $row->id, 'remark' => 'Atasan']);
+                    $waAtasan = route('penyebaran-kuesioner.pesan.wa.show', ['id' => $row->id]);
+                    $kuesionerAtasan = route('penyebaran-kuesioner.kuesioner.show', ['id' => $row->id, 'remark' => 'Atasan']);
                     return '
                         <div class="text-center d-flex flex-column align-items-center">
                             <div class="d-flex gap-1 mb-1">
@@ -162,5 +164,102 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
         }
 
         return view('penyebaran-kuesioner.index');
+    }
+
+    public function showKuesioner($id, $remark)
+    {
+        $project = DB::table('project')
+            ->join('users', 'project.user_id', '=', 'users.id')
+            ->select('project.*', 'users.name as user_name')
+            ->where('project.id', $id)
+            ->first();
+
+        $kuesioners = DB::table('project_kuesioner')
+            ->join('aspek', 'project_kuesioner.aspek_id', '=', 'aspek.id')
+            ->select(
+                'project_kuesioner.*',
+                'aspek.aspek as aspek_nama'
+            )
+            ->where('project_kuesioner.project_id', $id)
+            ->where('project_kuesioner.remark', $remark)
+            ->get();
+
+        $aspeks = DB::table('aspek')
+            ->select('id', 'aspek')
+            ->where('diklat_type_id', $project->diklat_type_id)
+            ->get();
+
+
+        return view('penyebaran-kuesioner.kuesioner', compact('project', 'kuesioners', 'remark', 'aspeks'));
+    }
+
+    public function showResponden($id): View|JsonResponse
+    {
+        if (request()->ajax()) {
+            $respondens = DB::table('project_responden')
+                ->where('project_id', $id)
+                ->get();
+
+            return DataTables::of($respondens)
+                ->addIndexColumn()
+                ->toJson();
+        }
+
+        $kriteriaResponden = DB::table('project_kriteria_responden')
+            ->where('project_id', $id)
+            ->first();
+
+        if (!$kriteriaResponden) {
+            abort(404, 'Kriteria Responden tidak ditemukan');
+        }
+
+        $kriteriaResponden->nilai_post_test = json_decode($kriteriaResponden->nilai_post_test, true);
+
+        $project = DB::table('project')
+            ->join('users', 'project.user_id', '=', 'users.id')
+            ->select('project.*', 'users.name as user_name')
+            ->where('project.id', $id)
+            ->first();
+
+        return view('penyebaran-kuesioner.responden', compact('project', 'kriteriaResponden'));
+    }
+
+    public function showPesanWa($id)
+    {
+        $project = DB::table('project')
+            ->join('users', 'project.user_id', '=', 'users.id')
+            ->select('project.*', 'users.name as user_name')
+            ->where('project.id', $id)
+            ->first();
+
+        $pesanWa = DB::table('project_pesan_wa')
+            ->where('project_pesan_wa.project_id', $id)
+            ->first();
+        return view('penyebaran-kuesioner.pesan_wa', compact('project', 'pesanWa'));
+    }
+
+    public function showBobot($id)
+    {
+        $project = DB::table('project')
+            ->join('users', 'project.user_id', '=', 'users.id')
+            ->select('project.*', 'users.name as user_name')
+            ->where('project.id', $id)
+            ->first();
+
+        $bobotAspek = DB::table('project_bobot_aspek')
+            ->join('aspek', 'project_bobot_aspek.aspek_id', '=', 'aspek.id')
+            ->select('project_bobot_aspek.*', 'aspek.aspek as aspek_nama', 'aspek.level')
+            ->where('project_bobot_aspek.project_id', $id)
+            ->get();
+
+        $dataSecondary = DB::table('project_bobot_aspek_sekunder')
+            ->select('project_bobot_aspek_sekunder.*')
+            ->where('project_bobot_aspek_sekunder.project_id', $id)
+            ->first();
+
+        $level3 = $bobotAspek->where('level', 3);
+        $level4 = $bobotAspek->where('level', 4);
+
+        return view('penyebaran-kuesioner.bobot', compact('project', 'level3', 'level4', 'dataSecondary'));
     }
 }

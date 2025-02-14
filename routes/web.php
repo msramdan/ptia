@@ -62,6 +62,14 @@ Route::middleware(['auth', 'web'])->group(function () {
     ]);
     Route::prefix('penyebaran-kuesioner')->controller(PenyebaranKuesionerController::class)->group(function () {
         Route::get('/', 'index')->name('penyebaran-kuesioner.index');
+        // Kuesioner
+        Route::get('/kuesioner/show/{id}/{remark}', 'showKuesioner')->name('penyebaran-kuesioner.kuesioner.show');
+        // responden
+        Route::get('/responden/show/{id}', 'showResponden')->name('penyebaran-kuesioner.responden.show');
+        //pesat wa
+        Route::get('/pesan-wa/show/{id}', 'showPesanWa')->name('penyebaran-kuesioner.pesan.wa.show');
+        //Bobot
+        Route::get('/bobot/show/{id}', 'showBobot')->name('penyebaran-kuesioner.bobot.show');
     });
 
 
