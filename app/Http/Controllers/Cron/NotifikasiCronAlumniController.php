@@ -1,19 +1,20 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Cron;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\URL;
-class NotifikasiCronAtasanController extends Controller
-{
+use App\Http\Controllers\Controller;
 
+class NotifikasiCronAlumniController extends Controller
+{
     public function kirimNotifikasi()
     {
+
         $currentHour = Carbon::now()->hour;
         if ($currentHour < 7 || $currentHour >= 17) {
             Log::info("Cron job dihentikan karena di luar jam kerja (07:00 - 17:00).");
@@ -21,24 +22,23 @@ class NotifikasiCronAtasanController extends Controller
         }
 
         $startTime = Carbon::now()->format('Y-m-d H:i:s');
-        $this->sendNotifTelegram("🚀 *Cron Job Dimulai* \n📅 Waktu Mulai: *{$startTime}* \nMengirim notifikasi ke atasan...");
+        $this->sendNotifTelegram("🚀 *Cron Job Dimulai* \n📅 Waktu Mulai: *{$startTime}* \nMengirim notifikasi ke alumni...");
         $limit = (int) env('NOTIFIKASI_LIMIT', 10);
         $notifikasiList = DB::table('project_responden')
             ->join('project_pesan_wa', 'project_responden.project_id', '=', 'project_pesan_wa.project_id')
             ->join('project', 'project_responden.project_id', '=', 'project.id')
             ->where('project.status', 'Pelaksanaan')
-            ->where('project_responden.status_pengisian_kuesioner_atasan', 'Belum')
-            ->where('project_responden.try_send_wa_atasan', '<', 7)
-            ->whereNotNull('project_responden.telepon_atasan')
+            ->where('project_responden.status_pengisian_kuesioner_alumni', 'Belum')
+            ->where('project_responden.try_send_wa_alumni', '<', 7)
             ->where(function ($query) {
-                $query->whereNull('project_responden.last_send_atasan_at')
-                    ->orWhereDate('project_responden.last_send_atasan_at', '<', Carbon::today());
+                $query->whereNull('project_responden.last_send_alumni_at')
+                    ->orWhereDate('project_responden.last_send_alumni_at', '<', Carbon::today());
             })
-            ->orderBy('project_responden.last_send_atasan_at', 'asc')
+            ->orderBy('project_responden.last_send_alumni_at', 'asc')
             ->limit($limit)
             ->select(
                 'project_responden.*',
-                'project_pesan_wa.text_pesan_atasan',
+                'project_pesan_wa.text_pesan_alumni',
                 'project.status',
                 'project.kaldikID',
                 'project.kaldikDesc'
@@ -56,14 +56,13 @@ class NotifikasiCronAtasanController extends Controller
 
         foreach ($notifikasiList as $notifikasi) {
             try {
-                $response = $this->sendNotifWa($notifikasi->telepon_atasan, "Halo, jangan lupa mengisi kuesioner atasan!");
+                $response = $this->sendNotifWa($notifikasi->telepon, "Halo, jangan lupa mengisi kuesioner alumni!");
                 if ($response['status'] === 'success') {
-                    $this->updateStatus($notifikasi->id, $notifikasi->try_send_wa_atasan, 'Atasan');
+                    $this->updateStatus($notifikasi->id, $notifikasi->try_send_wa_alumni, 'Alumni');
                     $successCount++;
                     $encryptedId = encryptShort($notifikasi->id);
-                    $encryptedTarget = encryptShort('atasan');
+                    $encryptedTarget = encryptShort('alumni');
                     $url = URL::to(route('responden-kuesioner.index', ['id' => $encryptedId, 'target' => $encryptedTarget]));
-
                     $this->sendNotifTelegram(
                         "✅ *Sukses Kirim WA* \n" .
                             "────────────\n" .
@@ -78,14 +77,12 @@ class NotifikasiCronAtasanController extends Controller
                     $errorMessage =
                         "❌ *Gagal Kirim WA*\n" .
                         "────────────\n" .
-                        "👨‍💼 *Nama Atasan:* {$notifikasi->nama_atasan}\n" .
-                        "👤 *Nama Peserta:* {$notifikasi->nama}\n" .
-                        "📞 *Nomor Atasan:* {$notifikasi->telepon_atasan}\n" .
+                        "👤 *Nama:* {$notifikasi->nama}\n" .
+                        "📞 *Nomor:* {$notifikasi->telepon}\n" .
                         "📌 *ID Diklat:* {$notifikasi->kaldikID}\n" .
                         "📚 *Nama Diklat:* {$notifikasi->kaldikDesc}\n" .
                         "⚠️ *Error:* {$response['message']}\n" .
                         "────────────";
-
                     Log::error($errorMessage);
                     $this->sendNotifTelegram($errorMessage);
                     $failureCount++;
@@ -94,9 +91,8 @@ class NotifikasiCronAtasanController extends Controller
                 $errorMessage =
                     "❌ *Terjadi Kesalahan*\n" .
                     "────────────\n" .
-                    "👨‍💼 *Nama Atasan:* {$notifikasi->nama_atasan}\n" .
-                    "👤 *Nama Peserta:* {$notifikasi->nama}\n" .
-                    "📞 *Nomor Atasan:* {$notifikasi->telepon_atasan}\n" .
+                    "👤 *Nama:* {$notifikasi->nama}\n" .
+                    "📞 *Nomor:* {$notifikasi->telepon}\n" .
                     "📌 *ID Diklat:* {$notifikasi->kaldikID}\n" .
                     "📚 *Nama Diklat:* {$notifikasi->kaldikDesc}\n" .
                     "⚠️ *Error:* {$e->getMessage()}\n" .
@@ -123,8 +119,8 @@ class NotifikasiCronAtasanController extends Controller
         DB::table('project_responden')
             ->where('id', $id)
             ->update([
-                'try_send_wa_atasan' => $trySendCount + 1,
-                'last_send_atasan_at' => Carbon::now(),
+                'try_send_wa_alumni' => $trySendCount + 1,
+                'last_send_alumni_at' => Carbon::now(),
             ]);
     }
 
@@ -136,7 +132,7 @@ class NotifikasiCronAtasanController extends Controller
     private function sendNotifTelegram($message)
     {
         $botToken = env('TELEGRAM_BOT_TOKEN');
-        $chatId = env('TELEGRAM_CHAT_ID_ATASAN');
+        $chatId = env('TELEGRAM_CHAT_ID_ALUMNI');
 
         if (!$botToken || !$chatId) {
             Log::error('Bot Token atau Chat ID Telegram tidak ditemukan.');

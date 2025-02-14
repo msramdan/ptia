@@ -1,6 +1,10 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Cron\{
+    NotifikasiCronAlumniController,
+    NotifikasiCronAtasanController,
+};
 use App\Http\Controllers\{
     ProfileController,
     UserController,
@@ -15,14 +19,13 @@ use App\Http\Controllers\{
     IndikatorDampakController,
     KonversiController,
     KuesionerController,
-    NotifikasiCronAlumniController,
-    NotifikasiCronAtasanController,
     PembuatanProjectController,
     PenyebaranKuesionerController,
     ProjectController,
     RespondenKuesionerController,
     SettingController
 };
+
 
 
 Route::get('/', function () {
