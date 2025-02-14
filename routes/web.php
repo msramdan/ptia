@@ -15,7 +15,8 @@ use App\Http\Controllers\{
     IndikatorDampakController,
     KonversiController,
     KuesionerController,
-    NotifikasiCronController,
+    NotifikasiCronAlumniController,
+    NotifikasiCronAtasanController,
     PembuatanProjectController,
     PenyebaranKuesionerController,
     ProjectController,
@@ -28,7 +29,8 @@ Route::get('/', function () {
 });
 
 // CRON Notifikasi
-Route::get('/kirim-notifikasi-alumni', [NotifikasiCronController::class, 'kirimNotifikasiAlumni']);
+Route::get('/kirim-notifikasi-alumni', [NotifikasiCronAlumniController::class, 'kirimNotifikasi']);
+Route::get('/kirim-notifikasi-atasan', [NotifikasiCronAtasanController::class, 'kirimNotifikasi']);
 
 Route::middleware(['auth', 'web'])->group(function () {
     Route::get('/', fn() => view('dashboard'));

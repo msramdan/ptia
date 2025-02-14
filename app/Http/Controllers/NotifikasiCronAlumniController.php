@@ -8,9 +8,9 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
 
-class NotifikasiCronController extends Controller
+class NotifikasiCronAlumniController extends Controller
 {
-    public function kirimNotifikasiAlumni()
+    public function kirimNotifikasi()
     {
         $startTime = Carbon::now()->format('Y-m-d H:i:s');
         $this->sendNotifTelegram("🚀 *Cron Job Dimulai* \n📅 Waktu Mulai: *{$startTime}* \nMengirim notifikasi ke alumni...");
@@ -49,22 +49,49 @@ class NotifikasiCronController extends Controller
             try {
                 $response = $this->sendNotifWa($notifikasi->telepon, "Halo, jangan lupa mengisi kuesioner alumni!");
                 if ($response['status'] === 'success') {
-                    $this->updateStatus($notifikasi->id, $notifikasi->try_send_wa_alumni);
+                    $this->updateStatus($notifikasi->id, $notifikasi->try_send_wa_alumni, 'Alumni');
                     $successCount++;
                     $url = 'https://www.dummyurl.com';
-                    $this->sendNotifTelegram("✅ *Sukses Kirim WA* \nNama: {$notifikasi->nama} \nNomor: {$notifikasi->telepon} \nID Diklat: {$notifikasi->kaldikID} \nNama Diklat: {$notifikasi->kaldikDesc} \nURL Kuesioner: {$url}");
+                    $this->sendNotifTelegram(
+                        "✅ *Sukses Kirim WA* \n" .
+                        "────────────\n" .
+                        "👤 *Nama:* {$notifikasi->nama} \n" .
+                        "📞 *Nomor:* {$notifikasi->telepon} \n" .
+                        "📌 *ID Diklat:* {$notifikasi->kaldikID} \n" .
+                        "📚 *Nama Diklat:* {$notifikasi->kaldikDesc} \n" .
+                        "🌐 *URL Kuesioner:* [Klik di sini]({$url})\n" .
+                        "────────────"
+                    );
                 } else {
-                    $errorMessage = "❌ *Gagal Kirim WA*\nNama: {$notifikasi->nama}\n📞 Nomor: {$notifikasi->telepon}\nID Diklat: {$notifikasi->kaldikID}\nNama Diklat: {$notifikasi->kaldikDesc}\n📝 Error: {$response['message']}";
+                    $errorMessage =
+                        "❌ *Gagal Kirim WA*\n" .
+                        "────────────\n" .
+                        "👤 *Nama:* {$notifikasi->nama}\n" .
+                        "📞 *Nomor:* {$notifikasi->telepon}\n" .
+                        "📌 *ID Diklat:* {$notifikasi->kaldikID}\n" .
+                        "📚 *Nama Diklat:* {$notifikasi->kaldikDesc}\n" .
+                        "⚠️ *Error:* {$response['message']}\n" .
+                        "────────────";
                     Log::error($errorMessage);
                     $this->sendNotifTelegram($errorMessage);
                     $failureCount++;
                 }
             } catch (\Exception $e) {
-                $errorMessage = "❌ *Terjadi Kesalahan*\nNama: {$notifikasi->nama}\n📞 Nomor: {$notifikasi->telepon}\nID Diklat: {$notifikasi->kaldikID}\nNama Diklat: {$notifikasi->kaldikDesc}\nError: {$e->getMessage()}";
+                $errorMessage =
+                    "❌ *Terjadi Kesalahan*\n" .
+                    "────────────\n" .
+                    "👤 *Nama:* {$notifikasi->nama}\n" .
+                    "📞 *Nomor:* {$notifikasi->telepon}\n" .
+                    "📌 *ID Diklat:* {$notifikasi->kaldikID}\n" .
+                    "📚 *Nama Diklat:* {$notifikasi->kaldikDesc}\n" .
+                    "⚠️ *Error:* {$e->getMessage()}\n" .
+                    "────────────";
+
                 Log::error($errorMessage);
                 $this->sendNotifTelegram($errorMessage);
                 $failureCount++;
             }
+
         }
 
         $endTime = Carbon::now()->format('Y-m-d H:i:s');
@@ -96,7 +123,7 @@ class NotifikasiCronController extends Controller
     private function sendNotifTelegram($message)
     {
         $botToken = env('TELEGRAM_BOT_TOKEN');
-        $chatId = env('TELEGRAM_CHAT_ID');
+        $chatId = env('TELEGRAM_CHAT_ID_ALUMNI');
 
         if (!$botToken || !$chatId) {
             Log::error('Bot Token atau Chat ID Telegram tidak ditemukan.');
