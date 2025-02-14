@@ -48,7 +48,7 @@
                 <div class="col-md-12">
                     <div class="card">
                         <div class="card-body">
-                            <form action="{{route('project.bobot.update')}}" method="POST">
+                            <form action="{{ route('project.bobot.update') }}" method="POST">
                                 @csrf
                                 @method('PUT')
                                 <table class="table">
@@ -74,7 +74,8 @@
                                                         <input type="number" step="0.01"
                                                             class="form-control form-control-sm level3-alumni"
                                                             name="level3[{{ $index }}][bobot_alumni]"
-                                                            value="{{ $bobot->bobot_alumni }}" oninput="calculateTotal()" />
+                                                            value="{{ $bobot->bobot_alumni }}"
+                                                            oninput="calculateTotal()" />
                                                         <span class="input-group-text">%</span>
                                                     </div>
                                                 </td>
@@ -171,9 +172,12 @@
                                 <a href="{{ route('project.index') }}" class="btn btn-secondary">
                                     <i class="fas fa-arrow-left"></i> {{ __('kembali') }}
                                 </a>
-                                <button type="submit" id="submit-btn" class="btn btn-primary"><i
-                                        class="fas fa-save"></i>
-                                    Update</button>
+
+                                @if ($project->status == 'Persiapan')
+                                    <button type="submit" id="submit-btn" class="btn btn-primary"><i
+                                            class="fas fa-save"></i>
+                                        Update</button>
+                                @endif
                             </form>
                         </div>
                     </div>

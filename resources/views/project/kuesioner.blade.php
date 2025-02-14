@@ -67,8 +67,8 @@
                     <form id="addForm" method="POST" action="{{ route('project.kuesioner.store') }}">
                         @csrf
                         <div class="modal-body">
-                            <input type="hidden" name="remark" value="{{$remark}}" readonly>
-                            <input type="hidden" name="project_id" value="{{$project->id}}" readonly>
+                            <input type="hidden" name="remark" value="{{ $remark }}" readonly>
+                            <input type="hidden" name="project_id" value="{{ $project->id }}" readonly>
                             <div class="mb-3">
                                 <label for="aspek" class="form-label">Aspek</label>
                                 <select class="form-control" id="aspek" name="aspek" required>
@@ -129,9 +129,11 @@
                                 <a href="{{ route('project.index') }}" class="btn btn-secondary">
                                     <i class="fas fa-arrow-left"></i> {{ __('kembali') }}
                                 </a>
-                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal">
-                                    <i class="fas fa-plus"></i> {{ __('Tambah data') }}
-                                </button>
+                                @if ($project->status == 'Persiapan')
+                                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal">
+                                        <i class="fas fa-plus"></i> {{ __('Tambah data') }}
+                                    </button>
+                                @endif
                             </div>
 
                             <div class="table-responsive p-1">
@@ -142,7 +144,9 @@
                                             <th>{{ __('Aspek') }}</th>
                                             <th>{{ __('Kriteria') }}</th>
                                             <th>{{ __('Pertanyaan') }}</th>
-                                            <th>{{ __('Action') }}</th>
+                                            @if ($project->status == 'Persiapan')
+                                                <th>{{ __('Action') }}</th>
+                                            @endif
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -152,18 +156,20 @@
                                                 <td>{{ $kuesioner->aspek_nama ?? '-' }}</td>
                                                 <td>{{ $kuesioner->kriteria ?? '-' }}</td>
                                                 <td>{!! $kuesioner->pertanyaan ?? '-' !!}</td>
-                                                <td>
-                                                    <div class="d-flex gap-2">
-                                                        <button onclick="openEditModal({{ $kuesioner->id }})"
-                                                            class="btn btn-sm btn-warning">
-                                                            <i class="fas fa-edit"></i>
-                                                        </button>
-                                                        <button onclick="deleteKuesioner({{ $kuesioner->id }})"
-                                                            class="btn btn-sm btn-danger">
-                                                            <i class="fas fa-trash"></i>
-                                                        </button>
-                                                    </div>
-                                                </td>
+                                                @if ($project->status == 'Persiapan')
+                                                    <td>
+                                                        <div class="d-flex gap-2">
+                                                            <button onclick="openEditModal({{ $kuesioner->id }})"
+                                                                class="btn btn-sm btn-warning">
+                                                                <i class="fas fa-edit"></i>
+                                                            </button>
+                                                            <button onclick="deleteKuesioner({{ $kuesioner->id }})"
+                                                                class="btn btn-sm btn-danger">
+                                                                <i class="fas fa-trash"></i>
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                @endif
                                             </tr>
                                         @endforeach
                                     </tbody>
