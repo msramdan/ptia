@@ -7,7 +7,8 @@ use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
-
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\URL;
 class NotifikasiCronAtasanController extends Controller
 {
 
@@ -59,13 +60,15 @@ class NotifikasiCronAtasanController extends Controller
                 if ($response['status'] === 'success') {
                     $this->updateStatus($notifikasi->id, $notifikasi->try_send_wa_atasan, 'Atasan');
                     $successCount++;
-                    $url = 'https://www.dummyurl.com';
+                    $encryptedId = encryptShort($notifikasi->id);
+                    $encryptedTarget = encryptShort('atasan');
+                    $url = URL::to(route('responden-kuesioner.index', ['id' => $encryptedId, 'target' => $encryptedTarget]));
+
                     $this->sendNotifTelegram(
                         "✅ *Sukses Kirim WA* \n" .
                             "────────────\n" .
-                            "👨‍💼 *Nama Atasan:* {$notifikasi->nama_atasan} \n" .
-                            "👤 *Nama Peserta:* {$notifikasi->nama} \n" .
-                            "📞 *Nomor Atasan:* {$notifikasi->telepon_atasan} \n" .
+                            "👤 *Nama:* {$notifikasi->nama} \n" .
+                            "📞 *Nomor:* {$notifikasi->telepon} \n" .
                             "📌 *ID Diklat:* {$notifikasi->kaldikID} \n" .
                             "📚 *Nama Diklat:* {$notifikasi->kaldikDesc} \n" .
                             "🌐 *URL Kuesioner:* [Klik di sini]({$url})\n" .

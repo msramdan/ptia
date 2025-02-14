@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\URL;
 
 class NotifikasiCronAlumniController extends Controller
 {
@@ -58,16 +59,20 @@ class NotifikasiCronAlumniController extends Controller
                 if ($response['status'] === 'success') {
                     $this->updateStatus($notifikasi->id, $notifikasi->try_send_wa_alumni, 'Alumni');
                     $successCount++;
-                    $url = 'https://www.dummyurl.com';
+                    $encryptedId = encryptShort($notifikasi->id);
+                    $encryptedTarget = encryptShort('alumni');
+                    $url = URL::to(route('responden-kuesioner.index', ['id' => $encryptedId, 'target' => $encryptedTarget]));
+                    var_dump($url);
+                    die();
                     $this->sendNotifTelegram(
                         "✅ *Sukses Kirim WA* \n" .
-                        "────────────\n" .
-                        "👤 *Nama:* {$notifikasi->nama} \n" .
-                        "📞 *Nomor:* {$notifikasi->telepon} \n" .
-                        "📌 *ID Diklat:* {$notifikasi->kaldikID} \n" .
-                        "📚 *Nama Diklat:* {$notifikasi->kaldikDesc} \n" .
-                        "🌐 *URL Kuesioner:* [Klik di sini]({$url})\n" .
-                        "────────────"
+                            "────────────\n" .
+                            "👤 *Nama:* {$notifikasi->nama} \n" .
+                            "📞 *Nomor:* {$notifikasi->telepon} \n" .
+                            "📌 *ID Diklat:* {$notifikasi->kaldikID} \n" .
+                            "📚 *Nama Diklat:* {$notifikasi->kaldikDesc} \n" .
+                            "🌐 *URL Kuesioner:* [Klik di sini]({$url})\n" .
+                            "────────────"
                     );
                 } else {
                     $errorMessage =
@@ -98,7 +103,6 @@ class NotifikasiCronAlumniController extends Controller
                 $this->sendNotifTelegram($errorMessage);
                 $failureCount++;
             }
-
         }
 
         $endTime = Carbon::now()->format('Y-m-d H:i:s');
@@ -110,7 +114,6 @@ class NotifikasiCronAlumniController extends Controller
             'failure_count' => $failureCount
         ], 200);
     }
-
 
     private function updateStatus($id, $trySendCount)
     {

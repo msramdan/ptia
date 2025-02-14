@@ -20,6 +20,7 @@ use App\Http\Controllers\{
     PembuatanProjectController,
     PenyebaranKuesionerController,
     ProjectController,
+    RespondenKuesionerController,
     SettingController
 };
 
@@ -31,6 +32,9 @@ Route::get('/', function () {
 // CRON Notifikasi
 Route::get('/kirim-notifikasi-alumni', [NotifikasiCronAlumniController::class, 'kirimNotifikasi']);
 Route::get('/kirim-notifikasi-atasan', [NotifikasiCronAtasanController::class, 'kirimNotifikasi']);
+
+// Share kuesioner
+Route::get('/responden-kuesioner/{id}/{target}', [RespondenKuesionerController::class, 'index'])->name('responden-kuesioner.index');
 
 Route::middleware(['auth', 'web'])->group(function () {
     Route::get('/', fn() => view('dashboard'));

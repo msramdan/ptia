@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Crypt;
 
 function is_active_submenu(string|array $route): string
 {
@@ -52,4 +53,31 @@ function is_active_submenu(string|array $route): string
 function get_setting()
 {
     return DB::table('setting')->first();
+}
+
+function encryptShort($string)
+{
+    return str_replace('=', '', base64_encode(gzcompress($string, 9)));
+}
+
+
+function decryptShort($string)
+{
+    try {
+        $decoded = base64_decode($string, true);
+
+        if ($decoded === false) {
+            abort(404);
+        }
+
+        $uncompressed = @gzuncompress($decoded);
+
+        if ($uncompressed === false) {
+            abort(404);
+        }
+
+        return $uncompressed;
+    } catch (\Exception $e) {
+        abort(404);
+    }
 }
