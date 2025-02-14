@@ -62,8 +62,6 @@ class NotifikasiCronAlumniController extends Controller
                     $encryptedId = encryptShort($notifikasi->id);
                     $encryptedTarget = encryptShort('alumni');
                     $url = URL::to(route('responden-kuesioner.index', ['id' => $encryptedId, 'target' => $encryptedTarget]));
-                    var_dump($url);
-                    die();
                     $this->sendNotifTelegram(
                         "✅ *Sukses Kirim WA* \n" .
                             "────────────\n" .
