@@ -26,33 +26,16 @@
         }
 
         .card-header {
-            font-size: 1.2rem;
-            font-weight: bold;
+            font-size: 1.0rem;
+
             background-color: #284D80;
             color: white;
             border-radius: 12px 12px 0 0;
-            padding: 15px;
+            padding: 10px;
         }
 
         .card-body {
             padding: 20px;
-        }
-
-        .form-label {
-            font-weight: 600;
-        }
-
-        .form-control,
-        .form-select {
-            border-radius: 8px;
-            border: 1px solid #ced4da;
-            padding: 10px;
-        }
-
-        .form-control:focus,
-        .form-select:focus {
-            border-color: #0056b3;
-            box-shadow: 0 0 5px rgba(0, 86, 179, 0.3);
         }
 
         .alert {
@@ -87,27 +70,13 @@
             color: white;
             font-weight: bold;
         }
-
-        .btn-submit {
-            background-color: #0056b3;
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 8px;
-            font-size: 1rem;
-            transition: background 0.3s ease-in-out;
-        }
-
-        .btn-submit:hover {
-            background-color: #004494;
-        }
     </style>
 </head>
 
 <body>
     <div class="container mt-4">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h4 class="fw-bold">KUESIONER EVALUASI PEMBELAJARAN LEVEL 3 dan 4</h4>
+        <div class="d-flex justify-content-center align-items-center mb-4">
+            <h5 class="fw-bold text-center">KUESIONER EVALUASI PEMBELAJARAN LEVEL 3 dan 4</h5>
         </div>
 
         <!-- Informasi Diklat -->
@@ -147,7 +116,7 @@
         </div>
 
         <!-- Uraian -->
-        <div class="alert alert-warning mb-4" role="alert">
+        <div class="alert alert-warning mb-4" role="alert" style="text-align: justify">
             <strong>Uraian:</strong> Isilah skor dari pernyataan berikut ini menurut persepsi anda dengan melingkari
             skala persepsi 1 - 4. Untuk aspek kemampuan membagikan keilmuan, skor persepsi hanya untuk kondisi setelah
             mengikuti pelatihan. Sedangkan untuk aspek lainnya, skor persepsi terdiri dari kondisi sebelum dan setelah
