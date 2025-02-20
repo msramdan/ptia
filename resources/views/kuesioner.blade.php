@@ -85,12 +85,11 @@
             <div class="card-body">
                 <div class="row mb-2">
                     <div class="col-md-3"><strong>Kode Diklat</strong></div>
-                    <div class="col-md-9">DD20250113008</div>
+                    <div class="col-md-9">{{ $responden->kaldikID }}</div>
                 </div>
                 <div class="row mb-2">
                     <div class="col-md-3"><strong>Nama Diklat</strong></div>
-                    <div class="col-md-9">Pelatihan dan Sertifikasi Certified Government Risk Assurer (CGRA) Tahun 2024
-                        bagi Pegawai BPKP</div>
+                    <div class="col-md-9">{{ $responden->kaldikDesc }}</div>
                 </div>
 
             </div>
@@ -102,19 +101,23 @@
             <div class="card-body">
                 <div class="mb-3">
                     <label class="form-label" style="margin-bottom: 4px;"><strong>Nama</strong></label>
-                    <input type="text" class="form-control" value="196605091994032001 - Ramdan" readonly>
+                    <input type="text" class="form-control" value="{{ $responden->nip }} - {{ $responden->nama }}"
+                        readonly>
                 </div>
                 <div class="mb-3">
                     <label class="form-label" style="margin-bottom: 4px;"><strong>Nama Atasan Langsung</strong></label>
-                    <input type="text" class="form-control">
+                    <input type="text" class="form-control" value="{{ $responden->nama_atasan ?? '' }}"
+                        {{ $responden->status_pengisian_kuesioner_alumni == 'Sudah' ? 'readonly' : '' }}>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label" style="margin-bottom: 4px;"><strong>No. Whatsapp Atasan Langsung</strong></label>
-                    <input type="number" class="form-control" placeholder="Contoh pengisian 081234567890">
+                    <label class="form-label" style="margin-bottom: 4px;"><strong>No. Whatsapp Atasan
+                            Langsung</strong></label>
+                    <input type="number" class="form-control" placeholder="Contoh pengisian 081234567890"
+                        value="{{ $responden->telepon_atasan ?? '' }}"
+                        {{ $responden->status_pengisian_kuesioner_alumni == 'Sudah' ? 'readonly' : '' }}>
                 </div>
             </div>
         </div>
-
 
         <!-- Uraian -->
         <div class="alert alert-warning mb-4" role="alert" style="text-align: justify">
@@ -324,12 +327,13 @@
             </div>
         </div>
 
-        <div class="d-flex justify-content-center mb-4">
-            <button type="submit" class="btn btn-danger">
-                <i class="fas fa-paper-plane"></i> Jika Sudah Yakin, Klik untuk kirim data
-            </button>
-        </div>
-
+        @if ($responden->status_pengisian_kuesioner_alumni != 'Sudah')
+            <div class="d-flex justify-content-center mb-4">
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-paper-plane"></i> Jika Sudah Yakin, Klik untuk kirim data
+                </button>
+            </div>
+        @endif
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>

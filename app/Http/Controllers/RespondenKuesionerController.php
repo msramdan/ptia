@@ -15,8 +15,15 @@ class RespondenKuesionerController extends Controller
             if (!in_array($target, ['alumni', 'atasan'])) {
                 abort(404);
             }
-            $responden = DB::table('project_responden')->where('id', $id)->first();
-
+            $responden = DB::table('project_responden')
+                ->join('project', 'project_responden.project_id', '=', 'project.id')
+                ->select(
+                    'project_responden.*',
+                    'project.status',
+                    'project.kaldikID',
+                    'project.kaldikDesc'
+                )
+                ->where('project_responden.id', $id)->first();
             if (!$responden) {
                 abort(404);
             }
@@ -30,7 +37,6 @@ class RespondenKuesionerController extends Controller
 
     public function generateUrl($id, $target)
     {
-        // Pastikan target valid sebelum dienkripsi
         if (!in_array($target, ['alumni', 'atasan'])) {
             return response()->json(['error' => 'Target tidak valid'], 400);
         }
