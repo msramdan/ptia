@@ -75,8 +75,13 @@
 
 <body>
     <div class="container mt-4">
-        <div class="d-flex justify-content-center align-items-center mb-4">
-            <h5 class="fw-bold text-center">KUESIONER EVALUASI PEMBELAJARAN LEVEL 3 dan 4</h5>
+        <div class="d-flex flex-column align-items-center text-center mb-4" style="gap: 12px; padding: 15px;">
+            <img src="https://registrasi.bpkp.go.id/ptia/assets/logo/Post%20Training%20Impact%20Assesment.png"
+                alt="Logo PTIA" class="img-fluid" style="max-height: 90px; width: auto;">
+            <h4 class="fw-bold"
+                style="color: #284D80; font-size: 1.5rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 600;">
+                KUESIONER EVALUASI PEMBELAJARAN LEVEL 3 dan 4
+            </h4>
         </div>
 
         <!-- Informasi Diklat -->
@@ -334,6 +339,7 @@
                 </button>
             </div>
         @endif
+
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
