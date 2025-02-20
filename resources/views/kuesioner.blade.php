@@ -135,18 +135,22 @@
         <div class="card mb-4">
             <div class="card-body">
                 <h5 class="fw-bold mb-3">A. Kemampuan Membagikan Keilmuan</h5>
-                <p class="text-muted">1. Sangat tidak setuju <br> 2. Tidak setuju <br> 3. Setuju <br> 4. Sangat setuju
+                <p class="text-muted">
+                    1. Sangat tidak setuju <br>
+                    2. Tidak setuju <br>
+                    3. Setuju <br>
+                    4. Sangat setuju
                 </p>
-                <p class="fw-bold">Setelah mengikuti pelatihan, saya berbagi pengetahuan yang telah saya peroleh selama
+                <p class="fw-bold">
+                    Setelah mengikuti pelatihan, saya berbagi pengetahuan yang telah saya peroleh selama
                     pelatihan kepada rekan-rekan kerja saya melalui kegiatan pelatihan di kantor sendiri, FGD, sharing
-                    session, atau bentuk knowledge sharing lainnya
-                    dengan
-                    pelatihan ini.</p>
+                    session, atau bentuk knowledge sharing lainnya dengan pelatihan ini.
+                </p>
 
                 <div class="row">
+                    <!-- Sebelum Pelatihan -->
                     <div class="col-md-6 mb-3">
-                        <div class="card text-white p-2" style="background-color: #284D80"
-                            style="background-color: #284D80">
+                        <div class="card text-white p-2" style="background-color: #284D80">
                             <strong>Sebelum</strong>
                         </div>
                         <div class="p-3 bg-white">
@@ -158,6 +162,8 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Sesudah Pelatihan -->
                     <div class="col-md-6 mb-3">
                         <div class="card text-white p-2" style="background-color: #284D80">
                             <strong>Sesudah</strong>
@@ -172,8 +178,16 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Textarea untuk catatan umum -->
+                <div class="mt-1">
+                    <textarea name="catatan" id="catatan" class="form-control mt-2" rows="3"
+                        placeholder=""
+                        style="border: 1px solid #ddd; padding: 10px; border-radius: 5px;"></textarea>
+                </div>
             </div>
         </div>
+
 
         <div class="card mb-4">
             <div class="card-body">
@@ -211,6 +225,13 @@
                             </div>
                         </div>
                     </div>
+                </div>
+
+                <!-- Textarea untuk catatan umum -->
+                <div class="mt-1">
+                    <textarea name="catatan" id="catatan" class="form-control mt-2" rows="3"
+                        placeholder=""
+                        style="border: 1px solid #ddd; padding: 10px; border-radius: 5px;"></textarea>
                 </div>
             </div>
         </div>
@@ -251,6 +272,13 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Textarea untuk catatan umum -->
+                <div class="mt-1">
+                    <textarea name="catatan" id="catatan" class="form-control mt-2" rows="3"
+                        placeholder=""
+                        style="border: 1px solid #ddd; padding: 10px; border-radius: 5px;"></textarea>
+                </div>
             </div>
         </div>
 
@@ -290,6 +318,13 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Textarea untuk catatan umum -->
+                <div class="mt-1">
+                    <textarea name="catatan" id="catatan" class="form-control mt-2" rows="3"
+                        placeholder=""
+                        style="border: 1px solid #ddd; padding: 10px; border-radius: 5px;"></textarea>
+                </div>
             </div>
         </div>
 
@@ -328,6 +363,13 @@
                             </div>
                         </div>
                     </div>
+                </div>
+
+                <!-- Textarea untuk catatan umum -->
+                <div class="mt-1">
+                    <textarea name="catatan" id="catatan" class="form-control mt-2" rows="3"
+                        placeholder=""
+                        style="border: 1px solid #ddd; padding: 10px; border-radius: 5px;"></textarea>
                 </div>
             </div>
         </div>
