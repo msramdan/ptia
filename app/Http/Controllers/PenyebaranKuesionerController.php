@@ -75,35 +75,34 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
                     return "$sudah Alumni ($persentase%)";
                 })
 
+                // ->addColumn('config_alumni', function ($row) {
+                //     $waAlumni = route('penyebaran-kuesioner.pesan.wa.show', ['id' => $row->id]);
+                //     $kuesionerAlumni = route('penyebaran-kuesioner.kuesioner.show', ['id' => $row->id, 'remark' => 'Alumni']);
+                //     $bobotKuesioner = route('penyebaran-kuesioner.bobot.show', ['id' => $row->id]);
+                //     return '
+                //         <div class="d-flex flex-column">
+                //             <div class="d-flex gap-1 mb-1">
+                //                 <a href="' . $waAlumni . '"
+                //                    class="btn btn-sm btn-success"
+                //                    data-toggle="tooltip" data-placement="left" title="Pesan WA Alumni">
+                //                     <i class="fab fa-whatsapp"></i>
+                //                 </a>
+                //                 <a href="' . $kuesionerAlumni . '"
+                //                    class="btn btn-sm btn-primary"
+                //                    data-toggle="tooltip" data-placement="left" title="Kuesioner Alumni">
+                //                     <i class="fa fa-file"></i>
+                //                 </a>
+                //             </div>
 
-                ->addColumn('config_alumni', function ($row) {
-                    $waAlumni = route('penyebaran-kuesioner.pesan.wa.show', ['id' => $row->id]);
-                    $kuesionerAlumni = route('penyebaran-kuesioner.kuesioner.show', ['id' => $row->id, 'remark' => 'Alumni']);
-                    $bobotKuesioner = route('penyebaran-kuesioner.bobot.show', ['id' => $row->id]);
-                    return '
-                        <div class="d-flex flex-column">
-                            <div class="d-flex gap-1 mb-1">
-                                <a href="' . $waAlumni . '"
-                                   class="btn btn-sm btn-success"
-                                   data-toggle="tooltip" data-placement="left" title="Pesan WA Alumni">
-                                    <i class="fab fa-whatsapp"></i>
-                                </a>
-                                <a href="' . $kuesionerAlumni . '"
-                                   class="btn btn-sm btn-primary"
-                                   data-toggle="tooltip" data-placement="left" title="Kuesioner Alumni">
-                                    <i class="fa fa-file"></i>
-                                </a>
-                            </div>
-
-                            <div class="d-flex gap-1 mb-1">
-                                <a href="' . $bobotKuesioner . '"
-                                    class="btn btn-sm btn-danger"
-                                    data-toggle="tooltip" data-placement="left" title="Bobot Alumni">
-                                    <i class="fas fa-balance-scale"></i>
-                                 </a>
-                            </div>
-                        </div>';
-                })
+                //             <div class="d-flex gap-1 mb-1">
+                //                 <a href="' . $bobotKuesioner . '"
+                //                     class="btn btn-sm btn-danger"
+                //                     data-toggle="tooltip" data-placement="left" title="Bobot Alumni">
+                //                     <i class="fas fa-balance-scale"></i>
+                //                  </a>
+                //             </div>
+                //         </div>';
+                // })
 
 
                 ->addColumn('responden_atasan', function ($row) {
@@ -127,25 +126,25 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
                     return "$sudah Atasan ($persentase%)";
                 })
 
-                ->addColumn('config_atasan', function ($row) {
-                    $waAtasan = route('penyebaran-kuesioner.pesan.wa.show', ['id' => $row->id]);
-                    $kuesionerAtasan = route('penyebaran-kuesioner.kuesioner.show', ['id' => $row->id, 'remark' => 'Atasan']);
-                    return '
-                        <div class="text-center d-flex flex-column align-items-center">
-                            <div class="d-flex gap-1 mb-1">
-                                <a href="' . $waAtasan . '"
-                                   class="btn btn-sm btn-success"
-                                   data-toggle="tooltip" data-placement="left" title="Pesan WA Alumni">
-                                    <i class="fab fa-whatsapp"></i>
-                                </a>
-                                <a href="' . $kuesionerAtasan . '"
-                                   class="btn btn-sm btn-primary"
-                                   data-toggle="tooltip" data-placement="left" title="Kuesioner Alumni">
-                                    <i class="fa fa-file"></i>
-                                </a>
-                            </div>
-                        </div>';
-                })
+                // ->addColumn('config_atasan', function ($row) {
+                //     $waAtasan = route('penyebaran-kuesioner.pesan.wa.show', ['id' => $row->id]);
+                //     $kuesionerAtasan = route('penyebaran-kuesioner.kuesioner.show', ['id' => $row->id, 'remark' => 'Atasan']);
+                //     return '
+                //         <div class="text-center d-flex flex-column align-items-center">
+                //             <div class="d-flex gap-1 mb-1">
+                //                 <a href="' . $waAtasan . '"
+                //                    class="btn btn-sm btn-success"
+                //                    data-toggle="tooltip" data-placement="left" title="Pesan WA Alumni">
+                //                     <i class="fab fa-whatsapp"></i>
+                //                 </a>
+                //                 <a href="' . $kuesionerAtasan . '"
+                //                    class="btn btn-sm btn-primary"
+                //                    data-toggle="tooltip" data-placement="left" title="Kuesioner Alumni">
+                //                     <i class="fa fa-file"></i>
+                //                 </a>
+                //             </div>
+                //         </div>';
+                // })
 
 
                 ->addColumn('user', function ($row) {
@@ -198,14 +197,47 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
     public function showRespondenAlumni($id): View|JsonResponse
     {
         if (request()->ajax()) {
-            $respondens = DB::table('project_responden')
-                ->where('project_id', $id)
+            $respondens = DB::table('project_responden as pr')
+                ->where('pr.project_id', $id)
+                ->leftJoinSub(
+                    DB::table('project_log_send_notif as log1')
+                        ->select('log1.project_responden_id', 'log1.telepon', 'log1.status')
+                        ->whereRaw('log1.created_at = (SELECT MAX(log2.created_at) FROM project_log_send_notif as log2 WHERE log2.project_responden_id = log1.project_responden_id AND log2.telepon = log1.telepon)')
+                        ->orderByDesc('log1.created_at'),
+                    'log_wa',
+                    function ($join) {
+                        $join->on('pr.id', '=', 'log_wa.project_responden_id')
+                            ->on('pr.telepon', '=', 'log_wa.telepon');
+                    }
+                )
+                ->select('pr.*', 'log_wa.status as wa_status')
                 ->get();
 
             return DataTables::of($respondens)
                 ->addIndexColumn()
+                ->addColumn('telepon', function ($row) {
+                    $telepon = $row->telepon ?? '-';
+                    $badgeStyle = 'display: inline-block; width: 100px; text-align: center;';
+
+                    $badge = '<span class="badge bg-warning" style="'.$badgeStyle.'">
+                                <i class="fas fa-hourglass-half"></i> Menunggu
+                              </span>';
+
+                    if ($row->wa_status === 'Sukses') {
+                        $badge = '<span class="badge bg-success" style="'.$badgeStyle.'">
+                                    <i class="fas fa-check"></i> Sukses
+                                  </span>';
+                    } elseif ($row->wa_status === 'Gagal') {
+                        $badge = '<span class="badge bg-danger" style="'.$badgeStyle.'">
+                                    <i class="fas fa-times"></i> Gagal
+                                  </span>';
+                    }
+
+                    return $telepon . '<br>' . $badge;
+                })
+
                 ->addColumn('action', 'penyebaran-kuesioner.include.action-responden-alumni')
-                ->rawColumns(['action'])
+                ->rawColumns(['telepon', 'action'])
                 ->toJson();
         }
 

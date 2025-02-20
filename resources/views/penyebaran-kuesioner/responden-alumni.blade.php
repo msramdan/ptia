@@ -235,39 +235,40 @@
                         data: 'DT_RowIndex',
                         name: 'DT_RowIndex',
                         orderable: false,
-                        searchable: false,
+                        searchable: false
                     },
                     {
                         data: 'nama',
-                        name: 'nama',
+                        name: 'nama'
                     },
                     {
                         data: 'nip',
-                        name: 'nip',
+                        name: 'nip'
                     },
                     {
                         data: 'telepon',
                         name: 'telepon',
+                        className: 'text-center'
                     },
                     {
                         data: 'jabatan',
-                        name: 'jabatan',
+                        name: 'jabatan'
                     },
                     {
                         data: 'unit',
-                        name: 'unit',
+                        name: 'unit'
                     },
                     {
                         data: 'nilai_pre_test',
-                        name: 'nilai_pre_test',
+                        name: 'nilai_pre_test'
                     },
                     {
                         data: 'nilai_post_test',
-                        name: 'nilai_post_test',
+                        name: 'nilai_post_test'
                     },
                     {
                         data: 'action',
-                        name: 'action',
+                        name: 'action'
                     }
                 ],
             });

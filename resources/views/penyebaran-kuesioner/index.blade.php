@@ -41,18 +41,18 @@
                                             <th rowspan="2">{{ __('Dibuat Oleh') }}</th>
                                             <th rowspan="2">{{ __('Kode Diklat') }}</th>
                                             <th rowspan="2">{{ __('Nama Diklat') }}</th>
-                                            <th colspan="3" class="text-center">{{ __('Alumni') }}</th>
-                                            <th colspan="3" class="text-center">{{ __('Atasan') }}</th>
+                                            <th colspan="2" class="text-center">{{ __('Alumni') }}</th>
+                                            <th colspan="2" class="text-center">{{ __('Atasan') }}</th>
                                             <th rowspan="2">{{ __('Action') }}</th>
                                         </tr>
 
                                         <tr>
                                             <th class="text-center">Responden</th>
                                             <th class="text-center">Keterisian</th>
-                                            <th class="text-center">Config</th>
+                                            {{-- <th class="text-center">Config</th> --}}
                                             <th class="text-center">Responden</th>
                                             <th class="text-center">Keterisian</th>
-                                            <th class="text-center">Config</th>
+                                            {{-- <th class="text-center">Config</th> --}}
                                         </tr>
                                     </thead>
                                 </table>
@@ -134,11 +134,11 @@
                     name: 'keterisian_alumni',
                     className: 'text-center',
                 },
-                {
-                    data: 'config_alumni',
-                    name: 'config_alumni',
-                    className: 'text-center',
-                },
+                // {
+                //     data: 'config_alumni',
+                //     name: 'config_alumni',
+                //     className: 'text-center',
+                // },
                 {
                     data: 'responden_atasan',
                     name: 'responden_atasan',
@@ -151,11 +151,11 @@
                     name: 'keterisian_atasan',
                     className: 'text-center',
                 },
-                {
-                    data: 'config_atasan',
-                    name: 'config_atasan',
-                    className: 'text-center',
-                },
+                // {
+                //     data: 'config_atasan',
+                //     name: 'config_atasan',
+                //     className: 'text-center',
+                // },
                 {
                     data: 'action',
                     name: 'action',
