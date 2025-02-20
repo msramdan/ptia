@@ -202,6 +202,8 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
 
             return DataTables::of($respondens)
                 ->addIndexColumn()
+                ->addColumn('action', 'penyebaran-kuesioner.include.action_responden')
+                ->rawColumns(['action'])
                 ->toJson();
         }
 

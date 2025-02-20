@@ -48,7 +48,7 @@
             <ul class="mb-0">
                 <li><code>{params_target}</code> akan otomatis digantikan dengan <strong>"Saya"</strong> atau
                     <strong>"Alumni"</strong> di kuesioner project.</li>
-                <li><code>{params_kaldikDesc}</code> akan otomatis digantikan dengan <strong>Nama Diklat</strong> di
+                <li><code>{params_nama_diklat}</code> akan otomatis digantikan dengan <strong>Nama Diklat</strong> di
                     kuesioner project.</li>
             </ul>
         </div>

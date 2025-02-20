@@ -14,7 +14,8 @@
                 </div>
                 <x-breadcrumb>
                     <li class="breadcrumb-item"><a href="/">{{ __('Dashboard') }}</a></li>
-                    <li class="breadcrumb-item"><a href="{{ route('penyebaran-kuesioner.index') }}">{{ __('Penyebaran Kuesioner') }}</a></li>
+                    <li class="breadcrumb-item"><a
+                            href="{{ route('penyebaran-kuesioner.index') }}">{{ __('Penyebaran Kuesioner') }}</a></li>
                     <li class="breadcrumb-item active" aria-current="page">{{ __('Responden') }}</li>
                 </x-breadcrumb>
             </div>
@@ -111,6 +112,7 @@
                                             <th>{{ __('Unit') }}</th>
                                             <th>{{ __('Nilai Post Test') }}</th>
                                             <th>{{ __('Nilai Kenaikan Pre Post') }}</th>
+                                            <th>{{ __('Action') }}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -171,7 +173,7 @@
                 processing: true,
                 serverSide: true,
                 ajax: {
-                    url: "{{ route('project.responden.show', ':id') }}".replace(':id', projectId),
+                    url: "{{ route('penyebaran-kuesioner.responden.show', ':id') }}".replace(':id', projectId),
                     data: function(d) {}
                 },
                 columns: [{
@@ -208,6 +210,10 @@
                         data: 'nilai_post_test',
                         name: 'nilai_post_test',
                     },
+                    {
+                        data: 'action',
+                        name: 'action',
+                    }
                 ],
             });
         });
