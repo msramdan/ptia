@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kuesioner Evaluasi</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <style>
         body {
             background-color: #f4f7fc;
@@ -27,7 +28,7 @@
         .card-header {
             font-size: 1.2rem;
             font-weight: bold;
-            background-color: #0056b3;
+            background-color: #284D80;
             color: white;
             border-radius: 12px 12px 0 0;
             padding: 15px;
@@ -111,27 +112,24 @@
 
         <!-- Informasi Diklat -->
         <div class="card mb-4">
-            <div class="card-header bg-primary text-white"><strong>Informasi Diklat</strong></div>
+            <div class="card-header text-white"><strong>Informasi Diklat</strong></div>
             <div class="card-body">
                 <div class="row mb-2">
-                    <div class="col-md-3"><strong>Nama Project</strong></div>
+                    <div class="col-md-3"><strong>Kode Diklat</strong></div>
+                    <div class="col-md-9">DD20250113008</div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-md-3"><strong>Nama Diklat</strong></div>
                     <div class="col-md-9">Pelatihan dan Sertifikasi Certified Government Risk Assurer (CGRA) Tahun 2024
                         bagi Pegawai BPKP</div>
                 </div>
-                <div class="row mb-2">
-                    <div class="col-md-3"><strong>Kode Project</strong></div>
-                    <div class="col-md-9">DD20250113008</div>
-                </div>
-                <div class="row">
-                    <div class="col-md-3"><strong>Dibuat Oleh</strong></div>
-                    <div class="col-md-9">Cahyo</div>
-                </div>
+
             </div>
         </div>
 
         <!-- Form Kuesioner -->
         <div class="card mb-4">
-            <div class="card-header bg-primary text-white"><strong>Form Kuesioner</strong></div>
+            <div class="card-header text-white"><strong>Form Kuesioner</strong></div>
             <div class="card-body">
                 <div class="mb-3">
                     <label class="form-label"><strong>Nama</strong></label>
@@ -144,14 +142,6 @@
                 <div class="mb-3">
                     <label class="form-label"><strong>No. Whatsapp Atasan Langsung</strong></label>
                     <input type="text" class="form-control" placeholder="Contoh pengisian 081234567890">
-                </div>
-                <div class="mb-3">
-                    <label class="form-label"><strong>Responden</strong></label>
-                    <select class="form-select">
-                        <option selected>Alumni</option>
-                        <option>Peserta</option>
-                        <option>Instruktur</option>
-                    </select>
                 </div>
             </div>
         </div>
@@ -177,7 +167,8 @@
 
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <div class="card bg-primary text-white p-2">
+                        <div class="card text-white p-2" style="background-color: #284D80"
+                            style="background-color: #284D80">
                             <strong>Sebelum</strong>
                         </div>
                         <div class="p-3 bg-white">
@@ -190,7 +181,7 @@
                         </div>
                     </div>
                     <div class="col-md-6 mb-3">
-                        <div class="card bg-primary text-white p-2">
+                        <div class="card text-white p-2" style="background-color: #284D80">
                             <strong>Sesudah</strong>
                         </div>
                         <div class="p-3 bg-white">
@@ -217,7 +208,7 @@
 
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <div class="card bg-primary text-white p-2">
+                        <div class="card text-white p-2" style="background-color: #284D80">
                             <strong>Sebelum</strong>
                         </div>
                         <div class="p-3 bg-white">
@@ -230,7 +221,7 @@
                         </div>
                     </div>
                     <div class="col-md-6 mb-3">
-                        <div class="card bg-primary text-white p-2">
+                        <div class="card text-white p-2" style="background-color: #284D80">
                             <strong>Sesudah</strong>
                         </div>
                         <div class="p-3 bg-white">
@@ -256,7 +247,7 @@
 
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <div class="card bg-primary text-white p-2">
+                        <div class="card text-white p-2" style="background-color: #284D80">
                             <strong>Sebelum</strong>
                         </div>
                         <div class="p-3 bg-white">
@@ -269,7 +260,7 @@
                         </div>
                     </div>
                     <div class="col-md-6 mb-3">
-                        <div class="card bg-primary text-white p-2">
+                        <div class="card text-white p-2" style="background-color: #284D80">
                             <strong>Sesudah</strong>
                         </div>
                         <div class="p-3 bg-white">
@@ -295,7 +286,7 @@
 
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <div class="card bg-primary text-white p-2">
+                        <div class="card text-white p-2" style="background-color: #284D80">
                             <strong>Sebelum</strong>
                         </div>
                         <div class="p-3 bg-white">
@@ -308,7 +299,7 @@
                         </div>
                     </div>
                     <div class="col-md-6 mb-3">
-                        <div class="card bg-primary text-white p-2">
+                        <div class="card text-white p-2" style="background-color: #284D80">
                             <strong>Sesudah</strong>
                         </div>
                         <div class="p-3 bg-white">
@@ -326,7 +317,7 @@
 
         <div class="card mb-4">
             <div class="card-body">
-                <h5 class="fw-bold mb-3">B. Hasil Pelatihan</h5>
+                <h5 class="fw-bold mb-3">E. Hasil Pelatihan</h5>
                 <p class="text-muted">1. Sangat tidak setuju <br> 2. Tidak setuju <br> 3. Setuju <br> 4. Sangat setuju
                 </p>
                 <p class="fw-bold">Implementasi hasil pelatihan ini berdampak positif dalam meningkatkan kualitas
@@ -334,7 +325,7 @@
 
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <div class="card bg-primary text-white p-2">
+                        <div class="card text-white p-2" style="background-color: #284D80">
                             <strong>Sebelum</strong>
                         </div>
                         <div class="p-3 bg-white">
@@ -347,7 +338,7 @@
                         </div>
                     </div>
                     <div class="col-md-6 mb-3">
-                        <div class="card bg-primary text-white p-2">
+                        <div class="card text-white p-2" style="background-color: #284D80">
                             <strong>Sesudah</strong>
                         </div>
                         <div class="p-3 bg-white">
@@ -363,12 +354,13 @@
             </div>
         </div>
 
-        <!-- Tombol Submit -->
-        <div class="d-flex justify-content-end mb-4">
-            <button type="submit" class="btn btn-submit">Submit</button>
+        <div class="d-flex justify-content-center mb-4">
+            <button type="submit" class="btn btn-danger">
+                <i class="fas fa-paper-plane"></i> Jika Sudah Yakin, Klik untuk kirim data
+            </button>
         </div>
-    </div>
 
+    </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
