@@ -1,11 +1,13 @@
 <td>
-    <a href="#" class="btn btn-warning btn-sm" title="Klik untuk merubah nomor Responden Alumni">
+    <button type="button" class="btn btn-warning btn-sm edit-telepon-btn" data-id="{{ $model->id }}"
+        data-telepon="{{ $model->telepon }}">
         <i class="fa fa-phone"></i>
-    </a>
+    </button>
+
+
     <a href="#" class="btn btn-primary btn-sm" title="Klik untuk kirim link Kuesioner kepada Responden Alumni">
         <i class="fas fa-paper-plane"></i>
     </a>
-
     @php
         $encryptedId = encryptShort($model->id);
         $encryptedTarget = encryptShort('alumni');
@@ -18,7 +20,6 @@
         target="_blank">
         <i class="fas fa-clipboard-list" aria-hidden="true"></i>
     </a>
-
     <a href="#" class="btn btn-secondary btn-sm" title="Log pengiriman pesan WA">
         <i class="fa fa-history" aria-hidden="true"></i>
     </a>

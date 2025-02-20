@@ -3,6 +3,30 @@
 @section('title', __('Responden'))
 
 @section('content')
+    <div class="modal fade" id="editTeleponModal" tabindex="-1" aria-labelledby="editTeleponLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Update No.Telepon</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="responden_id">
+                    <div class="mb-3">
+                        <label for="telepon" class="form-label">No.Telepon</label>
+                        <input type="text" class="form-control" id="telepon" autocomplete="off">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-primary" id="saveTeleponBtn">Simpan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
     <div class="page-heading">
         <div class="page-title">
             <div class="row">
@@ -145,6 +169,7 @@
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/v/bs5/dt-1.12.0/datatables.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         $(document).ready(function() {
             @if (session('success'))
@@ -173,7 +198,8 @@
                 processing: true,
                 serverSide: true,
                 ajax: {
-                    url: "{{ route('penyebaran-kuesioner.responden.show', ':id') }}".replace(':id', projectId),
+                    url: "{{ route('penyebaran-kuesioner.responden.show', ':id') }}".replace(':id',
+                        projectId),
                     data: function(d) {}
                 },
                 columns: [{
@@ -215,6 +241,62 @@
                         name: 'action',
                     }
                 ],
+            });
+        });
+    </script>
+
+    <script>
+        $(document).on("click", ".edit-telepon-btn", function() {
+            let id = $(this).data("id");
+            let telepon = $(this).data("telepon");
+            $("#responden_id").val(id);
+            $("#telepon").val(telepon);
+            $("#editTeleponModal").modal("show");
+        });
+
+        $("#saveTeleponBtn").on("click", function() {
+            let id = $("#responden_id").val();
+            let telepon = $("#telepon").val();
+
+            $.ajax({
+                url: "{{ route('penyebaran-kuesioner.update.telepon') }}",
+                type: "POST",
+                data: {
+                    _token: "{{ csrf_token() }}",
+                    id: id,
+                    telepon: telepon,
+                },
+                success: function(response) {
+                    if (response.success) {
+                        Swal.fire({
+                            icon: "success",
+                            title: "Berhasil!",
+                            text: response.message,
+                            timer: 2000,
+                            showConfirmButton: false
+                        }).then(() => {
+                            location.reload(); // Reload halaman setelah sukses
+                        });
+                        $("#editTeleponModal").modal("hide");
+                    } else {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Oops...",
+                            text: "Terjadi kesalahan!",
+                        });
+                    }
+                },
+                error: function(xhr) {
+                    let errorMessage = "Gagal mengupdate nomor telepon.";
+                    if (xhr.responseJSON && xhr.responseJSON.errors) {
+                        errorMessage = Object.values(xhr.responseJSON.errors).join("\n");
+                    }
+                    Swal.fire({
+                        icon: "error",
+                        title: "Validasi Gagal!",
+                        text: errorMessage,
+                    });
+                },
             });
         });
     </script>

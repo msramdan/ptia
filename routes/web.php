@@ -64,13 +64,16 @@ Route::middleware(['auth', 'web'])->group(function () {
         Route::get('/', 'index')->name('penyebaran-kuesioner.index');
         // Kuesioner
         Route::get('/kuesioner/show/{id}/{remark}', 'showKuesioner')->name('penyebaran-kuesioner.kuesioner.show');
-        // responden
+        // Responden
         Route::get('/responden/show/{id}', 'showResponden')->name('penyebaran-kuesioner.responden.show');
-        //pesat wa
+        // Pesan WA
         Route::get('/pesan-wa/show/{id}', 'showPesanWa')->name('penyebaran-kuesioner.pesan.wa.show');
-        //Bobot
+        // Bobot
         Route::get('/bobot/show/{id}', 'showBobot')->name('penyebaran-kuesioner.bobot.show');
+        // Update Telepon Responden
+        Route::post('/responden/update-telepon', 'updateTelepon')->name('penyebaran-kuesioner.update.telepon');
     });
+
 
 
 

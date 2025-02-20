@@ -3,6 +3,7 @@
 @section('title', __('Management Project'))
 
 @section('content')
+
     <div class="page-heading">
         <div class="page-title">
             <div class="row">
@@ -141,7 +142,7 @@
             ],
         });
     </script>
-    
+
     <script>
         $(document).ready(function() {
             // Event delegation untuk tombol Update Status

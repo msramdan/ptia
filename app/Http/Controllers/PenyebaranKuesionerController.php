@@ -10,6 +10,8 @@ use Illuminate\Routing\Controllers\{HasMiddleware, Middleware};
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Validator;
+
 
 class PenyebaranKuesionerController extends Controller implements HasMiddleware
 {
@@ -264,4 +266,39 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
 
         return view('penyebaran-kuesioner.bobot', compact('project', 'level3', 'level4', 'dataSecondary'));
     }
+
+    public function updateTelepon(Request $request)
+    {
+        // Validasi input
+        $validator = Validator::make($request->all(), [
+            'id' => 'required|exists:project_responden,id',
+            'telepon' => 'required|string|min:10|max:15',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validasi gagal!',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        try {
+            // Update nomor telepon menggunakan Query Builder
+            DB::table('project_responden')
+                ->where('id', $request->id)
+                ->update(['telepon' => $request->telepon]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Nomor telepon berhasil diperbarui!',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat memperbarui data!',
+            ], 500);
+        }
+    }
+
 }
