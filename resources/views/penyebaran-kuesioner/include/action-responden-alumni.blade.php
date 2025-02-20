@@ -4,10 +4,11 @@
         <i class="fa fa-phone"></i>
     </button>
 
-
-    <a href="#" class="btn btn-primary btn-sm" title="Klik untuk kirim link Kuesioner kepada Responden Alumni">
+    <a href="#" class="btn btn-primary btn-sm send-wa-btn" title="Kirim link Kuesioner ke WhatsApp"
+        data-id="{{ $model->id }}" data-remark="Alumni">
         <i class="fas fa-paper-plane"></i>
     </a>
+
     @php
         $encryptedId = encryptShort($model->id);
         $encryptedTarget = encryptShort('alumni');

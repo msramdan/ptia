@@ -55,7 +55,7 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
             return DataTables::of($projects)
                 ->addIndexColumn()
                 ->addColumn('responden_alumni', function ($row) {
-                    $showAlumni = route('penyebaran-kuesioner.responden.show', ['id' => $row->id]);
+                    $showAlumni = route('penyebaran-kuesioner.responden-alumni.show', ['id' => $row->id]);
                     return '
                         <div class="text-center">
                             <a href="' . $showAlumni . '"
@@ -107,7 +107,7 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
 
 
                 ->addColumn('responden_atasan', function ($row) {
-                    $showAtasan = route('penyebaran-kuesioner.responden.show', ['id' => $row->id]);
+                    $showAtasan = route('penyebaran-kuesioner.responden-alumni.show', ['id' => $row->id]);
                     return '
                         <div class="text-center">
                              <a href="' . $showAtasan . '"
@@ -195,7 +195,7 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
         return view('penyebaran-kuesioner.kuesioner', compact('project', 'kuesioners', 'remark', 'aspeks'));
     }
 
-    public function showResponden($id): View|JsonResponse
+    public function showRespondenAlumni($id): View|JsonResponse
     {
         if (request()->ajax()) {
             $respondens = DB::table('project_responden')
@@ -204,7 +204,7 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
 
             return DataTables::of($respondens)
                 ->addIndexColumn()
-                ->addColumn('action', 'penyebaran-kuesioner.include.action_responden')
+                ->addColumn('action', 'penyebaran-kuesioner.include.action-responden-alumni')
                 ->rawColumns(['action'])
                 ->toJson();
         }
@@ -225,7 +225,7 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
             ->where('project.id', $id)
             ->first();
 
-        return view('penyebaran-kuesioner.responden', compact('project', 'kriteriaResponden'));
+        return view('penyebaran-kuesioner.responden-alumni', compact('project', 'kriteriaResponden'));
     }
 
     public function showPesanWa($id)
@@ -269,10 +269,10 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
 
     public function updateTelepon(Request $request)
     {
-        // Validasi input
         $validator = Validator::make($request->all(), [
             'id' => 'required|exists:project_responden,id',
             'telepon' => 'required|string|min:10|max:15',
+            'remark' => 'required|in:Alumni,Atasan',
         ]);
 
         if ($validator->fails()) {
@@ -284,10 +284,11 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
         }
 
         try {
-            // Update nomor telepon menggunakan Query Builder
+            $fieldToUpdate = $request->remark === 'Alumni' ? 'telepon' : 'telepon_atasan';
+
             DB::table('project_responden')
                 ->where('id', $request->id)
-                ->update(['telepon' => $request->telepon]);
+                ->update([$fieldToUpdate => $request->telepon]);
 
             return response()->json([
                 'success' => true,
@@ -301,4 +302,68 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
         }
     }
 
+    public function sendNotifWa(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'id' => 'required|exists:project_responden,id',
+            'remark' => 'required|in:Alumni,Atasan',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validasi gagal!',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        try {
+            // Ambil data responden berdasarkan ID
+            $responden = DB::table('project_responden')->where('id', $request->id)->first();
+
+            if (!$responden) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Data responden tidak ditemukan!',
+                ], 404);
+            }
+
+            // Pilih nomor telepon berdasarkan remark
+            $telepon = $request->remark === 'Alumni' ? $responden->telepon : $responden->telepon_atasan;
+
+            if (!$telepon) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Nomor telepon tidak ditemukan!',
+                ], 400);
+            }
+
+            // Simulasi pengiriman WhatsApp (nanti diganti dengan API WA)
+            $responseWa = [
+                'status' => true, // Seolah-olah sukses
+                'message' => 'Notifikasi WhatsApp berhasil dikirim!',
+            ];
+
+            // Simpan log pengiriman notifikasi
+            DB::table('project_log_send_notif')->insert([
+                'telepon' => $telepon,
+                'remark' => $request->remark,
+                'status' => $responseWa['status'] ? 'Sukses' : 'Gagal',
+                'project_responden_id' => $responden->id,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            return response()->json([
+                'success' => $responseWa['status'],
+                'message' => $responseWa['message'],
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal mengirim notifikasi.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
 }

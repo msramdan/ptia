@@ -14,6 +14,7 @@
                     <input type="hidden" id="responden_id">
                     <div class="mb-3">
                         <label for="telepon" class="form-label">No.Telepon</label>
+                        <input type="text" class="form-control" id="remark" value="Alumni" autocomplete="off">
                         <input type="text" class="form-control" id="telepon" autocomplete="off">
                     </div>
                 </div>
@@ -170,6 +171,7 @@
     <script type="text/javascript" src="https://cdn.datatables.net/v/bs5/dt-1.12.0/datatables.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
         $(document).ready(function() {
             @if (session('success'))
@@ -191,6 +193,7 @@
             @endif
         });
     </script>
+
     <script>
         $(document).ready(function() {
             var projectId = @json($project->id);
@@ -198,7 +201,7 @@
                 processing: true,
                 serverSide: true,
                 ajax: {
-                    url: "{{ route('penyebaran-kuesioner.responden.show', ':id') }}".replace(':id',
+                    url: "{{ route('penyebaran-kuesioner.responden-alumni.show', ':id') }}".replace(':id',
                         projectId),
                     data: function(d) {}
                 },
@@ -257,6 +260,7 @@
         $("#saveTeleponBtn").on("click", function() {
             let id = $("#responden_id").val();
             let telepon = $("#telepon").val();
+            let remark = $("#remark").val();
 
             $.ajax({
                 url: "{{ route('penyebaran-kuesioner.update.telepon') }}",
@@ -265,6 +269,7 @@
                     _token: "{{ csrf_token() }}",
                     id: id,
                     telepon: telepon,
+                    remark: remark,
                 },
                 success: function(response) {
                     if (response.success) {
@@ -275,9 +280,10 @@
                             timer: 2000,
                             showConfirmButton: false
                         }).then(() => {
-                            location.reload(); // Reload halaman setelah sukses
+                            $("#editTeleponModal").modal("hide");
+                            $("#data-table").DataTable().ajax.reload(null,
+                                false); // 🔄 Refresh DataTables tanpa reload halaman
                         });
-                        $("#editTeleponModal").modal("hide");
                     } else {
                         Swal.fire({
                             icon: "error",
@@ -297,6 +303,47 @@
                         text: errorMessage,
                     });
                 },
+            });
+        });
+    </script>
+
+    <script>
+        $(document).on("click", ".send-wa-btn", function() {
+            let id = $(this).data("id");
+            let remark = $(this).data("remark");
+
+            Swal.fire({
+                title: "Kirim Notifikasi?",
+                text: "Apakah Anda yakin ingin mengirim link kuesioner via WhatsApp?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Ya, Kirim",
+                cancelButtonText: "Batal",
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: "{{ route('penyebaran-kuesioner.send.wa') }}",
+                        type: "POST",
+                        data: {
+                            _token: "{{ csrf_token() }}",
+                            id: id,
+                            remark: remark
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                Swal.fire("Berhasil!", response.message, "success");
+                                $("#data-table").DataTable().ajax.reload(null,
+                                false); // 🔄 Refresh DataTables tanpa reload halaman
+                            } else {
+                                Swal.fire("Gagal!", response.message, "error");
+                            }
+                        },
+                        error: function() {
+                            Swal.fire("Gagal!", "Terjadi kesalahan saat mengirim notifikasi.",
+                                "error");
+                        },
+                    });
+                }
             });
         });
     </script>

@@ -64,18 +64,17 @@ Route::middleware(['auth', 'web'])->group(function () {
         Route::get('/', 'index')->name('penyebaran-kuesioner.index');
         // Kuesioner
         Route::get('/kuesioner/show/{id}/{remark}', 'showKuesioner')->name('penyebaran-kuesioner.kuesioner.show');
-        // Responden
-        Route::get('/responden/show/{id}', 'showResponden')->name('penyebaran-kuesioner.responden.show');
+        // Responden Alumni
+        Route::get('/responden-alumni/show/{id}', 'showRespondenAlumni')->name('penyebaran-kuesioner.responden-alumni.show');
         // Pesan WA
         Route::get('/pesan-wa/show/{id}', 'showPesanWa')->name('penyebaran-kuesioner.pesan.wa.show');
         // Bobot
         Route::get('/bobot/show/{id}', 'showBobot')->name('penyebaran-kuesioner.bobot.show');
         // Update Telepon Responden
         Route::post('/responden/update-telepon', 'updateTelepon')->name('penyebaran-kuesioner.update.telepon');
+        // Kirim Notifikasi WhatsApp
+        Route::post('/send-wa', 'sendNotifWa')->name('penyebaran-kuesioner.send.wa');
     });
-
-
-
 
     Route::get('/bobot-aspek', [BobotAspekController::class, 'index'])->name('bobot-aspek.index');
     Route::put('/bobot-aspek', [BobotAspekController::class, 'update'])->name('bobot-aspek.update');
