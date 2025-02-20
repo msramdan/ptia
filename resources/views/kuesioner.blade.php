@@ -101,19 +101,20 @@
             <div class="card-header text-white"><strong>Form Kuesioner</strong></div>
             <div class="card-body">
                 <div class="mb-3">
-                    <label class="form-label"><strong>Nama</strong></label>
-                    <input type="text" class="form-control" value="196605091994032001 - Chairani" readonly>
+                    <label class="form-label" style="margin-bottom: 4px;"><strong>Nama</strong></label>
+                    <input type="text" class="form-control" value="196605091994032001 - Ramdan" readonly>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label"><strong>Nama Atasan Langsung</strong></label>
-                    <input type="text" class="form-control" placeholder="Nama Atasan Langsung">
+                    <label class="form-label" style="margin-bottom: 4px;"><strong>Nama Atasan Langsung</strong></label>
+                    <input type="text" class="form-control">
                 </div>
                 <div class="mb-3">
-                    <label class="form-label"><strong>No. Whatsapp Atasan Langsung</strong></label>
-                    <input type="text" class="form-control" placeholder="Contoh pengisian 081234567890">
+                    <label class="form-label" style="margin-bottom: 4px;"><strong>No. Whatsapp Atasan Langsung</strong></label>
+                    <input type="number" class="form-control" placeholder="Contoh pengisian 081234567890">
                 </div>
             </div>
         </div>
+
 
         <!-- Uraian -->
         <div class="alert alert-warning mb-4" role="alert" style="text-align: justify">
