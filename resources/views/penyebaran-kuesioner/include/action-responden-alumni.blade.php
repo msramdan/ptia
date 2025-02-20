@@ -1,11 +1,13 @@
 <td>
-    <button type="button" class="btn btn-warning btn-sm edit-telepon-btn" data-id="{{ $model->id }}"
-        data-telepon="{{ $model->telepon }}">
-        <i class="fa fa-phone"></i>
-    </button>
+
+    <a href="#" class="btn btn-warning btn-sm edit-telepon-btn" data-id="{{ $model->id }}"
+        data-telepon="{{ $model->telepon }}" data-nama="{{ $model->nama }}" title="Edit No. Telepon">
+        <i class="fas fa-phone"></i>
+    </a>
 
     <a href="#" class="btn btn-primary btn-sm send-wa-btn" title="Kirim link Kuesioner ke WhatsApp"
-        data-id="{{ $model->id }}" data-remark="Alumni">
+        data-id="{{ $model->id }}" data-remark="Alumni" data-nama="{{ $model->nama }}"
+        data-telepon="{{ $model->telepon }}">
         <i class="fas fa-paper-plane"></i>
     </a>
 
@@ -21,7 +23,9 @@
         target="_blank">
         <i class="fas fa-clipboard-list" aria-hidden="true"></i>
     </a>
-    <a href="#" class="btn btn-secondary btn-sm" title="Log pengiriman pesan WA">
+    <a href="#" class="btn btn-secondary btn-sm log-wa-btn" title="Log pengiriman pesan WA"
+        data-id="{{ $model->id }}" data-remark="Alumni"  data-nama="{{ $model->nama }}">
         <i class="fa fa-history" aria-hidden="true"></i>
     </a>
+
 </td>

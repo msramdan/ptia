@@ -340,7 +340,7 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
 
             // Simulasi pengiriman WhatsApp (nanti diganti dengan API WA)
             $responseWa = [
-                'status' => true, // Seolah-olah sukses
+                'status' => true,
                 'message' => 'Notifikasi WhatsApp berhasil dikirim!',
             ];
 
@@ -365,5 +365,22 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
                 'error' => $e->getMessage(),
             ], 500);
         }
+    }
+
+    public function getLogNotifWa(Request $request)
+    {
+        $id = $request->id;
+        $remark = $request->remark;
+        $logs = DB::table('project_log_send_notif')
+            ->where('project_responden_id', $id)
+            ->where('remark', $remark)
+            ->orderBy('created_at', 'desc');
+
+
+        return DataTables::of($logs)
+            ->addColumn('telepon', function ($log) {
+                return $log->remark === 'Alumni' ? $log->telepon : $log->telepon_atasan;
+            })
+            ->make(true);
     }
 }

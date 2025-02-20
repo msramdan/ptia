@@ -74,7 +74,10 @@ Route::middleware(['auth', 'web'])->group(function () {
         Route::post('/responden/update-telepon', 'updateTelepon')->name('penyebaran-kuesioner.update.telepon');
         // Kirim Notifikasi WhatsApp
         Route::post('/send-wa', 'sendNotifWa')->name('penyebaran-kuesioner.send.wa');
+        // Log Pengiriman WhatsApp
+        Route::get('/log-wa', 'getLogNotifWa')->name('penyebaran-kuesioner.log.wa');
     });
+
 
     Route::get('/bobot-aspek', [BobotAspekController::class, 'index'])->name('bobot-aspek.index');
     Route::put('/bobot-aspek', [BobotAspekController::class, 'update'])->name('bobot-aspek.update');

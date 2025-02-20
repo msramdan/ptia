@@ -3,18 +3,19 @@
 @section('title', __('Responden'))
 
 @section('content')
+    {{-- Modal update no telpon --}}
     <div class="modal fade" id="editTeleponModal" tabindex="-1" aria-labelledby="editTeleponLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Update No.Telepon</h5>
+                    <h5 class="modal-title" id="editTeleponLabel">Update No.Telepon - <span id="namaResponden"></span></h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <input type="hidden" id="responden_id">
                     <div class="mb-3">
                         <label for="telepon" class="form-label">No.Telepon</label>
-                        <input type="text" class="form-control" id="remark" value="Alumni" autocomplete="off">
+                        <input type="hidden" class="form-control" id="remark" value="Alumni" autocomplete="off">
                         <input type="text" class="form-control" id="telepon" autocomplete="off">
                     </div>
                 </div>
@@ -27,6 +28,31 @@
     </div>
 
 
+    <!-- Modal Log Pengiriman -->
+    <div class="modal fade" id="logWaModal" tabindex="-1" aria-labelledby="logWaModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="logWaModalLabel">Log Pengiriman WhatsApp - <span
+                            id="logNamaResponden"></span></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <table id="logWaTable" class="table table-sm table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Telepon</th>
+                                <th>Remark</th>
+                                <th>Status</th>
+                                <th>Tanggal</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="page-heading">
         <div class="page-title">
@@ -252,10 +278,14 @@
         $(document).on("click", ".edit-telepon-btn", function() {
             let id = $(this).data("id");
             let telepon = $(this).data("telepon");
+            let nama = $(this).data("nama");
+
             $("#responden_id").val(id);
             $("#telepon").val(telepon);
+            $("#namaResponden").text(nama);
             $("#editTeleponModal").modal("show");
         });
+
 
         $("#saveTeleponBtn").on("click", function() {
             let id = $("#responden_id").val();
@@ -311,10 +341,12 @@
         $(document).on("click", ".send-wa-btn", function() {
             let id = $(this).data("id");
             let remark = $(this).data("remark");
+            let nama = $(this).data("nama");
+            let telepon = $(this).data("telepon");
 
             Swal.fire({
                 title: "Kirim Notifikasi?",
-                text: "Apakah Anda yakin ingin mengirim link kuesioner via WhatsApp?",
+                text: `Apakah Anda yakin ingin mengirim link kuesioner ke ${nama} (${telepon}) via WhatsApp?`,
                 icon: "warning",
                 showCancelButton: true,
                 confirmButtonText: "Ya, Kirim",
@@ -332,8 +364,7 @@
                         success: function(response) {
                             if (response.success) {
                                 Swal.fire("Berhasil!", response.message, "success");
-                                $("#data-table").DataTable().ajax.reload(null,
-                                false); // 🔄 Refresh DataTables tanpa reload halaman
+                                $("#data-table").DataTable().ajax.reload(null, false);
                             } else {
                                 Swal.fire("Gagal!", response.message, "error");
                             }
@@ -344,6 +375,62 @@
                         },
                     });
                 }
+            });
+        });
+    </script>
+
+    {{-- Log pengiriman pesan wa --}}
+    <script>
+        $(document).on("click", ".log-wa-btn", function() {
+            let id = $(this).data("id");
+            let remark = $(this).data("remark");
+            let nama = $(this).data("nama"); // Ambil nama responden
+
+            $("#logNamaResponden").text(nama); // Tampilkan nama di modal
+            $("#logWaModal").modal("show");
+
+            // Hancurkan DataTables jika sudah ada, agar tidak ada duplikasi data lama
+            if ($.fn.DataTable.isDataTable("#logWaTable")) {
+                $("#logWaTable").DataTable().destroy();
+                $("#logWaTable tbody").empty();
+            }
+
+            // Inisialisasi ulang DataTables
+            $("#logWaTable").DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url: "{{ route('penyebaran-kuesioner.log.wa') }}",
+                    type: "GET",
+                    data: {
+                        id: id,
+                        remark: remark
+                    }
+                },
+                columns: [{
+                        data: "telepon",
+                        name: "telepon"
+                    },
+                    {
+                        data: "remark",
+                        name: "remark"
+                    },
+                    {
+                        data: "status",
+                        name: "status",
+                        render: function(data) {
+                            if (data === "Sukses") {
+                                return '<span class="badge bg-success">Sukses</span>';
+                            } else {
+                                return '<span class="badge bg-danger">Gagal</span>';
+                            }
+                        }
+                    },
+                    {
+                        data: "created_at",
+                        name: "created_at"
+                    }
+                ]
             });
         });
     </script>
