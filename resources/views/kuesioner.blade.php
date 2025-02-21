@@ -98,7 +98,7 @@
 
         /* Warna full tanpa padding */
         .radio-group input[type="radio"]:checked+span {
-            background: #0056b3;
+            background: green;
             color: white;
             border-radius: 6px;
             width: 100%;
@@ -281,7 +281,7 @@
                     if (selectedValueSesudah == "1" || selectedValueSesudah == "2") {
                         requiresTextarea = true;
                         warningText =
-                            '<i class="fas fa-exclamation-triangle fa-2x"></i> Anda memberikan skor 1 atau 2 pada periode sesudah pelatihan. Jelaskan alasannya di area catatan.';
+                            '<i class="fas fa-exclamation-triangle fa-2x"></i> Anda memberikan skor 1 atau 2 pada periode sesudah pelatihan. Jelaskan alasannya.';
                     }
 
                     if (beforeValue && selectedValueSesudah && parseInt(selectedValueSesudah) <= parseInt(
@@ -289,10 +289,10 @@
                         requiresTextarea = true;
                         if (warningText) {
                             warningText =
-                                '<i class="fas fa-exclamation-triangle fa-2x"></i> Anda memberikan skor 1 atau 2 pada periode sesudah pelatihan, dan nilai sesudah sama atau lebih rendah dari sebelum pelatihan. Jelaskan alasannya di area catatan.';
+                                '<i class="fas fa-exclamation-triangle fa-2x"></i> Anda memberikan skor 1 atau 2 pada periode sesudah pelatihan, dan nilai sesudah sama atau lebih rendah dari sebelum pelatihan. Jelaskan alasannya.';
                         } else {
                             warningText =
-                                '<i class="fas fa-exclamation-triangle fa-2x"></i> Anda memberikan skor sesudah sama atau lebih rendah dari sebelum pelatihan. Jelaskan alasannya di area catatan.';
+                                '<i class="fas fa-exclamation-triangle fa-2x"></i> Anda memberikan skor sesudah sama atau lebih rendah dari sebelum pelatihan. Jelaskan alasannya.';
                         }
                     }
 
@@ -335,7 +335,7 @@
                     if (selectedValueSesudah == "1" || selectedValueSesudah == "2") {
                         requiresTextarea = true;
                         warningText =
-                            '<i class="fas fa-exclamation-triangle fa-2x"></i> Anda memberikan skor 1 atau 2 pada periode sesudah pelatihan. Jelaskan alasannya di area catatan.';
+                            '<i class="fas fa-exclamation-triangle fa-2x"></i> Anda memberikan skor 1 atau 2 pada periode sesudah pelatihan. Jelaskan alasannya.';
                     }
 
                     if (beforeValue && selectedValueSesudah && parseInt(selectedValueSesudah) <= parseInt(
@@ -343,10 +343,10 @@
                         requiresTextarea = true;
                         if (warningText) {
                             warningText =
-                                '<i class="fas fa-exclamation-triangle fa-2x"></i> Anda memberikan skor 1 atau 2 pada periode sesudah pelatihan, dan nilai sesudah sama atau lebih rendah dari sebelum pelatihan. Jelaskan alasannya di area catatan.';
+                                '<i class="fas fa-exclamation-triangle fa-2x"></i> Anda memberikan skor 1 atau 2 pada periode sesudah pelatihan, dan nilai sesudah sama atau lebih rendah dari sebelum pelatihan. Jelaskan alasannya.';
                         } else {
                             warningText =
-                                '<i class="fas fa-exclamation-triangle fa-2x"></i> Anda memberikan skor sesudah sama atau lebih rendah dari sebelum pelatihan. Jelaskan alasannya di area catatan.';
+                                '<i class="fas fa-exclamation-triangle fa-2x"></i> Anda memberikan skor sesudah sama atau lebih rendah dari sebelum pelatihan. Jelaskan alasannya.';
                         }
                     }
 
