@@ -1,11 +1,11 @@
 <td>
 
     <a href="#" class="btn btn-warning btn-sm edit-telepon-btn" data-id="{{ $model->id }}"
-        data-telepon="{{ $model->telepon_atasan }}" data-nama="{{ $model->nama_atasan }}"  title="Edit No. Telepon">
+        data-telepon="{{ $model->telepon_atasan }}" data-nama="{{ $model->nama_atasan }}"  title="Edit No. Telepon Atasan Langsung">
         <i class="fas fa-phone"></i>
     </a>
 
-    <a href="#" class="btn btn-primary btn-sm send-wa-btn" title="Kirim link Kuesioner ke WhatsApp"
+    <a href="#" class="btn btn-primary btn-sm send-wa-btn" title="Kirim link Kuesioner ke WhatsApp Atasan Langsung"
         data-id="{{ $model->id }}" data-remark="Atasan" data-nama="{{ $model->nama_atasan }}"
         data-telepon="{{ $model->telepon_atasan }}">
         <i class="fas fa-paper-plane"></i>
