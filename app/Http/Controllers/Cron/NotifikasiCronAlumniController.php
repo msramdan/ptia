@@ -19,10 +19,10 @@ class NotifikasiCronAlumniController extends Controller
         $currentDay = Carbon::now()->dayOfWeek;
 
         // Cek apakah waktu di luar jam kerja atau hari Sabtu/Minggu
-        // if ($currentHour < 7 || $currentHour >= 17 || $currentDay === 0 || $currentDay === 6) {
-        //     Log::info("Cron job dihentikan karena di luar jam kerja atau hari libur (Sabtu/Minggu).");
-        //     return response()->json(['message' => 'Di luar jam kerja atau hari libur, cron tidak dieksekusi.'], 200);
-        // }
+        if ($currentHour < 7 || $currentHour >= 17 || $currentDay === 0 || $currentDay === 6) {
+            Log::info("Cron job dihentikan karena di luar jam kerja atau hari libur (Sabtu/Minggu).");
+            return response()->json(['message' => 'Di luar jam kerja atau hari libur, cron tidak dieksekusi.'], 200);
+        }
 
         $startTime = Carbon::now()->format('Y-m-d H:i:s');
         sendNotifTelegram("🚀 *Cron Job Dimulai* \n📅 Waktu Mulai: *{$startTime}* \nMengirim notifikasi ke alumni...", $type);
