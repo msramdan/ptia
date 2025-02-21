@@ -109,7 +109,7 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
 
 
                 ->addColumn('responden_atasan', function ($row) {
-                    $showAtasan = route('penyebaran-kuesioner.responden-alumni.show', ['id' => $row->id]);
+                    $showAtasan = route('penyebaran-kuesioner.responden-atasan.show', ['id' => $row->id]);
                     return '
                         <div class="text-center">
                              <a href="' . $showAtasan . '"
@@ -122,7 +122,7 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
                 })
 
                 ->addColumn('keterisian_atasan', function ($row) {
-                    $total = $row->total_responden ?: 1; // Hindari pembagian dengan nol
+                    $total = $row->total_responden ?: 1;
                     $sudah = $row->total_sudah_isi_atasan;
                     $persentase = round(($sudah / $total) * 100, 2);
 
@@ -261,6 +261,72 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
             ->first();
 
         return view('penyebaran-kuesioner.responden-alumni', compact('project', 'kriteriaResponden'));
+    }
+
+    public function showRespondenAtasan($id): View|JsonResponse
+    {
+        if (request()->ajax()) {
+            $respondens = DB::table('project_responden as pr')
+                ->where('pr.project_id', $id)
+                ->leftJoinSub(
+                    DB::table('project_log_send_notif as log1')
+                        ->select('log1.project_responden_id', 'log1.telepon', 'log1.status')
+                        ->whereRaw('log1.created_at = (SELECT MAX(log2.created_at) FROM project_log_send_notif as log2 WHERE log2.project_responden_id = log1.project_responden_id AND log2.telepon = log1.telepon)')
+                        ->orderByDesc('log1.created_at'),
+                    'log_wa',
+                    function ($join) {
+                        $join->on('pr.id', '=', 'log_wa.project_responden_id')
+                            ->on('pr.telepon', '=', 'log_wa.telepon');
+                    }
+                )
+                ->select('pr.*', 'log_wa.status as wa_status')
+                ->get();
+
+            return DataTables::of($respondens)
+                ->addIndexColumn()
+                ->addColumn('telepon', function ($row) {
+                    $telepon = $row->telepon ?? '-';
+                    $badgeStyle = 'display: inline-block; width: 100px; text-align: center;';
+
+                    $badge = '<span class="badge bg-warning" style="' . $badgeStyle . '">
+                                <i class="fas fa-hourglass-half"></i> Menunggu
+                              </span>';
+
+                    if ($row->wa_status === 'Sukses') {
+                        $badge = '<span class="badge bg-success" style="' . $badgeStyle . '">
+                                    <i class="fas fa-check"></i> Sukses
+                                  </span>';
+                    } elseif ($row->wa_status === 'Gagal') {
+                        $badge = '<span class="badge bg-danger" style="' . $badgeStyle . '">
+                                    <i class="fas fa-times"></i> Gagal
+                                  </span>';
+                    }
+
+                    return $telepon . '<br>' . $badge;
+                })
+
+                ->addColumn('action', 'penyebaran-kuesioner.include.action-responden-atasan')
+                ->rawColumns(['telepon', 'action'])
+                ->toJson();
+        }
+
+        $kriteriaResponden = DB::table('project_kriteria_responden')
+            ->where('project_id', $id)
+            ->first();
+
+        if (!$kriteriaResponden) {
+            abort(404, 'Kriteria Responden tidak ditemukan');
+        }
+
+        $kriteriaResponden->nilai_post_test = json_decode($kriteriaResponden->nilai_post_test, true);
+
+        $project = DB::table('project')
+            ->join('users', 'project.user_id', '=', 'users.id')
+            ->select('project.*', 'users.name as user_name')
+            ->where('project.id', $id)
+            ->first();
+
+        return view('penyebaran-kuesioner.responden-atasan', compact('project', 'kriteriaResponden'));
     }
 
     public function showPesanWa($id)

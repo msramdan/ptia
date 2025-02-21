@@ -60,7 +60,7 @@
                 <div class="col-12 col-md-8 order-md-1 order-last">
                     <h3>{{ __('Responden') }}</h3>
                     <p class="text-subtitle text-muted">
-                        {{ __('Berikut adalah daftar responden Alumni dari project.') }}
+                        {{ __('Berikut adalah daftar responden Atasan Langsung dari project.') }}
                     </p>
                 </div>
                 <x-breadcrumb>
@@ -96,10 +96,9 @@
                             </a>
                         </div>
                     </div>
-
                     <div class="card">
                         <div class="card-body">
-                            <h5>Daftar Responden Alumni</h5>
+                            <h5>Daftar Responden Atasan Langsung</h5>
                             <div class="table-responsive p-1">
                                 <table class="table table-striped" id="data-table" width="100%">
                                     <thead>
@@ -107,11 +106,8 @@
                                             <th>#</th>
                                             <th>{{ __('Nama peserta') }}</th>
                                             <th>{{ __('NIP') }}</th>
-                                            <th>{{ __('No.Telepon') }}</th>
-                                            <th>{{ __('Jabatan') }}</th>
-                                            <th>{{ __('Unit') }}</th>
-                                            <th>{{ __('Nilai Post Test') }}</th>
-                                            <th>{{ __('Nilai Kenaikan Pre Post') }}</th>
+                                            <th>{{ __('Nama atasan langsung') }}</th>
+                                            <th>{{ __('No.Telepon atasan langsung') }}</th>
                                             <th>{{ __('Action') }}</th>
                                         </tr>
                                     </thead>
@@ -123,6 +119,7 @@
                         </div>
                     </div>
                 </div>
+
             </div>
         </section>
 
@@ -174,7 +171,7 @@
                 processing: true,
                 serverSide: true,
                 ajax: {
-                    url: "{{ route('penyebaran-kuesioner.responden-alumni.show', ':id') }}".replace(':id',
+                    url: "{{ route('penyebaran-kuesioner.responden-atasan.show', ':id') }}".replace(':id',
                         projectId),
                     data: function(d) {}
                 },
@@ -193,25 +190,13 @@
                         name: 'nip'
                     },
                     {
-                        data: 'telepon',
-                        name: 'telepon',
+                        data: 'nama_atasan',
+                        name: 'nama_atasan'
+                    },
+                    {
+                        data: 'telepon_atasan',
+                        name: 'telepon_atasan',
                         className: 'text-center'
-                    },
-                    {
-                        data: 'jabatan',
-                        name: 'jabatan'
-                    },
-                    {
-                        data: 'unit',
-                        name: 'unit'
-                    },
-                    {
-                        data: 'nilai_pre_test',
-                        name: 'nilai_pre_test'
-                    },
-                    {
-                        data: 'nilai_post_test',
-                        name: 'nilai_post_test'
                     },
                     {
                         data: 'action',

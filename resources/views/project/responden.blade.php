@@ -93,9 +93,6 @@
 
                         </div>
                     </div>
-                </div>
-
-                <div class="col-md-12">
                     <div class="card">
                         <div class="card-body">
                             <h5>Daftar Responden</h5>
@@ -121,8 +118,6 @@
                         </div>
                     </div>
                 </div>
-
-
             </div>
         </section>
 

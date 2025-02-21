@@ -66,6 +66,8 @@ Route::middleware(['auth', 'web'])->group(function () {
         Route::get('/kuesioner/show/{id}/{remark}', 'showKuesioner')->name('penyebaran-kuesioner.kuesioner.show');
         // Responden Alumni
         Route::get('/responden-alumni/show/{id}', 'showRespondenAlumni')->name('penyebaran-kuesioner.responden-alumni.show');
+        // Responden Atasan
+        Route::get('/responden-atasan/show/{id}', 'showRespondenAtasan')->name('penyebaran-kuesioner.responden-atasan.show');
         // Pesan WA
         Route::get('/pesan-wa/show/{id}', 'showPesanWa')->name('penyebaran-kuesioner.pesan.wa.show');
         // Bobot

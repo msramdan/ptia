@@ -43,9 +43,6 @@
                             </table>
                         </div>
                     </div>
-                </div>
-
-                <div class="col-md-12">
                     <div class="card">
                         <div class="card-body">
                             <form action="{{ route('project.bobot.update') }}" method="POST">
@@ -154,7 +151,6 @@
                                                 </div>
                                             </td>
                                         </tr>
-
                                         <tr>
                                             <td></td>
                                             <td id="total-level4-alumni" class="total-percentage"
