@@ -271,7 +271,7 @@
                     }
                 },
                 error: function(xhr) {
-                    let errorMessage = "Gagal mengupdate nomor telepon.";
+                    let errorMessage = "Gagal mengupdate nomor telepon alumni.";
                     if (xhr.responseJSON && xhr.responseJSON.errors) {
                         errorMessage = Object.values(xhr.responseJSON.errors).join("\n");
                     }
@@ -294,7 +294,7 @@
 
             Swal.fire({
                 title: "Kirim Notifikasi?",
-                text: `Apakah Anda yakin ingin mengirim link kuesioner ke ${nama} (${telepon}) via WhatsApp?`,
+                text: `Apakah Anda yakin ingin mengirim link kuesioner ke Alumni ${nama} (${telepon}) via WhatsApp?`,
                 icon: "warning",
                 showCancelButton: true,
                 confirmButtonText: "Ya, Kirim",

@@ -268,6 +268,8 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
         if (request()->ajax()) {
             $respondens = DB::table('project_responden as pr')
                 ->where('pr.project_id', $id)
+                ->whereNotNull('pr.nama_atasan')
+                ->whereNotNull('pr.telepon_atasan')
                 ->leftJoinSub(
                     DB::table('project_log_send_notif as log1')
                         ->select('log1.project_responden_id', 'log1.telepon', 'log1.status')
@@ -276,16 +278,17 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
                     'log_wa',
                     function ($join) {
                         $join->on('pr.id', '=', 'log_wa.project_responden_id')
-                            ->on('pr.telepon', '=', 'log_wa.telepon');
+                            ->on('pr.telepon_atasan', '=', 'log_wa.telepon');
                     }
                 )
                 ->select('pr.*', 'log_wa.status as wa_status')
                 ->get();
 
+
             return DataTables::of($respondens)
                 ->addIndexColumn()
-                ->addColumn('telepon', function ($row) {
-                    $telepon = $row->telepon ?? '-';
+                ->addColumn('telepon_atasan', function ($row) {
+                    $telepon_atasan = $row->telepon_atasan ?? '-';
                     $badgeStyle = 'display: inline-block; width: 100px; text-align: center;';
 
                     $badge = '<span class="badge bg-warning" style="' . $badgeStyle . '">
@@ -302,11 +305,11 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
                                   </span>';
                     }
 
-                    return $telepon . '<br>' . $badge;
+                    return $telepon_atasan . '<br>' . $badge;
                 })
 
                 ->addColumn('action', 'penyebaran-kuesioner.include.action-responden-atasan')
-                ->rawColumns(['telepon', 'action'])
+                ->rawColumns(['telepon_atasan', 'action'])
                 ->toJson();
         }
 
@@ -502,9 +505,6 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
             ->orderBy('created_at', 'desc');
 
         return DataTables::of($logs)
-            ->addColumn('telepon', function ($log) {
-                return $log->remark === 'Alumni' ? $log->telepon : $log->telepon_atasan;
-            })
             ->make(true);
     }
 

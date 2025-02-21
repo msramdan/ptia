@@ -1,7 +1,7 @@
 <td>
 
     <a href="#" class="btn btn-warning btn-sm edit-telepon-btn" data-id="{{ $model->id }}"
-        data-telepon="{{ $model->telepon }}" data-nama="{{ $model->nama }}" title="Edit No. Telepon">
+        data-telepon="{{ $model->telepon }}" data-nama="{{ $model->nama }}"  title="Edit No. Telepon">
         <i class="fas fa-phone"></i>
     </a>
 

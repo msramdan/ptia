@@ -15,7 +15,7 @@
                     <input type="hidden" id="responden_id">
                     <div class="mb-3">
                         <label for="telepon" class="form-label">No.Telepon</label>
-                        <input type="hidden" class="form-control" id="remark" value="Alumni" autocomplete="off">
+                        <input type="hidden" class="form-control" id="remark" value="Atasan" autocomplete="off">
                         <input type="text" class="form-control" id="telepon" autocomplete="off">
                     </div>
                 </div>
@@ -256,7 +256,7 @@
                     }
                 },
                 error: function(xhr) {
-                    let errorMessage = "Gagal mengupdate nomor telepon.";
+                    let errorMessage = "Gagal mengupdate nomor telepon atasan langsung.";
                     if (xhr.responseJSON && xhr.responseJSON.errors) {
                         errorMessage = Object.values(xhr.responseJSON.errors).join("\n");
                     }
@@ -279,7 +279,7 @@
 
             Swal.fire({
                 title: "Kirim Notifikasi?",
-                text: `Apakah Anda yakin ingin mengirim link kuesioner ke ${nama} (${telepon}) via WhatsApp?`,
+                text: `Apakah Anda yakin ingin mengirim link kuesioner ke Atasan Langsung ${nama} (${telepon}) via WhatsApp?`,
                 icon: "warning",
                 showCancelButton: true,
                 confirmButtonText: "Ya, Kirim",
@@ -340,7 +340,8 @@
                         remark: remark
                     }
                 },
-                columns: [{
+                columns: [
+                    {
                         data: "telepon",
                         name: "telepon"
                     },
