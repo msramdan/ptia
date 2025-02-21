@@ -20,10 +20,10 @@ class NotifikasiCronAtasanController extends Controller
         $currentDay = Carbon::now()->dayOfWeek;
 
         // Cek apakah waktu di luar jam kerja atau hari Sabtu/Minggu
-        if ($currentHour < 7 || $currentHour >= 17 || $currentDay === 0 || $currentDay === 6) {
-            Log::info("Cron job dihentikan karena di luar jam kerja atau hari libur (Sabtu/Minggu).");
-            return response()->json(['message' => 'Di luar jam kerja atau hari libur, cron tidak dieksekusi.'], 200);
-        }
+        // if ($currentHour < 7 || $currentHour >= 17 || $currentDay === 0 || $currentDay === 6) {
+        //     Log::info("Cron job dihentikan karena di luar jam kerja atau hari libur (Sabtu/Minggu).");
+        //     return response()->json(['message' => 'Di luar jam kerja atau hari libur, cron tidak dieksekusi.'], 200);
+        // }
 
         $startTime = Carbon::now()->format('Y-m-d H:i:s');
         sendNotifTelegram("🚀 *Cron Job Dimulai* \n📅 Waktu Mulai: *{$startTime}* \nMengirim notifikasi ke atasan...", $type);
@@ -74,7 +74,7 @@ class NotifikasiCronAtasanController extends Controller
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);
-                $this->updateStatus($notifikasi->id, $notifikasi->try_send_wa_alumni);
+                $this->updateStatus($notifikasi->id, $notifikasi->try_send_wa_atasan);
                 if ($status) {
                     $successCount++;
                     $encryptedId = encryptShort($notifikasi->id);
@@ -90,7 +90,7 @@ class NotifikasiCronAtasanController extends Controller
                 }
                 sendNotifTelegram($message, $type);
             } catch (\Exception $e) {
-                $this->updateStatus($notifikasi->id, $notifikasi->try_send_wa_alumni);
+                $this->updateStatus($notifikasi->id, $notifikasi->try_send_wa_atasan);
                 // Insert ke tabel log
                 DB::table('project_log_send_notif')->insert([
                     'telepon' => $notifikasi->telepon_atasan,

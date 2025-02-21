@@ -373,6 +373,7 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
             }
 
             $telepon = $request->remark === 'Alumni' ? $notifikasi->telepon : $notifikasi->telepon_atasan;
+            $try_send_wa = $request->remark === 'Alumni' ? $notifikasi->try_send_wa_alumni : $notifikasi->try_send_wa_atasan;
             $response = sendNotifWa($telepon, "Halo, jangan lupa mengisi kuesioner alumni!", $request->remark);
             $status = $response['status'];
             $statusText = $status ? 'Sukses' : 'Gagal';
@@ -385,7 +386,7 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
-            $this->updateStatus($notifikasi->id, $notifikasi->try_send_wa_alumni);
+            $this->updateStatus($notifikasi->id, $try_send_wa, $request->remark);
             if ($status) {
                 $encryptedId = encryptShort($notifikasi->id);
                 $encryptedTarget = encryptShort($request->remark);
@@ -403,7 +404,7 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
                 'message' => $response['message'],
             ]);
         } catch (\Exception $e) {
-            $this->updateStatus($notifikasi->id, $notifikasi->try_send_wa_alumni);
+            $this->updateStatus($notifikasi->id, $try_send_wa, $request->remark);
             // Insert ke tabel log jika terjadi error
             DB::table('project_log_send_notif')->insert([
                 'telepon' => $telepon,
@@ -441,13 +442,26 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
             ->make(true);
     }
 
-    private function updateStatus($id, $trySendCount)
+    private function updateStatus($id, $trySendCount, $remark)
     {
-        DB::table('project_responden')
-            ->where('id', $id)
-            ->update([
+        $updateData = [];
+
+        if ($remark === 'Alumni') {
+            $updateData = [
+                'try_send_wa_alumni' => $trySendCount + 1,
+                'last_send_alumni_at' => Carbon::now(),
+            ];
+        } elseif ($remark === 'Atasan') {
+            $updateData = [
                 'try_send_wa_atasan' => $trySendCount + 1,
                 'last_send_atasan_at' => Carbon::now(),
-            ]);
+            ];
+        }
+
+        if (!empty($updateData)) {
+            DB::table('project_responden')
+                ->where('id', $id)
+                ->update($updateData);
+        }
     }
 }
