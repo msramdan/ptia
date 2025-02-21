@@ -14,8 +14,9 @@ class NotifikasiCronAlumniController extends Controller
 {
     public function kirimNotifikasi()
     {
+        $type = "Alumni";
         $currentHour = Carbon::now()->hour;
-        $currentDay = Carbon::now()->dayOfWeek; // 0 = Minggu, 6 = Sabtu
+        $currentDay = Carbon::now()->dayOfWeek;
 
         // Cek apakah waktu di luar jam kerja atau hari Sabtu/Minggu
         if ($currentHour < 7 || $currentHour >= 17 || $currentDay === 0 || $currentDay === 6) {
@@ -24,7 +25,7 @@ class NotifikasiCronAlumniController extends Controller
         }
 
         $startTime = Carbon::now()->format('Y-m-d H:i:s');
-        $this->sendNotifTelegram("🚀 *Cron Job Dimulai* \n📅 Waktu Mulai: *{$startTime}* \nMengirim notifikasi ke alumni...");
+        sendNotifTelegram("🚀 *Cron Job Dimulai* \n📅 Waktu Mulai: *{$startTime}* \nMengirim notifikasi ke alumni...", $type);
         $limit = (int) env('NOTIFIKASI_LIMIT', 10);
         $notifikasiList = DB::table('project_responden')
             ->join('project_pesan_wa', 'project_responden.project_id', '=', 'project_pesan_wa.project_id')
@@ -49,7 +50,7 @@ class NotifikasiCronAlumniController extends Controller
 
         if ($notifikasiList->isEmpty()) {
             $endTime = Carbon::now()->format('Y-m-d H:i:s');
-            $this->sendNotifTelegram("⚠️ *Cron Job Selesai* \nTidak ada notifikasi yang dikirim. \n📅 Waktu Selesai: *{$endTime}*");
+            sendNotifTelegram("⚠️ *Cron Job Selesai* \nTidak ada notifikasi yang dikirim. \n📅 Waktu Selesai: *{$endTime}*", $type);
             return response()->json(['message' => 'Tidak ada notifikasi untuk dikirim.'], 200);
         }
 
@@ -58,56 +59,54 @@ class NotifikasiCronAlumniController extends Controller
 
         foreach ($notifikasiList as $notifikasi) {
             try {
-                $response = $this->sendNotifWa($notifikasi->telepon, "Halo, jangan lupa mengisi kuesioner alumni!");
-                if ($response['status'] === 'success') {
-                    $this->updateStatus($notifikasi->id, $notifikasi->try_send_wa_alumni, 'Alumni');
+                $response =sendNotifWa($notifikasi->telepon, "Halo, jangan lupa mengisi kuesioner alumni!", $type);
+                $status = $response['status'];
+                $statusText = $status ? 'Sukses' : 'Gagal';
+                // Insert ke tabel log
+                DB::table('project_log_send_notif')->insert([
+                    'telepon' => $notifikasi->telepon,
+                    'remark' => "Alumni",
+                    'status' => $statusText,
+                    'project_responden_id' => $notifikasi->id,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+                $this->updateStatus($notifikasi->id, $notifikasi->try_send_wa_alumni);
+                if ($status) {
                     $successCount++;
                     $encryptedId = encryptShort($notifikasi->id);
-                    $encryptedTarget = encryptShort('alumni');
+                    $encryptedTarget = encryptShort($type);
                     $url = URL::to(route('responden-kuesioner.index', ['id' => $encryptedId, 'target' => $encryptedTarget]));
-                    $this->sendNotifTelegram(
-                        "✅ *Sukses Kirim WA* \n" .
-                            "────────────\n" .
-                            "👤 *Nama:* {$notifikasi->nama} \n" .
-                            "📞 *Nomor:* {$notifikasi->telepon} \n" .
-                            "📌 *ID Diklat:* {$notifikasi->kaldikID} \n" .
-                            "📚 *Nama Diklat:* {$notifikasi->kaldikDesc} \n" .
-                            "🌐 *URL Kuesioner:* [Klik di sini]({$url})\n" .
-                            "────────────"
-                    );
-                } else {
-                    $errorMessage =
-                        "❌ *Gagal Kirim WA*\n" .
-                        "────────────\n" .
-                        "👤 *Nama:* {$notifikasi->nama}\n" .
-                        "📞 *Nomor:* {$notifikasi->telepon}\n" .
-                        "📌 *ID Diklat:* {$notifikasi->kaldikID}\n" .
-                        "📚 *Nama Diklat:* {$notifikasi->kaldikDesc}\n" .
-                        "⚠️ *Error:* {$response['message']}\n" .
-                        "────────────";
-                    Log::error($errorMessage);
-                    $this->sendNotifTelegram($errorMessage);
+                }
+
+                $message = generateMessage($notifikasi, $status, $url ?? null, $response['message'] ?? null, $type);
+
+                if (!$status) {
+                    Log::error($message);
                     $failureCount++;
                 }
+                sendNotifTelegram($message, $type);
             } catch (\Exception $e) {
-                $errorMessage =
-                    "❌ *Terjadi Kesalahan*\n" .
-                    "────────────\n" .
-                    "👤 *Nama:* {$notifikasi->nama}\n" .
-                    "📞 *Nomor:* {$notifikasi->telepon}\n" .
-                    "📌 *ID Diklat:* {$notifikasi->kaldikID}\n" .
-                    "📚 *Nama Diklat:* {$notifikasi->kaldikDesc}\n" .
-                    "⚠️ *Error:* {$e->getMessage()}\n" .
-                    "────────────";
+                $this->updateStatus($notifikasi->id, $notifikasi->try_send_wa_alumni);
+                // Insert ke tabel log jika terjadi error
+                DB::table('project_log_send_notif')->insert([
+                    'telepon' => $notifikasi->telepon,
+                    'remark' => "Alumni",
+                    'status' => 'Gagal',
+                    'project_responden_id' => $notifikasi->id,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
 
+                $errorMessage = generateMessage($notifikasi, false, null, $e->getMessage(), $type);
                 Log::error($errorMessage);
-                $this->sendNotifTelegram($errorMessage);
+                sendNotifTelegram($errorMessage, $type);
                 $failureCount++;
             }
         }
 
         $endTime = Carbon::now()->format('Y-m-d H:i:s');
-        $this->sendNotifTelegram("✅ *Cron Job Selesai* \nNotifikasi berhasil dikirim: {$successCount} sukses, {$failureCount} gagal. \n📅 Waktu Selesai: *{$endTime}*");
+        sendNotifTelegram("✅ *Cron Job Selesai* \nNotifikasi berhasil dikirim: {$successCount} sukses, {$failureCount} gagal. \n📅 Waktu Selesai: *{$endTime}*", $type);
 
         return response()->json([
             'message' => 'Notifikasi berhasil dikirim.',
@@ -115,7 +114,6 @@ class NotifikasiCronAlumniController extends Controller
             'failure_count' => $failureCount
         ], 200);
     }
-
 
     private function updateStatus($id, $trySendCount)
     {
@@ -125,29 +123,5 @@ class NotifikasiCronAlumniController extends Controller
                 'try_send_wa_alumni' => $trySendCount + 1,
                 'last_send_alumni_at' => Carbon::now(),
             ]);
-    }
-
-    private function sendNotifWa($nomor, $pesan)
-    {
-        return ['status' => 'success', 'message' => 'Pesan berhasil dikirim'];
-    }
-
-    private function sendNotifTelegram($message)
-    {
-        $botToken = env('TELEGRAM_BOT_TOKEN');
-        $chatId = env('TELEGRAM_CHAT_ID_ALUMNI');
-
-        if (!$botToken || !$chatId) {
-            Log::error('Bot Token atau Chat ID Telegram tidak ditemukan.');
-            return;
-        }
-
-        $url = "https://api.telegram.org/bot{$botToken}/sendMessage";
-
-        Http::post($url, [
-            'chat_id' => $chatId,
-            'text' => $message,
-            'parse_mode' => 'Markdown',
-        ]);
     }
 }

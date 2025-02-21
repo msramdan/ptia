@@ -1,7 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 function is_active_submenu(string|array $route): string
 {
@@ -69,4 +70,65 @@ function decryptShort($string)
     }
 
     return $decoded;
+}
+
+
+function sendNotifTelegram($message, $remark)
+{
+    $botToken = env('TELEGRAM_BOT_TOKEN');
+    $chatId = null;
+
+    if ($remark === 'Alumni') {
+        $chatId = env('TELEGRAM_CHAT_ID_ALUMNI', '-1002353782295');
+    } elseif ($remark === 'Atasan') {
+        $chatId = env('TELEGRAM_CHAT_ID_ATASAN', '-1002441723360');
+    }
+
+    if (!$botToken || !$chatId) {
+        Log::error("Bot Token atau Chat ID Telegram tidak ditemukan untuk remark: {$remark}");
+        return;
+    }
+
+    $url = "https://api.telegram.org/bot{$botToken}/sendMessage";
+
+    Http::post($url, [
+        'chat_id' => $chatId,
+        'text' => $message,
+        'parse_mode' => 'Markdown',
+    ]);
+}
+
+function generateMessage($notifikasi, $status, $url = null, $errorMessage = null, $remark = null)
+{
+    if ($remark === 'Atasan') {
+        return implode("\n", [
+            $status ? "✅ *Sukses Kirim WA*" : "❌ *Gagal Kirim WA*",
+            "────────────",
+            "👨‍💼 *Nama Atasan:* {$notifikasi->nama_atasan}",
+            "📞 *Nomor Atasan:* {$notifikasi->telepon_atasan}",
+            "👤 *Nama Peserta:* {$notifikasi->nama}",
+            "📌 *ID Diklat:* {$notifikasi->kaldikID}",
+            "📚 *Nama Diklat:* {$notifikasi->kaldikDesc}",
+            $status ? "🌐 *URL Kuesioner Atasan:* [Klik di sini]({$url})" : "⚠️ *Error:* {$errorMessage}",
+            "────────────"
+        ]);
+    } elseif ($remark === 'Alumni') {
+        return implode("\n", [
+            $status ? "✅ *Sukses Kirim WA*" : "❌ *Gagal Kirim WA*",
+            "────────────",
+            "👤 *Nama:* {$notifikasi->nama}",
+            "📞 *Nomor:* {$notifikasi->telepon}",
+            "📌 *ID Diklat:* {$notifikasi->kaldikID}",
+            "📚 *Nama Diklat:* {$notifikasi->kaldikDesc}",
+            $status ? "🌐 *URL Kuesioner Alumni:* [Klik di sini]({$url})" : "⚠️ *Error:* {$errorMessage}",
+            "────────────"
+        ]);
+    }
+
+    return "⚠️ *Remark tidak valid!*";
+}
+
+function sendNotifWa($nomor, $pesan, $remark)
+{
+    return ['status' => true, 'message' => 'Pesan berhasil dikirim'];
 }

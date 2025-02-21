@@ -12,7 +12,7 @@ class RespondenKuesionerController extends Controller
         try {
             $id = decryptShort($encryptedId);
             $target = decryptShort($encryptedTarget);
-            if (!in_array($target, ['alumni', 'atasan'])) {
+            if (!in_array($target, ['Alumni', 'Atasan'])) {
                 abort(404);
             }
             $responden = DB::table('project_responden')

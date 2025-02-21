@@ -11,6 +11,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\URL;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 
 class PenyebaranKuesionerController extends Controller implements HasMiddleware
@@ -219,16 +222,16 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
                     $telepon = $row->telepon ?? '-';
                     $badgeStyle = 'display: inline-block; width: 100px; text-align: center;';
 
-                    $badge = '<span class="badge bg-warning" style="'.$badgeStyle.'">
+                    $badge = '<span class="badge bg-warning" style="' . $badgeStyle . '">
                                 <i class="fas fa-hourglass-half"></i> Menunggu
                               </span>';
 
                     if ($row->wa_status === 'Sukses') {
-                        $badge = '<span class="badge bg-success" style="'.$badgeStyle.'">
+                        $badge = '<span class="badge bg-success" style="' . $badgeStyle . '">
                                     <i class="fas fa-check"></i> Sukses
                                   </span>';
                     } elseif ($row->wa_status === 'Gagal') {
-                        $badge = '<span class="badge bg-danger" style="'.$badgeStyle.'">
+                        $badge = '<span class="badge bg-danger" style="' . $badgeStyle . '">
                                     <i class="fas fa-times"></i> Gagal
                                   </span>';
                     }
@@ -350,47 +353,70 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
         }
 
         try {
-            // Ambil data responden berdasarkan ID
-            $responden = DB::table('project_responden')->where('id', $request->id)->first();
+            $notifikasi = DB::table('project_responden')
+                ->join('project_pesan_wa', 'project_responden.project_id', '=', 'project_pesan_wa.project_id')
+                ->join('project', 'project_responden.project_id', '=', 'project.id')
+                ->select(
+                    'project_responden.*',
+                    'project_pesan_wa.text_pesan_alumni',
+                    'project.status',
+                    'project.kaldikID',
+                    'project.kaldikDesc'
+                )
+                ->where('project_responden.id', $request->id)->first();
 
-            if (!$responden) {
+            if (!$notifikasi) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Data responden tidak ditemukan!',
                 ], 404);
             }
 
-            // Pilih nomor telepon berdasarkan remark
-            $telepon = $request->remark === 'Alumni' ? $responden->telepon : $responden->telepon_atasan;
-
-            if (!$telepon) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Nomor telepon tidak ditemukan!',
-                ], 400);
-            }
-
-            // Simulasi pengiriman WhatsApp (nanti diganti dengan API WA)
-            $responseWa = [
-                'status' => true,
-                'message' => 'Notifikasi WhatsApp berhasil dikirim!',
-            ];
-
-            // Simpan log pengiriman notifikasi
+            $telepon = $request->remark === 'Alumni' ? $notifikasi->telepon : $notifikasi->telepon_atasan;
+            $response = sendNotifWa($telepon, "Halo, jangan lupa mengisi kuesioner alumni!", $request->remark);
+            $status = $response['status'];
+            $statusText = $status ? 'Sukses' : 'Gagal';
+            // Insert ke tabel log
             DB::table('project_log_send_notif')->insert([
                 'telepon' => $telepon,
                 'remark' => $request->remark,
-                'status' => $responseWa['status'] ? 'Sukses' : 'Gagal',
-                'project_responden_id' => $responden->id,
+                'status' => $statusText,
+                'project_responden_id' => $notifikasi->id,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+            $this->updateStatus($notifikasi->id, $notifikasi->try_send_wa_alumni);
+            if ($status) {
+                $encryptedId = encryptShort($notifikasi->id);
+                $encryptedTarget = encryptShort($request->remark);
+                $url = URL::to(route('responden-kuesioner.index', ['id' => $encryptedId, 'target' => $encryptedTarget]));
+            }
+
+            $message = generateMessage($notifikasi, $status, $url ?? null, $response['message'] ?? null, $request->remark);
+
+            if (!$status) {
+                Log::error($message);
+            }
+            sendNotifTelegram($message, $request->remark);
+            return response()->json([
+                'success' => $status,
+                'message' => $response['message'],
+            ]);
+        } catch (\Exception $e) {
+            $this->updateStatus($notifikasi->id, $notifikasi->try_send_wa_alumni);
+            // Insert ke tabel log jika terjadi error
+            DB::table('project_log_send_notif')->insert([
+                'telepon' => $telepon,
+                'remark' => $request->remark,
+                'status' => 'Gagal',
+                'project_responden_id' => $notifikasi->id,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
 
-            return response()->json([
-                'success' => $responseWa['status'],
-                'message' => $responseWa['message'],
-            ]);
-        } catch (\Exception $e) {
+            $errorMessage = generateMessage($notifikasi, false, null, $e->getMessage(), $request->remark);
+            Log::error($errorMessage);
+            sendNotifTelegram($errorMessage, 'atasan');
             return response()->json([
                 'success' => false,
                 'message' => 'Gagal mengirim notifikasi.',
@@ -408,11 +434,20 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
             ->where('remark', $remark)
             ->orderBy('created_at', 'desc');
 
-
         return DataTables::of($logs)
             ->addColumn('telepon', function ($log) {
                 return $log->remark === 'Alumni' ? $log->telepon : $log->telepon_atasan;
             })
             ->make(true);
+    }
+
+    private function updateStatus($id, $trySendCount)
+    {
+        DB::table('project_responden')
+            ->where('id', $id)
+            ->update([
+                'try_send_wa_atasan' => $trySendCount + 1,
+                'last_send_atasan_at' => Carbon::now(),
+            ]);
     }
 }
