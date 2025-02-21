@@ -12,9 +12,11 @@ class RespondenKuesionerController extends Controller
         try {
             $id = decryptShort($encryptedId);
             $target = decryptShort($encryptedTarget);
+
             if (!in_array($target, ['Alumni', 'Atasan'])) {
                 abort(404);
             }
+
             $responden = DB::table('project_responden')
                 ->join('project', 'project_responden.project_id', '=', 'project.id')
                 ->select(
@@ -23,16 +25,24 @@ class RespondenKuesionerController extends Controller
                     'project.kaldikID',
                     'project.kaldikDesc'
                 )
-                ->where('project_responden.id', $id)->first();
+                ->where('project_responden.id', $id)
+                ->first();
+
             if (!$responden) {
                 abort(404);
             }
 
-            return view('kuesioner', compact('responden', 'target'));
+            $kuesioner = DB::table('project_kuesioner')
+                ->where('remark', $target)
+                ->where('project_id', $responden->project_id)
+                ->get();
+
+            return view('kuesioner', compact('responden', 'target', 'kuesioner'));
         } catch (\Exception $e) {
             abort(404);
         }
     }
+
 
 
     public function generateUrl($id, $target)

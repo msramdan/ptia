@@ -7,6 +7,24 @@
     <title>Kuesioner Evaluasi</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <!-- Tambahkan Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+    <style>
+        .warning-message {
+            display: flex;
+            align-items: center;
+            color: #ffc107;
+            /* Warna kuning untuk warning */
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .warning-message i {
+            margin-right: 5px;
+            /* Jarak ikon dengan teks */
+        }
+    </style>
     <style>
         body {
             background-color: #f4f7fc;
@@ -48,40 +66,59 @@
         .radio-group {
             display: flex;
             justify-content: space-between;
-            gap: 15px;
+            gap: 10px;
+        }
+
+        .radio-group {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
         }
 
         .radio-group label {
             flex: 1;
             text-align: center;
             background: #e9ecef;
-            padding: 10px;
             border-radius: 6px;
             cursor: pointer;
-            transition: background 0.3s ease-in-out;
+            transition: background 0.3s ease-in-out, color 0.3s ease-in-out;
+            font-weight: bold;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 40px;
+            /* Atur tinggi agar konsisten */
         }
 
+        /* Sembunyikan radio button */
         .radio-group input[type="radio"] {
             display: none;
         }
 
-        .radio-group input[type="radio"]:checked+label {
+        /* Warna full tanpa padding */
+        .radio-group input[type="radio"]:checked+span {
             background: #0056b3;
             color: white;
-            font-weight: bold;
+            border-radius: 6px;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
     </style>
 </head>
 
 <body>
     <div class="container mt-4">
-        <div class="d-flex flex-column align-items-center text-center mb-4" style="gap: 12px; padding: 15px;">
+        <div class="d-flex flex-column align-items-center text-center" style="padding: 15px;">
             <img src="https://registrasi.bpkp.go.id/ptia/assets/logo/Post%20Training%20Impact%20Assesment.png"
-                alt="Logo PTIA" class="img-fluid" style="max-height: 90px; width: auto;">
-            <h4 class="fw-bold"
-                style="color: #284D80; font-size: 1.5rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 600;">
+                alt="Logo PTIA" class="img-fluid" style="max-height: 80px; width: auto;">
+
+            <p class="fw-bold mt-3" style="color: #284D80;">
                 KUESIONER EVALUASI PEMBELAJARAN LEVEL 3 dan 4
-            </h4>
+            </p>
         </div>
 
         <!-- Informasi Diklat -->
@@ -104,22 +141,32 @@
         <div class="card mb-4">
             <div class="card-header text-white"><strong>Form Kuesioner</strong></div>
             <div class="card-body">
+                <!-- Catatan bahwa field bertanda * wajib diisi -->
+                <p class="text-danger mb-3"><strong>Catatan:</strong> Kolom dengan tanda <span
+                        class="text-danger">*</span> wajib diisi.</p>
+
                 <div class="mb-3">
-                    <label class="form-label" style="margin-bottom: 4px;"><strong>Nama</strong></label>
+                    <label class="form-label" style="margin-bottom: 2px;"><strong>Nama Peserta</strong></label>
                     <input type="text" class="form-control" value="{{ $responden->nip }} - {{ $responden->nama }}"
-                        readonly>
+                        readonly style="background-color: #e9ecef;">
                 </div>
+
                 <div class="mb-3">
-                    <label class="form-label" style="margin-bottom: 4px;"><strong>Nama Atasan Langsung</strong></label>
-                    <input type="text" class="form-control" value="{{ $responden->nama_atasan ?? '' }}"
-                        {{ $responden->status_pengisian_kuesioner_alumni == 'Sudah' ? 'readonly' : '' }}>
+                    <label class="form-label" style="margin-bottom: 2px;">
+                        <strong>Nama Atasan Langsung</strong> <span class="text-danger">*</span>
+                    </label>
+                    <input type="text" class="form-control" id="atasan" name="atasan"
+                        value="{{ $responden->nama_atasan ?? '' }}"
+                        {{ $target == 'Atasan' || $responden->status_pengisian_kuesioner_alumni == 'Sudah' ? 'readonly style=background-color:#e9ecef;' : '' }}>
                 </div>
+
                 <div class="mb-3">
-                    <label class="form-label" style="margin-bottom: 4px;"><strong>No. Whatsapp Atasan
-                            Langsung</strong></label>
-                    <input type="number" class="form-control" placeholder="Contoh pengisian 081234567890"
-                        value="{{ $responden->telepon_atasan ?? '' }}"
-                        {{ $responden->status_pengisian_kuesioner_alumni == 'Sudah' ? 'readonly' : '' }}>
+                    <label class="form-label" style="margin-bottom: 2px;">
+                        <strong>No. Whatsapp Atasan Langsung</strong> <span class="text-danger">*</span>
+                    </label>
+                    <input type="number" id="no_wa" name="no_wa" class="form-control"
+                        placeholder="Contoh. 081234567890" value="{{ $responden->telepon_atasan ?? '' }}"
+                        {{ $target == 'Atasan' || $responden->status_pengisian_kuesioner_alumni == 'Sudah' ? 'readonly style=background-color:#e9ecef;' : '' }}>
                 </div>
             </div>
         </div>
@@ -132,251 +179,75 @@
             mengikuti pelatihan.
         </div>
 
-        <div class="card mb-4">
-            <div class="card-body">
-                <h5 class="fw-bold mb-3">A. Kemampuan Membagikan Keilmuan</h5>
-                <p class="text-muted">
-                    1. Sangat tidak setuju <br>
-                    2. Tidak setuju <br>
-                    3. Setuju <br>
-                    4. Sangat setuju
-                </p>
-                <p class="fw-bold">
-                    Setelah mengikuti pelatihan, saya berbagi pengetahuan yang telah saya peroleh selama
-                    pelatihan kepada rekan-rekan kerja saya melalui kegiatan pelatihan di kantor sendiri, FGD, sharing
-                    session, atau bentuk knowledge sharing lainnya dengan pelatihan ini.
-                </p>
+        @foreach ($kuesioner as $item)
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="fw-bold mb-3">{{ $loop->iteration }}. {{ $item->aspek }}</h5>
+                    <p class="text-muted">
+                        1. Sangat tidak setuju <br>
+                        2. Tidak setuju <br>
+                        3. Setuju <br>
+                        4. Sangat setuju
+                    </p>
+                    <p class="fw-bold">{{ $item->pertanyaan }}</p>
 
-                <div class="row">
-                    <!-- Sebelum Pelatihan -->
-                    <div class="col-md-6 mb-3">
-                        <div class="card text-white p-2" style="background-color: #284D80">
-                            <strong>Sebelum</strong>
+                    <div class="row">
+                        <!-- Sebelum Pelatihan -->
+                        <div class="col-md-6 mb-3">
+                            <div class="card text-white p-2" style="background-color: #284D80">
+                                <strong>Sebelum</strong>
+                            </div>
+                            <div class="p-3 bg-white">
+                                <div class="radio-group">
+                                    @for ($i = 1; $i <= 4; $i++)
+                                        <label>
+                                            <input type="radio" name="sebelum[{{ $item->id }}]"
+                                                value="{{ $i }}">
+                                            <span>{{ $i }}</span>
+                                        </label>
+                                    @endfor
+                                </div>
+                            </div>
                         </div>
-                        <div class="p-3 bg-white">
-                            <div class="radio-group">
-                                <label><input type="radio" name="motivasi_sebelum" value="1"> 1</label>
-                                <label><input type="radio" name="motivasi_sebelum" value="2"> 2</label>
-                                <label><input type="radio" name="motivasi_sebelum" value="3"> 3</label>
-                                <label><input type="radio" name="motivasi_sebelum" value="4"> 4</label>
+
+                        <!-- Sesudah Pelatihan -->
+                        <div class="col-md-6 mb-3">
+                            <div class="card text-white p-2" style="background-color: #284D80">
+                                <strong>Sesudah</strong>
+                            </div>
+                            <div class="p-3 bg-white">
+                                <div class="radio-group">
+                                    @for ($i = 1; $i <= 4; $i++)
+                                        <label>
+                                            <input type="radio" name="sesudah[{{ $item->id }}]"
+                                                value="{{ $i }}">
+                                            <span>{{ $i }}</span>
+                                        </label>
+                                    @endfor
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Sesudah Pelatihan -->
-                    <div class="col-md-6 mb-3">
-                        <div class="card text-white p-2" style="background-color: #284D80">
-                            <strong>Sesudah</strong>
-                        </div>
-                        <div class="p-3 bg-white">
-                            <div class="radio-group">
-                                <label><input type="radio" name="motivasi_sesudah" value="1"> 1</label>
-                                <label><input type="radio" name="motivasi_sesudah" value="2"> 2</label>
-                                <label><input type="radio" name="motivasi_sesudah" value="3"> 3</label>
-                                <label><input type="radio" name="motivasi_sesudah" value="4"> 4</label>
-                            </div>
+                    <!-- Textarea untuk catatan umum -->
+                    <div>
+                        <textarea name="catatan[{{ $item->id }}]" class="form-control" rows="3" placeholder="Tambahkan catatan..."
+                            style="border: 1px solid #ddd; padding: 10px; border-radius: 5px;"></textarea>
+
+                        <!-- Warning jika skor sebelum dan sesudah sama atau turun -->
+                        <div class="warning-message text-danger mt-2" style="display: none;">
+                            <strong>WARNING!!!</strong>: data skor sebelum dan sesudah sama atau turun (tidak ada
+                            peningkatan).
                         </div>
                     </div>
-                </div>
-
-                <!-- Textarea untuk catatan umum -->
-                <div class="mt-1">
-                    <textarea name="catatan" id="catatan" class="form-control mt-2" rows="3"
-                        placeholder=""
-                        style="border: 1px solid #ddd; padding: 10px; border-radius: 5px;"></textarea>
                 </div>
             </div>
-        </div>
+        @endforeach
 
-
-        <div class="card mb-4">
-            <div class="card-body">
-                <h5 class="fw-bold mb-3">B. Kemampuan Implementasi Keilmuan</h5>
-                <p class="text-muted">1. Sangat tidak setuju <br> 2. Tidak setuju <br> 3. Setuju <br> 4. Sangat setuju
-                </p>
-                <p class="fw-bold">Saya mampu menerapkan ilmu yang telah saya peroleh selama Pelatihan dan Sertifikasi
-                    Certified Government Risk Assurer (CGRA) Batch 2 Bagi Pegawai BPKP pada setiap penugasan yang
-                    relevan</p>
-
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <div class="card text-white p-2" style="background-color: #284D80">
-                            <strong>Sebelum</strong>
-                        </div>
-                        <div class="p-3 bg-white">
-                            <div class="radio-group">
-                                <label><input type="radio" name="kepercayaan_sebelum" value="1"> 1</label>
-                                <label><input type="radio" name="kepercayaan_sebelum" value="2"> 2</label>
-                                <label><input type="radio" name="kepercayaan_sebelum" value="3"> 3</label>
-                                <label><input type="radio" name="kepercayaan_sebelum" value="4"> 4</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <div class="card text-white p-2" style="background-color: #284D80">
-                            <strong>Sesudah</strong>
-                        </div>
-                        <div class="p-3 bg-white">
-                            <div class="radio-group">
-                                <label><input type="radio" name="kepercayaan_sesudah" value="1"> 1</label>
-                                <label><input type="radio" name="kepercayaan_sesudah" value="2"> 2</label>
-                                <label><input type="radio" name="kepercayaan_sesudah" value="3"> 3</label>
-                                <label><input type="radio" name="kepercayaan_sesudah" value="4"> 4</label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Textarea untuk catatan umum -->
-                <div class="mt-1">
-                    <textarea name="catatan" id="catatan" class="form-control mt-2" rows="3"
-                        placeholder=""
-                        style="border: 1px solid #ddd; padding: 10px; border-radius: 5px;"></textarea>
-                </div>
-            </div>
-        </div>
-
-        <div class="card mb-4">
-            <div class="card-body">
-                <h5 class="fw-bold mb-3">C. Motivasi</h5>
-                <p class="text-muted">1. Sangat tidak setuju <br> 2. Tidak setuju <br> 3. Setuju <br> 4. Sangat setuju
-                </p>
-                <p class="fw-bold">Saya termotivasi untuk terlibat secara aktif dalam setiap penugasan yang relevan
-                    dengan pelatihan ini.</p>
-
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <div class="card text-white p-2" style="background-color: #284D80">
-                            <strong>Sebelum</strong>
-                        </div>
-                        <div class="p-3 bg-white">
-                            <div class="radio-group">
-                                <label><input type="radio" name="kepercayaan_sebelum" value="1"> 1</label>
-                                <label><input type="radio" name="kepercayaan_sebelum" value="2"> 2</label>
-                                <label><input type="radio" name="kepercayaan_sebelum" value="3"> 3</label>
-                                <label><input type="radio" name="kepercayaan_sebelum" value="4"> 4</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <div class="card text-white p-2" style="background-color: #284D80">
-                            <strong>Sesudah</strong>
-                        </div>
-                        <div class="p-3 bg-white">
-                            <div class="radio-group">
-                                <label><input type="radio" name="kepercayaan_sesudah" value="1"> 1</label>
-                                <label><input type="radio" name="kepercayaan_sesudah" value="2"> 2</label>
-                                <label><input type="radio" name="kepercayaan_sesudah" value="3"> 3</label>
-                                <label><input type="radio" name="kepercayaan_sesudah" value="4"> 4</label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Textarea untuk catatan umum -->
-                <div class="mt-1">
-                    <textarea name="catatan" id="catatan" class="form-control mt-2" rows="3"
-                        placeholder=""
-                        style="border: 1px solid #ddd; padding: 10px; border-radius: 5px;"></textarea>
-                </div>
-            </div>
-        </div>
-
-        <div class="card mb-4">
-            <div class="card-body">
-                <h5 class="fw-bold mb-3">D. Kepercayaan Diri</h5>
-                <p class="text-muted">1. Sangat tidak setuju <br> 2. Tidak setuju <br> 3. Setuju <br> 4. Sangat setuju
-                </p>
-                <p class="fw-bold">Saya percaya diri untuk terlibat secara aktif dalam setiap kegiatan yang relevan
-                    dengan pelatihan ini..</p>
-
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <div class="card text-white p-2" style="background-color: #284D80">
-                            <strong>Sebelum</strong>
-                        </div>
-                        <div class="p-3 bg-white">
-                            <div class="radio-group">
-                                <label><input type="radio" name="kepercayaan_sebelum" value="1"> 1</label>
-                                <label><input type="radio" name="kepercayaan_sebelum" value="2"> 2</label>
-                                <label><input type="radio" name="kepercayaan_sebelum" value="3"> 3</label>
-                                <label><input type="radio" name="kepercayaan_sebelum" value="4"> 4</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <div class="card text-white p-2" style="background-color: #284D80">
-                            <strong>Sesudah</strong>
-                        </div>
-                        <div class="p-3 bg-white">
-                            <div class="radio-group">
-                                <label><input type="radio" name="kepercayaan_sesudah" value="1"> 1</label>
-                                <label><input type="radio" name="kepercayaan_sesudah" value="2"> 2</label>
-                                <label><input type="radio" name="kepercayaan_sesudah" value="3"> 3</label>
-                                <label><input type="radio" name="kepercayaan_sesudah" value="4"> 4</label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Textarea untuk catatan umum -->
-                <div class="mt-1">
-                    <textarea name="catatan" id="catatan" class="form-control mt-2" rows="3"
-                        placeholder=""
-                        style="border: 1px solid #ddd; padding: 10px; border-radius: 5px;"></textarea>
-                </div>
-            </div>
-        </div>
-
-        <div class="card mb-4">
-            <div class="card-body">
-                <h5 class="fw-bold mb-3">E. Hasil Pelatihan</h5>
-                <p class="text-muted">1. Sangat tidak setuju <br> 2. Tidak setuju <br> 3. Setuju <br> 4. Sangat setuju
-                </p>
-                <p class="fw-bold">Implementasi hasil pelatihan ini berdampak positif dalam meningkatkan kualitas
-                    manajemen risiko pada organisasi</p>
-
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <div class="card text-white p-2" style="background-color: #284D80">
-                            <strong>Sebelum</strong>
-                        </div>
-                        <div class="p-3 bg-white">
-                            <div class="radio-group">
-                                <label><input type="radio" name="kepercayaan_sebelum" value="1"> 1</label>
-                                <label><input type="radio" name="kepercayaan_sebelum" value="2"> 2</label>
-                                <label><input type="radio" name="kepercayaan_sebelum" value="3"> 3</label>
-                                <label><input type="radio" name="kepercayaan_sebelum" value="4"> 4</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <div class="card text-white p-2" style="background-color: #284D80">
-                            <strong>Sesudah</strong>
-                        </div>
-                        <div class="p-3 bg-white">
-                            <div class="radio-group">
-                                <label><input type="radio" name="kepercayaan_sesudah" value="1"> 1</label>
-                                <label><input type="radio" name="kepercayaan_sesudah" value="2"> 2</label>
-                                <label><input type="radio" name="kepercayaan_sesudah" value="3"> 3</label>
-                                <label><input type="radio" name="kepercayaan_sesudah" value="4"> 4</label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Textarea untuk catatan umum -->
-                <div class="mt-1">
-                    <textarea name="catatan" id="catatan" class="form-control mt-2" rows="3"
-                        placeholder=""
-                        style="border: 1px solid #ddd; padding: 10px; border-radius: 5px;"></textarea>
-                </div>
-            </div>
-        </div>
 
         @if ($responden->status_pengisian_kuesioner_alumni != 'Sudah')
             <div class="d-flex justify-content-center mb-4">
-                <button type="submit" class="btn btn-danger">
+                <button type="submit" class="btn btn-danger" id="submitButton" disabled>
                     <i class="fas fa-paper-plane"></i> Jika Sudah Yakin, Klik untuk kirim data
                 </button>
             </div>
@@ -384,6 +255,145 @@
 
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            function checkFormValidity() {
+                let allChecked = true;
+                let allTextareaFilled = true;
+
+                $(".radio-group").each(function() {
+                    if (!$(this).find("input[type='radio']:checked").length) {
+                        allChecked = false;
+                    }
+                });
+
+                $(".card").each(function() {
+                    let selectedValueSesudah = $(this).find("input[name^='sesudah']:checked").val();
+                    let beforeValue = $(this).find("input[name^='sebelum']:checked").val();
+                    let textarea = $(this).find("textarea");
+                    let warningMessage = $(this).find(".warning-message");
+
+                    let requiresTextarea = false;
+                    let warningText = "";
+
+                    if (selectedValueSesudah == "1" || selectedValueSesudah == "2") {
+                        requiresTextarea = true;
+                        warningText =
+                            '<i class="fas fa-exclamation-triangle"></i> Anda memberikan skor 1 atau 2 pada periode sesudah pelatihan. Jelaskan alasannya di area catatan.';
+                    }
+
+                    if (beforeValue && selectedValueSesudah && parseInt(selectedValueSesudah) <= parseInt(
+                            beforeValue)) {
+                        requiresTextarea = true;
+                        if (warningText) {
+                            warningText =
+                                '<i class="fas fa-exclamation-triangle"></i> Anda memberikan skor 1 atau 2 pada periode sesudah pelatihan, dan nilai sesudah sama atau lebih rendah dari sebelum pelatihan. Jelaskan alasannya di area catatan.';
+                        } else {
+                            warningText =
+                                '<i class="fas fa-exclamation-triangle"></i> Anda memberikan skor sesudah sama atau lebih rendah dari sebelum pelatihan. Jelaskan alasannya di area catatan.';
+                        }
+                    }
+
+                    if (requiresTextarea) {
+                        if (textarea.val().trim() === "") {
+                            textarea.addClass("border-danger").attr("required", true);
+                            warningMessage.html(warningText).show();
+                            allTextareaFilled = false;
+                        } else {
+                            textarea.removeClass("border-danger"); // Hapus border merah jika ada isi
+                        }
+                    } else {
+                        textarea.removeClass("border-danger").removeAttr("required");
+                        warningMessage.hide();
+                    }
+                });
+
+                let atasanFilled = $("#atasan").val().trim() !== "";
+                let noWaFilled = $("#no_wa").val().trim() !== "";
+
+                if (allChecked && allTextareaFilled && atasanFilled && noWaFilled) {
+                    $("#submitButton").prop("disabled", false);
+                    $("#alertMessage").hide();
+                } else {
+                    $("#submitButton").prop("disabled", true);
+                    $("#alertMessage").show();
+                }
+            }
+
+            function checkTextareaRequirement() {
+                $(".card").each(function() {
+                    let selectedValueSesudah = $(this).find("input[name^='sesudah']:checked").val();
+                    let beforeValue = $(this).find("input[name^='sebelum']:checked").val();
+                    let textarea = $(this).find("textarea");
+                    let warningMessage = $(this).find(".warning-message");
+
+                    let requiresTextarea = false;
+                    let warningText = "";
+
+                    if (selectedValueSesudah == "1" || selectedValueSesudah == "2") {
+                        requiresTextarea = true;
+                        warningText =
+                            '<i class="fas fa-exclamation-triangle"></i> Anda memberikan skor 1 atau 2 pada periode sesudah pelatihan. Jelaskan alasannya di area catatan.';
+                    }
+
+                    if (beforeValue && selectedValueSesudah && parseInt(selectedValueSesudah) <= parseInt(
+                            beforeValue)) {
+                        requiresTextarea = true;
+                        if (warningText) {
+                            warningText =
+                                '<i class="fas fa-exclamation-triangle"></i> Anda memberikan skor 1 atau 2 pada periode sesudah pelatihan, dan nilai sesudah sama atau lebih rendah dari sebelum pelatihan. Jelaskan alasannya di area catatan.';
+                        } else {
+                            warningText =
+                                '<i class="fas fa-exclamation-triangle"></i> Anda memberikan skor sesudah sama atau lebih rendah dari sebelum pelatihan. Jelaskan alasannya di area catatan.';
+                        }
+                    }
+
+                    if (requiresTextarea) {
+                        if (textarea.val().trim() === "") {
+                            textarea.addClass("border-danger").attr("required", true);
+                            warningMessage.html(warningText).show();
+                        } else {
+                            textarea.removeClass("border-danger"); // Hapus border merah jika ada isi
+                        }
+                    } else {
+                        textarea.removeClass("border-danger").removeAttr("required");
+                        warningMessage.hide();
+                    }
+                });
+
+                checkFormValidity();
+            }
+
+            $("input[name^='sesudah'], input[name^='sebelum']").on("change", function() {
+                checkTextareaRequirement();
+            });
+
+            $("textarea").on("input", function() {
+                let textarea = $(this);
+
+                // Hapus border merah jika textarea sudah terisi
+                if (textarea.val().trim() !== "") {
+                    textarea.removeClass("border-danger");
+                }
+
+                checkFormValidity();
+            });
+
+            $("#atasan, #no_wa").on("input", checkFormValidity);
+
+            checkTextareaRequirement();
+            checkFormValidity();
+        });
+    </script>
+
+
+
+
+
+
+
 </body>
 
 </html>
