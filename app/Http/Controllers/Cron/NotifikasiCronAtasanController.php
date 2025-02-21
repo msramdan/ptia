@@ -19,12 +19,15 @@ class NotifikasiCronAtasanController extends Controller
         $currentHour = Carbon::now()->hour;
         $currentDay = Carbon::now()->dayOfWeek;
 
-        // Cek apakah waktu di luar jam kerja atau hari Sabtu/Minggu
-        if ($currentHour < 7 || $currentHour >= 17 || $currentDay === 0 || $currentDay === 6) {
-            Log::info("Cron job dihentikan karena di luar jam kerja atau hari libur (Sabtu/Minggu).");
+        $workStartHour = env('WORK_START_HOUR', 7); // Default jam mulai kerja: 07:00
+        $workEndHour = env('WORK_END_HOUR', 17); // Default jam selesai kerja: 17:00
+        $weekendDays = explode(',', env('WEEKEND_DAYS', '0,6')); // Default hari libur: Minggu (0) & Sabtu (6)
+
+        // Cek apakah di luar jam kerja atau hari libur
+        if ($currentHour < $workStartHour || $currentHour >= $workEndHour || in_array($currentDay, $weekendDays)) {
+            Log::info("Cron job dihentikan karena di luar jam kerja atau hari libur.");
             return response()->json(['message' => 'Di luar jam kerja atau hari libur, cron tidak dieksekusi.'], 200);
         }
-
         $startTime = Carbon::now()->format('Y-m-d H:i:s');
         sendNotifTelegram("🚀 *Cron Job Dimulai* \n📅 Waktu Mulai: *{$startTime}* \nMengirim notifikasi ke atasan...", $type);
         $limit = (int) env('NOTIFIKASI_LIMIT', 10);
@@ -88,7 +91,10 @@ class NotifikasiCronAtasanController extends Controller
                     Log::error($message);
                     $failureCount++;
                 }
-                sendNotifTelegram($message, $type);
+
+                if (env('SEND_NOTIF_TELEGRAM', false)) {
+                    sendNotifTelegram($message, $type);
+                }
             } catch (\Exception $e) {
                 $this->updateStatus($notifikasi->id, $notifikasi->try_send_wa_atasan);
                 // Insert ke tabel log
@@ -103,7 +109,9 @@ class NotifikasiCronAtasanController extends Controller
 
                 $errorMessage = generateMessage($notifikasi, false, null, $e->getMessage(), $type);
                 Log::error($errorMessage);
-                sendNotifTelegram($errorMessage, $type);
+                if (env('SEND_NOTIF_TELEGRAM', false)) {
+                    sendNotifTelegram($errorMessage, $type);
+                }
                 $failureCount++;
             }
         }

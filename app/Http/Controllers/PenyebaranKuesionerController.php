@@ -467,7 +467,11 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
             if (!$status) {
                 Log::error($message);
             }
-            sendNotifTelegram($message, $request->remark);
+
+            if (env('SEND_NOTIF_TELEGRAM', false)) {
+                sendNotifTelegram($message, $request->remark);
+            }
+
             return response()->json([
                 'success' => $status,
                 'message' => $response['message'],
@@ -486,7 +490,10 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
 
             $errorMessage = generateMessage($notifikasi, false, null, $e->getMessage(), $request->remark);
             Log::error($errorMessage);
-            sendNotifTelegram($errorMessage, 'atasan');
+            if (env('SEND_NOTIF_TELEGRAM', false)) {
+                sendNotifTelegram($errorMessage, $request->remark);
+            }
+
             return response()->json([
                 'success' => false,
                 'message' => 'Gagal mengirim notifikasi.',
