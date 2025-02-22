@@ -23,7 +23,9 @@ class RespondenKuesionerController extends Controller
                     'project_responden.*',
                     'project.status',
                     'project.kaldikID',
-                    'project.kaldikDesc'
+                    'project.kaldikDesc',
+                    'project_responden.deadline_pengisian_alumni',
+                    'project_responden.deadline_pengisian_atasan'
                 )
                 ->where('project_responden.id', $id)
                 ->first();
@@ -37,11 +39,18 @@ class RespondenKuesionerController extends Controller
                 ->where('project_id', $responden->project_id)
                 ->get();
 
-            return view('kuesioner', compact('responden', 'target', 'kuesioner'));
+            // Tentukan deadline berdasarkan target
+            $deadline = $target === 'Alumni' ? $responden->deadline_pengisian_alumni : $responden->deadline_pengisian_atasan;
+
+            // Cek apakah sudah lewat deadline
+            $isExpired = $deadline && now()->gt($deadline);
+
+            return view('kuesioner', compact('responden', 'target', 'kuesioner', 'isExpired'));
         } catch (\Exception $e) {
             abort(404);
         }
     }
+
 
 
 

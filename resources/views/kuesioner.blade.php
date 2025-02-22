@@ -112,6 +112,16 @@
 
 <body>
     <div class="container mt-4">
+        @if ($isExpired)
+            <div class="alert alert-warning d-flex align-items-center" role="alert">
+                <i class="fas fa-exclamation-circle me-2 fa-lg"></i>
+                <div>
+                    Form kuesioner sudah expired. Silakan hubungi administrator untuk informasi lebih lanjut.
+                </div>
+            </div>
+        @endif
+
+
         <div class="d-flex flex-column align-items-center text-center" style="padding: 15px;">
             <img src="https://registrasi.bpkp.go.id/ptia/assets/logo/Post%20Training%20Impact%20Assesment.png"
                 alt="Logo PTIA" class="img-fluid" style="max-height: 80px; width: auto;">
@@ -245,13 +255,14 @@
         @endforeach
 
 
-        @if ($responden->status_pengisian_kuesioner_alumni != 'Sudah')
+        @if (!$isExpired && $responden->status_pengisian_kuesioner_alumni != 'Sudah')
             <div class="d-flex justify-content-center mb-4">
-                <button type="submit" class="btn btn-danger" id="submitButton" disabled>
+                <button type="submit" class="btn btn-danger" id="submitButton">
                     <i class="fas fa-paper-plane"></i> Jika Sudah Yakin, Klik untuk kirim data
                 </button>
             </div>
         @endif
+
 
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
