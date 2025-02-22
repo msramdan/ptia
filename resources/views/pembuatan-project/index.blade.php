@@ -262,14 +262,14 @@
                 if (result.isConfirmed) {
                     // Tampilkan indikator loading
                     const loadingSwal = Swal.fire({
-                        title: "Sedang generate project",
+                        title: "Mohon tunggu, proses sedang berlangsung...",
                         html: `
-                    <div style="width: 100%; text-align: center;">
-                        <div class="progress" style="width: 100%; height: 20px;">
-                            <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: 100%"></div>
-                        </div>
-                    </div>
-                `,
+    <div style="width: 100%; text-align: center;">
+        <div class="progress" style="width: 100%; height: 20px;">
+            <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: 100%"></div>
+        </div>
+    </div>
+    `,
                         showConfirmButton: false,
                         willOpen: () => {
                             $(".progress-bar").css("width", "100%");
@@ -277,6 +277,7 @@
                         allowOutsideClick: false,
                         allowEscapeKey: false
                     });
+
 
                     $.ajax({
                         url: "{{ route('project.store') }}",

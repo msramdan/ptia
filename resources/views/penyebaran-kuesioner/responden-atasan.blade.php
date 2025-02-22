@@ -286,6 +286,23 @@
                 cancelButtonText: "Batal",
             }).then((result) => {
                 if (result.isConfirmed) {
+                    const loadingSwal = Swal.fire({
+                        title: "Mohon tunggu, proses sedang berlangsung...",
+                        html: `
+    <div style="width: 100%; text-align: center;">
+        <div class="progress" style="width: 100%; height: 20px;">
+            <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: 100%"></div>
+        </div>
+    </div>
+    `,
+                        showConfirmButton: false,
+                        willOpen: () => {
+                            $(".progress-bar").css("width", "100%");
+                        },
+                        allowOutsideClick: false,
+                        allowEscapeKey: false
+                    });
+
                     $.ajax({
                         url: "{{ route('penyebaran-kuesioner.send.wa') }}",
                         type: "POST",
@@ -295,6 +312,7 @@
                             remark: remark
                         },
                         success: function(response) {
+                            loadingSwal.close();
                             if (response.success) {
                                 Swal.fire("Berhasil!", response.message, "success");
                                 $("#data-table").DataTable().ajax.reload(null, false);
@@ -303,6 +321,7 @@
                             }
                         },
                         error: function() {
+                            loadingSwal.close();
                             Swal.fire("Gagal!", "Terjadi kesalahan saat mengirim notifikasi.",
                                 "error");
                         },
@@ -340,8 +359,7 @@
                         remark: remark
                     }
                 },
-                columns: [
-                    {
+                columns: [{
                         data: "telepon",
                         name: "telepon"
                     },
