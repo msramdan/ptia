@@ -25,7 +25,6 @@ return new class extends Migration {
             $table->date('deadline_pengisian_alumni')->nullable(); // Hanya tanggal, tanpa jam
 
             // Data atasan
-            $table->string('nip_atasan')->nullable();
             $table->string('nama_atasan')->nullable();
             $table->string('telepon_atasan')->nullable();
             $table->integer('try_send_wa_atasan')->default(0);

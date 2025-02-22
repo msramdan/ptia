@@ -84,6 +84,8 @@ class RespondenKuesionerController extends Controller
             'sesudah' => 'required|array',
             'catatan' => 'nullable|array',
             'remark' => 'required|in:Alumni,Atasan',
+            'atasan' => 'nullable|string',
+            'no_wa' => 'nullable|string',
         ]);
 
         try {
@@ -91,33 +93,37 @@ class RespondenKuesionerController extends Controller
 
             $dataToInsert = [];
             foreach ($validatedData['project_kuesioner_id'] as $kuesionerId => $projectKuesionerId) {
-                $nilaiSebelum = $validatedData['sebelum'][$kuesionerId] ?? 0;
-                $nilaiSesudah = $validatedData['sesudah'][$kuesionerId] ?? 0;
-                $catatan = $validatedData['catatan'][$kuesionerId] ?? null;
-
                 $dataToInsert[] = [
                     'project_kuesioner_id' => $projectKuesionerId,
                     'project_responden_id' => $validatedData['project_responden_id'],
-                    'nilai_sebelum' => $nilaiSebelum,
-                    'nilai_sesudah' => $nilaiSesudah,
-                    'catatan' => $catatan,
+                    'nilai_sebelum' => $validatedData['sebelum'][$kuesionerId] ?? 0,
+                    'nilai_sesudah' => $validatedData['sesudah'][$kuesionerId] ?? 0,
+                    'catatan' => $validatedData['catatan'][$kuesionerId] ?? null,
                     'remark' => $validatedData['remark'],
                     'created_at' => now(),
                     'updated_at' => now(),
                 ];
             }
 
-            // Insert data ke dalam tabel project_jawaban_kuesioner
+            // Insert batch data ke dalam tabel project_jawaban_kuesioner
             DB::table('project_jawaban_kuesioner')->insert($dataToInsert);
 
             // Menentukan field yang diupdate berdasarkan remark
-            $fieldToUpdate = ($validatedData['remark'] === 'Alumni') ?
-                'status_pengisian_kuesioner_alumni' : 'status_pengisian_kuesioner_atasan';
+            $updateData = [
+                ($validatedData['remark'] === 'Alumni' ? 'status_pengisian_kuesioner_alumni' : 'status_pengisian_kuesioner_atasan') => 'Sudah'
+            ];
+
+            // Jika remark adalah Alumni, tambahkan update nama_atasan, telepon_atasan, dan deadline_pengisian_atasan
+            if ($validatedData['remark'] === 'Alumni') {
+                $updateData['nama_atasan'] = $validatedData['atasan'] ?? null;
+                $updateData['telepon_atasan'] = $validatedData['no_wa'] ?? null;
+                $updateData['deadline_pengisian_atasan'] = now()->addDays((int) env('DEADLINE_PENGISIAN', 7))->format('Y-m-d');
+            }
 
             // Update status di project_responden
             DB::table('project_responden')
                 ->where('id', $validatedData['project_responden_id'])
-                ->update([$fieldToUpdate => 'Sudah']);
+                ->update($updateData);
 
             DB::commit();
 
