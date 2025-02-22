@@ -443,7 +443,7 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
 
             $telepon = $request->remark === 'Alumni' ? $notifikasi->telepon : $notifikasi->telepon_atasan;
             $try_send_wa = $request->remark === 'Alumni' ? $notifikasi->try_send_wa_alumni : $notifikasi->try_send_wa_atasan;
-            $response = sendNotifWa($telepon, "Halo, jangan lupa mengisi kuesioner alumni!", $request->remark);
+            $response = sendNotifWa($notifikasi, $telepon, $request->remark);
             $status = $response['status'];
             $statusText = $status ? 'Sukses' : 'Gagal';
             // Insert ke tabel log

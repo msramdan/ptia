@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\URL;
 
 function is_active_submenu(string|array $route): string
 {
@@ -72,7 +73,6 @@ function decryptShort($string)
     return $decoded;
 }
 
-
 function sendNotifTelegram($message, $remark)
 {
     $botToken = env('TELEGRAM_BOT_TOKEN');
@@ -128,7 +128,132 @@ function generateMessage($notifikasi, $status, $url = null, $errorMessage = null
     return "⚠️ *Remark tidak valid!*";
 }
 
-function sendNotifWa($nomor, $pesan, $remark)
+function formatPesanWhatsApp($html, $notifikasi = null, $remark = null)
 {
-    return ['status' => true, 'message' => 'Pesan berhasil dikirim'];
+    // Ubah <p> menjadi newline, mengganti </p><p> dengan dua newline
+    $text = preg_replace('/<\/p>\s*<p>/', "\n\n", $html);
+
+    // Hapus tag <p> di awal dan akhir
+    $text = preg_replace('/<\/?p>/', '', $text);
+
+    // Konversi teks tebal <b> atau <strong> menjadi *
+    $text = preg_replace('/<b>(.*?)<\/b>|<strong>(.*?)<\/strong>/', '*$1$2*', $text);
+
+    // Konversi teks miring <i> atau <em> menjadi _
+    $text = preg_replace('/<i>(.*?)<\/i>|<em>(.*?)<\/em>/', '_$1$2_', $text);
+
+    // Konversi teks bergaris bawah <u> menjadi ~
+    $text = preg_replace('/<u>(.*?)<\/u>/', '~$1~', $text);
+
+    // Ubah <br> menjadi newline
+    $text = preg_replace('/<br\s*\/?>/i', "\n", $text);
+
+    // Decode HTML entities (&nbsp;, &lt;, dll.)
+    $text = html_entity_decode($text, ENT_QUOTES, 'UTF-8');
+
+    // Hapus tag HTML lainnya jika masih ada
+    $text = strip_tags($text);
+
+    // Jika {params_link} ada dalam teks, kita ganti dengan URL terenkripsi
+    if (strpos($text, '{params_link}') !== false && $notifikasi && $remark) {
+        $encryptedId = encryptShort($notifikasi->id);
+        $encryptedTarget = encryptShort($remark);
+        $url = URL::to(route('responden-kuesioner.index', ['id' => $encryptedId, 'target' => $encryptedTarget]));
+
+        // Ganti {params_link} dengan URL
+        $text = str_replace('{params_link}', $url, $text);
+    }
+
+    // Trim untuk menghapus spasi ekstra di awal & akhir
+    return trim($text);
+}
+
+
+function sendNotifWa($notifikasi, $nomor, $remark)
+{
+    $url = "https://wagw-service.rajabilling.my.id/api/send-message";
+    $apiKey = "2e87f073bc3ac04d8633268b09d82e706403bcdd";
+    $timeout = env('TIME_OUT_SEND_WA', 5); // Ambil dari ENV, default 5 detik
+
+    // Ambil data dari tabel project_pesan_wa berdasarkan project_id
+    $pesanData = DB::table('project_pesan_wa')->where('project_id', $notifikasi->project_id)->first();
+
+    // Jika data tidak ditemukan, return error
+    if (!$pesanData) {
+        return ['status' => false, 'message' => 'Pesan tidak ditemukan untuk project ini.'];
+    }
+
+    // Tentukan pesan berdasarkan remark
+    if ($remark == "Alumni") {
+        $message = $pesanData->text_pesan_alumni ?? null;
+    } elseif ($remark == "Atasan") {
+        $message = $pesanData->text_pesan_atasan ?? null;
+    } else {
+        return ['status' => false, 'message' => 'Tipe remark tidak valid.'];
+    }
+
+    // Jika pesan kosong, return error
+    if (!$message) {
+        return ['status' => false, 'message' => 'Pesan tidak tersedia untuk remark ini.'];
+    }
+
+    // Format pesan ke format WhatsApp dengan mengganti {params_link}
+    $message = formatPesanWhatsApp($message, $notifikasi, $remark);
+
+    // Cek jika nomor kosong atau tidak valid (harus angka & panjang 10-15 karakter)
+    if (empty($nomor) || !preg_match('/^(0|62)[0-9]{9,14}$/', $nomor)) {
+        return ['status' => false, 'message' => 'Invalid WhatsApp number.'];
+    }
+
+    // Ubah nomor jika diawali dengan "0"
+    if (substr($nomor, 0, 1) === "0") {
+        $nomor = "62" . substr($nomor, 1);
+    }
+
+    $payload = [
+        "api_key" => (string) $apiKey,
+        "receiver" => (string) $nomor,
+        "data" => [
+            "message" => (string) $message
+        ]
+    ];
+
+    try {
+        $ch = curl_init($url);
+        if ($ch === false) {
+            throw new Exception("cURL initialization failed");
+        }
+
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+        curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
+
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+        if (curl_errno($ch)) {
+            $errorMsg = curl_error($ch);
+            curl_close($ch);
+
+            if (strpos($errorMsg, "timed out") !== false) {
+                return ['status' => false, 'message' => 'Gagal mengirim pesan: Permintaan timeout'];
+            }
+
+            throw new Exception('cURL error: ' . $errorMsg);
+        }
+
+        curl_close($ch);
+
+        $decodedResponse = json_decode($response, true);
+
+        if ($httpCode == 200 && isset($decodedResponse['status']) && $decodedResponse['status'] === true) {
+            return ['status' => true, 'message' => 'Pesan berhasil dikirim', 'response' => $decodedResponse];
+        } else {
+            return ['status' => false, 'message' => $decodedResponse['message'] ?? 'Gagal mengirim pesan', 'error' => $decodedResponse];
+        }
+    } catch (Exception $e) {
+        return ['status' => false, 'message' => 'Gagal mengirim pesan', 'error' => $e->getMessage()];
+    }
 }
