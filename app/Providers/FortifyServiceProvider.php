@@ -114,7 +114,7 @@ class FortifyServiceProvider extends ServiceProvider
             'nama_unit' => $userInfo['namaunit'],
         ]);
 
-        $this->assignRole($user, 1);
+        $this->assignRole($user, 2);
         return $user;
     }
 

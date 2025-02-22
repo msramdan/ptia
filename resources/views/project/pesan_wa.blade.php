@@ -78,10 +78,10 @@
                                 <a href="{{ route('project.index') }}" class="btn btn-secondary">
                                     <i class="fas fa-arrow-left"></i> {{ __('kembali') }}
                                 </a>
-                                {{-- @if ($project->status == 'Persiapan') --}}
+                                @if ($project->status == 'Persiapan')
                                     <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i>
                                         {{ __('Update') }}</button>
-                                {{-- @endif --}}
+                                @endif
                             </form>
                         </div>
                     </div>

@@ -180,13 +180,22 @@ function formatPesanWhatsApp($html, $notifikasi = null, $remark = null)
     return trim($text);
 }
 
-
-
 function sendNotifWa($notifikasi, $nomor, $remark)
 {
-    $url = "https://wagw-service.rajabilling.my.id/api/send-message";
-    $apiKey = "2e87f073bc3ac04d8633268b09d82e706403bcdd";
-    $timeout = env('TIME_OUT_SEND_WA', 5); // Ambil dari ENV, default 5 detik
+    $session = DB::table('sessions')
+        ->where('status', 'CONNECTED')
+        ->where('is_aktif', 'Yes')
+        ->select('api_key')
+        ->first();
+
+    if (!$session) {
+        return ['status' => false, 'message' => 'Gagal mengirim pesan: Tidak ada session aktif yang terhubung'];
+    }
+
+    $apiKey = $session->api_key;
+    $baseNode = env('BASE_NODE', 'http://localhost:3301');
+    $url = "$baseNode/api/send-message";
+    $timeout = env('TIME_OUT_SEND_WA', 5);
 
     // Ambil data dari tabel project_pesan_wa berdasarkan project_id
     $pesanData = DB::table('project_pesan_wa')->where('project_id', $notifikasi->project_id)->first();
