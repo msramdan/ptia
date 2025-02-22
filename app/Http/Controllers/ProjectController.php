@@ -697,12 +697,16 @@ class ProjectController extends Controller implements HasMiddleware
 
             $project = DB::table('project')->where('id', $id)->first();
 
-            if ($project && $project->status === 'Pelaksanaan') {
+            if (!$project) {
+                return to_route('project.index')->with('error', __('Project tidak ditemukan.'));
+            }
+
+            if ($project->status === 'Pelaksanaan') {
                 return to_route('project.index')->with('error', __('Status sudah Pelaksanaan, tidak bisa diubah lagi.'));
             }
 
             // Ambil jumlah hari dari ENV, default 7 jika tidak diset
-            $deadlineDays = env('DEADLINE_PENGISIAN', 7);
+            $deadlineDays = (int) env('DEADLINE_PENGISIAN', 7);
             $deadlineDate = now()->addDays($deadlineDays)->toDateString(); // Format YYYY-MM-DD
 
             // Update status proyek
@@ -713,9 +717,13 @@ class ProjectController extends Controller implements HasMiddleware
             }
 
             // Update deadline_pengisian_alumni untuk semua responden dalam proyek
-            DB::table('project_responden')
+            $respondensUpdated = DB::table('project_responden')
                 ->where('project_id', $id)
                 ->update(['deadline_pengisian_alumni' => $deadlineDate]);
+
+            if ($respondensUpdated === 0) {
+                throw new \Exception("Gagal mengupdate deadline pengisian alumni.");
+            }
 
             DB::commit(); // Commit transaksi jika semua berhasil
 
@@ -723,8 +731,12 @@ class ProjectController extends Controller implements HasMiddleware
         } catch (\Exception $e) {
             DB::rollBack(); // Rollback transaksi jika terjadi kesalahan
 
+            // Log error untuk debugging
+            \Log::error('Gagal mengupdate status proyek: ' . $e->getMessage());
+
             return to_route('project.index')->with('error', __('Terjadi kesalahan: ') . $e->getMessage());
         }
     }
+
 
 }
