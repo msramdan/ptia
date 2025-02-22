@@ -64,7 +64,7 @@ class NotifikasiCronAtasanController extends Controller
 
         foreach ($notifikasiList as $notifikasi) {
             try {
-                $response =sendNotifWa($notifikasi->telepon_atasan, "Halo, jangan lupa mengisi kuesioner atasan!", $type);
+                $response = sendNotifWa($notifikasi, $notifikasi->telepon, $type);
                 $status = $response['status'];
                 $statusText = $status ? 'Sukses' : 'Gagal';
 

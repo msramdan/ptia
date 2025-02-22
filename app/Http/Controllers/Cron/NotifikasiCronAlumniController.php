@@ -62,7 +62,7 @@ class NotifikasiCronAlumniController extends Controller
 
         foreach ($notifikasiList as $notifikasi) {
             try {
-                $response =sendNotifWa($notifikasi->telepon, "Halo, jangan lupa mengisi kuesioner alumni!", $type);
+                $response = sendNotifWa($notifikasi, $notifikasi->telepon, $type);
                 $status = $response['status'];
                 $statusText = $status ? 'Sukses' : 'Gagal';
                 // Insert ke tabel log
