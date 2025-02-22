@@ -22,20 +22,25 @@ return new class extends Migration {
             $table->integer('try_send_wa_alumni')->default(0);
             $table->enum('status_pengisian_kuesioner_alumni', ['Sudah', 'Belum'])->default('Belum');
             $table->timestamp('last_send_alumni_at')->nullable();
-            // data atasan
+            $table->date('deadline_pengisian_alumni')->nullable(); // Hanya tanggal, tanpa jam
+
+            // Data atasan
             $table->string('nip_atasan')->nullable();
             $table->string('nama_atasan')->nullable();
             $table->string('telepon_atasan')->nullable();
             $table->integer('try_send_wa_atasan')->default(0);
             $table->enum('status_pengisian_kuesioner_atasan', ['Sudah', 'Belum'])->default('Belum');
             $table->timestamp('last_send_atasan_at')->nullable();
+            $table->date('deadline_pengisian_atasan')->nullable(); // Hanya tanggal, tanpa jam
+
             $table->timestamps();
         });
     }
+
+
 
     public function down()
     {
         Schema::dropIfExists('project_responden');
     }
 };
-

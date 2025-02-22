@@ -689,23 +689,42 @@ class ProjectController extends Controller implements HasMiddleware
 
         return redirect()->back()->with('success', 'Bobot aspek berhasil diperbarui.');
     }
-    
+
     public function updateStatus($id)
     {
-        $project = DB::table('project')->where('id', $id)->first();
+        try {
+            DB::beginTransaction(); // Mulai transaksi
 
-        if ($project && $project->status === 'Pelaksanaan') {
-            return to_route('project.index')->with('error', __('Status sudah Pelaksanaan, tidak bisa diubah lagi.'));
-        }
+            $project = DB::table('project')->where('id', $id)->first();
 
-        $updated = DB::table('project')
-            ->where('id', $id)
-            ->update(['status' => 'Pelaksanaan']);
+            if ($project && $project->status === 'Pelaksanaan') {
+                return to_route('project.index')->with('error', __('Status sudah Pelaksanaan, tidak bisa diubah lagi.'));
+            }
 
-        if ($updated) {
+            // Ambil jumlah hari dari ENV, default 7 jika tidak diset
+            $deadlineDays = env('DEADLINE_PENGISIAN', 7);
+            $deadlineDate = now()->addDays($deadlineDays)->toDateString(); // Format YYYY-MM-DD
+
+            // Update status proyek
+            $updated = DB::table('project')->where('id', $id)->update(['status' => 'Pelaksanaan']);
+
+            if (!$updated) {
+                throw new \Exception("Gagal mengupdate status proyek.");
+            }
+
+            // Update deadline_pengisian_alumni untuk semua responden dalam proyek
+            DB::table('project_responden')
+                ->where('project_id', $id)
+                ->update(['deadline_pengisian_alumni' => $deadlineDate]);
+
+            DB::commit(); // Commit transaksi jika semua berhasil
+
             return to_route('project.index')->with('success', __('Status berhasil diperbarui menjadi Pelaksanaan.'));
-        }
+        } catch (\Exception $e) {
+            DB::rollBack(); // Rollback transaksi jika terjadi kesalahan
 
-        return to_route('project.index')->with('error', __('Terjadi kesalahan saat mengupdate status.'));
+            return to_route('project.index')->with('error', __('Terjadi kesalahan: ') . $e->getMessage());
+        }
     }
+
 }

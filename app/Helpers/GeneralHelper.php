@@ -154,19 +154,32 @@ function formatPesanWhatsApp($html, $notifikasi = null, $remark = null)
     // Hapus tag HTML lainnya jika masih ada
     $text = strip_tags($text);
 
-    // Jika {params_link} ada dalam teks, kita ganti dengan URL terenkripsi
+    // Ganti {params_link} jika ada
     if (strpos($text, '{params_link}') !== false && $notifikasi && $remark) {
         $encryptedId = encryptShort($notifikasi->id);
         $encryptedTarget = encryptShort($remark);
         $url = URL::to(route('responden-kuesioner.index', ['id' => $encryptedId, 'target' => $encryptedTarget]));
 
-        // Ganti {params_link} dengan URL
         $text = str_replace('{params_link}', $url, $text);
+    }
+
+    // Ganti {params_deadline} jika ada
+    if (strpos($text, '{params_deadline}') !== false && $notifikasi && $remark) {
+        $deadline = null;
+
+        if ($remark === 'Alumni') {
+            $deadline = $notifikasi->deadline_pengisian_alumni ?? '-';
+        } elseif ($remark === 'Atasan') {
+            $deadline = $notifikasi->deadline_pengisian_atasan ?? '-';
+        }
+
+        $text = str_replace('{params_deadline}', $deadline, $text);
     }
 
     // Trim untuk menghapus spasi ekstra di awal & akhir
     return trim($text);
 }
+
 
 
 function sendNotifWa($notifikasi, $nomor, $remark)
