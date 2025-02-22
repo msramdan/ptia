@@ -122,7 +122,7 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
                 })
 
                 ->addColumn('keterisian_atasan', function ($row) {
-                    $total = $row->total_responden ?: 1;
+                    $total = $row->total_responden_atasan ?: 1;
                     $sudah = $row->total_sudah_isi_atasan;
                     $persentase = round(($sudah / $total) * 100, 2);
 
