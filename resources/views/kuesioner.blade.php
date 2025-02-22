@@ -151,7 +151,7 @@
             </div>
         </div>
 
-        <form action="{{ route('responden-kuesioner.store') }}" method="POST">
+        <form action="{{ route('responden-kuesioner.store') }}" method="POST"   @if ($sudahMengisi || $isExpired) style="pointer-events: none; opacity: 0.6;" @endif>
             @csrf
             <!-- Form Kuesioner -->
             <div class="card mb-4">
