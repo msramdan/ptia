@@ -38,6 +38,7 @@ Route::get('/kirim-notifikasi-atasan', [NotifikasiCronAtasanController::class, '
 
 // Share kuesioner
 Route::get('/responden-kuesioner/{id}/{target}', [RespondenKuesionerController::class, 'index'])->name('responden-kuesioner.index');
+Route::post('/responden-kuesioner', [RespondenKuesionerController::class, 'store'])->name('responden-kuesioner.store');
 
 Route::middleware(['auth', 'web'])->group(function () {
     Route::get('/', fn() => view('dashboard'));
