@@ -205,7 +205,14 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
                 ->leftJoinSub(
                     DB::table('project_log_send_notif as log1')
                         ->select('log1.project_responden_id', 'log1.telepon', 'log1.status')
-                        ->whereRaw('log1.created_at = (SELECT MAX(log2.created_at) FROM project_log_send_notif as log2 WHERE log2.project_responden_id = log1.project_responden_id AND log2.telepon = log1.telepon)')
+                        ->where('log1.remark', 'Alumni') // Tambahkan filter remark = 'Alumni'
+                        ->whereRaw('log1.created_at = (
+                        SELECT MAX(log2.created_at)
+                        FROM project_log_send_notif as log2
+                        WHERE log2.project_responden_id = log1.project_responden_id
+                        AND log2.telepon = log1.telepon
+                        AND log2.remark = "Alumni"
+                    )')
                         ->orderByDesc('log1.created_at'),
                     'log_wa',
                     function ($join) {
@@ -215,6 +222,7 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
                 )
                 ->select('pr.*', 'log_wa.status as wa_status')
                 ->get();
+
 
             return DataTables::of($respondens)
                 ->addIndexColumn()
@@ -273,7 +281,8 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
                 ->leftJoinSub(
                     DB::table('project_log_send_notif as log1')
                         ->select('log1.project_responden_id', 'log1.telepon', 'log1.status')
-                        ->whereRaw('log1.created_at = (SELECT MAX(log2.created_at) FROM project_log_send_notif as log2 WHERE log2.project_responden_id = log1.project_responden_id AND log2.telepon = log1.telepon)')
+                        ->where('log1.remark', 'Atasan')
+                        ->whereRaw('log1.created_at = (SELECT MAX(log2.created_at) FROM project_log_send_notif as log2 WHERE log2.project_responden_id = log1.project_responden_id AND log2.telepon = log1.telepon AND log2.remark = "Atasan")')
                         ->orderByDesc('log1.created_at'),
                     'log_wa',
                     function ($join) {
