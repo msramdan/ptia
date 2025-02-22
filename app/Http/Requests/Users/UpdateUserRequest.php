@@ -27,7 +27,8 @@ class UpdateUserRequest extends FormRequest
             'email' => ['required', 'email', 'unique:users,email,' . $this?->user?->id ?? request()->segment(2)],
             'avatar' => ['nullable', 'image', 'max:1024'],
             'role' => ['required', 'exists:roles,id'],
-            'password' =>  $this->passwordRules()
+            'password' =>  $this->passwordRules(),
+            'phone' => ['required', 'regex:/^[0-9]+$/', 'min:10', 'max:15']
         ];
     }
 }

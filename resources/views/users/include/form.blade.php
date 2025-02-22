@@ -26,6 +26,22 @@
             @enderror
         </div>
     </div>
+
+    <div class="col-md-12 mb-3">
+        <div class="form-group">
+            <label for="phone">Telepon</label>
+            <input type="number" name="phone" id="phone"
+                class="form-control @error('phone') is-invalid @enderror" placeholder="Telepon"
+                value="{{ isset($user) ? $user->phone : old('phone') }}" required>
+            @error('phone')
+                <span class="text-danger">
+                    {{ $message }}
+                </span>
+            @enderror
+        </div>
+    </div>
+
+
     @isset($user)
         <div class="col-md-12 mb-3">
             <div class="form-group">

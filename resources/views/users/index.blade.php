@@ -41,8 +41,9 @@
                                         <tr>
                                             <th>#</th>
                                             <th>{{ __('Avatar') }}</th>
-                                            <th>{{ __('Name') }}</th>
+                                            <th>{{ __('Nama') }}</th>
                                             <th>{{ __('Email') }}</th>
+                                            <th>{{ __('Telepon') }}</th>
                                             <th>{{ __('Role') }}</th>
                                             <th>{{ __('Action') }}</th>
                                         </tr>
@@ -119,6 +120,10 @@
                 {
                     data: 'email',
                     name: 'email'
+                },
+                {
+                    data: 'phone',
+                    name: 'phone'
                 },
                 {
                     data: 'role',

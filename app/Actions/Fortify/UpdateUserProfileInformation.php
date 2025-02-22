@@ -37,25 +37,28 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
                 'max:255',
                 Rule::unique('users')->ignore($user->id),
             ],
+            'phone' => ['required', 'regex:/^[0-9]+$/', 'min:10', 'max:15'],
             'avatar' => ['nullable', 'image', 'max:1024']
         ])->validateWithBag('updateProfileInformation');
 
+        // Update avatar jika diunggah
         if (isset($input['avatar']) && $input['avatar']->isValid()) {
-
             $filename = (new ImageService)->upload(name: 'avatar', path: $this->avatarPath, defaultImage: $user->avatar);
-
             $user->forceFill(['avatar' => $filename])->save();
         }
 
+        // Jika email berubah dan perlu diverifikasi
         if ($input['email'] !== $user->email && $user instanceof MustVerifyEmail) {
             $this->updateVerifiedUser($user, $input);
         } else {
             $user->forceFill([
                 'name' => $input['name'],
                 'email' => $input['email'],
+                'phone' => $input['phone'], // Menambahkan update phone
             ])->save();
         }
     }
+
 
     /**
      * Update the given verified user's profile information.

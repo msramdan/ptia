@@ -46,12 +46,16 @@
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td class="fw-bold">{{ __('Name') }}</td>
+                                        <td class="fw-bold">{{ __('Nama') }}</td>
                                         <td>{{ $user->name }}</td>
                                     </tr>
                                     <tr>
                                         <td class="fw-bold">{{ __('Email') }}</td>
                                         <td>{{ $user->email }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold">{{ __('Telepon') }}</td>
+                                        <td>{{ $user->phone }}</td>
                                     </tr>
                                     <tr>
                                         <td class="fw-bold">{{ __('Role') }}</td>

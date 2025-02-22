@@ -37,7 +37,20 @@
                                 @method('PUT')
 
                                 <div class="form-group">
-                                    <label for="email">{{ __('E-mail Address') }}</label>
+                                    <label for="name">{{ __('Nama') }}</label>
+                                    <input type="text" name="name" readonly
+                                        class="form-control @error('name', 'updateProfileInformation') is-invalid @enderror"
+                                        id="name" placeholder="{{ __('Name') }}"
+                                        value="{{ old('name') ?? auth()?->user()?->name }}" required>
+                                    @error('name', 'updateProfileInformation')
+                                        <span class="text-danger">
+                                            {{ $message }}
+                                        </span>
+                                    @enderror
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="email">{{ __('Email') }}</label>
                                     <input type="email" name="email" readonly
                                         class="form-control @error('email', 'updateProfileInformation') is-invalid @enderror"
                                         id="email" placeholder="{{ __('E-mail Address') }}"
@@ -51,17 +64,18 @@
                                 </div>
 
                                 <div class="form-group">
-                                    <label for="name">{{ __('Name') }}</label>
-                                    <input type="text" name="name" readonly
-                                        class="form-control  @error('name', 'updateProfileInformation') is-invalid @enderror"
-                                        id="name" placeholder="{{ __('Name') }}"
-                                        value="{{ old('name') ?? auth()?->user()?->name }}" required>
-                                    @error('name', 'updateProfileInformation')
+                                    <label for="phone">{{ __('Telepon') }}</label>
+                                    <input type="text" name="phone"
+                                        class="form-control @error('phone', 'updateProfileInformation') is-invalid @enderror"
+                                        id="phone" placeholder="{{ __('Telepon') }}"
+                                        value="{{ old('phone') ?? auth()?->user()?->phone }}" required>
+                                    @error('phone', 'updateProfileInformation')
                                         <span class="text-danger">
                                             {{ $message }}
                                         </span>
                                     @enderror
                                 </div>
+
 
                                 <div class="row">
                                     <div class="col-md-4">
