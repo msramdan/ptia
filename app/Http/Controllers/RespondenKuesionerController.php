@@ -17,6 +17,7 @@ class RespondenKuesionerController extends Controller
                 abort(404);
             }
 
+            // Ambil responden dengan data project
             $responden = DB::table('project_responden')
                 ->join('project', 'project_responden.project_id', '=', 'project.id')
                 ->select(
@@ -26,8 +27,8 @@ class RespondenKuesionerController extends Controller
                     'project.kaldikDesc',
                     'project_responden.deadline_pengisian_alumni',
                     'project_responden.deadline_pengisian_atasan',
-                    'project_responden.status_pengisian_kuesioner_alumni', // Tambahkan status alumni
-                    'project_responden.status_pengisian_kuesioner_atasan'  // Tambahkan status atasan
+                    'project_responden.status_pengisian_kuesioner_alumni',
+                    'project_responden.status_pengisian_kuesioner_atasan'
                 )
                 ->where('project_responden.id', $id)
                 ->first();
@@ -36,9 +37,23 @@ class RespondenKuesionerController extends Controller
                 abort(404);
             }
 
-            $kuesioner = DB::table('project_kuesioner')
-                ->where('remark', $target)
-                ->where('project_id', $responden->project_id)
+            // Ambil semua kuesioner beserta jawabannya dalam satu query
+            $kuesioner = DB::table('project_kuesioner as pk')
+                ->leftJoin('project_jawaban_kuesioner as pj', function ($join) use ($id, $target) {
+                    $join->on('pk.id', '=', 'pj.project_kuesioner_id')
+                        ->where('pj.project_responden_id', $id)
+                        ->where('pj.remark', $target);
+                })
+                ->where('pk.remark', $target)
+                ->where('pk.project_id', $responden->project_id)
+                ->select(
+                    'pk.id',
+                    'pk.aspek',
+                    'pk.pertanyaan',
+                    'pj.nilai_sebelum',
+                    'pj.nilai_sesudah',
+                    'pj.catatan'
+                )
                 ->get();
 
             // Tentukan deadline berdasarkan target
@@ -59,7 +74,6 @@ class RespondenKuesionerController extends Controller
             abort(404);
         }
     }
-
 
     public function store(Request $request)
     {
