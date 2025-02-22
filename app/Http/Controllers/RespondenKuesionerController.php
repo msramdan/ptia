@@ -84,8 +84,8 @@ class RespondenKuesionerController extends Controller
             'sesudah' => 'required|array',
             'catatan' => 'nullable|array',
             'remark' => 'required|in:Alumni,Atasan',
-            'atasan' => 'nullable|string',
-            'no_wa' => 'nullable|string',
+            'atasan' => 'required|string',
+            'no_wa' => 'required|string',
         ]);
 
         try {
