@@ -61,7 +61,8 @@ class WaBlastController extends Controller implements HasMiddleware
             'api_key' => $apiKey,
             'user_id' => auth()->id(),
         ]);
-        return to_route('wa-blast.index')->with('success', __('The wa blast was created successfully.'));
+
+        return to_route('wa-blast.index')->with('success', __('WA Blast berhasil dibuat.'));
     }
 
     public function show(WaBlast $waBlast): View
@@ -74,9 +75,9 @@ class WaBlastController extends Controller implements HasMiddleware
         try {
             $waBlast->delete();
 
-            return to_route('wa-blast.index')->with('success', __('The wa blast was deleted successfully.'));
+            return to_route('wa-blast.index')->with('success', __('WA Blast berhasil dihapus.'));
         } catch (\Exception $e) {
-            return to_route('wa-blast.index')->with('error', __("The wa blast can't be deleted because it's related to another table."));
+            return to_route('wa-blast.index')->with('error', __("WA Blast tidak dapat dihapus karena terkait dengan tabel lain."));
         }
     }
 
@@ -104,10 +105,10 @@ class WaBlastController extends Controller implements HasMiddleware
                 return response()->json(['success' => true]);
             }
 
-            return response()->json(['success' => false, 'message' => 'Session not found or not updated.'], 404);
+            return response()->json(['success' => false, 'message' => 'Sesi tidak ditemukan atau tidak diperbarui.'], 404);
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['success' => false, 'message' => 'An error occurred while updating the session.'], 500);
+            return response()->json(['success' => false, 'message' => 'Terjadi kesalahan saat memperbarui sesi.'], 500);
         }
     }
 }

@@ -97,12 +97,12 @@ class UserController extends Controller implements HasMiddleware
 
             $user->syncRoles($role->name);
 
-            return to_route('users.index')->with('success', __('The user was updated successfully.'));
+            return to_route('users.index')->with('success', __('Pengguna berhasil diperbarui.'));
         });
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Menghapus pengguna yang dipilih.
      */
     public function destroy(User $user): RedirectResponse
     {
@@ -114,10 +114,11 @@ class UserController extends Controller implements HasMiddleware
 
                 $this->imageService->delete(image: $this->avatarPath . $avatar);
 
-                return to_route('users.index')->with('success', __('The user was deleted successfully.'));
+                return to_route('users.index')->with('success', __('Pengguna berhasil dihapus.'));
             });
         } catch (\Exception $e) {
-            return to_route('users.index')->with('error', __("The user can't be deleted because it's related to another table."));
+            return to_route('users.index')->with('error', __("Pengguna tidak dapat dihapus karena terkait dengan tabel lain."));
         }
     }
+
 }

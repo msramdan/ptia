@@ -31,7 +31,7 @@ class SingleSenderController extends Controller implements HasMiddleware
         if ($activeSession) {
             return view('single-sender.create', ['activeSession' => $activeSession]);
         } else {
-            return to_route('wa-blast.index')->with('error', __('No active WhatsApp session found.'));
+            return to_route('wa-blast.index')->with('error', __('Tidak ada sesi WhatsApp aktif yang ditemukan.'));
         }
     }
 
@@ -50,12 +50,12 @@ class SingleSenderController extends Controller implements HasMiddleware
             $response = Http::post("{$baseUrl}/api/send-message", $payload);
 
             if ($response->successful()) {
-                return to_route('single-sender.index')->with('success', __('The single sender was sent successfully.'));
+                return to_route('single-sender.index')->with('success', __('Pesan berhasil dikirim.'));
             } else {
-                return to_route('single-sender.index')->with('error', __('The message could not be sent.'));
+                return to_route('single-sender.index')->with('error', __('Pesan gagal dikirim.'));
             }
         } catch (\Exception $e) {
-            return to_route('single-sender.index')->with('error', __('An error occurred while sending the message.'));
+            return to_route('single-sender.index')->with('error', __('Terjadi kesalahan saat mengirim pesan.'));
         }
     }
 }

@@ -67,18 +67,17 @@ class IndikatorDampakController extends Controller implements HasMiddleware
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Simpan data indikator dampak yang baru.
      */
     public function store(StoreIndikatorDampakRequest $request): RedirectResponse
     {
-
         IndikatorDampak::create($request->validated());
 
-        return to_route('indikator-dampak.index')->with('success', __('The indikator dampak was created successfully.'));
+        return to_route('indikator-dampak.index')->with('success', __('Indikator dampak berhasil dibuat.'));
     }
 
     /**
-     * Display the specified resource.
+     * Tampilkan detail indikator dampak.
      */
     public function show(IndikatorDampak $indikatorDampak): View
     {
@@ -86,7 +85,7 @@ class IndikatorDampakController extends Controller implements HasMiddleware
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Tampilkan formulir untuk mengedit indikator dampak.
      */
     public function edit(IndikatorDampak $indikatorDampak): View
     {
@@ -95,27 +94,26 @@ class IndikatorDampakController extends Controller implements HasMiddleware
     }
 
     /**
-     * Update the specified resource in storage.
+     * Perbarui data indikator dampak yang dipilih.
      */
     public function update(UpdateIndikatorDampakRequest $request, IndikatorDampak $indikatorDampak): RedirectResponse
     {
-
         $indikatorDampak->update($request->validated());
 
-        return to_route('indikator-dampak.index')->with('success', __('The indikator dampak was updated successfully.'));
+        return to_route('indikator-dampak.index')->with('success', __('Indikator dampak berhasil diperbarui.'));
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Hapus data indikator dampak yang dipilih.
      */
     public function destroy(IndikatorDampak $indikatorDampak): RedirectResponse
     {
         try {
             $indikatorDampak->delete();
 
-            return to_route('indikator-dampak.index')->with('success', __('The indikator dampak was deleted successfully.'));
+            return to_route('indikator-dampak.index')->with('success', __('Indikator dampak berhasil dihapus.'));
         } catch (\Exception $e) {
-            return to_route('indikator-dampak.index')->with('error', __("The indikator dampak can't be deleted because it's related to another table."));
+            return to_route('indikator-dampak.index')->with('error', __('Indikator dampak tidak dapat dihapus karena masih terhubung dengan tabel lain.'));
         }
     }
 }

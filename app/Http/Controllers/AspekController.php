@@ -114,31 +114,30 @@ class AspekController extends Controller implements HasMiddleware
     public function edit(Aspek $aspek): View
     {
         $diklatTypes = DB::table('diklat_type')->select('id', 'nama_diklat_type')->get();
-        return view('aspek.edit', compact('aspek','diklatTypes'));
+        return view('aspek.edit', compact('aspek', 'diklatTypes'));
     }
 
     /**
-     * Update the specified resource in storage.
+     * Perbarui data aspek yang dipilih.
      */
     public function update(UpdateAspekRequest $request, Aspek $aspek): RedirectResponse
     {
-
         $aspek->update($request->validated());
 
-        return to_route('aspek.index')->with('success', __('The aspek was updated successfully.'));
+        return to_route('aspek.index')->with('success', __('Aspek berhasil diperbarui.'));
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Hapus data aspek yang dipilih.
      */
     public function destroy(Aspek $aspek): RedirectResponse
     {
         try {
             $aspek->delete();
 
-            return to_route('aspek.index')->with('success', __('The aspek was deleted successfully.'));
+            return to_route('aspek.index')->with('success', __('Aspek berhasil dihapus.'));
         } catch (\Exception $e) {
-            return to_route('aspek.index')->with('error', __("The aspek can't be deleted because it's related to another table."));
+            return to_route('aspek.index')->with('error', __('Aspek tidak dapat dihapus karena masih terhubung dengan tabel lain.'));
         }
     }
 }

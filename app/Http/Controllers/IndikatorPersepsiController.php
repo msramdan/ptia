@@ -73,18 +73,17 @@ class IndikatorPersepsiController extends Controller implements HasMiddleware
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Simpan data indikator persepsi yang baru.
      */
     public function store(StoreIndikatorPersepsiRequest $request): RedirectResponse
     {
-
         IndikatorPersepsi::create($request->validated());
 
-        return to_route('indikator-persepsi.index')->with('success', __('The indikator persepsi was created successfully.'));
+        return to_route('indikator-persepsi.index')->with('success', __('Indikator persepsi berhasil dibuat.'));
     }
 
     /**
-     * Display the specified resource.
+     * Tampilkan detail indikator persepsi.
      */
     public function show(IndikatorPersepsi $indikatorPersepsi): View
     {
@@ -94,7 +93,7 @@ class IndikatorPersepsiController extends Controller implements HasMiddleware
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Tampilkan formulir untuk mengedit indikator persepsi.
      */
     public function edit(IndikatorPersepsi $indikatorPersepsi): View
     {
@@ -104,27 +103,26 @@ class IndikatorPersepsiController extends Controller implements HasMiddleware
     }
 
     /**
-     * Update the specified resource in storage.
+     * Perbarui data indikator persepsi yang dipilih.
      */
     public function update(UpdateIndikatorPersepsiRequest $request, IndikatorPersepsi $indikatorPersepsi): RedirectResponse
     {
-
         $indikatorPersepsi->update($request->validated());
 
-        return to_route('indikator-persepsi.index')->with('success', __('The indikator persepsi was updated successfully.'));
+        return to_route('indikator-persepsi.index')->with('success', __('Indikator persepsi berhasil diperbarui.'));
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Hapus data indikator persepsi yang dipilih.
      */
     public function destroy(IndikatorPersepsi $indikatorPersepsi): RedirectResponse
     {
         try {
             $indikatorPersepsi->delete();
 
-            return to_route('indikator-persepsi.index')->with('success', __('The indikator persepsi was deleted successfully.'));
+            return to_route('indikator-persepsi.index')->with('success', __('Indikator persepsi berhasil dihapus.'));
         } catch (\Exception $e) {
-            return to_route('indikator-persepsi.index')->with('error', __("The indikator persepsi can't be deleted because it's related to another table."));
+            return to_route('indikator-persepsi.index')->with('error', __('Indikator persepsi tidak dapat dihapus karena masih terhubung dengan tabel lain.'));
         }
     }
 }

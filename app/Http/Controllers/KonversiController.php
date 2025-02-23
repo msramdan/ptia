@@ -70,22 +70,21 @@ class KonversiController extends Controller implements HasMiddleware
     public function create(): View
     {
         $diklatTypes = DB::table('diklat_type')->select('id', 'nama_diklat_type')->get();
-        return view('konversi.create',compact('diklatTypes'));
+        return view('konversi.create', compact('diklatTypes'));
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Simpan data konversi yang baru.
      */
     public function store(StoreKonversiRequest $request): RedirectResponse
     {
-
         Konversi::create($request->validated());
 
-        return to_route('konversi.index')->with('success', __('The konversi was created successfully.'));
+        return to_route('konversi.index')->with('success', __('Konversi berhasil dibuat.'));
     }
 
     /**
-     * Display the specified resource.
+     * Tampilkan detail konversi.
      */
     public function show(Konversi $konversi): View
     {
@@ -93,36 +92,35 @@ class KonversiController extends Controller implements HasMiddleware
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Tampilkan formulir untuk mengedit konversi.
      */
     public function edit(Konversi $konversi): View
     {
         $diklatTypes = DB::table('diklat_type')->select('id', 'nama_diklat_type')->get();
-        return view('konversi.edit', compact('konversi','diklatTypes'));
+        return view('konversi.edit', compact('konversi', 'diklatTypes'));
     }
 
     /**
-     * Update the specified resource in storage.
+     * Perbarui data konversi yang dipilih.
      */
     public function update(UpdateKonversiRequest $request, Konversi $konversi): RedirectResponse
     {
-
         $konversi->update($request->validated());
 
-        return to_route('konversi.index')->with('success', __('The konversi was updated successfully.'));
+        return to_route('konversi.index')->with('success', __('Konversi berhasil diperbarui.'));
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Hapus data konversi yang dipilih.
      */
     public function destroy(Konversi $konversi): RedirectResponse
     {
         try {
             $konversi->delete();
 
-            return to_route('konversi.index')->with('success', __('The konversi was deleted successfully.'));
+            return to_route('konversi.index')->with('success', __('Konversi berhasil dihapus.'));
         } catch (\Exception $e) {
-            return to_route('konversi.index')->with('error', __("The konversi can't be deleted because it's related to another table."));
+            return to_route('konversi.index')->with('error', __('Konversi tidak dapat dihapus karena masih terhubung dengan tabel lain.'));
         }
     }
 }

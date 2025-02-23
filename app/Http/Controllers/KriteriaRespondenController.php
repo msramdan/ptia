@@ -51,7 +51,8 @@ class KriteriaRespondenController extends Controller implements HasMiddleware
 
         $kriteriaResponden->update($data);
 
-        return back()->with('success', __('The kriteria responden was updated successfully.'));
+        return back()->with('success', __('Kriteria responden berhasil diperbarui.'));
     }
+
 
 }

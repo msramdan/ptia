@@ -30,7 +30,7 @@ class RoleAndPermissionController extends Controller implements HasMiddleware
      *
      * @return \Illuminate\Http\Response
      */
-    public function index():  View|JsonResponse
+    public function index(): View|JsonResponse
     {
         if (request()->ajax()) {
             $users = Role::query();
@@ -38,7 +38,7 @@ class RoleAndPermissionController extends Controller implements HasMiddleware
             return DataTables::of($users)
                 ->addIndexColumn()
                 ->addColumn('created_at', fn($row) => $row->created_at->format('Y-m-d H:i:s'))
-                ->addColumn('updated_at',fn($row) => $row->updated_at->format('Y-m-d H:i:s'))
+                ->addColumn('updated_at', fn($row) => $row->updated_at->format('Y-m-d H:i:s'))
                 ->addColumn('action', 'roles.include.action')
                 ->toJson();
         }
@@ -53,20 +53,19 @@ class RoleAndPermissionController extends Controller implements HasMiddleware
     {
         return view('roles.create');
     }
-
     /**
-     * Store a newly created resource in storage.
+     * Simpan role baru ke dalam database.
      */
     public function store(StoreRoleRequest $request): RedirectResponse
     {
         $role = Role::create(['name' => $request->name]);
         $role->givePermissionTo($request->permissions);
 
-        return to_route('roles.index')->with('success', __('The role was created successfully.'));
+        return to_route('roles.index')->with('success', __('Role berhasil dibuat.'));
     }
 
     /**
-     * Display the specified resource.
+     * Tampilkan detail role.
      */
     public function show(int $id): View
     {
@@ -76,7 +75,7 @@ class RoleAndPermissionController extends Controller implements HasMiddleware
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Tampilkan form edit role.
      */
     public function edit(int $id): View
     {
@@ -86,7 +85,7 @@ class RoleAndPermissionController extends Controller implements HasMiddleware
     }
 
     /**
-     * Update the specified resource in storage.
+     * Perbarui data role di database.
      */
     public function update(UpdateRoleRequest $request, string $id): RedirectResponse
     {
@@ -94,11 +93,11 @@ class RoleAndPermissionController extends Controller implements HasMiddleware
         $role->update(['name' => $request->name]);
         $role->syncPermissions($request->permissions);
 
-        return to_route('roles.index')->with('success', __('The role was updated successfully.'));
+        return to_route('roles.index')->with('success', __('Role berhasil diperbarui.'));
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Hapus role dari database.
      */
     public function destroy(string $id): RedirectResponse
     {
@@ -107,9 +106,9 @@ class RoleAndPermissionController extends Controller implements HasMiddleware
         if ($role->users_count < 1) {
             $role->delete();
 
-            return to_route('roles.index')->with('success', __('The role was deleted successfully.'));
+            return to_route('roles.index')->with('success', __('Role berhasil dihapus.'));
         }
 
-        return to_route('roles.index')->with('error', __('Can`t delete role.'));
+        return to_route('roles.index')->with('error', __('Role tidak dapat dihapus.'));
     }
 }

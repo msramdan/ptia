@@ -67,16 +67,18 @@ class KuesionerController extends Controller implements HasMiddleware
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Simpan data baru ke dalam penyimpanan.
      */
     public function store(StoreKuesionerRequest $request): RedirectResponse
     {
-
         Kuesioner::create($request->validated());
 
-        return to_route('kuesioner.index')->with('success', __('The kuesioner was created successfully.'));
+        return to_route('kuesioner.index')->with('success', __('Kuesioner berhasil dibuat.'));
     }
 
+    /**
+     * Tampilkan data kuesioner yang dipilih.
+     */
     public function show(int $id): View
     {
         $kuesioner = DB::table('kuesioner')
@@ -97,6 +99,9 @@ class KuesionerController extends Controller implements HasMiddleware
         return view('kuesioner.show', compact('kuesioner'));
     }
 
+    /**
+     * Tampilkan formulir untuk mengedit data kuesioner.
+     */
     public function edit($id): View
     {
         $kuesioner = DB::table('kuesioner')
@@ -105,32 +110,37 @@ class KuesionerController extends Controller implements HasMiddleware
             ->select('kuesioner.*', 'aspek.aspek', 'aspek.diklat_type_id', 'diklat_type.nama_diklat_type')
             ->where('kuesioner.id', $id)
             ->first(); // Pakai first() karena kita ambil satu record
-    
+
         $diklatTypes = DB::table('diklat_type')->select('id', 'nama_diklat_type')->get();
         $aspeks = DB::table('aspek')
             ->join('diklat_type', 'aspek.diklat_type_id', '=', 'diklat_type.id')
             ->select('aspek.id', 'aspek.aspek', 'aspek.diklat_type_id', 'diklat_type.nama_diklat_type')
             ->get();
-    
+
         return view('kuesioner.edit', compact('kuesioner', 'diklatTypes', 'aspeks'));
     }
 
+    /**
+     * Perbarui data kuesioner yang dipilih.
+     */
     public function update(UpdateKuesionerRequest $request, Kuesioner $kuesioner): RedirectResponse
     {
-
         $kuesioner->update($request->validated());
 
-        return to_route('kuesioner.index')->with('success', __('The kuesioner was updated successfully.'));
+        return to_route('kuesioner.index')->with('success', __('Kuesioner berhasil diperbarui.'));
     }
-    
+
+    /**
+     * Hapus data kuesioner yang dipilih.
+     */
     public function destroy(Kuesioner $kuesioner): RedirectResponse
     {
         try {
             $kuesioner->delete();
 
-            return to_route('kuesioner.index')->with('success', __('The kuesioner was deleted successfully.'));
+            return to_route('kuesioner.index')->with('success', __('Kuesioner berhasil dihapus.'));
         } catch (\Exception $e) {
-            return to_route('kuesioner.index')->with('error', __("The kuesioner can't be deleted because it's related to another table."));
+            return to_route('kuesioner.index')->with('error', __("Kuesioner tidak dapat dihapus karena masih terkait dengan tabel lain."));
         }
     }
 }

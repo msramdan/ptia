@@ -30,9 +30,9 @@ class PesanWaController extends Controller implements HasMiddleware
 
     public function update(UpdatePesanWaRequest $request, PesanWa $pesanWa): RedirectResponse
     {
-
         $pesanWa->update($request->validated());
 
-        return to_route('pesan-wa.index')->with('success', __('The pesan wa was updated successfully.'));
+        return to_route('pesan-wa.index')->with('success', __('Pesan WA berhasil diperbarui.'));
     }
+
 }
