@@ -20,6 +20,7 @@ use App\Http\Controllers\{
     KonversiController,
     KuesionerController,
     PembuatanProjectController,
+    PengumpulanDataController,
     PenyebaranKuesionerController,
     ProjectController,
     RespondenKuesionerController,
@@ -81,6 +82,10 @@ Route::middleware(['auth', 'web'])->group(function () {
         Route::get('/log-wa', 'getLogNotifWa')->name('penyebaran-kuesioner.log.wa');
     });
 
+    Route::prefix('pengumpulan-data')->controller(PengumpulanDataController::class)->group(function () {
+        Route::get('/', 'index')->name('pengumpulan-data.index');
+    });
+
 
     Route::get('/bobot-aspek', [BobotAspekController::class, 'index'])->name('bobot-aspek.index');
     Route::put('/bobot-aspek', [BobotAspekController::class, 'update'])->name('bobot-aspek.update');
@@ -112,3 +117,4 @@ Route::middleware(['auth', 'web'])->group(function () {
         Route::put('/update-status/{id}', 'updateStatus')->name('project.updateStatus');
     });
 });
+

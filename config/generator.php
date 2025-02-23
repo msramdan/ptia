@@ -178,7 +178,7 @@ return [
                         'title' => 'Kriteria Responden',
                         'route' => '/kriteria-responden',
                         'permission' => 'kriteria responden view'
-                    ],
+                    ]
                 ]
             ]
         ]
@@ -260,17 +260,20 @@ return [
     [
         'header' => 'Pelaksanaan',
         'permissions' => [
-            'penyebaran kuesioner view'
+            'penyebaran kuesioner view',
+            'pengumpulan data view'
         ],
         'menus' => [
             [
                 'title' => 'Pelaksanaan',
                 'icon' => '<i class="bi bi-folder"></i>',
                 'route' => [
-                    'penyebaran-kuesioner*'
+                    'penyebaran-kuesioner*',
+                    'pengumpulan-data*'
                 ],
                 'permissions' => [
-                    'penyebaran kuesioner view'
+                    'penyebaran kuesioner view',
+                    'pengumpulan data view'
                 ],
                 'submenus' => [
                     [
@@ -280,7 +283,7 @@ return [
                     ],
                     [
                         'title' => 'Pengumpulan Data',
-                        'route' => '/project',
+                        'route' => '/pengumpulan-data',
                         'permission' => 'pengumpulan data view'
                     ]
                 ]
