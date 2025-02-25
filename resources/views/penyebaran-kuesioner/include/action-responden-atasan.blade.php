@@ -17,7 +17,7 @@
         $isBelum = $model->status_pengisian_kuesioner_atasan === 'Belum';
     @endphp
 
-    <a href="{{ route('responden-kuesioner.index', ['id' => $encryptedId, 'target' => $encryptedTarget]) }}"
+    <a href="{{ route('responden-kuesioner.index', ['id' => $encryptedId, 'target' => $encryptedTarget, 'token' => $model->token]) }}"
         class="btn btn-{{ $isBelum ? 'danger' : 'success' }} btn-sm"
         title="{{ $isBelum ? 'Atasan langsung belum melakukan pengisian Kuisioner klik untuk melihat kuesioner' : 'Kuisioner sudah diisi klik untuk melihat data' }}"
         target="_blank">
