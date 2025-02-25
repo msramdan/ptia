@@ -194,18 +194,28 @@
             </div>
 
             <!-- Uraian -->
+            @php
+                $aspekSkorPersepsi = $kuesioner
+                    ->where('kriteria', 'Skor Persepsi')
+                    ->pluck('aspek')
+                    ->unique()
+                    ->implode(', ');
+            @endphp
+
             <div class="alert alert-warning mb-4" role="alert"
-                style="text-align: justify,border-radius: 8px;
+                style="text-align: justify; border-radius: 8px;
             font-size: 0.95rem;
             background: #fff4e6;
             border-left: 5px solid #ff9800;">
-                <strong>Uraian:</strong> Isilah skor dari pernyataan berikut ini menurut persepsi anda dengan melingkari
-                skala persepsi 1 - 4. Untuk aspek kemampuan membagikan keilmuan, skor persepsi hanya untuk kondisi
-                setelah
-                mengikuti pelatihan. Sedangkan untuk aspek lainnya, skor persepsi terdiri dari kondisi sebelum dan
-                setelah
-                mengikuti pelatihan.
+                <strong>Uraian:</strong> Isilah skor untuk setiap pernyataan berikut berdasarkan persepsi Anda dengan
+                memilih skala 1 - 4.
+                @if ($aspekSkorPersepsi)
+                    Untuk aspek <strong>{{ $aspekSkorPersepsi }}</strong>, hanya perlu mengisi skor persepsi
+                    <strong>setelah mengikuti pelatihan</strong>.
+                @endif
+                Untuk aspek lainnya, isi skor persepsi <strong>baik sebelum maupun setelah pelatihan</strong>.
             </div>
+
 
             @foreach ($kuesioner as $item)
                 <div class="card mb-4">
