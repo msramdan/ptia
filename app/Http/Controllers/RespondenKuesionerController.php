@@ -49,6 +49,7 @@ class RespondenKuesionerController extends Controller
                 ->select(
                     'pk.id',
                     'pk.aspek',
+                    'pk.kriteria',
                     'pk.pertanyaan',
                     'pj.nilai_sebelum',
                     'pj.nilai_sesudah',
@@ -68,7 +69,7 @@ class RespondenKuesionerController extends Controller
                 $responden->status_pengisian_kuesioner_atasan;
 
             $sudahMengisi = ($statusPengisian === 'Sudah');
-
+            // dd($kuesioner);
             return view('kuesioner', compact('responden', 'target', 'kuesioner', 'isExpired', 'sudahMengisi'));
         } catch (\Exception $e) {
             abort(404);

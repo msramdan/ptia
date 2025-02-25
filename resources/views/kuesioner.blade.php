@@ -151,7 +151,8 @@
             </div>
         </div>
 
-        <form action="{{ route('responden-kuesioner.store') }}" method="POST"   @if ($sudahMengisi || $isExpired) style="pointer-events: none; opacity: 0.6;" @endif>
+        <form action="{{ route('responden-kuesioner.store') }}" method="POST"
+            @if ($sudahMengisi || $isExpired) style="pointer-events: none; opacity: 0.6;" @endif>
             @csrf
             <!-- Form Kuesioner -->
             <div class="card mb-4">
@@ -207,73 +208,78 @@
             </div>
 
             @foreach ($kuesioner as $item)
-            <div class="card mb-4">
-                <div class="card-body">
-                    <h5 class="fw-bold mb-3">{{ $loop->iteration }}. {{ $item->aspek }}</h5>
-                    <p class="text-muted">
-                        1. Sangat tidak setuju <br>
-                        2. Tidak setuju <br>
-                        3. Setuju <br>
-                        4. Sangat setuju
-                    </p>
-                    <p class="fw-bold">{{ $item->pertanyaan }}</p>
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="fw-bold mb-3">{{ $loop->iteration }}. {{ $item->aspek }}</h5>
+                        <p class="text-muted">
+                            1. Sangat tidak setuju <br>
+                            2. Tidak setuju <br>
+                            3. Setuju <br>
+                            4. Sangat setuju
+                        </p>
+                        <p class="fw-bold">{{ $item->pertanyaan }}</p>
 
-                    <!-- Input hidden untuk project_kuesioner_id -->
-                    <input type="hidden" name="project_kuesioner_id[{{ $item->id }}]" value="{{ $item->id }}">
+                        <!-- Input hidden untuk project_kuesioner_id -->
+                        <input type="hidden" name="project_kuesioner_id[{{ $item->id }}]"
+                            value="{{ $item->id }}">
 
-                    <div class="row">
-                        <!-- Sebelum Pelatihan -->
-                        <div class="col-md-6 mb-3">
-                            <div class="card text-white p-2" style="background-color: #284D80">
-                                <strong>Sebelum</strong>
-                            </div>
-                            <div class="p-3 bg-white">
-                                <div class="radio-group">
-                                    @for ($i = 1; $i <= 4; $i++)
-                                        <label>
-                                            <input type="radio" name="sebelum[{{ $item->id }}]"
-                                                value="{{ $i }}"
-                                                {{ $item->nilai_sebelum == $i ? 'checked' : '' }}>
-                                            <span>{{ $i }}</span>
-                                        </label>
-                                    @endfor
+                        <div class="row">
+                            @if ($item->kriteria === 'Delta Skor Persepsi')
+                                <!-- Sebelum Pelatihan (Hanya Jika Kriteria adalah Delta Skor Persepsi) -->
+                                <div class="col-md-6 mb-3">
+                                    <div class="card text-white p-2" style="background-color: #284D80">
+                                        <strong>Sebelum</strong>
+                                    </div>
+                                    <div class="p-3 bg-white">
+                                        <div class="radio-group">
+                                            @for ($i = 1; $i <= 4; $i++)
+                                                <label>
+                                                    <input type="radio" name="sebelum[{{ $item->id }}]"
+                                                        value="{{ $i }}"
+                                                        {{ $item->nilai_sebelum == $i ? 'checked' : '' }}>
+                                                    <span>{{ $i }}</span>
+                                                </label>
+                                            @endfor
+                                        </div>
+                                    </div>
+                                </div>
+                            @endif
+
+                            <!-- Sesudah Pelatihan -->
+                            <div class="col-md-{{ $item->kriteria === 'Delta Skor Persepsi' ? '6' : '12' }} mb-3">
+                                <div class="card text-white p-2" style="background-color: #284D80">
+                                    <strong>Sesudah</strong>
+                                </div>
+                                <div class="p-3 bg-white">
+                                    <div class="radio-group">
+                                        @for ($i = 1; $i <= 4; $i++)
+                                            <label>
+                                                <input type="radio" name="sesudah[{{ $item->id }}]"
+                                                    value="{{ $i }}"
+                                                    {{ $item->nilai_sesudah == $i ? 'checked' : '' }}>
+                                                <span>{{ $i }}</span>
+                                            </label>
+                                        @endfor
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Sesudah Pelatihan -->
-                        <div class="col-md-6 mb-3">
-                            <div class="card text-white p-2" style="background-color: #284D80">
-                                <strong>Sesudah</strong>
-                            </div>
-                            <div class="p-3 bg-white">
-                                <div class="radio-group">
-                                    @for ($i = 1; $i <= 4; $i++)
-                                        <label>
-                                            <input type="radio" name="sesudah[{{ $item->id }}]"
-                                                value="{{ $i }}"
-                                                {{ $item->nilai_sesudah == $i ? 'checked' : '' }}>
-                                            <span>{{ $i }}</span>
-                                        </label>
-                                    @endfor
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                        <!-- Textarea untuk catatan -->
+                        <div>
+                            <textarea name="catatan[{{ $item->id }}]" class="form-control" rows="3"
+                                placeholder="Tambahkan catatan..." style="border: 1px solid #ddd; padding: 10px; border-radius: 5px;">{{ $item->catatan }}</textarea>
 
-                    <!-- Textarea untuk catatan -->
-                    <div>
-                        <textarea name="catatan[{{ $item->id }}]" class="form-control" rows="3"
-                            placeholder="Tambahkan catatan..." style="border: 1px solid #ddd; padding: 10px; border-radius: 5px;">{{ $item->catatan }}</textarea>
-
-                        <!-- Warning jika skor sebelum dan sesudah sama atau turun -->
-                        <div class="warning-message text-danger mt-2" style="display: none;">
-                            <strong>WARNING!!!</strong>: data skor sebelum dan sesudah sama atau turun (tidak ada peningkatan).
+                            <!-- Warning jika skor sebelum dan sesudah sama atau turun -->
+                            <div class="warning-message text-danger mt-2" style="display: none;">
+                                <strong>WARNING!!!</strong>: data skor sebelum dan sesudah sama atau turun (tidak ada
+                                peningkatan).
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        @endforeach
+            @endforeach
+
 
 
             @if (!$sudahMengisi && !$isExpired)
