@@ -31,7 +31,7 @@ return new class extends Migration {
             $table->enum('status_pengisian_kuesioner_atasan', ['Sudah', 'Belum'])->default('Belum');
             $table->timestamp('last_send_atasan_at')->nullable();
             $table->date('deadline_pengisian_atasan')->nullable(); // Hanya tanggal, tanpa jam
-
+            $table->string('token', 12);
             $table->timestamps();
         });
     }

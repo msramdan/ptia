@@ -207,19 +207,21 @@ class ProjectController extends Controller implements HasMiddleware
 
             foreach ($respondenData['data'] as $responden) {
                 $insertData[] = [
-                    'project_id'              => $projectId,
-                    'peserta_id' => $responden['pesertaID'],
-                    'nama' => $responden['pesertaNama'],
-                    'nip' => $responden['pesertaNIP'],
-                    'telepon' => $responden['pesertaTelepon'],
-                    'jabatan' => trim($responden['jabatanFullName']),
-                    'unit' => $responden['unitName'],
-                    'nilai_pre_test' => $responden['pesertaNilaiPreTest'],
-                    'nilai_post_test' => $responden['pesertaNilaiPostTest'],
-                    'created_at' => now(),
-                    'updated_at' => now(),
+                    'project_id'       => $projectId,
+                    'peserta_id'       => $responden['pesertaID'],
+                    'nama'             => $responden['pesertaNama'],
+                    'nip'              => $responden['pesertaNIP'],
+                    'telepon'          => $responden['pesertaTelepon'],
+                    'jabatan'          => trim($responden['jabatanFullName']),
+                    'unit'            => $responden['unitName'],
+                    'nilai_pre_test'   => $responden['pesertaNilaiPreTest'],
+                    'nilai_post_test'  => $responden['pesertaNilaiPostTest'],
+                    'token'            => Str::random(12),
+                    'created_at'       => now(),
+                    'updated_at'       => now(),
                 ];
             }
+
 
             if (!empty($insertData)) {
                 DB::table('project_responden')->insert($insertData);

@@ -79,7 +79,11 @@ class NotifikasiCronAlumniController extends Controller
                     $successCount++;
                     $encryptedId = encryptShort($notifikasi->id);
                     $encryptedTarget = encryptShort($type);
-                    $url = URL::to(route('responden-kuesioner.index', ['id' => $encryptedId, 'target' => $encryptedTarget]));
+                    $url = URL::to(route('responden-kuesioner.index', [
+                        'id'     => $encryptedId,
+                        'target' => $encryptedTarget,
+                        'token'  => $notifikasi->token
+                    ]));
                 }
 
                 $message = generateMessage($notifikasi, $status, $url ?? null, $response['message'] ?? null, $type);

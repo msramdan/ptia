@@ -7,17 +7,18 @@ use Illuminate\Support\Facades\DB;
 
 class RespondenKuesionerController extends Controller
 {
-    public function index($encryptedId, $encryptedTarget)
+    public function index($encryptedId, $encryptedTarget, Request $request)
     {
         try {
             $id = decryptShort($encryptedId);
             $target = decryptShort($encryptedTarget);
+            $token = $request->query('token'); // Ambil token dari URL
 
             if (!in_array($target, ['Alumni', 'Atasan'])) {
                 abort(404);
             }
 
-            // Ambil responden dengan data project
+            // Ambil responden dengan data project dan token
             $responden = DB::table('project_responden')
                 ->join('project', 'project_responden.project_id', '=', 'project.id')
                 ->select(
@@ -35,6 +36,11 @@ class RespondenKuesionerController extends Controller
 
             if (!$responden) {
                 abort(404);
+            }
+
+            // Cek apakah token valid
+            if (!$token || $token !== $responden->token) {
+                abort(403, 'Token tidak valid');
             }
 
             // Ambil semua kuesioner beserta jawabannya dalam satu query
@@ -69,12 +75,13 @@ class RespondenKuesionerController extends Controller
                 $responden->status_pengisian_kuesioner_atasan;
 
             $sudahMengisi = ($statusPengisian === 'Sudah');
-            // dd($kuesioner);
+
             return view('kuesioner', compact('responden', 'target', 'kuesioner', 'isExpired', 'sudahMengisi'));
         } catch (\Exception $e) {
             abort(404);
         }
     }
+
 
     public function store(Request $request)
     {
