@@ -575,6 +575,7 @@ class ProjectController extends Controller implements HasMiddleware
                     'unit'               => $responden['unitName'],
                     'nilai_pre_test'     => $responden['pesertaNilaiPreTest'],
                     'nilai_post_test'    => $responden['pesertaNilaiPostTest'],
+                    'token'            => Str::random(12),
                     'created_at'         => now(),
                     'updated_at'         => now(),
                 ];
