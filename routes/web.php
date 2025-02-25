@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Cron\{
+    AutoCreateProjectController,
     NotifikasiCronAlumniController,
     NotifikasiCronAtasanController,
 };
@@ -36,6 +37,7 @@ Route::get('/', function () {
 // CRON Notifikasi
 Route::get('/kirim-notifikasi-alumni', [NotifikasiCronAlumniController::class, 'kirimNotifikasi']);
 Route::get('/kirim-notifikasi-atasan', [NotifikasiCronAtasanController::class, 'kirimNotifikasi']);
+Route::get('/auto-create-project', [AutoCreateProjectController::class, 'autoCreate']);
 
 // Share kuesioner
 Route::get('/responden-kuesioner/{id}/{target}', [RespondenKuesionerController::class, 'index'])->name('responden-kuesioner.index');
@@ -117,4 +119,3 @@ Route::middleware(['auth', 'web'])->group(function () {
         Route::put('/update-status/{id}', 'updateStatus')->name('project.updateStatus');
     });
 });
-

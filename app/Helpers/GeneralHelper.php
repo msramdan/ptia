@@ -82,6 +82,8 @@ function sendNotifTelegram($message, $remark)
         $chatId = env('TELEGRAM_CHAT_ID_ALUMNI', '-1002353782295');
     } elseif ($remark === 'Atasan') {
         $chatId = env('TELEGRAM_CHAT_ID_ATASAN', '-1002441723360');
+    } elseif ($remark === 'Cron') {
+        $chatId = env('TELEGRAM_CHAT_AUTO_CREATE', '-1002441723360');
     }
 
     if (!$botToken || !$chatId) {
