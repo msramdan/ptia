@@ -20,12 +20,19 @@ class AutoCreateProjectController extends Controller
 
         $apiUrl = config('services.pusdiklatwas.endpoint') . "/len-kaldik";
         $apiToken = config('services.pusdiklatwas.api_token');
+        $readyGenerate = DB::table('project')->pluck('kaldikID')->toArray();
 
-        $response = Http::retry(3, 100)->get($apiUrl, [
+        // Query parameters
+        $queryParams = [
             'api_key' => $apiToken,
             'is_cron_auto_create' => 'Yes',
-        ]);
+        ];
 
+        // Kirim request GET dengan query params di URL dan body JSON
+        $response = Http::retry(3, 100)
+            ->withHeaders(['Content-Type' => 'application/json'])
+            ->withBody(json_encode(['ready_generate' => $readyGenerate]), 'application/json')
+            ->get($apiUrl . '?' . http_build_query($queryParams));
         $data = $response->json()['data'] ?? [];
         $user = User::where('id', 1)->first();
 
