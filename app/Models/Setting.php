@@ -31,11 +31,11 @@ class Setting extends Model
         'is_aktif_pengumuman',
         'jam_mulai',
         'jam_selesai',
-        'hari_libur',
+        'hari_jalan_cron',
     ];
 
     protected $casts = [
-        'hari_libur' => 'array', // Cast kolom JSON ke array
+        'hari_jalan_cron' => 'array', // Cast kolom JSON ke array
     ];
     /**
      * Get the attributes that should be cast.

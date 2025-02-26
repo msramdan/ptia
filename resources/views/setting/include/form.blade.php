@@ -199,10 +199,9 @@
     <div class="col-md-6">
         <div class="form-group">
             <label for="jam_mulai">{{ __('Jam Mulai Cron') }}</label>
-            <input type="text" name="jam_mulai" id="jam_mulai"
+            <input type="time" name="jam_mulai" id="jam_mulai"
                 class="form-control @error('jam_mulai') is-invalid @enderror"
-                value="{{ isset($setting) ? date('H:i', strtotime($setting->jam_mulai)) : old('jam_mulai') }}"
-                {{ old('jam_mulai') ? 'required' : '' }} />
+                value="{{ isset($setting) ? \Carbon\Carbon::parse($setting->jam_mulai)->format('H:i') : old('jam_mulai', '07:00') }}" />
             @error('jam_mulai')
                 <span class="text-danger">
                     {{ $message }}
@@ -214,10 +213,9 @@
     <div class="col-md-6">
         <div class="form-group">
             <label for="jam_selesai">{{ __('Jam Selesai Cron') }}</label>
-            <input type="text" name="jam_selesai" id="jam_selesai"
+            <input type="time" name="jam_selesai" id="jam_selesai"
                 class="form-control @error('jam_selesai') is-invalid @enderror"
-                value="{{ isset($setting) ? date('H:i', strtotime($setting->jam_selesai)) : old('jam_selesai') }}"
-                {{ old('jam_selesai') ? 'required' : '' }} />
+                value="{{ isset($setting) ? \Carbon\Carbon::parse($setting->jam_selesai)->format('H:i') : old('jam_selesai', '17:00') }}" />
             @error('jam_selesai')
                 <span class="text-danger">
                     {{ $message }}
@@ -225,6 +223,7 @@
             @enderror
         </div>
     </div>
+
 
     <div class="col-md-12">
         <div class="form-group mt-3">
@@ -240,12 +239,16 @@
                         5 => 'Jumat',
                         6 => 'Sabtu',
                     ];
-                    $selectedDays = isset($setting) ? $setting->hari_libur ?? [1, 2, 3, 4, 5] : [1, 2, 3, 4, 5];
+                    $selectedDays = isset($setting) ? $setting->hari_jalan_cron : [];
+                    if (is_string($selectedDays)) {
+                        $selectedDays = json_decode($selectedDays, true);
+                    }
+                    $selectedDays = is_array($selectedDays) ? $selectedDays : [];
                 @endphp
 
                 @foreach ($days as $value => $day)
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="hari_libur[]"
+                        <input class="form-check-input" type="checkbox" name="hari_jalan_cron[]"
                             value="{{ $value }}" id="day-{{ $value }}"
                             {{ in_array($value, $selectedDays) ? 'checked' : '' }}>
                         <label class="form-check-label" for="day-{{ $value }}">
@@ -254,7 +257,7 @@
                     </div>
                 @endforeach
             </div>
-            @error('hari_libur')
+            @error('hari_jalan_cron')
                 <span class="text-danger">
                     {{ $message }}
                 </span>
@@ -262,4 +265,6 @@
             <div class="form-text">{{ __('Pilih hari-hari ketika cron job akan dijalankan') }}</div>
         </div>
     </div>
+
+
 </div>

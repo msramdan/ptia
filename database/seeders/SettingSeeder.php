@@ -20,6 +20,9 @@ class SettingSeeder extends Seeder
             'favicon' => null,
             'pengumuman' => 'Pengumuman default aplikasi.',
             'is_aktif_pengumuman' => 'No',
+            'jam_mulai' => '07:00:00',
+            'jam_selesai' => '17:00:00',
+            'hari_jalan_cron' => json_encode(["1", "2", "3", "4", "5"]),
             'created_at' => now(),
             'updated_at' => now(),
         ]);
