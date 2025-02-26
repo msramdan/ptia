@@ -20,9 +20,11 @@ return new class extends Migration
             $table->string('favicon')->nullable();
             $table->text('pengumuman');
             $table->enum('is_aktif_pengumuman', ['Yes', 'No']);
+            $table->time('jam_mulai')->default('07:00:00');
+            $table->time('jam_selesai')->default('17:00:00');
+            $table->json('hari_libur')->nullable();
             $table->timestamps();
         });
-
     }
 
     /**

@@ -21,8 +21,22 @@ class Setting extends Model
      *
      * @var string[]
      */
-    protected $fillable = ['nama_aplikasi', 'tentang_aplikasi', 'logo', 'logo_login', 'favicon', 'pengumuman', 'is_aktif_pengumuman'];
+    protected $fillable = [
+        'nama_aplikasi',
+        'tentang_aplikasi',
+        'logo',
+        'logo_login',
+        'favicon',
+        'pengumuman',
+        'is_aktif_pengumuman',
+        'jam_mulai',
+        'jam_selesai',
+        'hari_libur',
+    ];
 
+    protected $casts = [
+        'hari_libur' => 'array', // Cast kolom JSON ke array
+    ];
     /**
      * Get the attributes that should be cast.
      *
@@ -32,6 +46,4 @@ class Setting extends Model
     {
         return ['nama_aplikasi' => 'string', 'tentang_aplikasi' => 'string', 'logo' => 'string', 'logo_login' => 'string', 'favicon' => 'string', 'pengumuman' => 'string', 'created_at' => 'datetime:Y-m-d H:i:s', 'updated_at' => 'datetime:Y-m-d H:i:s'];
     }
-
-
 }
