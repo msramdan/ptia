@@ -6,6 +6,7 @@ use App\Models\Setting;
 use App\Http\Requests\Settings\{UpdateSettingRequest};
 use Illuminate\Contracts\View\View;
 use App\Generators\Services\ImageService;
+use Carbon\Carbon;
 use Illuminate\Http\{RedirectResponse};
 use Illuminate\Routing\Controllers\{HasMiddleware, Middleware};
 
@@ -52,14 +53,14 @@ class SettingController extends Controller implements HasMiddleware
         $validated['logo_login'] = $this->imageService->upload(name: 'logo_login', path: $this->logoLoginPath, defaultImage: $setting?->logo_login);
         $validated['favicon'] = $this->imageService->upload(name: 'favicon', path: $this->faviconPath, defaultImage: $setting?->favicon);
 
-        $setting->update($validated);
-
-        // Simpan status pengumuman di session jika aktif
-        if ($setting->is_aktif_pengumuman === 'Yes') {
-            session(['show_announcement' => true]);
-        } else {
-            session()->forget('show_announcement');
+        if ($request->has('jam_mulai')) {
+            $validated['jam_mulai'] = Carbon::parse($validated['jam_mulai'])->format('H:i');
         }
+        if ($request->has('jam_selesai')) {
+            $validated['jam_selesai'] = Carbon::parse($validated['jam_selesai'])->format('H:i');
+        }
+
+        $setting->update($validated);
 
         return to_route('setting.index')->with('success', __('Pengaturan berhasil diperbarui.'));
     }

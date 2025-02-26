@@ -9,20 +9,29 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\URL;
 use App\Http\Controllers\Controller;
+use App\Models\Setting;
 
 class NotifikasiCronAlumniController extends Controller
 {
     public function kirimNotifikasi()
     {
         $type = "Alumni";
+        // Ambil pengaturan dari database
+        $setting = Setting::first();
+        if (!$setting) {
+            Log::error("Pengaturan CRON tidak ditemukan di database.");
+            return response()->json(['message' => 'Pengaturan CRON tidak ditemukan.'], 404);
+        }
+
+        // Ambil jam mulai, jam selesai, dan hari libur dari database
+        $workStartHour = Carbon::createFromFormat('H:i:s', $setting->jam_mulai)->hour;
+        $workEndHour = Carbon::createFromFormat('H:i:s', $setting->jam_selesai)->hour;
+        $weekendDays = $setting->hari_libur ?? [0, 6]; // Default: Minggu (0) dan Sabtu (6)
+
+        // Cek apakah di luar jam kerja atau hari libur
         $currentHour = Carbon::now()->hour;
         $currentDay = Carbon::now()->dayOfWeek;
 
-        $workStartHour = env('WORK_START_HOUR', 7); // Default jam mulai kerja: 07:00
-        $workEndHour = env('WORK_END_HOUR', 17); // Default jam selesai kerja: 17:00
-        $weekendDays = explode(',', env('WEEKEND_DAYS', '0,6')); // Default hari libur: Minggu (0) & Sabtu (6)
-
-        // Cek apakah di luar jam kerja atau hari libur
         if ($currentHour < $workStartHour || $currentHour >= $workEndHour || in_array($currentDay, $weekendDays)) {
             Log::info("Cron job dihentikan karena di luar jam kerja atau hari libur.");
             return response()->json(['message' => 'Di luar jam kerja atau hari libur, cron tidak dieksekusi.'], 200);
