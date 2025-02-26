@@ -34,9 +34,6 @@
                                 @method('PUT')
 
                                 @include('setting.include.form')
-
-                                <a href="{{ route('setting.index') }}" class="btn btn-secondary">{{ __('Back') }}</a>
-
                                 <button type="submit" class="btn btn-primary">{{ __('Update') }}</button>
                             </form>
                         </div>
