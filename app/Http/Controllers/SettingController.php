@@ -60,8 +60,14 @@ class SettingController extends Controller implements HasMiddleware
             $validated['jam_selesai'] = Carbon::parse($validated['jam_selesai'])->format('H:i');
         }
 
+        // Konversi hari_jalan_cron ke array integer sebelum disimpan
+        if ($request->has('hari_jalan_cron')) {
+            $validated['hari_jalan_cron'] = array_map('intval', $validated['hari_jalan_cron']);
+        }
+
         $setting->update($validated);
 
         return to_route('setting.index')->with('success', __('Pengaturan berhasil diperbarui.'));
     }
+
 }
