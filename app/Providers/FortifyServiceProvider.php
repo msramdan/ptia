@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Actions\Fortify\{CreateNewUser, ResetUserPassword, UpdateUserPassword, UpdateUserProfileInformation};
+use App\Models\Setting;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
@@ -42,6 +43,12 @@ class FortifyServiceProvider extends ServiceProvider
 
                 Auth::login($user, $request->filled('remember'));
                 session(['api_token' => $data['data']['token']]);
+
+                // Cek status pengumuman
+                $setting = Setting::first();
+                if ($setting && $setting->is_aktif_pengumuman === 'Yes') {
+                    session(['show_pengumuman' => true]);
+                }
                 return $user;
             }
 
