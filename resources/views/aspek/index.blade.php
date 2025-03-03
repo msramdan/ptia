@@ -60,7 +60,7 @@
                                             <th>{{ __('Aspek') }}</th>
                                             <th>{{ __('Kriteria') }}</th>
                                             <th>{{ __('Urutan') }}</th>
-                                            <th>{{ __('Action') }}</th>
+                                            <th>{{ __('Aksi') }}</th>
                                         </tr>
                                     </thead>
                                 </table>

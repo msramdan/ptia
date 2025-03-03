@@ -142,7 +142,7 @@
                                             <th>{{ __('Kriteria') }}</th>
                                             <th>{{ __('Pertanyaan') }}</th>
                                             @if ($project->status == 'Persiapan')
-                                                <th>{{ __('Action') }}</th>
+                                                <th>{{ __('Aksi') }}</th>
                                             @endif
                                         </tr>
                                     </thead>

@@ -41,7 +41,7 @@
                                         <tr>
                                             <th>#</th>
                                             <th>{{ __('Name') }}</th>
-                                            <th>{{ __('Action') }}</th>
+                                            <th>{{ __('Aksi') }}</th>
                                         </tr>
                                     </thead>
                                 </table>

@@ -34,7 +34,7 @@
                                             <th>{{ __('Jenis DIklat') }}</th>
                                             <th>{{ __('Tanggal Diklat') }}</th>
                                             <th>{{ __('Status Generate') }}</th>
-                                            <th>{{ __('Action') }}</th>
+                                            <th>{{ __('Aksi') }}</th>
                                         </tr>
                                     </thead>
                                 </table>

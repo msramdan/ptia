@@ -58,7 +58,7 @@
                                             <th>{{ __('Jenis Skor') }}</th>
                                             <th>{{ __('Skor') }}</th>
                                             <th>{{ __('Konversi') }}</th>
-                                            <th>{{ __('Action') }}</th>
+                                            <th>{{ __('Aksi') }}</th>
                                         </tr>
                                     </thead>
                                 </table>

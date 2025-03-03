@@ -58,7 +58,7 @@
                                             <th>{{ __('Diklat Type') }}</th>
                                             <th>{{ __('Aspek') }}</th>
                                             <th>{{ __('Pertanyaan') }}</th>
-                                            <th>{{ __('Action') }}</th>
+                                            <th>{{ __('Aksi') }}</th>
                                         </tr>
                                     </thead>
                                 </table>

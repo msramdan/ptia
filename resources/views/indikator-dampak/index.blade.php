@@ -57,7 +57,7 @@
                                             <th>{{ __('Diklat Type') }}</th>
                                             <th>{{ __('Indikator Dampak (%)') }}</th>
                                             <th>{{ __('Kriteria Dampak') }}</th>
-                                            <th>{{ __('Action') }}</th>
+                                            <th>{{ __('Aksi') }}</th>
                                         </tr>
                                     </thead>
                                 </table>

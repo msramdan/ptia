@@ -52,7 +52,7 @@
                                             <th>{{ __('Api Key') }}</th>
                                             <th>{{ __('Status') }}</th>
                                             <th>{{ __('Is Aktif') }}</th>
-                                            <th>{{ __('Action') }}</th>
+                                            <th>{{ __('Aksi') }}</th>
                                         </tr>
                                     </thead>
                                 </table>

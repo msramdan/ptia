@@ -108,7 +108,7 @@
                                             <th>{{ __('NIP') }}</th>
                                             <th>{{ __('Nama atasan langsung') }}</th>
                                             <th>{{ __('No.Telepon atasan langsung') }}</th>
-                                            <th>{{ __('Action') }}</th>
+                                            <th>{{ __('Aksi') }}</th>
                                         </tr>
                                     </thead>
                                     <tbody>

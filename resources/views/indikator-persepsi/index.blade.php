@@ -67,7 +67,7 @@
                                             <th>{{ __('Aspek') }}</th>
                                             <th>{{ __('Indikator Persepsi') }}</th>
                                             <th>{{ __('Kriteria Persepsi') }}</th>
-                                            <th>{{ __('Action') }}</th>
+                                            <th>{{ __('Aksi') }}</th>
                                         </tr>
                                     </thead>
                                 </table>

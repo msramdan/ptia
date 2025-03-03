@@ -45,7 +45,7 @@
                                             <th>{{ __('Email') }}</th>
                                             <th>{{ __('Telepon') }}</th>
                                             <th>{{ __('Role') }}</th>
-                                            <th>{{ __('Action') }}</th>
+                                            <th>{{ __('Aksi') }}</th>
                                         </tr>
                                     </thead>
                                 </table>

@@ -43,7 +43,7 @@
                                             <th rowspan="2">{{ __('Nama Diklat') }}</th>
                                             <th colspan="2" class="text-center">{{ __('Alumni') }}</th>
                                             <th colspan="2" class="text-center">{{ __('Atasan') }}</th>
-                                            <th rowspan="2">{{ __('Action') }}</th>
+                                            <th rowspan="2">{{ __('Aksi') }}</th>
                                         </tr>
 
                                         <tr>

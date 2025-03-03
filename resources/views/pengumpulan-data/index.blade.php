@@ -28,7 +28,20 @@
                                 <table class="table table-striped" id="data-table" width="100%">
                                     <thead>
                                         <tr>
-                                            <th>{{ __('Action') }}</th>
+                                            <th rowspan="2">#</th>
+                                            <th rowspan="2">{{ __('Dibuat Oleh') }}</th>
+                                            <th rowspan="2">{{ __('Kode Diklat') }}</th>
+                                            <th rowspan="2">{{ __('Nama Diklat') }}</th>
+                                            <th colspan="2" class="text-center">{{ __('Alumni') }}</th>
+                                            <th colspan="2" class="text-center">{{ __('Atasan') }}</th>
+                                            <th rowspan="2">{{ __('Aksi') }}</th>
+                                        </tr>
+
+                                        <tr>
+                                            <th class="text-center">Responden</th>
+                                            <th class="text-center">Data</th>
+                                            <th class="text-center">Responden</th>
+                                            <th class="text-center">Data</th>
                                         </tr>
                                     </thead>
                                 </table>
@@ -47,6 +60,90 @@
 @endpush
 
 @push('js')
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"
+        integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/v/bs5/dt-1.12.0/datatables.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            @if (session('success'))
+                toastr.success("{{ session('success') }}", "Success", {
+                    closeButton: true,
+                    progressBar: true,
+                    positionClass: "toast-top-right",
+                    timeOut: 5000,
+                });
+            @endif
+
+            @if (session('error'))
+                toastr.error("{{ session('error') }}", "Error", {
+                    closeButton: true,
+                    progressBar: true,
+                    positionClass: "toast-top-right",
+                    timeOut: 5000,
+                });
+            @endif
+        });
+    </script>
+
+    <script>
+        $('#data-table').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: "{{ route('penyebaran-kuesioner.index') }}",
+            columns: [{
+                    data: 'DT_RowIndex',
+                    name: 'DT_RowIndex',
+                    orderable: false,
+                    searchable: false,
+                },
+                {
+                    data: 'user',
+                    name: 'user',
+                },
+                {
+                    data: 'kaldikID',
+                    name: 'kaldikID',
+                },
+                {
+                    data: 'kaldikDesc',
+                    name: 'kaldikDesc',
+                },
+                {
+                    data: 'keterisian_alumni',
+                    name: 'keterisian_alumni',
+                    className: 'text-center',
+                    orderable: false,
+                    searchable: false
+                },
+                {
+                    data: 'data_alumni',
+                    name: 'data_alumni',
+                    className: 'text-center',
+                    orderable: false,
+                    searchable: false
+                },
+                {
+                    data: 'keterisian_atasan',
+                    name: 'keterisian_atasan',
+                    className: 'text-center',
+                    orderable: false,
+                    searchable: false
+                },
+                {
+                    data: 'data_atasan',
+                    name: 'data_atasan',
+                    className: 'text-center',
+                    orderable: false,
+                    searchable: false
+                },
+                {
+                    data: 'action',
+                    name: 'action',
+                    className: 'text-center',
+                }
+            ],
+        });
+    </script>
 @endpush

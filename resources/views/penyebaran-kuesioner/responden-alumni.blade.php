@@ -112,7 +112,7 @@
                                             <th>{{ __('Unit') }}</th>
                                             <th>{{ __('Nilai Post Test') }}</th>
                                             <th>{{ __('Nilai Kenaikan Pre Post') }}</th>
-                                            <th>{{ __('Action') }}</th>
+                                            <th>{{ __('Aksi') }}</th>
                                         </tr>
                                     </thead>
                                     <tbody>

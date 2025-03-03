@@ -46,7 +46,7 @@
                                             <th class="text-center">{{ __('Bobot') }}</th>
                                             <th class="text-center">{{ __('Pesan WA') }}</th>
                                             <th class="text-center">{{ __('Kuesioner') }}</th>
-                                            <th>{{ __('Action') }}</th>
+                                            <th>{{ __('Aksi') }}</th>
                                         </tr>
                                     </thead>
                                 </table>
