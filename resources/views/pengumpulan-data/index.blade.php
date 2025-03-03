@@ -38,9 +38,9 @@
                                         </tr>
 
                                         <tr>
-                                            <th class="text-center">Responden</th>
+                                            <th class="text-center">Keterisian</th>
                                             <th class="text-center">Data</th>
-                                            <th class="text-center">Responden</th>
+                                            <th class="text-center">Keterisian</th>
                                             <th class="text-center">Data</th>
                                         </tr>
                                     </thead>
@@ -91,7 +91,7 @@
         $('#data-table').DataTable({
             processing: true,
             serverSide: true,
-            ajax: "{{ route('penyebaran-kuesioner.index') }}",
+            ajax: "{{ route('pengumpulan-data.index') }}",
             columns: [{
                     data: 'DT_RowIndex',
                     name: 'DT_RowIndex',
@@ -114,29 +114,21 @@
                     data: 'keterisian_alumni',
                     name: 'keterisian_alumni',
                     className: 'text-center',
-                    orderable: false,
-                    searchable: false
                 },
                 {
                     data: 'data_alumni',
                     name: 'data_alumni',
                     className: 'text-center',
-                    orderable: false,
-                    searchable: false
                 },
                 {
                     data: 'keterisian_atasan',
                     name: 'keterisian_atasan',
                     className: 'text-center',
-                    orderable: false,
-                    searchable: false
                 },
                 {
                     data: 'data_atasan',
                     name: 'data_atasan',
                     className: 'text-center',
-                    orderable: false,
-                    searchable: false
                 },
                 {
                     data: 'action',

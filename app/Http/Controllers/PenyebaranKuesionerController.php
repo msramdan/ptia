@@ -75,38 +75,8 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
                     $sudah = $row->total_sudah_isi;
                     $persentase = round(($sudah / $total) * 100, 2);
 
-                    return "$sudah Alumni ($persentase%)";
+                    return "$sudah Alumni<br>($persentase%)";
                 })
-
-                // ->addColumn('config_alumni', function ($row) {
-                //     $waAlumni = route('penyebaran-kuesioner.pesan.wa.show', ['id' => $row->id]);
-                //     $kuesionerAlumni = route('penyebaran-kuesioner.kuesioner.show', ['id' => $row->id, 'remark' => 'Alumni']);
-                //     $bobotKuesioner = route('penyebaran-kuesioner.bobot.show', ['id' => $row->id]);
-                //     return '
-                //         <div class="d-flex flex-column">
-                //             <div class="d-flex gap-1 mb-1">
-                //                 <a href="' . $waAlumni . '"
-                //                    class="btn btn-sm btn-success"
-                //                    data-toggle="tooltip" data-placement="left" title="Pesan WA Alumni">
-                //                     <i class="fab fa-whatsapp"></i>
-                //                 </a>
-                //                 <a href="' . $kuesionerAlumni . '"
-                //                    class="btn btn-sm btn-primary"
-                //                    data-toggle="tooltip" data-placement="left" title="Kuesioner Alumni">
-                //                     <i class="fa fa-file"></i>
-                //                 </a>
-                //             </div>
-
-                //             <div class="d-flex gap-1 mb-1">
-                //                 <a href="' . $bobotKuesioner . '"
-                //                     class="btn btn-sm btn-danger"
-                //                     data-toggle="tooltip" data-placement="left" title="Bobot Alumni">
-                //                     <i class="fas fa-balance-scale"></i>
-                //                  </a>
-                //             </div>
-                //         </div>';
-                // })
-
 
                 ->addColumn('responden_atasan', function ($row) {
                     $showAtasan = route('penyebaran-kuesioner.responden-atasan.show', ['id' => $row->id]);
@@ -126,29 +96,8 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
                     $sudah = $row->total_sudah_isi_atasan;
                     $persentase = round(($sudah / $total) * 100, 2);
 
-                    return "$sudah Atasan ($persentase%)";
+                    return "$sudah Atasan<br>($persentase%)";
                 })
-
-                // ->addColumn('config_atasan', function ($row) {
-                //     $waAtasan = route('penyebaran-kuesioner.pesan.wa.show', ['id' => $row->id]);
-                //     $kuesionerAtasan = route('penyebaran-kuesioner.kuesioner.show', ['id' => $row->id, 'remark' => 'Atasan']);
-                //     return '
-                //         <div class="text-center d-flex flex-column align-items-center">
-                //             <div class="d-flex gap-1 mb-1">
-                //                 <a href="' . $waAtasan . '"
-                //                    class="btn btn-sm btn-success"
-                //                    data-toggle="tooltip" data-placement="left" title="Pesan WA Alumni">
-                //                     <i class="fab fa-whatsapp"></i>
-                //                 </a>
-                //                 <a href="' . $kuesionerAtasan . '"
-                //                    class="btn btn-sm btn-primary"
-                //                    data-toggle="tooltip" data-placement="left" title="Kuesioner Alumni">
-                //                     <i class="fa fa-file"></i>
-                //                 </a>
-                //             </div>
-                //         </div>';
-                // })
-
 
                 ->addColumn('user', function ($row) {
                     $avatar = $row->avatar
@@ -163,7 +112,7 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
                         </div>';
                 })
                 ->addColumn('action', 'penyebaran-kuesioner.include.action')
-                ->rawColumns(['action', 'responden_alumni', 'responden_atasan', 'keterisian_alumni', 'keterisian_atasan', 'config_alumni', 'config_atasan', 'user'])
+                ->rawColumns(['action', 'responden_alumni', 'responden_atasan', 'keterisian_alumni', 'keterisian_atasan', 'user'])
                 ->toJson();
         }
 

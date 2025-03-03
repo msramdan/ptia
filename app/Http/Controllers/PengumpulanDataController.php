@@ -8,6 +8,7 @@ use Illuminate\Contracts\View\View;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Http\{JsonResponse, RedirectResponse};
 use Illuminate\Routing\Controllers\{HasMiddleware, Middleware};
+use Illuminate\Support\Facades\DB;
 
 class PengumpulanDataController extends Controller implements HasMiddleware
 {
@@ -55,14 +56,40 @@ class PengumpulanDataController extends Controller implements HasMiddleware
                     $sudah = $row->total_sudah_isi;
                     $persentase = round(($sudah / $total) * 100, 2);
 
-                    return "$sudah Alumni ($persentase%)";
+                    return "$sudah Alumni<br>($persentase%)";
                 })
+
+                ->addColumn('data_alumni', function ($row) {
+                    $showAlumni = route('penyebaran-kuesioner.responden-alumni.show', ['id' => $row->id]);
+                    return '
+                        <div class="text-center">
+                            <a href="' . $showAlumni . '"
+                               class="btn btn-sm btn-success"
+                               style="width: 150px;"
+                               data-toggle="tooltip" data-placement="left" title="Atur Bobot"><i class="fas fa-list"></i> Rekap Kuesioner
+                            </a>
+                        </div>';
+                })
+
                 ->addColumn('keterisian_atasan', function ($row) {
                     $total = $row->total_responden_atasan ?: 1;
                     $sudah = $row->total_sudah_isi_atasan;
                     $persentase = round(($sudah / $total) * 100, 2);
 
-                    return "$sudah Atasan ($persentase%)";
+                    return "$sudah Atasan<br>($persentase%)";
+                })
+
+
+                ->addColumn('data_atasan', function ($row) {
+                    $showAtasan = route('penyebaran-kuesioner.responden-atasan.show', ['id' => $row->id]);
+                    return '
+                        <div class="text-center">
+                             <a href="' . $showAtasan . '"
+                               class="btn btn-sm btn-success"
+                               style="width: 150px;"
+                               data-toggle="tooltip" data-placement="left" title="Atur Bobot"><i class="fas fa-list"></i> Rekap Kuesioner
+                            </a>
+                        </div>';
                 })
 
                 ->addColumn('user', function ($row) {
@@ -78,7 +105,7 @@ class PengumpulanDataController extends Controller implements HasMiddleware
                         </div>';
                 })
                 ->addColumn('action', 'penyebaran-kuesioner.include.action')
-                ->rawColumns(['action', 'responden_alumni', 'responden_atasan', 'keterisian_alumni', 'keterisian_atasan', 'config_alumni', 'config_atasan', 'user'])
+                ->rawColumns(['action', 'data_alumni', 'data_atasan', 'keterisian_alumni', 'keterisian_atasan','user'])
                 ->toJson();
         }
 

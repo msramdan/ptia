@@ -66,16 +66,10 @@ Route::middleware(['auth', 'web'])->group(function () {
     ]);
     Route::prefix('penyebaran-kuesioner')->controller(PenyebaranKuesionerController::class)->group(function () {
         Route::get('/', 'index')->name('penyebaran-kuesioner.index');
-        // Kuesioner
-        Route::get('/kuesioner/show/{id}/{remark}', 'showKuesioner')->name('penyebaran-kuesioner.kuesioner.show');
         // Responden Alumni
         Route::get('/responden-alumni/show/{id}', 'showRespondenAlumni')->name('penyebaran-kuesioner.responden-alumni.show');
         // Responden Atasan
         Route::get('/responden-atasan/show/{id}', 'showRespondenAtasan')->name('penyebaran-kuesioner.responden-atasan.show');
-        // Pesan WA
-        Route::get('/pesan-wa/show/{id}', 'showPesanWa')->name('penyebaran-kuesioner.pesan.wa.show');
-        // Bobot
-        Route::get('/bobot/show/{id}', 'showBobot')->name('penyebaran-kuesioner.bobot.show');
         // Update Telepon Responden
         Route::post('/responden/update-telepon', 'updateTelepon')->name('penyebaran-kuesioner.update.telepon');
         // Kirim Notifikasi WhatsApp
