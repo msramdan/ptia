@@ -60,10 +60,10 @@ class PengumpulanDataController extends Controller implements HasMiddleware
                 })
 
                 ->addColumn('data_alumni', function ($row) {
-                    $showAlumni = route('penyebaran-kuesioner.responden-alumni.show', ['id' => $row->id]);
+                    $rekapKuesionerAlumni = route('penyebaran-kuesioner.rekap.kuesioner', ['id' => $row->id, 'remark' => 'Alumni']);
                     return '
                         <div class="text-center">
-                            <a href="' . $showAlumni . '"
+                            <a href="' . $rekapKuesionerAlumni . '"
                                class="btn btn-sm btn-success"
                                style="width: 150px;"
                                data-toggle="tooltip" data-placement="left" title="Atur Bobot"><i class="fas fa-list"></i> Rekap Kuesioner
@@ -81,10 +81,10 @@ class PengumpulanDataController extends Controller implements HasMiddleware
 
 
                 ->addColumn('data_atasan', function ($row) {
-                    $showAtasan = route('penyebaran-kuesioner.responden-atasan.show', ['id' => $row->id]);
+                    $rekapKuesionerAtasan = route('penyebaran-kuesioner.rekap.kuesioner', ['id' => $row->id, 'remark' => 'Atasan']);
                     return '
                         <div class="text-center">
-                             <a href="' . $showAtasan . '"
+                             <a href="' . $rekapKuesionerAtasan . '"
                                class="btn btn-sm btn-success"
                                style="width: 150px;"
                                data-toggle="tooltip" data-placement="left" title="Atur Bobot"><i class="fas fa-list"></i> Rekap Kuesioner
@@ -105,11 +105,21 @@ class PengumpulanDataController extends Controller implements HasMiddleware
                         </div>';
                 })
                 ->addColumn('action', 'penyebaran-kuesioner.include.action')
-                ->rawColumns(['action', 'data_alumni', 'data_atasan', 'keterisian_alumni', 'keterisian_atasan','user'])
+                ->rawColumns(['action', 'data_alumni', 'data_atasan', 'keterisian_alumni', 'keterisian_atasan', 'user'])
                 ->toJson();
         }
 
         return view('pengumpulan-data.index');
     }
 
+    public function rekapKuesioner($id, $remark)
+    {
+        $project = DB::table('project')
+            ->join('users', 'project.user_id', '=', 'users.id')
+            ->select('project.*', 'users.name as user_name')
+            ->where('project.id', $id)
+            ->first();
+
+        return view('pengumpulan-data.rekap-kuesioner', compact('project', 'remark'));
+    }
 }

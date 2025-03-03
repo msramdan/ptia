@@ -80,6 +80,9 @@ Route::middleware(['auth', 'web'])->group(function () {
 
     Route::prefix('pengumpulan-data')->controller(PengumpulanDataController::class)->group(function () {
         Route::get('/', 'index')->name('pengumpulan-data.index');
+        // Rekap Kuesioner
+        Route::get('/rekap-kuesioner/{id}/{remark}', 'rekapKuesioner')->name('penyebaran-kuesioner.rekap.kuesioner');
+        Route::get('/export-rekap-kuesioner', 'ExportRekapKuesioner')->name('penyebaran-kuesioner.export.rekap.kuesioner');
     });
 
 

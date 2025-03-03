@@ -119,33 +119,6 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
         return view('penyebaran-kuesioner.index');
     }
 
-    public function showKuesioner($id, $remark)
-    {
-        $project = DB::table('project')
-            ->join('users', 'project.user_id', '=', 'users.id')
-            ->select('project.*', 'users.name as user_name')
-            ->where('project.id', $id)
-            ->first();
-
-        $kuesioners = DB::table('project_kuesioner')
-            ->join('aspek', 'project_kuesioner.aspek_id', '=', 'aspek.id')
-            ->select(
-                'project_kuesioner.*',
-                'aspek.aspek as aspek_nama'
-            )
-            ->where('project_kuesioner.project_id', $id)
-            ->where('project_kuesioner.remark', $remark)
-            ->get();
-
-        $aspeks = DB::table('aspek')
-            ->select('id', 'aspek')
-            ->where('diklat_type_id', $project->diklat_type_id)
-            ->get();
-
-
-        return view('penyebaran-kuesioner.kuesioner', compact('project', 'kuesioners', 'remark', 'aspeks'));
-    }
-
     public function showRespondenAlumni($id): View|JsonResponse
     {
         if (request()->ajax()) {
@@ -288,45 +261,6 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
             ->first();
 
         return view('penyebaran-kuesioner.responden-atasan', compact('project', 'kriteriaResponden'));
-    }
-
-    public function showPesanWa($id)
-    {
-        $project = DB::table('project')
-            ->join('users', 'project.user_id', '=', 'users.id')
-            ->select('project.*', 'users.name as user_name')
-            ->where('project.id', $id)
-            ->first();
-
-        $pesanWa = DB::table('project_pesan_wa')
-            ->where('project_pesan_wa.project_id', $id)
-            ->first();
-        return view('penyebaran-kuesioner.pesan_wa', compact('project', 'pesanWa'));
-    }
-
-    public function showBobot($id)
-    {
-        $project = DB::table('project')
-            ->join('users', 'project.user_id', '=', 'users.id')
-            ->select('project.*', 'users.name as user_name')
-            ->where('project.id', $id)
-            ->first();
-
-        $bobotAspek = DB::table('project_bobot_aspek')
-            ->join('aspek', 'project_bobot_aspek.aspek_id', '=', 'aspek.id')
-            ->select('project_bobot_aspek.*', 'aspek.aspek as aspek_nama', 'aspek.level')
-            ->where('project_bobot_aspek.project_id', $id)
-            ->get();
-
-        $dataSecondary = DB::table('project_bobot_aspek_sekunder')
-            ->select('project_bobot_aspek_sekunder.*')
-            ->where('project_bobot_aspek_sekunder.project_id', $id)
-            ->first();
-
-        $level3 = $bobotAspek->where('level', 3);
-        $level4 = $bobotAspek->where('level', 4);
-
-        return view('penyebaran-kuesioner.bobot', compact('project', 'level3', 'level4', 'dataSecondary'));
     }
 
     public function updateTelepon(Request $request)
