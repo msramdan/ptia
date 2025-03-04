@@ -208,7 +208,7 @@ OR
                                                         'target' => encryptShort($remark),
                                                         'token' => $respondenItem->token,
                                                     ]) }}"
-                                                        class="btn btn-success btn-sm" target="_blank">
+                                                        class="btn btn-success btn-sm" target="_blank" title="Lihat Kuesioner">
                                                         <i class="fas fa-clipboard-list" aria-hidden="true"></i>
                                                         <span class="visually-hidden">Lihat Kuesioner</span>
                                                     </a>
