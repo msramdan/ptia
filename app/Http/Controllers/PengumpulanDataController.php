@@ -119,32 +119,24 @@ class PengumpulanDataController extends Controller implements HasMiddleware
             ->select('project.*', 'users.name as user_name')
             ->where('project.id', $id)
             ->first();
+        $respondenQuery = DB::table('project_responden')
+            ->where('project_responden.project_id', $id);
 
-        if (request()->ajax()) {
-            $respondenQuery = DB::table('project_responden')
-                ->where('project_responden.project_id', $id);
-
-            if ($remark === 'Alumni') {
-                $respondenQuery->where('status_pengisian_kuesioner_alumni', 'Sudah');
-            } elseif ($remark === 'Atasan') {
-                $respondenQuery->where('status_pengisian_kuesioner_atasan', 'Sudah');
-            }
-
-            $responden = $respondenQuery->get();
-
-            return DataTables::of($responden)
-                ->addIndexColumn()
-                ->toJson();
+        if ($remark === 'Alumni') {
+            $respondenQuery->where('status_pengisian_kuesioner_alumni', 'Sudah');
+        } elseif ($remark === 'Atasan') {
+            $respondenQuery->where('status_pengisian_kuesioner_atasan', 'Sudah');
         }
+
+        $responden = $respondenQuery->get();
 
         // Query untuk mendapatkan data dari project_kuesioner
         $kuesioner = DB::table('project_kuesioner')
-            ->selectRaw('MIN(level) as level, aspek, ANY_VALUE(aspek_id) as aspek_id, ANY_VALUE(kriteria) as kriteria')
+            ->selectRaw('MIN(level) as level, aspek, ANY_VALUE(kriteria) as kriteria')
             ->where('remark', $remark)
             ->groupBy('aspek')
             ->get();
 
-        return view('pengumpulan-data.rekap-kuesioner', compact('project', 'remark', 'kuesioner'));
+        return view('pengumpulan-data.rekap-kuesioner', compact('project', 'remark', 'kuesioner', 'responden'));
     }
-
 }
