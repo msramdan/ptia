@@ -48,9 +48,9 @@
                             <a href="{{ route('pengumpulan-data.index') }}" class="btn btn-secondary">
                                 <i class="fas fa-arrow-left"></i> {{ __('kembali') }}
                             </a>
-
-                            {{-- <a href="{{ route('export.excel') }}" class="btn btn-success"> <i class="fas fa-file-excel"></i>{{ __('Export Data') }}</a> --}}
-                            <button id="export-excel" class="btn btn-primary">Export ke Excel</button>
+                            <button id="export-excel" class="btn btn-success">
+                                <i class="fas fa-file-excel"></i> Export ke Excel
+                            </button>
 
 
                         </div>
@@ -257,29 +257,5 @@ OR
         integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/v/bs5/dt-1.12.0/datatables.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script>
-        document.getElementById("export-excel").addEventListener("click", function () {
-            let table = document.getElementById("data-table");
-            let workbook = XLSX.utils.book_new();
-            let ws = XLSX.utils.table_to_sheet(table, { sheet: "Data", raw: true });
-
-            // Hapus kolom "Aksi" berdasarkan index
-            let aksiColumnIndex = document.querySelector("#data-table th:last-child").cellIndex;
-            let range = XLSX.utils.decode_range(ws["!ref"]);
-
-            for (let row = range.s.r; row <= range.e.r; row++) {
-                let cellAddress = XLSX.utils.encode_cell({ r: row, c: aksiColumnIndex });
-                delete ws[cellAddress]; // Hapus isi sel
-            }
-
-            // Update range agar kolom terakhir tidak terbaca lagi
-            range.e.c--;
-            ws["!ref"] = XLSX.utils.encode_range(range);
-
-            XLSX.utils.book_append_sheet(workbook, ws, "Data Tabel");
-            XLSX.writeFile(workbook, "rekap_kuesioner.xlsx");
-        });
-    </script>
 
 @endpush
