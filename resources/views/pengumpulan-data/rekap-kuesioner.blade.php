@@ -48,9 +48,11 @@
                             <a href="{{ route('pengumpulan-data.index') }}" class="btn btn-secondary">
                                 <i class="fas fa-arrow-left"></i> {{ __('kembali') }}
                             </a>
-                            <a href="#" class="btn btn-success">
-                                <i class="fas fa-file-excel"></i> {{ __('Export Data') }}
-                            </a>
+
+                            {{-- <a href="{{ route('export.excel') }}" class="btn btn-success"> <i class="fas fa-file-excel"></i>{{ __('Export Data') }}</a> --}}
+                            <button id="export-excel" class="btn btn-primary">Export ke Excel</button>
+
+
                         </div>
                     </div>
 
@@ -180,11 +182,22 @@ OR
                                                     <td>{{ $data->rata_rata_delta ?? '-' }}</td>
                                                     <td>{{ $data->konversi_nilai ?? '-' }}</td>
                                                     <td>{{ $data->bobot ?? '-' }}%</td>
-                                                    <td style="color: green"><b>{{ $nilai }}</b> </td>
+                                                    <td style="color: green">
+                                                        <b
+                                                            title="Perhitungan: ({{ $data->konversi_nilai ?? 0 }} * {{ $data->bobot ?? 0 }}%)">
+                                                            {{ $nilai }}
+                                                        </b>
+                                                    </td>
                                                 @endforeach
 
                                                 {{-- Total Level 3 --}}
-                                                <td style="color: red"><b>{{ $total_level_3 }}</b></td>
+                                                <td style="color: red">
+                                                    <b
+                                                        title="Total level 3: {{ implode(' + ', collect($groupedLevels[3])->map(fn($aspek) => collect($result)->firstWhere('aspek', $aspek->aspek)->nilai ?? 0)->toArray()) }}">
+                                                        {{ $total_level_3 }}
+                                                    </b>
+                                                </td>
+
 
                                                 {{-- Looping Level 4 --}}
                                                 @php
@@ -199,16 +212,28 @@ OR
                                                     <td>{{ $data->rata_rata_delta ?? '-' }}</td>
                                                     <td>{{ $data->konversi_nilai ?? '-' }}</td>
                                                     <td>{{ $data->bobot ?? '-' }}%</td>
-                                                    <td style="color: green"><b>{{ $nilai }}</b> </td>
+                                                    <td style="color: green">
+                                                        <b
+                                                            title="Perhitungan: ({{ $data->konversi_nilai ?? 0 }} * {{ $data->bobot ?? 0 }}%)">
+                                                            {{ $nilai }}
+                                                        </b>
+                                                    </td>
                                                 @endforeach
-                                                <td style="color: red"><b>{{ $total_level_4 }}</b></td>
+                                                <td style="color: red">
+                                                    <b
+                                                        title="Total level 4: {{ implode(' + ', collect($groupedLevels[4])->map(fn($aspek) => collect($result)->firstWhere('aspek', $aspek->aspek)->nilai ?? 0)->toArray()) }}">
+                                                        {{ $total_level_4 }}
+                                                    </b>
+                                                </td>
+
                                                 <td>
                                                     <a href="{{ route('responden-kuesioner.index', [
                                                         'id' => encryptShort($respondenItem->id),
                                                         'target' => encryptShort($remark),
                                                         'token' => $respondenItem->token,
                                                     ]) }}"
-                                                        class="btn btn-success btn-sm" target="_blank" title="Lihat Kuesioner">
+                                                        class="btn btn-success btn-sm" target="_blank"
+                                                        title="Lihat Kuesioner">
                                                         <i class="fas fa-clipboard-list" aria-hidden="true"></i>
                                                         <span class="visually-hidden">Lihat Kuesioner</span>
                                                     </a>
@@ -232,4 +257,29 @@ OR
         integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/v/bs5/dt-1.12.0/datatables.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script>
+        document.getElementById("export-excel").addEventListener("click", function () {
+            let table = document.getElementById("data-table");
+            let workbook = XLSX.utils.book_new();
+            let ws = XLSX.utils.table_to_sheet(table, { sheet: "Data", raw: true });
+
+            // Hapus kolom "Aksi" berdasarkan index
+            let aksiColumnIndex = document.querySelector("#data-table th:last-child").cellIndex;
+            let range = XLSX.utils.decode_range(ws["!ref"]);
+
+            for (let row = range.s.r; row <= range.e.r; row++) {
+                let cellAddress = XLSX.utils.encode_cell({ r: row, c: aksiColumnIndex });
+                delete ws[cellAddress]; // Hapus isi sel
+            }
+
+            // Update range agar kolom terakhir tidak terbaca lagi
+            range.e.c--;
+            ws["!ref"] = XLSX.utils.encode_range(range);
+
+            XLSX.utils.book_append_sheet(workbook, ws, "Data Tabel");
+            XLSX.writeFile(workbook, "rekap_kuesioner.xlsx");
+        });
+    </script>
+
 @endpush
