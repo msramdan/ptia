@@ -2,13 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\PengumpulanDatum;
-use App\Http\Requests\PengumpulanDatas\{StorePengumpulanDatumRequest, UpdatePengumpulanDatumRequest};
 use Illuminate\Contracts\View\View;
 use Yajra\DataTables\Facades\DataTables;
-use Illuminate\Http\{JsonResponse, RedirectResponse};
 use Illuminate\Routing\Controllers\{HasMiddleware, Middleware};
 use Illuminate\Support\Facades\DB;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class PengumpulanDataController extends Controller implements HasMiddleware
 {
@@ -112,7 +111,8 @@ class PengumpulanDataController extends Controller implements HasMiddleware
         return view('pengumpulan-data.index');
     }
 
-    public function rekapKuesioner($id, $remark)
+
+    public function rekapKuesioner($id, $remark): View|JsonResponse
     {
         $project = DB::table('project')
             ->join('users', 'project.user_id', '=', 'users.id')
@@ -120,6 +120,31 @@ class PengumpulanDataController extends Controller implements HasMiddleware
             ->where('project.id', $id)
             ->first();
 
-        return view('pengumpulan-data.rekap-kuesioner', compact('project', 'remark'));
+        if (request()->ajax()) {
+            $respondenQuery = DB::table('project_responden')
+                ->where('project_responden.project_id', $id);
+
+            if ($remark === 'Alumni') {
+                $respondenQuery->where('status_pengisian_kuesioner_alumni', 'Sudah');
+            } elseif ($remark === 'Atasan') {
+                $respondenQuery->where('status_pengisian_kuesioner_atasan', 'Sudah');
+            }
+
+            $responden = $respondenQuery->get();
+
+            return DataTables::of($responden)
+                ->addIndexColumn()
+                ->toJson();
+        }
+
+        // Query untuk mendapatkan data dari project_kuesioner
+        $kuesioner = DB::table('project_kuesioner')
+            ->selectRaw('MIN(level) as level, aspek, ANY_VALUE(aspek_id) as aspek_id, ANY_VALUE(kriteria) as kriteria')
+            ->where('remark', $remark)
+            ->groupBy('aspek')
+            ->get();
+
+        return view('pengumpulan-data.rekap-kuesioner', compact('project', 'remark', 'kuesioner'));
     }
+
 }
