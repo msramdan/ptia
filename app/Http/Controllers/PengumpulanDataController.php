@@ -8,6 +8,8 @@ use Illuminate\Routing\Controllers\{HasMiddleware, Middleware};
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use App\Exports\RekapKuesionerExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class PengumpulanDataController extends Controller implements HasMiddleware
 {
@@ -138,5 +140,33 @@ class PengumpulanDataController extends Controller implements HasMiddleware
             ->get();
 
         return view('pengumpulan-data.rekap-kuesioner', compact('project', 'remark', 'kuesioner', 'responden'));
+    }
+
+    public function exportExcel($id, $remark)
+    {
+        $project = DB::table('project')
+            ->join('users', 'project.user_id', '=', 'users.id')
+            ->select('project.*', 'users.name as user_name')
+            ->where('project.id', $id)
+            ->first();
+
+        $respondenQuery = DB::table('project_responden')
+            ->where('project_responden.project_id', $id);
+
+        if ($remark === 'Alumni') {
+            $respondenQuery->where('status_pengisian_kuesioner_alumni', 'Sudah');
+        } elseif ($remark === 'Atasan') {
+            $respondenQuery->where('status_pengisian_kuesioner_atasan', 'Sudah');
+        }
+
+        $responden = $respondenQuery->get();
+
+        $kuesioner = DB::table('project_kuesioner')
+            ->selectRaw('MIN(level) as level, aspek, ANY_VALUE(kriteria) as kriteria')
+            ->where('remark', $remark)
+            ->groupBy('aspek')
+            ->get();
+
+        return Excel::download(new RekapKuesionerExport($project, $remark, $kuesioner, $responden), 'rekap-kuesioner.xlsx');
     }
 }

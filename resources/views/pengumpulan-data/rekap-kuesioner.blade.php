@@ -48,9 +48,13 @@
                             <a href="{{ route('pengumpulan-data.index') }}" class="btn btn-secondary">
                                 <i class="fas fa-arrow-left"></i> {{ __('kembali') }}
                             </a>
-                            <button id="export-excel" class="btn btn-success">
+                            {{-- <button id="export-excel" class="btn btn-success">
                                 <i class="fas fa-file-excel"></i> Export ke Excel
-                            </button>
+                            </button> --}}
+                            <a href="{{ route('pengumpulan-data.export-excel', ['id' => $project->id, 'remark' => $remark]) }}"
+                                class="btn btn-success">
+                                <i class="fas fa-file-excel"></i> Export ke Excel
+                            </a>
 
 
                         </div>
@@ -257,5 +261,4 @@ OR
         integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/v/bs5/dt-1.12.0/datatables.min.js"></script>
-
 @endpush
