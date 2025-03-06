@@ -48,15 +48,10 @@
                             <a href="{{ route('pengumpulan-data.index') }}" class="btn btn-secondary">
                                 <i class="fas fa-arrow-left"></i> {{ __('kembali') }}
                             </a>
-                            {{-- <button id="export-excel" class="btn btn-success">
-                                <i class="fas fa-file-excel"></i> Export ke Excel
-                            </button> --}}
                             <a href="{{ route('pengumpulan-data.export-excel', ['id' => $project->id, 'remark' => $remark]) }}"
                                 class="btn btn-success">
                                 <i class="fas fa-file-excel"></i> Export ke Excel
                             </a>
-
-
                         </div>
                     </div>
 
