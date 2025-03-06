@@ -84,8 +84,6 @@ Route::middleware(['auth', 'web'])->group(function () {
         Route::get('/rekap-kuesioner/{id}/{remark}', 'rekapKuesioner')->name('penyebaran-kuesioner.rekap.kuesioner');
         // Ekspor Excel
         Route::get('/export-rekap-kuesioner/{id}/{remark}', 'exportExcel')->name('pengumpulan-data.export-excel');
-
-        Route::get('/export-rekap-kuesioner', 'ExportRekapKuesioner')->name('penyebaran-kuesioner.export.rekap.kuesioner');
     });
 
 
