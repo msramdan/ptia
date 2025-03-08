@@ -11,12 +11,7 @@ class DataSekunderPermissionSeeder extends Seeder
     public function run(): void
     {
         // Daftar permission untuk Data Sekunder
-        $permissions = [
-            'data sekunder view',
-            'data sekunder create',
-            'data sekunder edit',
-            'data sekunder delete',
-        ];
+        $permissions = ['data sekunder view', 'data sekunder create'];
 
         // Buat atau pastikan permission ada di database
         foreach ($permissions as $permission) {
