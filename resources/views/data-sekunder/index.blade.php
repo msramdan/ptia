@@ -32,6 +32,7 @@
                                             <th>{{ __('Dibuat Oleh') }}</th>
                                             <th>{{ __('Kode Diklat') }}</th>
                                             <th>{{ __('Nama Diklat') }}</th>
+                                            <th>{{ __('Jenis Diklat') }}</th>
                                             <th>{{ __('Aksi') }}</th>
                                         </tr>
                                     </thead>
@@ -181,16 +182,19 @@
                     },
                     {
                         data: 'kaldikID',
-                        name: 'kaldikID'
+                        name: 'kaldikID',
                     },
                     {
                         data: 'kaldikDesc',
-                        name: 'kaldikDesc'
+                        name: 'kaldikDesc',
+                    },
+                    {
+                        data: 'nama_diklat_type',
+                        name: 'diklat_type.nama_diklat_type',
                     },
                     {
                         data: 'action',
                         name: 'action',
-                        className: 'text-center'
                     }
                 ]
             });

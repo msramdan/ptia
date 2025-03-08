@@ -42,6 +42,7 @@
                                             <th>{{ __('Dibuat Oleh') }}</th>
                                             <th>{{ __('Kode Diklat') }}</th>
                                             <th>{{ __('Nama Diklat') }}</th>
+                                            <th>{{ __('Jenis Diklat') }}</th>
                                             <th class="text-center">{{ __('Responden') }}</th>
                                             <th class="text-center">{{ __('Bobot') }}</th>
                                             <th class="text-center">{{ __('Pesan WA') }}</th>
@@ -117,7 +118,11 @@
                 },
                 {
                     data: 'kaldikDesc',
-                    name: 'project.kaldikDesc',
+                    name: 'kaldikDesc',
+                },
+                {
+                    data: 'nama_diklat_type',
+                    name: 'diklat_type.nama_diklat_type',
                 },
                 {
                     data: 'responden',

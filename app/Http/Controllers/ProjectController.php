@@ -31,11 +31,16 @@ class ProjectController extends Controller implements HasMiddleware
     {
         if (request()->ajax()) {
             $projects = DB::table('project')
-                ->join('users', 'project.user_id', '=', 'users.id')
-                ->select('project.*', 'users.name as user_name', 'users.email', 'users.avatar')
-                ->orderBy('project.id', 'desc')
-                ->get();
-
+            ->join('users', 'project.user_id', '=', 'users.id')
+            ->join('diklat_type', 'project.diklat_type_id', '=', 'diklat_type.id')
+            ->select(
+                'project.*',
+                'users.name as user_name',
+                'users.email',
+                'users.avatar',
+                'diklat_type.nama_diklat_type'
+            )
+            ->orderBy('project.id', 'desc');
             return DataTables::of($projects)
                 ->addIndexColumn()
                 ->addColumn('kuesioner', function ($row) {

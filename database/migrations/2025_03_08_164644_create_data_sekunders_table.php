@@ -11,11 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('data_sekunders', function (Blueprint $table) {
+        Schema::create('project_data_sekunder', function (Blueprint $table) {
             $table->id();
-            $table->integer('nilai_kinerja_awal')->length(11);
+            $table->foreignId('project_id')->constrained('project')->restrictOnUpdate()->cascadeOnDelete();
+            $table->bigInteger('nilai_kinerja_awal');
             $table->string('periode_awal', 150);
-            $table->integer('nilai_kinerja_akhir')->length(11);
+            $table->bigInteger('nilai_kinerja_akhir');
             $table->string('periode_akhir', 150);
             $table->enum('satuan', ['Persentase (%)', 'Skor', 'Rupiah (Rp)', 'Waktu (Jam)', 'Waktu (Hari)', 'Pcs', 'Unit', 'Item', 'Dollar (USD)', 'Index']);
             $table->string('sumber_data', 150);
@@ -33,6 +34,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('data_sekunders');
+        Schema::dropIfExists('project_data_sekunder');
     }
 };

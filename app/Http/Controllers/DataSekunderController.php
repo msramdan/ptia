@@ -11,6 +11,7 @@ use Illuminate\Routing\Controllers\{HasMiddleware, Middleware};
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use App\Helpers\ValidationMessages;
 
 class DataSekunderController extends Controller implements HasMiddleware
 {
@@ -34,15 +35,18 @@ class DataSekunderController extends Controller implements HasMiddleware
         if (request()->ajax()) {
             $projects = DB::table('project')
                 ->join('users', 'project.user_id', '=', 'users.id')
+                ->join('diklat_type', 'project.diklat_type_id', '=', 'diklat_type.id')
                 ->select(
-                    'project.*',
+                    'project.id',
+                    'project.kaldikID',
+                    'project.kaldikDesc',
                     'users.name as user_name',
                     'users.email',
-                    'users.avatar'
+                    'users.avatar',
+                    'diklat_type.nama_diklat_type'
                 )
                 ->where('project.status', 'Pelaksanaan')
-                ->orderBy('project.id', 'desc')
-                ->get();
+                ->orderBy('project.id', 'desc'); // Tanpa get()
 
             return DataTables::of($projects)
                 ->addIndexColumn()
@@ -91,13 +95,28 @@ class DataSekunderController extends Controller implements HasMiddleware
             'telpon' => 'required|string|max:15',
             'keterangan' => 'nullable|string',
             'berkas' => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx,jpg,png,ppt,pptx|max:2048',
+        ], ValidationMessages::get());
+
+        $validator->setAttributeNames([
+            'project_id' => 'Proyek',
+            'nilai_kinerja_awal' => 'Nilai Kinerja Awal',
+            'periode_awal' => 'Periode Awal',
+            'nilai_kinerja_akhir' => 'Nilai Kinerja Akhir',
+            'periode_akhir' => 'Periode Akhir',
+            'satuan' => 'Satuan',
+            'sumber_data' => 'Sumber Data',
+            'unit_kerja' => 'Unit Kerja',
+            'nama_pic' => 'Nama PIC',
+            'telpon' => 'Nomor Telepon',
+            'keterangan' => 'Keterangan',
+            'berkas' => 'Berkas Lampiran',
         ]);
 
         if ($validator->fails()) {
             return redirect()->back()
                 ->withErrors($validator)
                 ->withInput()
-                ->with('error', 'Validasi gagal, silakan periksa input Anda.');
+                ->with('error', 'Validasi gagal: ' . json_encode($validator->errors()->all()));
         }
 
         try {

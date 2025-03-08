@@ -29,12 +29,16 @@ class PengumpulanDataController extends Controller implements HasMiddleware
         if (request()->ajax()) {
             $projects = DB::table('project')
                 ->join('users', 'project.user_id', '=', 'users.id')
+                ->join('diklat_type', 'project.diklat_type_id', '=', 'diklat_type.id')
                 ->leftJoin('project_responden', 'project_responden.project_id', '=', 'project.id')
                 ->select(
-                    'project.*',
+                    'project.id',
+                    'project.kaldikID',
+                    'project.kaldikDesc',
                     'users.name as user_name',
                     'users.email',
                     'users.avatar',
+                    'diklat_type.nama_diklat_type',
                     // Total responden (semua)
                     DB::raw('COUNT(project_responden.id) as total_responden'),
                     // Total yang sudah mengisi kuesioner alumni
@@ -46,8 +50,7 @@ class PengumpulanDataController extends Controller implements HasMiddleware
                 )
                 ->where('project.status', 'Pelaksanaan')
                 ->groupBy('project.id', 'users.name', 'users.email', 'users.avatar')
-                ->orderBy('project.id', 'desc')
-                ->get();
+                ->orderBy('project.id', 'desc');
 
 
             return DataTables::of($projects)

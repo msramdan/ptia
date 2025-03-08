@@ -32,11 +32,11 @@
                                             <th rowspan="2">{{ __('Dibuat Oleh') }}</th>
                                             <th rowspan="2">{{ __('Kode Diklat') }}</th>
                                             <th rowspan="2">{{ __('Nama Diklat') }}</th>
+                                            <th rowspan="2">{{ __('Jenis Diklat') }}</th>
                                             <th colspan="2" class="text-center">{{ __('Alumni') }}</th>
                                             <th colspan="2" class="text-center">{{ __('Atasan') }}</th>
                                             <th rowspan="2">{{ __('Aksi') }}</th>
                                         </tr>
-
                                         <tr>
                                             <th class="text-center">Keterisian</th>
                                             <th class="text-center">Data</th>
@@ -109,6 +109,10 @@
                 {
                     data: 'kaldikDesc',
                     name: 'kaldikDesc',
+                },
+                {
+                    data: 'nama_diklat_type',
+                    name: 'diklat_type.nama_diklat_type',
                 },
                 {
                     data: 'keterisian_alumni',
