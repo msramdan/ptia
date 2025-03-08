@@ -220,5 +220,6 @@ return [
         ['group' => 'setting', 'access' => ['setting view', 'setting create', 'setting edit', 'setting delete']],
         ['group' => 'kuesioners', 'access' => ['kuesioner view', 'kuesioner create', 'kuesioner edit', 'kuesioner delete']],
         ['group' => 'Pengumpulan Data', 'access' => ['pengumpulan data view']],
+        ['group' => 'Data Sekunder', 'access' => ['data sekunder view']],
     ],
 ];

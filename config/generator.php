@@ -260,6 +260,7 @@ return [
     [
         'header' => 'Pelaksanaan',
         'permissions' => [
+            'data sekunder view',
             'penyebaran kuesioner view',
             'pengumpulan data view'
         ],
@@ -268,14 +269,21 @@ return [
                 'title' => 'Pelaksanaan',
                 'icon' => '<i class="bi bi-folder"></i>',
                 'route' => [
+                    'data-sekunder*',
                     'penyebaran-kuesioner*',
                     'pengumpulan-data*'
                 ],
                 'permissions' => [
+                    'data sekunder view',
                     'penyebaran kuesioner view',
                     'pengumpulan data view'
                 ],
                 'submenus' => [
+                    [
+                        'title' => 'Data Sekunder',
+                        'route' => '/data-sekunder',
+                        'permission' => 'data sekunder view'
+                    ],
                     [
                         'title' => 'Penyebaran Kuesioner',
                         'route' => '/penyebaran-kuesioner',
