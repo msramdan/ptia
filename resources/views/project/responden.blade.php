@@ -106,8 +106,8 @@
                                             <th>{{ __('No.Telepon') }}</th>
                                             <th>{{ __('Jabatan') }}</th>
                                             <th>{{ __('Unit') }}</th>
-                                            <th>{{ __('Nilai Post Test') }}</th>
-                                            <th>{{ __('Nilai Kenaikan Pre Post') }}</th>
+                                            <th>{{ __('Nilai Pre Test') }}</th>
+                                            <th>{{ __('Nilai Post Post') }}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
