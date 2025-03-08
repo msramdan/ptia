@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use App\Helpers\ValidationMessages;
-
 class DataSekunderController extends Controller implements HasMiddleware
 {
     /**
@@ -36,6 +35,7 @@ class DataSekunderController extends Controller implements HasMiddleware
             $projects = DB::table('project')
                 ->join('users', 'project.user_id', '=', 'users.id')
                 ->join('diklat_type', 'project.diklat_type_id', '=', 'diklat_type.id')
+                ->leftJoin('project_data_sekunder', 'project_data_sekunder.project_id', '=', 'project.id')
                 ->select(
                     'project.id',
                     'project.kaldikID',
@@ -43,10 +43,13 @@ class DataSekunderController extends Controller implements HasMiddleware
                     'users.name as user_name',
                     'users.email',
                     'users.avatar',
-                    'diklat_type.nama_diklat_type'
+                    'diklat_type.nama_diklat_type',
+                    'project_data_sekunder.nilai_kinerja_awal',
+                    'project_data_sekunder.nilai_kinerja_akhir',
+                    'project_data_sekunder.berkas'
                 )
                 ->where('project.status', 'Pelaksanaan')
-                ->orderBy('project.id', 'desc'); // Tanpa get()
+                ->orderBy('project.id', 'desc');
 
             return DataTables::of($projects)
                 ->addIndexColumn()
@@ -62,24 +65,52 @@ class DataSekunderController extends Controller implements HasMiddleware
                         <span>' . e($row->user_name) . '</span>
                     </div>';
                 })
+                ->addColumn('berkas', function ($row) {
+                    if ($row->berkas) {
+                        $url = asset("storage/uploads/berkas/$row->berkas");
+                        return '<a href="' . e($url) . '" target="_blank" class="btn btn-sm btn-success" title="Download Berkas">
+                                    <i class="fas fa-download"></i>
+                                </a>';
+                    }
+                    return '-';
+                })
+                ->addColumn('data_sekunder', function ($row) {
+                    if ($row->nilai_kinerja_awal !== null && $row->nilai_kinerja_akhir !== null) {
+                        // Menentukan status perubahan
+                        if ($row->nilai_kinerja_akhir > $row->nilai_kinerja_awal) {
+                            $status = '<span class="badge bg-success">Meningkat</span>';
+                        } elseif ($row->nilai_kinerja_akhir < $row->nilai_kinerja_awal) {
+                            $status = '<span class="badge bg-danger">Menurun</span>';
+                        } else {
+                            $status = '<span class="badge bg-primary">Tetap</span>';
+                        }
+
+                        return '
+                        <td class="text-center">
+                            ' . e($row->nilai_kinerja_awal) . '-' . e($row->nilai_kinerja_akhir) . '
+                            <hr style="margin:5px">
+                            ' . $status . '
+                        </td>';
+                    }
+                    return '-';
+                })
                 ->addColumn('action', function ($row) {
                     return '
                     <div class="text-center">
-                        <button class="btn btn-sm btn-primary btn-action" data-id="' . $row->id . '">
-                            <i class="fas fa-plus"></i> Tambah Data Sekunder
+                        <button  title="Input Data Sekunder" class="btn btn-sm btn-primary btn-action" data-id="' . $row->id . '">
+                            <i class="fas fa-plus"></i> Data Sekunder
                         </button>
                     </div>';
                 })
-                ->rawColumns(['user', 'action'])
+                ->rawColumns(['user', 'berkas', 'data_sekunder', 'action'])
                 ->toJson();
         }
+
+
 
         return view('data-sekunder.index');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request): RedirectResponse
     {
         $validator = Validator::make($request->all(), [
@@ -97,21 +128,6 @@ class DataSekunderController extends Controller implements HasMiddleware
             'berkas' => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx,jpg,png,ppt,pptx|max:2048',
         ], ValidationMessages::get());
 
-        $validator->setAttributeNames([
-            'project_id' => 'Proyek',
-            'nilai_kinerja_awal' => 'Nilai Kinerja Awal',
-            'periode_awal' => 'Periode Awal',
-            'nilai_kinerja_akhir' => 'Nilai Kinerja Akhir',
-            'periode_akhir' => 'Periode Akhir',
-            'satuan' => 'Satuan',
-            'sumber_data' => 'Sumber Data',
-            'unit_kerja' => 'Unit Kerja',
-            'nama_pic' => 'Nama PIC',
-            'telpon' => 'Nomor Telepon',
-            'keterangan' => 'Keterangan',
-            'berkas' => 'Berkas Lampiran',
-        ]);
-
         if ($validator->fails()) {
             return redirect()->back()
                 ->withErrors($validator)
@@ -120,23 +136,47 @@ class DataSekunderController extends Controller implements HasMiddleware
         }
 
         try {
-            $data = $request->all();
+            $data = $request->except(['berkas']);
+            $existingData = DataSekunder::where('project_id', $request->project_id)->first();
 
+            // Handle file upload
             if ($request->hasFile('berkas')) {
                 $file = $request->file('berkas');
-                $filename = time() . '_' . $file->getClientOriginalName();
-                $file->storeAs('uploads', $filename, 'public');
+                $timestamp = now()->format('YmdHis'); // Format waktu: 20240309123045
+                $extension = $file->getClientOriginalExtension();
+                $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+                $filename = "{$timestamp}_{$originalName}.{$extension}";
+
+                $file->storeAs('uploads/berkas', $filename, 'public');
                 $data['berkas'] = $filename;
+
+                // Hapus berkas lama jika ada
+                if ($existingData && $existingData->berkas) {
+                    Storage::disk('public')->delete('uploads/berkas/' . $existingData->berkas);
+                }
+            } else {
+                // Gunakan berkas lama jika ada
+                if ($existingData && $existingData->berkas) {
+                    $data['berkas'] = $existingData->berkas;
+                }
             }
 
-            DataSekunder::create($data);
+            if ($existingData) {
+                // Update data lama
+                $existingData->update($data);
+                $message = 'Data Sekunder berhasil diperbarui.';
+            } else {
+                // Simpan data baru
+                DataSekunder::create($data);
+                $message = 'Data Sekunder berhasil ditambahkan.';
+            }
 
-            return redirect()->route('data-sekunder.index')
-                ->with('success', 'Data Sekunder berhasil ditambahkan.');
+            return redirect()->route('data-sekunder.index')->with('success', $message);
         } catch (\Exception $e) {
             return redirect()->back()
                 ->with('error', 'Terjadi kesalahan saat menyimpan data: ' . $e->getMessage())
                 ->withInput();
         }
     }
+
 }

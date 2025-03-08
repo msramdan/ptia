@@ -33,6 +33,8 @@
                                             <th>{{ __('Kode Diklat') }}</th>
                                             <th>{{ __('Nama Diklat') }}</th>
                                             <th>{{ __('Jenis Diklat') }}</th>
+                                            <th>{{ __('Data Sekunder') }}</th>
+                                            <th>{{ __('Berkas') }}</th>
                                             <th>{{ __('Aksi') }}</th>
                                         </tr>
                                     </thead>
@@ -191,6 +193,15 @@
                     {
                         data: 'nama_diklat_type',
                         name: 'diklat_type.nama_diklat_type',
+                    },
+                    {
+                        data: 'data_sekunder',
+                        name: 'data_sekunder',
+                        className: 'text-center',
+                    },
+                    {
+                        data: 'berkas',
+                        name: 'berkas',
                     },
                     {
                         data: 'action',
