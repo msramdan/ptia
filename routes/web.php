@@ -25,7 +25,8 @@ use App\Http\Controllers\{
     PenyebaranKuesionerController,
     ProjectController,
     RespondenKuesionerController,
-    SettingController
+    SettingController,
+    DataSekunderController
 };
 
 
@@ -64,6 +65,8 @@ Route::middleware(['auth', 'web'])->group(function () {
         'setting' => SettingController::class,
         'kuesioner' => KuesionerController::class,
     ]);
+
+
     Route::prefix('penyebaran-kuesioner')->controller(PenyebaranKuesionerController::class)->group(function () {
         Route::get('/', 'index')->name('penyebaran-kuesioner.index');
         // Responden Alumni
@@ -76,6 +79,12 @@ Route::middleware(['auth', 'web'])->group(function () {
         Route::post('/send-wa', 'sendNotifWa')->name('penyebaran-kuesioner.send.wa');
         // Log Pengiriman WhatsApp
         Route::get('/log-wa', 'getLogNotifWa')->name('penyebaran-kuesioner.log.wa');
+    });
+
+    // Route khusus untuk Data Sekunder
+    Route::prefix('data-sekunder')->controller(DataSekunderController::class)->group(function () {
+        Route::get('/', 'index')->name('data-sekunder.index');
+        Route::post('/', 'store')->name('data-sekunder.store');
     });
 
     Route::prefix('pengumpulan-data')->controller(PengumpulanDataController::class)->group(function () {

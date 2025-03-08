@@ -26,4 +26,3 @@ class DatabaseSeeder extends Seeder
         $this->call(KuesionerSeeder::class);
     }
 }
-
