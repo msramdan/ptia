@@ -49,7 +49,7 @@
 
     <!-- Modal Statis untuk Input Data Sekunder -->
     <div class="modal fade" id="createModal" tabindex="-1" aria-labelledby="createModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
+        <div class="modal-dialog modal-lg"> <!-- Ubah ke modal-lg untuk lebih lebar -->
             <div class="modal-content">
                 <form action="{{ route('data-sekunder.store') }}" method="POST" enctype="multipart/form-data">
                     @csrf
@@ -59,50 +59,25 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <!-- Kelompok Kinerja Awal - Periode -->
-                        <div class="card mb-3">
-                            <div class="card-header">
-                                <h6 class="mb-0">Kinerja Awal - Periode</h6>
-                            </div>
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <label for="nilai_kinerja_awal" class="form-label">Nilai Kinerja Awal</label>
-                                        <input type="number" class="form-control" id="nilai_kinerja_awal"
-                                            name="nilai_kinerja_awal" required>
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label for="periode_awal" class="form-label">Periode Awal</label>
-                                        <input type="text" class="form-control" id="periode_awal" name="periode_awal"
-                                            required>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Kelompok Kinerja Akhir - Periode -->
-                        <div class="card mb-3">
-                            <div class="card-header">
-                                <h6 class="mb-0">Kinerja Akhir - Periode</h6>
-                            </div>
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <label for="nilai_kinerja_akhir" class="form-label">Nilai Kinerja Akhir</label>
-                                        <input type="number" class="form-control" id="nilai_kinerja_akhir"
-                                            name="nilai_kinerja_akhir" required>
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label for="periode_akhir" class="form-label">Periode Akhir</label>
-                                        <input type="text" class="form-control" id="periode_akhir" name="periode_akhir"
-                                            required>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Input Lainnya -->
                         <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="nilai_kinerja_awal" class="form-label">Kinerja Awal</label>
+                                <input type="number" class="form-control" id="nilai_kinerja_awal" name="nilai_kinerja_awal"
+                                    required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="periode_awal" class="form-label">Periode Awal</label>
+                                <input type="text" class="form-control" id="periode_awal" name="periode_awal" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="nilai_kinerja_akhir" class="form-label">Kinerja Akhir</label>
+                                <input type="number" class="form-control" id="nilai_kinerja_akhir"
+                                    name="nilai_kinerja_akhir" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="periode_akhir" class="form-label">Periode Akhir</label>
+                                <input type="text" class="form-control" id="periode_akhir" name="periode_akhir" required>
+                            </div>
                             <div class="col-md-6 mb-3">
                                 <label for="satuan" class="form-label">Satuan</label>
                                 <select class="form-control" id="satuan" name="satuan" required>
