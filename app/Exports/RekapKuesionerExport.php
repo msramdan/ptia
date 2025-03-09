@@ -45,7 +45,7 @@ class RekapKuesionerExport implements FromView, ShouldAutoSize, WithEvents, With
     {
         return [
             AfterSheet::class => function (AfterSheet $event) {
-                $cellRange = 'A1:Y3'; // Sesuaikan dengan jumlah header
+                $cellRange = ($this->remark == 'Atasan') ? 'A1:Z3' : 'A1:Y3';
                 $event->sheet->getStyle($cellRange)->applyFromArray([
                     'borders' => [
                         'allBorders' => [
@@ -64,5 +64,6 @@ class RekapKuesionerExport implements FromView, ShouldAutoSize, WithEvents, With
             },
         ];
     }
+
 
 }

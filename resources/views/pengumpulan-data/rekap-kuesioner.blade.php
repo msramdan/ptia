@@ -64,9 +64,11 @@
                                     <thead class="table-primary">
                                         <tr>
                                             <th rowspan="3">No.</th>
-                                            <th rowspan="3">Nama</th>
+                                            <th rowspan="3">Nama Peserta</th>
                                             <th rowspan="3">NIP</th>
-
+                                            @if ($remark == 'Atasan')
+                                                <th rowspan="3">Nama Atlas</th>
+                                            @endif
                                             @php
                                                 $groupedLevels = collect($kuesioner)->groupBy('level');
                                             @endphp
@@ -169,6 +171,9 @@ OR
                                                 <td>{{ $index + 1 }}</td>
                                                 <td>{{ $respondenItem->nama }}</td>
                                                 <td>{{ $respondenItem->nip }}</td>
+                                                @if ($remark == 'Atasan')
+                                                    <td>{{ $respondenItem->nama_atasan }}</td>
+                                                @endif
                                                 @php
                                                     $total_level_3 = 0;
                                                 @endphp
