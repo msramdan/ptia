@@ -85,6 +85,7 @@ Route::middleware(['auth', 'web'])->group(function () {
     Route::prefix('data-sekunder')->controller(DataSekunderController::class)->group(function () {
         Route::get('/', 'index')->name('data-sekunder.index');
         Route::post('/', 'store')->name('data-sekunder.store');
+        Route::get('/get/{project_id}', 'getDataSekunder')->name('data-sekunder.get');
     });
 
     Route::prefix('pengumpulan-data')->controller(PengumpulanDataController::class)->group(function () {

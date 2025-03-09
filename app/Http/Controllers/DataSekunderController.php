@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use App\Helpers\ValidationMessages;
+
 class DataSekunderController extends Controller implements HasMiddleware
 {
     /**
@@ -78,11 +79,11 @@ class DataSekunderController extends Controller implements HasMiddleware
                     if ($row->nilai_kinerja_awal !== null && $row->nilai_kinerja_akhir !== null) {
                         // Menentukan status perubahan
                         if ($row->nilai_kinerja_akhir > $row->nilai_kinerja_awal) {
-                            $status = '<span class="badge bg-success">Meningkat</span>';
+                            $status = '<span class="badge bg-success"><i class="fas fa-arrow-up"></i> Meningkat</span>';
                         } elseif ($row->nilai_kinerja_akhir < $row->nilai_kinerja_awal) {
-                            $status = '<span class="badge bg-danger">Menurun</span>';
+                            $status = '<span class="badge bg-danger"><i class="fas fa-arrow-down"></i> Menurun</span>';
                         } else {
-                            $status = '<span class="badge bg-primary">Tetap</span>';
+                            $status = '<span class="badge bg-secondary"><i class="fas fa-minus"></i> Tetap</span>';
                         }
 
                         return '
@@ -97,8 +98,8 @@ class DataSekunderController extends Controller implements HasMiddleware
                 ->addColumn('action', function ($row) {
                     return '
                     <div class="text-center">
-                        <button  title="Input Data Sekunder" class="btn btn-sm btn-primary btn-action" data-id="' . $row->id . '">
-                            <i class="fas fa-plus"></i> Data Sekunder
+                        <button style="width: 140px"  title="Input Data Sekunder" class="btn btn-sm btn-primary btn-action" data-id="' . $row->id . '">
+                            <i class="fas fa-pencil"></i> Data Sekunder
                         </button>
                     </div>';
                 })
@@ -179,4 +180,20 @@ class DataSekunderController extends Controller implements HasMiddleware
         }
     }
 
+    public function getDataSekunder($project_id)
+    {
+        $data = DataSekunder::where('project_id', $project_id)->first();
+
+        if ($data) {
+            return response()->json([
+                'success' => true,
+                'data' => $data
+            ]);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'Data tidak ditemukan'
+            ]);
+        }
+    }
 }

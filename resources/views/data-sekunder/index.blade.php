@@ -113,10 +113,10 @@
                                 <input type="text" class="form-control" id="telpon" name="telpon" required>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="berkas" class="form-label">Upload Berkas (PDF, Word, Excel, JPG, PNG,
-                                    PowerPoint)</label>
+                                <label for="berkas" class="form-label">Upload Berkas</label>
                                 <input type="file" class="form-control" id="berkas" name="berkas"
                                     accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.png,.ppt,.pptx">
+                                <small class="text-muted">Format yang diperbolehkan: PDF, Word, Excel, JPG, PNG, PowerPoint</small>
                             </div>
                         </div>
                         <div class="mb-3">
@@ -214,8 +214,32 @@
             $(document).on('click', '.btn-action', function() {
                 var projectId = $(this).data('id');
                 $('#project_id').val(projectId);
-                $('#createModal').modal('show');
+                $.ajax({
+                    url: '/data-sekunder/get/' + projectId,
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function(response) {
+                        if (response.success) {
+                            $('#nilai_kinerja_awal').val(response.data.nilai_kinerja_awal);
+                            $('#periode_awal').val(response.data.periode_awal);
+                            $('#nilai_kinerja_akhir').val(response.data.nilai_kinerja_akhir);
+                            $('#periode_akhir').val(response.data.periode_akhir);
+                            $('#sumber_data').val(response.data.sumber_data);
+                            $('#unit_kerja').val(response.data.unit_kerja);
+                            $('#nama_pic').val(response.data.nama_pic);
+                            $('#telpon').val(response.data.telpon);
+                            $('#keterangan').val(response.data.keterangan);
+                            $('#satuan').val(response.data.satuan).change();
+                        } else {
+                            $('#nilai_kinerja_awal, #periode_awal, #nilai_kinerja_akhir, #periode_akhir, #sumber_data, #unit_kerja, #nama_pic, #telpon, #keterangan')
+                                .val('');
+                            $('#satuan').val('').change();
+                        }
+                        $('#createModal').modal('show');
+                    }
+                });
             });
+
         });
     </script>
 @endpush
