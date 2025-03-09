@@ -3,6 +3,19 @@
 @section('title', __('Data Sekunder'))
 
 @section('content')
+    <style>
+        .tooltip-box {
+            position: absolute;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            padding: 8px;
+            border-radius: 5px;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+            font-size: 14px;
+            z-index: 1000;
+            max-width: 250px;
+        }
+    </style>
     <div class="page-heading">
         <div class="page-title">
             <div class="row">
@@ -62,27 +75,32 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
+                        <p class="text-danger"><i>Note: * Wajib diisi</i></p>
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="nilai_kinerja_awal" class="form-label">Kinerja Awal</label>
+                                <label for="nilai_kinerja_awal" class="form-label">Kinerja Awal <span
+                                        class="text-danger">*</span></label>
                                 <input type="number" class="form-control" id="nilai_kinerja_awal" name="nilai_kinerja_awal"
                                     required>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="periode_awal" class="form-label">Periode Awal</label>
+                                <label for="periode_awal" class="form-label">Periode Awal <span
+                                        class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="periode_awal" name="periode_awal" required>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="nilai_kinerja_akhir" class="form-label">Kinerja Akhir</label>
+                                <label for="nilai_kinerja_akhir" class="form-label">Kinerja Akhir <span
+                                        class="text-danger">*</span></label>
                                 <input type="number" class="form-control" id="nilai_kinerja_akhir"
                                     name="nilai_kinerja_akhir" required>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="periode_akhir" class="form-label">Periode Akhir</label>
+                                <label for="periode_akhir" class="form-label">Periode Akhir <span
+                                        class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="periode_akhir" name="periode_akhir" required>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="satuan" class="form-label">Satuan</label>
+                            <div class="col-md-4 mb-3">
+                                <label for="satuan" class="form-label">Satuan <span class="text-danger">*</span></label>
                                 <select class="form-control" id="satuan" name="satuan" required>
                                     <option value="Persentase (%)">Persentase (%)</option>
                                     <option value="Skor">Skor</option>
@@ -96,34 +114,44 @@
                                     <option value="Index">Index</option>
                                 </select>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="sumber_data" class="form-label">Sumber Data</label>
+                            <div class="col-md-4 mb-3">
+                                <label for="sumber_data" class="form-label">Sumber Data <span
+                                        class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="sumber_data" name="sumber_data" required>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="unit_kerja" class="form-label">Unit Kerja</label>
-                                <input type="text" class="form-control" id="unit_kerja" name="unit_kerja" required>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="nama_pic" class="form-label">Nama PIC</label>
-                                <input type="text" class="form-control" id="nama_pic" name="nama_pic" required>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="telpon" class="form-label">Telpon</label>
-                                <input type="text" class="form-control" id="telpon" name="telpon" required>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="berkas" class="form-label">Upload Berkas</label>
+                            <div class="col-md-4 mb-3 position-relative">
+                                <label for="berkas" class="form-label">
+                                    Upload Berkas
+                                    <i class="fa fa-info-circle text-primary" data-bs-toggle="tooltip"
+                                        data-bs-placement="right"
+                                        title="Format yang diperbolehkan: PDF, Word, Excel, JPG, PNG, PowerPoint"></i>
+                                </label>
                                 <input type="file" class="form-control" id="berkas" name="berkas"
                                     accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.png,.ppt,.pptx">
-                                <small class="text-muted">Format yang diperbolehkan: PDF, Word, Excel, JPG, PNG, PowerPoint</small>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="unit_kerja" class="form-label">Unit Kerja <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="unit_kerja" name="unit_kerja" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="nama_pic" class="form-label">Nama PIC <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="nama_pic" name="nama_pic" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="telpon" class="form-label">Telpon <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="telpon" name="telpon" required>
+                            </div>
+                            <div class="col-md-12 mb-3">
+                                <label for="keterangan" class="form-label">Keterangan <span
+                                        class="text-danger">*</span></label>
+                                <textarea class="form-control" id="keterangan" name="keterangan" rows="3"></textarea>
                             </div>
                         </div>
-                        <div class="mb-3">
-                            <label for="keterangan" class="form-label">Keterangan</label>
-                            <textarea class="form-control" id="keterangan" name="keterangan" rows="3"></textarea>
-                        </div>
                     </div>
+
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
                         <button type="submit" class="btn btn-primary">Simpan</button>
@@ -240,6 +268,11 @@
                 });
             });
 
+        });
+    </script>
+    <script>
+        $(document).ready(function() {
+            $('[data-bs-toggle="tooltip"]').tooltip();
         });
     </script>
 @endpush
