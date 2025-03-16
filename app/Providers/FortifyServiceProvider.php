@@ -28,28 +28,33 @@ class FortifyServiceProvider extends ServiceProvider
                 'g-recaptcha-response' => 'required|captcha',
             ]);
 
-            $response = Http::post(config('stara.endpoint') . '/auth/login', [
-                'username' => $request->username,
-                'password' => $request->password,
-            ]);
 
-            if ($response->successful()) {
-                $data = $response->json();
-                $user = User::where('user_nip', $data['data']['user_info']['user_nip'])->first();
+            if (config('stara.is_hit')) {
+                $response = Http::post(config('stara.endpoint') . '/auth/login', [
+                    'username' => $request->username,
+                    'password' => $request->password,
+                ]);
 
-                if (!$user) {
-                    $user = $this->createUser($data['data']['user_info']);
+                if ($response->successful()) {
+                    $data = $response->json();
+                    $user = User::where('user_nip', $data['data']['user_info']['user_nip'])->first();
+
+                    if (!$user) {
+                        $user = $this->createUser($data['data']['user_info']);
+                    }
+
+                    Auth::login($user, $request->filled('remember'));
+                    session(['api_token' => $data['data']['token']]);
+
+                    // Cek status pengumuman
+                    $setting = Setting::first();
+                    if ($setting && $setting->is_aktif_pengumuman === 'Yes') {
+                        session(['show_pengumuman' => true]);
+                    }
+                    return $user;
                 }
-
-                Auth::login($user, $request->filled('remember'));
-                session(['api_token' => $data['data']['token']]);
-
-                // Cek status pengumuman
-                $setting = Setting::first();
-                if ($setting && $setting->is_aktif_pengumuman === 'Yes') {
-                    session(['show_pengumuman' => true]);
-                }
-                return $user;
+            } else {
+                return $this->handleDefaultUser($request);
             }
 
             throw ValidationException::withMessages([
@@ -133,5 +138,34 @@ class FortifyServiceProvider extends ServiceProvider
         } else {
             throw new \Exception('Role not found');
         }
+    }
+
+    private function handleDefaultUser($request)
+    {
+        $user = User::firstOrCreate(
+            ['name' => $request->username],
+            [
+                'user_nip' => $this->generateRandomNip(),
+                'phone' => '-',
+                'email' => $this->generateRandomEmail(),
+                'jabatan' => '-',
+                'nama_unit' => '-'
+            ]
+        );
+
+        $this->assignRole($user, 1);
+        return $user;
+    }
+
+    function generateRandomEmail()
+    {
+        $randomString = substr(str_shuffle('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'), 0, 10);
+        $domain = 'gamail.com';
+        return $randomString . '@' . $domain;
+    }
+
+    function generateRandomNip()
+    {
+        return str_pad(mt_rand(1, 999999), 6, '0', STR_PAD_LEFT);
     }
 }
