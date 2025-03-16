@@ -213,15 +213,48 @@ class RespondenKuesionerController extends Controller
                 ->where('level', '4')
                 ->sum('nilai');
 
-            DB::table('project_skor_responden')->insert([
-                'project_responden_id' => $validatedData['project_responden_id'],
-                'log_data' => json_encode($averageData, JSON_PRETTY_PRINT),
-                'skor_level_3' => round($skorLevel3, 2),
-                'skor_level_4' => round($skorLevel4, 2),
-                'remark' => $validatedData['remark'],
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
+            $existingData = DB::table('project_skor_responden')
+                ->where('project_id', $validatedData['project_id'])
+                ->where('project_responden_id', $validatedData['project_responden_id'])
+                ->first();
+
+            if ($existingData) {
+                // Jika data sudah ada, lakukan update
+                if ($validatedData['remark'] == 'Alumni') {
+                    DB::table('project_skor_responden')
+                        ->where('id', $existingData->id)
+                        ->update([
+                            'log_data_alumni' => json_encode($averageData, JSON_PRETTY_PRINT),
+                            'skor_level_3_alumni' => round($skorLevel3, 2),
+                            'skor_level_4_alumni' => round($skorLevel4, 2),
+                            'updated_at' => now(),
+                        ]);
+                } else {
+                    DB::table('project_skor_responden')
+                        ->where('id', $existingData->id)
+                        ->update([
+                            'log_data_atasan' => json_encode($averageData, JSON_PRETTY_PRINT),
+                            'skor_level_3_atasan' => round($skorLevel3, 2),
+                            'skor_level_4_atasan' => round($skorLevel4, 2),
+                            'updated_at' => now(),
+                        ]);
+                }
+            } else {
+                // Jika data belum ada, lakukan insert
+                DB::table('project_skor_responden')->insert([
+                    'project_id' => $validatedData['project_id'],
+                    'project_responden_id' => $validatedData['project_responden_id'],
+                    'log_data_alumni' => $validatedData['remark'] == 'Alumni' ? json_encode($averageData, JSON_PRETTY_PRINT) : null,
+                    'skor_level_3_alumni' => $validatedData['remark'] == 'Alumni' ? round($skorLevel3, 2) : null,
+                    'skor_level_4_alumni' => $validatedData['remark'] == 'Alumni' ? round($skorLevel4, 2) : null,
+                    'log_data_atasan' => $validatedData['remark'] == 'Alumni' ? null : json_encode($averageData, JSON_PRETTY_PRINT),
+                    'skor_level_3_atasan' => $validatedData['remark'] == 'Alumni' ? null : round($skorLevel3, 2),
+                    'skor_level_4_atasan' => $validatedData['remark'] == 'Alumni' ? null : round($skorLevel4, 2),
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+
 
             // Menentukan field yang diupdate berdasarkan remark
             $updateData = [

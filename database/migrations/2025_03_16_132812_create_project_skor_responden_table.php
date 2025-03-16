@@ -8,11 +8,14 @@ return new class extends Migration {
     {
         Schema::create('project_skor_responden', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('project_id')->constrained('project')->onDelete('cascade');
             $table->foreignId('project_responden_id')->constrained('project_responden')->onDelete('cascade');
-            $table->float('skor_level_3');
-            $table->float('skor_level_4');
-            $table->enum('remark', ['Alumni', 'Atasan']);
-            $table->json('log_data');
+            $table->float('skor_level_3_alumni')->nullable();
+            $table->float('skor_level_4_alumni')->nullable();
+            $table->json('log_data_alumni')->nullable();
+            $table->float('skor_level_3_atasan')->nullable();
+            $table->float('skor_level_4_atasan')->nullable();
+            $table->json('log_data_atasan')->nullable();
             $table->timestamps();
         });
     }
