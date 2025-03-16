@@ -24,6 +24,7 @@ class RespondenKuesionerController extends Controller
                 ->select(
                     'project_responden.*',
                     'project.status',
+                    'project.id as project_id',
                     'project.kaldikID',
                     'project.kaldikDesc',
                     'project_responden.deadline_pengisian_alumni',
@@ -54,6 +55,9 @@ class RespondenKuesionerController extends Controller
                 ->where('pk.project_id', $responden->project_id)
                 ->select(
                     'pk.id',
+                    'pk.aspek_id',
+                    'pk.kriteria',
+                    'pk.level',
                     'pk.aspek',
                     'pk.kriteria',
                     'pk.pertanyaan',
@@ -88,33 +92,136 @@ class RespondenKuesionerController extends Controller
         $validatedData = $request->validate([
             'project_kuesioner_id' => 'required|array',
             'project_responden_id' => 'required',
+            'project_id' => 'required',
             'sebelum' => 'required|array',
             'sesudah' => 'required|array',
             'catatan' => 'nullable|array',
             'remark' => 'required|in:Alumni,Atasan',
             'atasan' => 'required|string',
             'no_wa' => 'required|string',
+            'aspek_id' => 'required|array',
+            'level' => 'required|array',
+            'kriteria' => 'required|array',
         ]);
 
         try {
-            DB::beginTransaction(); // Mulai transaksi
+
+            DB::beginTransaction();
+            $diklatTypeId = DB::table('project')
+                ->where('id', $validatedData['project_id'])
+                ->value('diklat_type_id');
 
             $dataToInsert = [];
+
+            // Mengisi array data
             foreach ($validatedData['project_kuesioner_id'] as $kuesionerId => $projectKuesionerId) {
+                $nilai_sebelum = $validatedData['sebelum'][$kuesionerId] ?? 0;
+                $nilai_sesudah = $validatedData['sesudah'][$kuesionerId] ?? 0;
+                $nilai_delta = $nilai_sesudah - $nilai_sebelum;
+
                 $dataToInsert[] = [
                     'project_kuesioner_id' => $projectKuesionerId,
                     'project_responden_id' => $validatedData['project_responden_id'],
-                    'nilai_sebelum' => $validatedData['sebelum'][$kuesionerId] ?? 0,
-                    'nilai_sesudah' => $validatedData['sesudah'][$kuesionerId] ?? 0,
+                    'kriteria' => $validatedData['kriteria'][$kuesionerId] ?? null,
+                    'nilai_sebelum' => $nilai_sebelum,
+                    'nilai_sesudah' => $nilai_sesudah,
+                    'nilai_delta' => $nilai_delta,
                     'catatan' => $validatedData['catatan'][$kuesionerId] ?? null,
+                    'aspek_id' => $validatedData['aspek_id'][$kuesionerId] ?? null,
+                    'level' => $validatedData['level'][$kuesionerId] ?? null,
                     'remark' => $validatedData['remark'],
                     'created_at' => now(),
                     'updated_at' => now(),
                 ];
             }
 
+            $dataToInsertDB = array_map(function ($item) {
+                unset($item['aspek_id'], $item['level'], $item['kriteria']);
+                return $item;
+            }, $dataToInsert);
+
             // Insert batch data ke dalam tabel project_jawaban_kuesioner
-            DB::table('project_jawaban_kuesioner')->insert($dataToInsert);
+            DB::table('project_jawaban_kuesioner')->insert($dataToInsertDB);
+
+            $averageByAspek = [];
+            $countByAspek = [];
+            $kriteriaByAspek = [];
+            $levelByAspek = [];
+
+            foreach ($dataToInsert as $item) {
+                $aspekId = $item['aspek_id'];
+                $kriteria = $item['kriteria'];
+                $level = $item['level'];
+
+                if ($aspekId !== null) {
+                    if (!isset($averageByAspek[$aspekId])) {
+                        $averageByAspek[$aspekId] = 0;
+                        $countByAspek[$aspekId] = 0;
+                        $kriteriaByAspek[$aspekId] = $kriteria;
+                        $levelByAspek[$aspekId] = $level;
+                    }
+                    $averageByAspek[$aspekId] += $item['nilai_delta'];
+                    $countByAspek[$aspekId]++;
+                }
+            }
+
+            // Buat array hasil rata-rata dengan konversi dan bobot
+            $averageData = [];
+
+            foreach ($averageByAspek as $aspekId => $totalDelta) {
+                $averageNilaiDelta = (int) round($totalDelta / $countByAspek[$aspekId]);
+                $kriteria = $kriteriaByAspek[$aspekId] ?? null;
+
+                // Penyesuaian kriteria untuk query konversi
+                $jenisSkor = ($kriteria == 'Delta Skor Persepsi') ? '∆ Skor Persepsi' : $kriteria;
+
+                // Ambil data konversi berdasarkan diklat_type_id, jenis_skor, dan skor
+                $konversi = DB::table('konversi')
+                    ->where('diklat_type_id', $diklatTypeId)
+                    ->where('jenis_skor', $jenisSkor)
+                    ->where('skor', $averageNilaiDelta)
+                    ->value('konversi') ?? 0; // Jika tidak ditemukan, set default ke 0
+
+                // Ambil bobot berdasarkan project_id dan aspek_id
+                $bobotField = ($validatedData['remark'] == 'Alumni') ? 'bobot_alumni' : 'bobot_atasan_langsung';
+
+                $bobot = DB::table('project_bobot_aspek')
+                    ->where('project_id', $validatedData['project_id'])
+                    ->where('aspek_id', $aspekId)
+                    ->value($bobotField) ?? 0; // Jika tidak ditemukan, set default ke 0
+
+                // Hitung nilai dengan rumus konversi * bobot / 100, dibulatkan 2 angka desimal
+                $nilai = round(($konversi * $bobot) / 100, 2);
+
+                $averageData[] = [
+                    'diklat_type_id' => $diklatTypeId,
+                    'aspek_id' => $aspekId,
+                    'kriteria' => $kriteria,
+                    'level' => $levelByAspek[$aspekId] ?? null,
+                    'average_nilai_delta' => $averageNilaiDelta,
+                    'konversi' => (int) $konversi,
+                    'bobot' => $bobot,
+                    'nilai' => $nilai,
+                ];
+            }
+
+            $skorLevel3 = collect($averageData)
+                ->where('level', '3')
+                ->sum('nilai');
+
+            $skorLevel4 = collect($averageData)
+                ->where('level', '4')
+                ->sum('nilai');
+
+            DB::table('project_skor_responden')->insert([
+                'project_responden_id' => $validatedData['project_responden_id'],
+                'log_data' => json_encode($averageData, JSON_PRETTY_PRINT),
+                'skor_level_3' => round($skorLevel3, 2),
+                'skor_level_4' => round($skorLevel4, 2),
+                'remark' => $validatedData['remark'],
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
 
             // Menentukan field yang diupdate berdasarkan remark
             $updateData = [

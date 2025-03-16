@@ -12,6 +12,7 @@ return new class extends Migration {
             $table->float('skor_level_3');
             $table->float('skor_level_4');
             $table->enum('remark', ['Alumni', 'Atasan']);
+            $table->json('log_data');
             $table->timestamps();
         });
     }

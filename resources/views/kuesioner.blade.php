@@ -165,6 +165,8 @@
                         readonly style="background-color: #e9ecef;">
                     <input type="hidden" id="project_responden_id" name="project_responden_id" class="form-control"
                         value="{{ $responden->id }}" readonly style="background-color: #e9ecef;">
+                    <input type="hidden" id="project_id" name="project_id" class="form-control"
+                        value="{{ $responden->project_id }}" readonly style="background-color: #e9ecef;">
 
                     <div class="mb-3">
                         <label class="form-label" style="margin-bottom: 2px;"><strong>Nama Peserta</strong></label>
@@ -229,9 +231,11 @@
                         </p>
                         <p class="fw-bold">{{ $item->pertanyaan }}</p>
 
-                        <!-- Input hidden untuk project_kuesioner_id -->
                         <input type="hidden" name="project_kuesioner_id[{{ $item->id }}]"
                             value="{{ $item->id }}">
+                        <input type="hidden" name="aspek_id[{{ $item->id }}]" value="{{ $item->aspek_id }}">
+                        <input type="hidden" name="kriteria[{{ $item->id }}]" value="{{ $item->kriteria }}">
+                        <input type="hidden" name="level[{{ $item->id }}]" value="{{ $item->level }}">
 
                         <div class="row">
                             @if ($item->kriteria === 'Delta Skor Persepsi')
