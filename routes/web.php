@@ -26,10 +26,9 @@ use App\Http\Controllers\{
     ProjectController,
     RespondenKuesionerController,
     SettingController,
-    DataSekunderController
+    DataSekunderController,
+    HasilEvaluasiController
 };
-
-
 
 Route::get('/', function () {
     return view('welcome');
@@ -66,6 +65,10 @@ Route::middleware(['auth', 'web'])->group(function () {
         'kuesioner' => KuesionerController::class,
     ]);
 
+    // Route khusus untuk Hasil Evaluasi
+    Route::prefix('hasil-evaluasi')->controller(HasilEvaluasiController::class)->group(function () {
+        Route::get('/', 'index')->name('hasil-evaluasi.index');
+    });
 
     Route::prefix('penyebaran-kuesioner')->controller(PenyebaranKuesionerController::class)->group(function () {
         Route::get('/', 'index')->name('penyebaran-kuesioner.index');
@@ -95,7 +98,6 @@ Route::middleware(['auth', 'web'])->group(function () {
         // Ekspor Excel
         Route::get('/export-rekap-kuesioner/{id}/{remark}', 'exportExcel')->name('pengumpulan-data.export-excel');
     });
-
 
     Route::get('/bobot-aspek', [BobotAspekController::class, 'index'])->name('bobot-aspek.index');
     Route::put('/bobot-aspek', [BobotAspekController::class, 'update'])->name('bobot-aspek.update');
