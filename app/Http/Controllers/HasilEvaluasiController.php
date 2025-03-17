@@ -79,8 +79,8 @@ class HasilEvaluasiController extends Controller implements HasMiddleware
                                 <span>' . e($row->user_name) . '</span>
                             </div>';
                 })
-                ->addColumn('avg_skor_level_3', fn($row) => '<a href="' . e(url("/detail-skor/level-3/{$row->id}")) . '" target="_blank" class="btn btn-link">' . e($row->avg_skor_level_3) . '</a>')
-                ->addColumn('avg_skor_level_4', fn($row) => '<a href="' . e(url("/detail-skor/level-4/{$row->id}")) . '" target="_blank" class="btn btn-link">' . e($row->avg_skor_level_4) . '</a>')
+                ->addColumn('avg_skor_level_3', fn($row) => '<a href="' . e(url("/hasil-evaluasi/level-3/{$row->id}")) . '"  class="btn btn-link">' . e($row->avg_skor_level_3) . '</a>')
+                ->addColumn('avg_skor_level_4', fn($row) => '<a href="' . e(url("/hasil-evaluasi/level-4/{$row->id}")) . '"  class="btn btn-link">' . e($row->avg_skor_level_4) . '</a>')
                 ->addColumn('kriteria_dampak_level_3', fn($row) => e($row->kriteria_dampak_level_3 ?? '-'))
                 ->addColumn('kriteria_dampak_level_4', fn($row) => e($row->kriteria_dampak_level_4 ?? '-'))
                 ->rawColumns(['user', 'avg_skor_level_3', 'avg_skor_level_4'])
@@ -89,22 +89,24 @@ class HasilEvaluasiController extends Controller implements HasMiddleware
         return view('hasil-evaluasi.index');
     }
 
-
-
-
-    /**
-     * Menentukan predikat berdasarkan skor.
-     */
-    private function getPredikat($skor): string
+    public function showLevel3($id)
     {
-        if ($skor >= 80) {
-            return 'Sangat Berdampak';
-        } elseif ($skor >= 60) {
-            return 'Berdampak';
-        } elseif ($skor >= 40) {
-            return 'Cukup Berdampak';
-        } else {
-            return 'Kurang Berdampak';
-        }
+        $project = DB::table('project')
+            ->join('users', 'project.user_id', '=', 'users.id')
+            ->select('project.*', 'users.name as user_name')
+            ->where('project.id', $id)
+            ->first();
+
+        return view('hasil-evaluasi.detail-skor-level3', compact('project'));
+    }
+
+    public function showLevel4($id)
+    {
+        $project = DB::table('project')
+            ->join('users', 'project.user_id', '=', 'users.id')
+            ->select('project.*', 'users.name as user_name')
+            ->where('project.id', $id)
+            ->first();
+        return view('hasil-evaluasi.detail-skor-level4', compact('project'));
     }
 }

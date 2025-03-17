@@ -116,7 +116,6 @@ class PengumpulanDataController extends Controller implements HasMiddleware
         return view('pengumpulan-data.index');
     }
 
-
     public function rekapKuesioner($id, $remark): View|JsonResponse
     {
         $project = DB::table('project')
