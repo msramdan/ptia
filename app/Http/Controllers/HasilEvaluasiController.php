@@ -125,9 +125,11 @@ class HasilEvaluasiController extends Controller implements HasMiddleware
                     'project_responden.unit',
                     'project.diklat_type_id',
                     DB::raw('
-                    (COALESCE(project_skor_responden.skor_level_3_alumni, 0) +
-                     COALESCE(project_skor_responden.skor_level_3_atasan, 0)) / 2
-                     AS avg_skor_level_3
+                    ROUND(
+                        (COALESCE(project_skor_responden.skor_level_3_alumni, 0) +
+                         COALESCE(project_skor_responden.skor_level_3_atasan, 0)) / 2,
+                        2
+                    ) AS avg_skor_level_3
                 '),
                     'indikator_dampak.kriteria_dampak'
                 ])
@@ -251,9 +253,11 @@ class HasilEvaluasiController extends Controller implements HasMiddleware
                     'project_responden.unit',
                     'project.diklat_type_id',
                     DB::raw('
-                    (COALESCE(project_skor_responden.skor_level_4_alumni, 0) +
-                     COALESCE(project_skor_responden.skor_level_4_atasan, 0)) / 2
-                     AS avg_skor_level_4
+                    ROUND(
+                        (COALESCE(project_skor_responden.skor_level_4_alumni, 0) +
+                         COALESCE(project_skor_responden.skor_level_4_atasan, 0)) / 2,
+                        2
+                    ) AS avg_skor_level_4
                 '),
                     'indikator_dampak.kriteria_dampak'
                 ])

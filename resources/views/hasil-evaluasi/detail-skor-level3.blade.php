@@ -168,7 +168,6 @@
                         project_responden_id: respondenId
                     },
                     success: function(response) {
-
                         $('#modal-content').html(response);
                         $('#skorModal').modal('show');
                     },
