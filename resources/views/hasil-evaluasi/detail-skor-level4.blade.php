@@ -37,17 +37,17 @@
                     <div class="card">
                         <div class="card-body">
                             <table class="table table-borderless">
-                                <tr>
-                                    <td><strong>Kode Diklat</strong></td>
-                                    <td>: {{ $project->kaldikID ?? '-' }}</td>
+                                <tr sty>
+                                    <td style="text-align: left !important;"><strong>Kode Diklat</strong></td>
+                                    <td style="text-align: left !important;">: {{ $project->kaldikID ?? '-' }}</td>
                                 </tr>
                                 <tr>
-                                    <td><strong>Nama Diklat</strong></td>
-                                    <td>: {{ $project->kaldikDesc ?? '-' }}</td>
+                                    <td style="text-align: left !important;"><strong>Nama Diklat</strong></td>
+                                    <td style="text-align: left !important;">: {{ $project->kaldikDesc ?? '-' }}</td>
                                 </tr>
                                 <tr>
-                                    <td><strong>Dibuat Oleh</strong></td>
-                                    <td>: {{ $project->user_name ?? '-' }}</td>
+                                    <td style="text-align: left !important;"><strong>Dibuat Oleh</strong></td>
+                                    <td style="text-align: left !important;">: {{ $project->user_name ?? '-' }}</td>
                                 </tr>
                             </table>
 
@@ -62,14 +62,15 @@
                                 <table class="table table-striped" id="data-table" width="100%">
                                     <thead>
                                         <tr>
-                                            <th rowspan="2">#</th>
-                                            <th rowspan="2">{{ __('Nama peserta') }}</th>
-                                            <th rowspan="2">{{ __('NIP') }}</th>
-                                            <th rowspan="2">{{ __('No.Telepon') }}</th>
-                                            <th rowspan="2">{{ __('Jabatan') }}</th>
-                                            <th rowspan="2">{{ __('Unit') }}</th>
+                                            <th rowspan="2" style="text-align: left !important;">#</th>
+                                            <th rowspan="2" style="text-align: left !important;">{{ __('Nama peserta') }}</th>
+                                            <th rowspan="2" style="text-align: left !important;">{{ __('NIP') }}</th>
+                                            <th rowspan="2" style="text-align: left !important;">{{ __('No.Telepon') }}</th>
+                                            <th rowspan="2" style="text-align: left !important;">{{ __('Jabatan') }}</th>
+                                            <th rowspan="2" style="text-align: left !important;">{{ __('Unit') }}</th>
                                             <th colspan="2" class="text-center">{{ __('Level 3') }}</th>
                                         </tr>
+
                                         <tr>
                                             <th class="text-center">Skor</th>
                                             <th class="text-center">Predikat</th>
@@ -80,7 +81,7 @@
                                     <tfoot>
                                         <tr>
                                             <th colspan="6" class="text-end">Rata-rata:</th>
-                                            <th class="text-center" id="avg-skor-level-3">0</th>
+                                            <th class="text-center" id="avg-skor-level-4">0</th>
                                             <th></th>
                                         </tr>
                                     </tfoot>
@@ -118,28 +119,34 @@
                 columns: [{
                         data: 'DT_RowIndex',
                         name: 'DT_RowIndex',
+                        className: 'text-start',
                         orderable: false,
                         searchable: false
                     },
                     {
                         data: 'nama',
-                        name: 'nama'
+                        name: 'nama',
+                        className: 'text-start'
                     },
                     {
                         data: 'nip',
-                        name: 'nip'
+                        name: 'nip',
+                        className: 'text-start'
                     },
                     {
                         data: 'telepon',
-                        name: 'telepon'
+                        name: 'telepon',
+                        className: 'text-start'
                     },
                     {
                         data: 'jabatan',
-                        name: 'jabatan'
+                        name: 'jabatan',
+                        className: 'text-start'
                     },
                     {
                         data: 'unit',
-                        name: 'unit'
+                        name: 'unit',
+                        className: 'text-start'
                     },
                     {
                         data: 'avg_skor_level_4',
@@ -151,7 +158,8 @@
                     },
                     {
                         data: 'kriteria_dampak',
-                        name: 'kriteria_dampak'
+                        name: 'kriteria_dampak',
+                        className: 'text-start'
                     }
                 ]
             });
@@ -194,7 +202,7 @@
                 });
 
                 let avgSkor = count > 0 ? (totalSkor / count).toFixed(2) : 0;
-                document.getElementById("avg-skor-level-3").textContent = avgSkor;
+                document.getElementById("avg-skor-level-4").textContent = avgSkor;
             }
 
             // Panggil fungsi setelah tabel dimuat
