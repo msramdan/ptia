@@ -3,6 +3,19 @@
 @section('title', __('Rekap Kuesioner'))
 
 @section('content')
+    <div class="modal fade" id="skorModal" tabindex="-1" aria-labelledby="skorModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Detail Skor Level 3</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="modal-content">
+                    <!-- Data akan diisi lewat AJAX -->
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="page-heading">
         <div class="page-title">
@@ -96,13 +109,12 @@
     <script>
         $(document).ready(function() {
             var projectId = @json($project->id);
-            $('#data-table').DataTable({
+            var table = $('#data-table').DataTable({
                 processing: true,
                 serverSide: true,
                 ajax: {
                     url: "{{ route('hasil-evaluasi.detail-skor.level3', ':id') }}".replace(':id',
                         projectId),
-                    data: function(d) {}
                 },
                 columns: [{
                         data: 'DT_RowIndex',
@@ -132,7 +144,11 @@
                     },
                     {
                         data: 'avg_skor_level_3',
-                        name: 'avg_skor_level_3'
+                        name: 'avg_skor_level_3',
+                        className: "text-center skor-clickable",
+                        render: function(data, type, row) {
+                            return `<a href="#" class="skor-detail"  data-id="${row.project_responden_id}">${data}</a>`;
+                        }
                     },
                     {
                         data: 'kriteria_dampak',
@@ -140,6 +156,29 @@
                     }
                 ]
             });
+
+            // Event listener untuk klik skor
+            $('#data-table tbody').on('click', '.skor-detail', function(e) {
+                e.preventDefault();
+                var respondenId = $(this).data('id');
+                $.ajax({
+                    url: "{{ route('detail-level-3.responden') }}",
+                    type: "GET",
+                    data: {
+                        project_responden_id: respondenId
+                    },
+                    success: function(response) {
+
+                        $('#modal-content').html(response);
+                        $('#skorModal').modal('show');
+                    },
+                    error: function(xhr, status, error) {
+                        console.error(xhr.responseText);
+                        alert('Gagal mengambil data skor.');
+                    }
+                });
+            });
+
         });
     </script>
     <script>
@@ -159,8 +198,6 @@
                 let avgSkor = count > 0 ? (totalSkor / count).toFixed(2) : 0;
                 document.getElementById("avg-skor-level-3").textContent = avgSkor;
             }
-
-            // Panggil fungsi setelah tabel dimuat
             setTimeout(calculateAverage, 1000);
         });
     </script>

@@ -138,6 +138,83 @@ class HasilEvaluasiController extends Controller implements HasMiddleware
         return view('hasil-evaluasi.detail-skor-level3', compact('project'));
     }
 
+    public function getDetailSkorLevel3(Request $request)
+    {
+
+        $respondenId = $request->query('project_responden_id');
+
+        $data = DB::select("WITH delta_data AS (
+                SELECT
+                    project_jawaban_kuesioner.remark,
+                    project_kuesioner.aspek_id,
+                    project_kuesioner.level,
+                    project_kuesioner.aspek,
+                    project_kuesioner.kriteria,
+                    project.diklat_type_id,
+                    project.id AS project_id,
+                    ROUND(AVG(project_jawaban_kuesioner.nilai_delta), 0) AS rata_rata_delta
+                FROM project_jawaban_kuesioner
+                JOIN project_kuesioner
+                    ON project_jawaban_kuesioner.project_kuesioner_id = project_kuesioner.id
+                JOIN project
+                    ON project_kuesioner.project_id = project.id
+                WHERE
+                    project_jawaban_kuesioner.project_responden_id = ?
+                    AND project_kuesioner.level = '3'
+                GROUP BY
+                    project_kuesioner.aspek_id,
+                    project_jawaban_kuesioner.remark,
+                    project_kuesioner.level,
+                    project_kuesioner.aspek,
+                    project_kuesioner.kriteria,
+                    project.diklat_type_id,
+                    project.id
+            )
+            SELECT
+                delta_data.remark,
+                delta_data.aspek_id,
+                delta_data.level,
+                delta_data.aspek,
+                delta_data.kriteria,
+                delta_data.diklat_type_id,
+                delta_data.rata_rata_delta,
+                konversi.konversi,  -- Menambahkan nilai konversi
+                -- Ambil bobot berdasarkan remark
+                CASE
+                    WHEN delta_data.remark = 'Alumni' THEN project_bobot_aspek.bobot_alumni
+                    WHEN delta_data.remark = 'Atasan' THEN project_bobot_aspek.bobot_atasan_langsung
+                    ELSE NULL
+                END AS bobot,
+                -- Perhitungan nilai = (konversi * bobot) / 100, dibulatkan 2 angka desimal
+                ROUND(
+                    CASE
+                        WHEN konversi.konversi IS NOT NULL AND
+                            (delta_data.remark = 'Alumni' OR delta_data.remark = 'Atasan')
+                        THEN (konversi.konversi *
+                            CASE
+                                WHEN delta_data.remark = 'Alumni' THEN project_bobot_aspek.bobot_alumni
+                                WHEN delta_data.remark = 'Atasan' THEN project_bobot_aspek.bobot_atasan_langsung
+                                ELSE 0
+                            END) / 100
+                        ELSE NULL
+                    END, 2
+                ) AS nilai
+            FROM delta_data
+            LEFT JOIN konversi
+                ON delta_data.diklat_type_id = konversi.diklat_type_id
+                AND delta_data.rata_rata_delta = konversi.skor
+                AND (
+                    (delta_data.kriteria = 'Skor Persepsi' AND konversi.jenis_skor = 'Skor Persepsi')
+                    OR
+                    (delta_data.kriteria = 'Delta Skor Persepsi' AND konversi.jenis_skor = '∆ Skor Persepsi')
+                )
+            LEFT JOIN project_bobot_aspek
+                ON delta_data.project_id = project_bobot_aspek.project_id
+                AND delta_data.aspek_id = project_bobot_aspek.aspek_id", [$respondenId]);
+    }
+
+
+
     public function showLevel4($id)
     {
         $project = DB::table('project')

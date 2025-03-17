@@ -70,7 +70,9 @@ Route::middleware(['auth', 'web'])->group(function () {
         Route::get('/', 'index')->name('hasil-evaluasi.index');
         Route::get('/level-3/{id}', 'showLevel3')->name('hasil-evaluasi.detail-skor.level3');
         Route::get('/level-4/{id}', 'showLevel4')->name('hasil-evaluasi.detail-skor.level4');
+        Route::get('/detail-level-3', 'getDetailSkorLevel3')->name('detail-level-3.responden');
     });
+
 
     Route::prefix('penyebaran-kuesioner')->controller(PenyebaranKuesionerController::class)->group(function () {
         Route::get('/', 'index')->name('penyebaran-kuesioner.index');
