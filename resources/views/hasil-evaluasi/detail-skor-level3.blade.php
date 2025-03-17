@@ -11,7 +11,6 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body" id="modal-content">
-                    <!-- Data akan diisi lewat AJAX -->
                 </div>
             </div>
         </div>
@@ -39,16 +38,16 @@
                         <div class="card-body">
                             <table class="table table-borderless">
                                 <tr sty>
-                                    <td style="text-align: left !important;"><strong>Kode Diklat</strong></td>
-                                    <td style="text-align: left !important;">: {{ $project->kaldikID ?? '-' }}</td>
+                                    <td><strong>Kode Diklat</strong></td>
+                                    <td>: {{ $project->kaldikID ?? '-' }}</td>
                                 </tr>
                                 <tr>
-                                    <td style="text-align: left !important;"><strong>Nama Diklat</strong></td>
-                                    <td style="text-align: left !important;">: {{ $project->kaldikDesc ?? '-' }}</td>
+                                    <td><strong>Nama Diklat</strong></td>
+                                    <td>: {{ $project->kaldikDesc ?? '-' }}</td>
                                 </tr>
                                 <tr>
-                                    <td style="text-align: left !important;"><strong>Dibuat Oleh</strong></td>
-                                    <td style="text-align: left !important;">: {{ $project->user_name ?? '-' }}</td>
+                                    <td><strong>Dibuat Oleh</strong></td>
+                                    <td>: {{ $project->user_name ?? '-' }}</td>
                                 </tr>
                             </table>
 
@@ -64,12 +63,12 @@
                                 <table class="table table-striped" id="data-table" width="100%">
                                     <thead>
                                         <tr>
-                                            <th rowspan="2" style="text-align: left !important;">#</th>
-                                            <th rowspan="2" style="text-align: left !important;">{{ __('Nama peserta') }}</th>
-                                            <th rowspan="2" style="text-align: left !important;">{{ __('NIP') }}</th>
-                                            <th rowspan="2" style="text-align: left !important;">{{ __('No.Telepon') }}</th>
-                                            <th rowspan="2" style="text-align: left !important;">{{ __('Jabatan') }}</th>
-                                            <th rowspan="2" style="text-align: left !important;">{{ __('Unit') }}</th>
+                                            <th rowspan="2">#</th>
+                                            <th rowspan="2">{{ __('Nama peserta') }}</th>
+                                            <th rowspan="2">{{ __('NIP') }}</th>
+                                            <th rowspan="2">{{ __('No.Telepon') }}</th>
+                                            <th rowspan="2">{{ __('Jabatan') }}</th>
+                                            <th rowspan="2">{{ __('Unit') }}</th>
                                             <th colspan="2" class="text-center">{{ __('Level 3') }}</th>
                                         </tr>
 

@@ -238,32 +238,32 @@ class HasilEvaluasiController extends Controller implements HasMiddleware
         $countAtasan = 0;
 
         $html = '<style>
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        font-family: Arial, sans-serif;
-    }
-    th, td {
-        border: 1px solid #ddd;
-        padding: 8px;
-        text-align: center;
-    }
-    th {
-        background-color: #f2f2f2;
-    }
-    .group-header {
-        background-color: #d1e7dd;
-        font-weight: bold;
-    }
-    .total-row {
-        background-color: #f8d7da;
-        font-weight: bold;
-    }
-    .avg-row {
-        background-color: #d4e3fc;
-        font-weight: bold;
-    }
-</style>';
+        #skorModal table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: Arial, sans-serif;
+        }
+        #skorModal th, #skorModal td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        #skorModal th {
+            background-color: #f2f2f2;
+        }
+        #skorModal .group-header {
+            background-color: #d1e7dd;
+            font-weight: bold;
+        }
+        #skorModal .total-row {
+            background-color: #f8d7da;
+            font-weight: bold;
+        }
+        #skorModal .avg-row {
+            background-color: #d4e3fc;
+            font-weight: bold;
+        }
+    </style>';
 
         $html .= '<table>';
         $html .= '<tr>
@@ -283,7 +283,7 @@ class HasilEvaluasiController extends Controller implements HasMiddleware
 
             foreach ($items as $item) {
                 $html .= "<tr>
-                    <td>{$item->aspek}</td>
+                    <td style='text-align: left !important;'>{$item->aspek}</td>
                     <td>{$item->kriteria}</td>
                     <td>{$item->rata_rata_delta}</td>
                     <td>{$item->konversi}</td>
@@ -462,32 +462,32 @@ class HasilEvaluasiController extends Controller implements HasMiddleware
         $countAtasan = 0;
 
         $html = '<style>
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        font-family: Arial, sans-serif;
-    }
-    th, td {
-        border: 1px solid #ddd;
-        padding: 8px;
-        text-align: center;
-    }
-    th {
-        background-color: #f2f2f2;
-    }
-    .group-header {
-        background-color: #d1e7dd;
-        font-weight: bold;
-    }
-    .total-row {
-        background-color: #f8d7da;
-        font-weight: bold;
-    }
-    .avg-row {
-        background-color: #d4e3fc;
-        font-weight: bold;
-    }
-</style>';
+        #skorModal table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: Arial, sans-serif;
+        }
+        #skorModal th, #skorModal td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        #skorModal th {
+            background-color: #f2f2f2;
+        }
+        #skorModal .group-header {
+            background-color: #d1e7dd;
+            font-weight: bold;
+        }
+        #skorModal .total-row {
+            background-color: #f8d7da;
+            font-weight: bold;
+        }
+        #skorModal .avg-row {
+            background-color: #d4e3fc;
+            font-weight: bold;
+        }
+    </style>';
 
         $html .= '<table>';
         $html .= '<tr>
@@ -507,7 +507,7 @@ class HasilEvaluasiController extends Controller implements HasMiddleware
 
             foreach ($items as $item) {
                 $html .= "<tr>
-                    <td>{$item->aspek}</td>
+                    <td style='text-align: left !important;'>{$item->aspek}</td>
                     <td>{$item->kriteria}</td>
                     <td>{$item->rata_rata_delta}</td>
                     <td>{$item->konversi}</td>
