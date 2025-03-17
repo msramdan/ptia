@@ -22,7 +22,7 @@ class IndikatorDampakSeeder extends Seeder
 
             $data[] = [
                 'diklat_type_id' => $diklatTypeId,
-                'nilai_minimal' => 26,
+                'nilai_minimal' => 25,
                 'nilai_maksimal' => 50,
                 'kriteria_dampak' => 'Kurang berdampak',
                 'created_at' => now(),
@@ -31,7 +31,7 @@ class IndikatorDampakSeeder extends Seeder
 
             $data[] = [
                 'diklat_type_id' => $diklatTypeId,
-                'nilai_minimal' => 51,
+                'nilai_minimal' => 50,
                 'nilai_maksimal' => 75,
                 'kriteria_dampak' => 'Cukup berdampak',
                 'created_at' => now(),
@@ -40,7 +40,7 @@ class IndikatorDampakSeeder extends Seeder
 
             $data[] = [
                 'diklat_type_id' => $diklatTypeId,
-                'nilai_minimal' => 76,
+                'nilai_minimal' => 75,
                 'nilai_maksimal' => 100,
                 'kriteria_dampak' => 'Sangat berdampak',
                 'created_at' => now(),

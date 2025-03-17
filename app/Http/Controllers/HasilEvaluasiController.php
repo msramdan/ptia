@@ -58,11 +58,19 @@ class HasilEvaluasiController extends Controller implements HasMiddleware
                 ->leftJoin('users', 'project.user_id', '=', 'users.id')
                 ->leftJoin('indikator_dampak AS indikator_3', function ($join) {
                     $join->on('project.diklat_type_id', '=', 'indikator_3.diklat_type_id')
-                        ->whereRaw('COALESCE(avg_scores.avg_skor_level_3, 0) BETWEEN indikator_3.nilai_minimal AND indikator_3.nilai_maksimal');
+                        ->whereRaw('
+                            COALESCE(avg_scores.avg_skor_level_3, 0) > indikator_3.nilai_minimal
+                            AND
+                            COALESCE(avg_scores.avg_skor_level_3, 0) <= indikator_3.nilai_maksimal
+                        ');
                 })
                 ->leftJoin('indikator_dampak AS indikator_4', function ($join) {
                     $join->on('project.diklat_type_id', '=', 'indikator_4.diklat_type_id')
-                        ->whereRaw('COALESCE(avg_scores.avg_skor_level_4, 0) BETWEEN indikator_4.nilai_minimal AND indikator_4.nilai_maksimal');
+                        ->whereRaw('
+                            COALESCE(avg_scores.avg_skor_level_4, 0) > indikator_4.nilai_minimal
+                            AND
+                            COALESCE(avg_scores.avg_skor_level_4, 0) <= indikator_4.nilai_maksimal
+                        ');
                 })
                 ->where('project.status', 'Pelaksanaan')
                 ->orderByDesc('project.id');
@@ -107,10 +115,14 @@ class HasilEvaluasiController extends Controller implements HasMiddleware
                 ->join('indikator_dampak', function ($join) {
                     $join->on('indikator_dampak.diklat_type_id', '=', 'project.diklat_type_id')
                         ->whereRaw('
-                    (COALESCE(project_skor_responden.skor_level_3_alumni, 0) +
-                     COALESCE(project_skor_responden.skor_level_3_atasan, 0)) / 2
-                    BETWEEN indikator_dampak.nilai_minimal AND indikator_dampak.nilai_maksimal
-                 ');
+                            (COALESCE(project_skor_responden.skor_level_3_alumni, 0) +
+                             COALESCE(project_skor_responden.skor_level_3_atasan, 0)) / 2
+                            > indikator_dampak.nilai_minimal
+                            AND
+                            (COALESCE(project_skor_responden.skor_level_3_alumni, 0) +
+                             COALESCE(project_skor_responden.skor_level_3_atasan, 0)) / 2
+                            <= indikator_dampak.nilai_maksimal
+                        ');
                 })
                 ->where('project_skor_responden.project_id', $id)
 
@@ -327,10 +339,14 @@ class HasilEvaluasiController extends Controller implements HasMiddleware
                 ->join('indikator_dampak', function ($join) {
                     $join->on('indikator_dampak.diklat_type_id', '=', 'project.diklat_type_id')
                         ->whereRaw('
-                        (COALESCE(project_skor_responden.skor_level_4_alumni, 0) +
-                         COALESCE(project_skor_responden.skor_level_4_atasan, 0)) / 2
-                        BETWEEN indikator_dampak.nilai_minimal AND indikator_dampak.nilai_maksimal
-                     ');
+                            (COALESCE(project_skor_responden.skor_level_4_alumni, 0) +
+                             COALESCE(project_skor_responden.skor_level_4_atasan, 0)) / 2
+                            > indikator_dampak.nilai_minimal
+                            AND
+                            (COALESCE(project_skor_responden.skor_level_4_alumni, 0) +
+                             COALESCE(project_skor_responden.skor_level_4_atasan, 0)) / 2
+                            <= indikator_dampak.nilai_maksimal
+                        ');
                 })
                 ->where('project_skor_responden.project_id', $id)
                 ->select([
