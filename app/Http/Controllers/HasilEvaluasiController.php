@@ -107,12 +107,13 @@ class HasilEvaluasiController extends Controller implements HasMiddleware
                 ->join('indikator_dampak', function ($join) {
                     $join->on('indikator_dampak.diklat_type_id', '=', 'project.diklat_type_id')
                         ->whereRaw('
-                        (COALESCE(project_skor_responden.skor_level_3_alumni, 0) +
-                         COALESCE(project_skor_responden.skor_level_3_atasan, 0)) / 2
-                        BETWEEN indikator_dampak.nilai_minimal AND indikator_dampak.nilai_maksimal
-                     ');
+                    (COALESCE(project_skor_responden.skor_level_3_alumni, 0) +
+                     COALESCE(project_skor_responden.skor_level_3_atasan, 0)) / 2
+                    BETWEEN indikator_dampak.nilai_minimal AND indikator_dampak.nilai_maksimal
+                 ');
                 })
                 ->where('project_skor_responden.project_id', $id)
+
                 ->select([
                     'project_skor_responden.project_id',
                     'project_skor_responden.project_responden_id',
@@ -125,16 +126,15 @@ class HasilEvaluasiController extends Controller implements HasMiddleware
                     'project_responden.unit',
                     'project.diklat_type_id',
                     DB::raw('
-                    ROUND(
-                        (COALESCE(project_skor_responden.skor_level_3_alumni, 0) +
-                         COALESCE(project_skor_responden.skor_level_3_atasan, 0)) / 2,
-                        2
-                    ) AS avg_skor_level_3
-                '),
+                ROUND(
+                    (COALESCE(project_skor_responden.skor_level_3_alumni, 0) +
+                     COALESCE(project_skor_responden.skor_level_3_atasan, 0)) / 2,
+                    2
+                ) AS avg_skor_level_3
+            '),
                     'indikator_dampak.kriteria_dampak'
                 ])
                 ->get();
-
             return DataTables::of($data)->addIndexColumn()->toJson();
         }
         return view('hasil-evaluasi.detail-skor-level3', compact('project'));
@@ -213,9 +213,101 @@ class HasilEvaluasiController extends Controller implements HasMiddleware
             LEFT JOIN project_bobot_aspek
                 ON delta_data.project_id = project_bobot_aspek.project_id
                 AND delta_data.aspek_id = project_bobot_aspek.aspek_id", [$respondenId]);
+
+        $groupedData = [];
+
+        foreach ($data as $item) {
+            $groupedData[$item->remark][] = $item;
+        }
+
+        $totalAlumni = 0;
+        $totalAtasan = 0;
+        $countAlumni = 0;
+        $countAtasan = 0;
+
+        $html = '<style>
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-family: Arial, sans-serif;
     }
+    th, td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: center;
+    }
+    th {
+        background-color: #f2f2f2;
+    }
+    .group-header {
+        background-color: #d1e7dd;
+        font-weight: bold;
+    }
+    .total-row {
+        background-color: #f8d7da;
+        font-weight: bold;
+    }
+    .avg-row {
+        background-color: #d4e3fc;
+        font-weight: bold;
+    }
+</style>';
 
+        $html .= '<table>';
+        $html .= '<tr>
+            <th>Aspek</th>
+            <th>Kriteria</th>
+            <th>Rata-rata Skor</th>
+            <th>Konversi</th>
+            <th>Bobot</th>
+            <th>Nilai</th>
+         </tr>';
 
+        foreach ($groupedData as $remark => $items) {
+            $html .= "<tr class='group-header'><td colspan='6'>$remark</td></tr>";
+
+            $totalNilai = 0;
+            $count = 0;
+
+            foreach ($items as $item) {
+                $html .= "<tr>
+                    <td>{$item->aspek}</td>
+                    <td>{$item->kriteria}</td>
+                    <td>{$item->rata_rata_delta}</td>
+                    <td>{$item->konversi}</td>
+                    <td>{$item->bobot}</td>
+                    <td>{$item->nilai}</td>
+                  </tr>";
+
+                $totalNilai += $item->nilai;
+                $count++;
+
+                if ($remark == 'Alumni') {
+                    $totalAlumni += $item->nilai;
+                    $countAlumni++;
+                } else {
+                    $totalAtasan += $item->nilai;
+                    $countAtasan++;
+                }
+            }
+
+            $html .= "<tr class='total-row'>
+                <td colspan='5'>Total Nilai $remark</td>
+                <td>$totalNilai</td>
+              </tr>";
+        }
+
+        $avgNilai = round(($totalAlumni + $totalAtasan) / 2, 2);
+
+        $html .= "<tr class='avg-row'>
+            <td colspan='5'>Rata-rata Nilai Alumni & Atasan</td>
+            <td>$avgNilai</td>
+          </tr>";
+
+        $html .= '</table>';
+
+        echo $html;
+    }
 
     public function showLevel4($id)
     {
@@ -266,5 +358,174 @@ class HasilEvaluasiController extends Controller implements HasMiddleware
             return DataTables::of($data)->addIndexColumn()->toJson();
         }
         return view('hasil-evaluasi.detail-skor-level4', compact('project'));
+    }
+
+    public function getDetailSkorLevel4(Request $request)
+    {
+
+        $respondenId = $request->query('project_responden_id');
+
+        $data = DB::select("WITH delta_data AS (
+                SELECT
+                    project_jawaban_kuesioner.remark,
+                    project_kuesioner.aspek_id,
+                    project_kuesioner.level,
+                    project_kuesioner.aspek,
+                    project_kuesioner.kriteria,
+                    project.diklat_type_id,
+                    project.id AS project_id,
+                    ROUND(AVG(project_jawaban_kuesioner.nilai_delta), 0) AS rata_rata_delta
+                FROM project_jawaban_kuesioner
+                JOIN project_kuesioner
+                    ON project_jawaban_kuesioner.project_kuesioner_id = project_kuesioner.id
+                JOIN project
+                    ON project_kuesioner.project_id = project.id
+                WHERE
+                    project_jawaban_kuesioner.project_responden_id = ?
+                    AND project_kuesioner.level = '4'
+                GROUP BY
+                    project_kuesioner.aspek_id,
+                    project_jawaban_kuesioner.remark,
+                    project_kuesioner.level,
+                    project_kuesioner.aspek,
+                    project_kuesioner.kriteria,
+                    project.diklat_type_id,
+                    project.id
+            )
+            SELECT
+                delta_data.remark,
+                delta_data.aspek_id,
+                delta_data.level,
+                delta_data.aspek,
+                delta_data.kriteria,
+                delta_data.diklat_type_id,
+                delta_data.rata_rata_delta,
+                konversi.konversi,  -- Menambahkan nilai konversi
+                -- Ambil bobot berdasarkan remark
+                CASE
+                    WHEN delta_data.remark = 'Alumni' THEN project_bobot_aspek.bobot_alumni
+                    WHEN delta_data.remark = 'Atasan' THEN project_bobot_aspek.bobot_atasan_langsung
+                    ELSE NULL
+                END AS bobot,
+                -- Perhitungan nilai = (konversi * bobot) / 100, dibulatkan 2 angka desimal
+                ROUND(
+                    CASE
+                        WHEN konversi.konversi IS NOT NULL AND
+                            (delta_data.remark = 'Alumni' OR delta_data.remark = 'Atasan')
+                        THEN (konversi.konversi *
+                            CASE
+                                WHEN delta_data.remark = 'Alumni' THEN project_bobot_aspek.bobot_alumni
+                                WHEN delta_data.remark = 'Atasan' THEN project_bobot_aspek.bobot_atasan_langsung
+                                ELSE 0
+                            END) / 100
+                        ELSE NULL
+                    END, 2
+                ) AS nilai
+            FROM delta_data
+            LEFT JOIN konversi
+                ON delta_data.diklat_type_id = konversi.diklat_type_id
+                AND delta_data.rata_rata_delta = konversi.skor
+                AND (
+                    (delta_data.kriteria = 'Skor Persepsi' AND konversi.jenis_skor = 'Skor Persepsi')
+                    OR
+                    (delta_data.kriteria = 'Delta Skor Persepsi' AND konversi.jenis_skor = '∆ Skor Persepsi')
+                )
+            LEFT JOIN project_bobot_aspek
+                ON delta_data.project_id = project_bobot_aspek.project_id
+                AND delta_data.aspek_id = project_bobot_aspek.aspek_id", [$respondenId]);
+
+        $groupedData = [];
+
+        foreach ($data as $item) {
+            $groupedData[$item->remark][] = $item;
+        }
+
+        $totalAlumni = 0;
+        $totalAtasan = 0;
+        $countAlumni = 0;
+        $countAtasan = 0;
+
+        $html = '<style>
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-family: Arial, sans-serif;
+    }
+    th, td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: center;
+    }
+    th {
+        background-color: #f2f2f2;
+    }
+    .group-header {
+        background-color: #d1e7dd;
+        font-weight: bold;
+    }
+    .total-row {
+        background-color: #f8d7da;
+        font-weight: bold;
+    }
+    .avg-row {
+        background-color: #d4e3fc;
+        font-weight: bold;
+    }
+</style>';
+
+        $html .= '<table>';
+        $html .= '<tr>
+            <th>Aspek</th>
+            <th>Kriteria</th>
+            <th>Rata-rata Skor</th>
+            <th>Konversi</th>
+            <th>Bobot</th>
+            <th>Nilai</th>
+         </tr>';
+
+        foreach ($groupedData as $remark => $items) {
+            $html .= "<tr class='group-header'><td colspan='6'>$remark</td></tr>";
+
+            $totalNilai = 0;
+            $count = 0;
+
+            foreach ($items as $item) {
+                $html .= "<tr>
+                    <td>{$item->aspek}</td>
+                    <td>{$item->kriteria}</td>
+                    <td>{$item->rata_rata_delta}</td>
+                    <td>{$item->konversi}</td>
+                    <td>{$item->bobot}</td>
+                    <td>{$item->nilai}</td>
+                  </tr>";
+
+                $totalNilai += $item->nilai;
+                $count++;
+
+                if ($remark == 'Alumni') {
+                    $totalAlumni += $item->nilai;
+                    $countAlumni++;
+                } else {
+                    $totalAtasan += $item->nilai;
+                    $countAtasan++;
+                }
+            }
+
+            $html .= "<tr class='total-row'>
+                <td colspan='5'>Total Nilai $remark</td>
+                <td>$totalNilai</td>
+              </tr>";
+        }
+
+        $avgNilai = round(($totalAlumni + $totalAtasan) / 2, 2);
+
+        $html .= "<tr class='avg-row'>
+            <td colspan='5'>Rata-rata Nilai Alumni & Atasan</td>
+            <td>$avgNilai</td>
+          </tr>";
+
+        $html .= '</table>';
+
+        echo $html;
     }
 }

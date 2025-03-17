@@ -3,7 +3,19 @@
 @section('title', __('Rekap Kuesioner'))
 
 @section('content')
-
+<div class="modal fade" id="skorModal" tabindex="-1" aria-labelledby="skorModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Detail Skor Level 4</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="modal-content">
+                <!-- Data akan diisi lewat AJAX -->
+            </div>
+        </div>
+    </div>
+</div>
     <div class="page-heading">
         <div class="page-title">
             <div class="row">
@@ -134,7 +146,7 @@
                         name: 'avg_skor_level_4',
                         className: "text-center skor-clickable",
                         render: function(data, type, row) {
-                            return `<a href="#" class="skor-detail" data-project_id="${row.project_id} data-project_responden_id="${row.project_responden_id}">${data}</a>`;
+                            return `<a href="#" class="skor-detail"  data-id="${row.project_responden_id}">${data}</a>`;
                         }
                     },
                     {
@@ -143,6 +155,28 @@
                     }
                 ]
             });
+
+            // Event listener untuk klik skor
+            $('#data-table tbody').on('click', '.skor-detail', function(e) {
+                e.preventDefault();
+                var respondenId = $(this).data('id');
+                $.ajax({
+                    url: "{{ route('detail-level-4.responden') }}",
+                    type: "GET",
+                    data: {
+                        project_responden_id: respondenId
+                    },
+                    success: function(response) {
+                        $('#modal-content').html(response);
+                        $('#skorModal').modal('show');
+                    },
+                    error: function(xhr, status, error) {
+                        console.error(xhr.responseText);
+                        alert('Gagal mengambil data skor.');
+                    }
+                });
+            });
+
         });
     </script>
     <script>
