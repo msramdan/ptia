@@ -44,7 +44,6 @@
                             </a>
                         </div>
                     </div>
-
                     <div class="card">
                         <div class="card-body">
                             <div class="table-responsive p-1">
@@ -57,7 +56,7 @@
                                             <th rowspan="2">{{ __('No.Telepon') }}</th>
                                             <th rowspan="2">{{ __('Jabatan') }}</th>
                                             <th rowspan="2">{{ __('Unit') }}</th>
-                                            <th colspan="2" class="text-center">{{ __('Level 4') }}</th>
+                                            <th colspan="2" class="text-center">{{ __('Level 3') }}</th>
                                         </tr>
                                         <tr>
                                             <th class="text-center">Skor</th>
@@ -66,6 +65,13 @@
                                     </thead>
                                     <tbody>
                                     </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <th colspan="6" class="text-end">Rata-rata:</th>
+                                            <th class="text-center" id="avg-skor-level-3">0</th>
+                                            <th></th>
+                                        </tr>
+                                    </tfoot>
                                 </table>
                             </div>
                         </div>
@@ -133,6 +139,28 @@
                     }
                 ]
             });
+        });
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            function calculateAverage() {
+                let totalSkor = 0;
+                let count = 0;
+
+                document.querySelectorAll("#data-table tbody tr").forEach(row => {
+                    let skorCell = row.cells[6]; // Kolom skor Level 3 (indeks ke-6)
+                    let skorValue = parseFloat(skorCell.textContent) || 0;
+
+                    totalSkor += skorValue;
+                    count++;
+                });
+
+                let avgSkor = count > 0 ? (totalSkor / count).toFixed(2) : 0;
+                document.getElementById("avg-skor-level-3").textContent = avgSkor;
+            }
+
+            // Panggil fungsi setelah tabel dimuat
+            setTimeout(calculateAverage, 1000);
         });
     </script>
 @endpush
