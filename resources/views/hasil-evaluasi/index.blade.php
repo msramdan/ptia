@@ -10,7 +10,7 @@
                 <div class="col-12 col-md-8 order-md-1 order-last">
                     <h3>{{ __('Hasil Evaluasi Pasca Pembelajaran') }}</h3>
                     <p class="text-subtitle text-muted">
-                        {{ __('Master Data Hasil Evaluasi Pasca Pembelajaran') }}
+                        {{ __('Hasil Evaluasi Pasca Pembelajaran') }}
                     </p>
                 </div>
                 <x-breadcrumb>
@@ -29,24 +29,22 @@
                                 <table class="table table-striped" id="data-table" width="100%">
                                     <thead>
                                         <tr>
-                                            <th>{{ __('No') }}</th>
-                                            <th>{{ __('Nama Project') }}</th>
-                                            <th>{{ __('Kode Project') }}</th>
+                                            <th rowspan="2">#</th>
+                                            <th rowspan="2">{{ __('Dibuat Oleh') }}</th>
+                                            <th rowspan="2">{{ __('Kode Diklat') }}</th>
+                                            <th rowspan="2">{{ __('Nama Diklat') }}</th>
+                                            <th rowspan="2">{{ __('Jenis Diklat') }}</th>
                                             <th colspan="2" class="text-center">{{ __('Level 3') }}</th>
                                             <th colspan="2" class="text-center">{{ __('Level 4') }}</th>
                                         </tr>
                                         <tr>
-                                            <th></th>
-                                            <th></th>
-                                            <th></th>
-                                            <th>{{ __('Skor') }}</th>
-                                            <th>{{ __('Predikat') }}</th>
-                                            <th>{{ __('Skor') }}</th>
-                                            <th>{{ __('Predikat') }}</th>
+                                            <th class="text-center">Skor</th>
+                                            <th class="text-center">Predikat</th>
+                                            <th class="text-center">Skor</th>
+                                            <th class="text-center">Predikat</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <!-- Data akan diisi oleh DataTables via AJAX -->
                                     </tbody>
                                 </table>
                             </div>
@@ -100,31 +98,40 @@
                         searchable: false
                     },
                     {
+                        data: 'user',
+                        name: 'user'
+                    },
+                    {
+                        data: 'kaldikID',
+                        name: 'kaldikID'
+                    },
+                    {
                         data: 'nama_project',
                         name: 'nama_project'
                     },
                     {
-                        data: 'kode_project',
-                        name: 'kode_project'
+                        data: 'nama_diklat_type',
+                        name: 'nama_diklat_type'
                     },
                     {
-                        data: 'skor_level_3',
-                        name: 'skor_level_3'
+                        data: 'avg_skor_level_3',
+                        name: 'avg_skor_level_3'
                     },
                     {
-                        data: 'predikat_level_3',
-                        name: 'predikat_level_3'
+                        data: 'kriteria_dampak_level_3',
+                        name: 'kriteria_dampak_level_3'
                     },
                     {
-                        data: 'skor_level_4',
-                        name: 'skor_level_4'
+                        data: 'avg_skor_level_4',
+                        name: 'avg_skor_level_4'
                     },
                     {
-                        data: 'predikat_level_4',
-                        name: 'predikat_level_4'
-                    },
+                        data: 'kriteria_dampak_level_4',
+                        name: 'kriteria_dampak_level_4'
+                    }
                 ]
             });
         });
     </script>
 @endpush
+
