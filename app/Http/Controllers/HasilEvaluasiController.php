@@ -96,7 +96,45 @@ class HasilEvaluasiController extends Controller implements HasMiddleware
             ->select('project.*', 'users.name as user_name')
             ->where('project.id', $id)
             ->first();
+        if (!$project) {
+            abort(404, 'Project tidak ditemukan');
+        }
 
+        if (request()->ajax()) {
+            $data = DB::table('project_skor_responden')
+                ->join('project_responden', 'project_responden.id', '=', 'project_skor_responden.project_responden_id')
+                ->join('project', 'project.id', '=', 'project_skor_responden.project_id')
+                ->join('indikator_dampak', function ($join) {
+                    $join->on('indikator_dampak.diklat_type_id', '=', 'project.diklat_type_id')
+                        ->whereRaw('
+                        (COALESCE(project_skor_responden.skor_level_3_alumni, 0) +
+                         COALESCE(project_skor_responden.skor_level_3_atasan, 0)) / 2
+                        BETWEEN indikator_dampak.nilai_minimal AND indikator_dampak.nilai_maksimal
+                     ');
+                })
+                ->where('project_skor_responden.project_id', $id)
+                ->select([
+                    'project_skor_responden.project_id',
+                    'project_skor_responden.project_responden_id',
+                    'project_skor_responden.skor_level_3_alumni',
+                    'project_skor_responden.skor_level_3_atasan',
+                    'project_responden.nama',
+                    'project_responden.nip',
+                    'project_responden.telepon',
+                    'project_responden.jabatan',
+                    'project_responden.unit',
+                    'project.diklat_type_id',
+                    DB::raw('
+                    (COALESCE(project_skor_responden.skor_level_3_alumni, 0) +
+                     COALESCE(project_skor_responden.skor_level_3_atasan, 0)) / 2
+                     AS avg_skor_level_3
+                '),
+                    'indikator_dampak.kriteria_dampak'
+                ])
+                ->get();
+
+            return DataTables::of($data)->addIndexColumn()->toJson();
+        }
         return view('hasil-evaluasi.detail-skor-level3', compact('project'));
     }
 
@@ -107,6 +145,45 @@ class HasilEvaluasiController extends Controller implements HasMiddleware
             ->select('project.*', 'users.name as user_name')
             ->where('project.id', $id)
             ->first();
+        if (!$project) {
+            abort(404, 'Project tidak ditemukan');
+        }
+
+        if (request()->ajax()) {
+            $data = DB::table('project_skor_responden')
+                ->join('project_responden', 'project_responden.id', '=', 'project_skor_responden.project_responden_id')
+                ->join('project', 'project.id', '=', 'project_skor_responden.project_id')
+                ->join('indikator_dampak', function ($join) {
+                    $join->on('indikator_dampak.diklat_type_id', '=', 'project.diklat_type_id')
+                        ->whereRaw('
+                        (COALESCE(project_skor_responden.skor_level_4_alumni, 0) +
+                         COALESCE(project_skor_responden.skor_level_4_atasan, 0)) / 2
+                        BETWEEN indikator_dampak.nilai_minimal AND indikator_dampak.nilai_maksimal
+                     ');
+                })
+                ->where('project_skor_responden.project_id', $id)
+                ->select([
+                    'project_skor_responden.project_id',
+                    'project_skor_responden.project_responden_id',
+                    'project_skor_responden.skor_level_4_alumni',
+                    'project_skor_responden.skor_level_4_atasan',
+                    'project_responden.nama',
+                    'project_responden.nip',
+                    'project_responden.telepon',
+                    'project_responden.jabatan',
+                    'project_responden.unit',
+                    'project.diklat_type_id',
+                    DB::raw('
+                    (COALESCE(project_skor_responden.skor_level_4_alumni, 0) +
+                     COALESCE(project_skor_responden.skor_level_4_atasan, 0)) / 2
+                     AS avg_skor_level_4
+                '),
+                    'indikator_dampak.kriteria_dampak'
+                ])
+                ->get();
+
+            return DataTables::of($data)->addIndexColumn()->toJson();
+        }
         return view('hasil-evaluasi.detail-skor-level4', compact('project'));
     }
 }

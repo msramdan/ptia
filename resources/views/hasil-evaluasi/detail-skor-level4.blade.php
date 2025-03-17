@@ -8,9 +8,9 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-12 col-md-8 order-md-1 order-last">
-                    <h3>{{ __('Hasil Evaluasi Pasca Pembelajaran') }}</h3>
+                    <h3>{{ __('Hasil Evaluasi Pasca Pembelajaran Level 4') }}</h3>
                     <p class="text-subtitle text-muted">
-                        {{ __('Hasil Evaluasi Pasca Pembelajaran') }}
+                        {{ __('Hasil Evaluasi Pasca Pembelajaran Level 4') }}
                     </p>
                 </div>
                 <x-breadcrumb>
@@ -76,3 +76,63 @@
 
     </div>
 @endsection
+@push('css')
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs5/dt-1.12.0/datatables.min.css" />
+@endpush
+
+@push('js')
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"
+        integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/v/bs5/dt-1.12.0/datatables.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            var projectId = @json($project->id);
+            $('#data-table').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url: "{{ route('hasil-evaluasi.detail-skor.level4', ':id') }}".replace(':id',
+                        projectId),
+                    data: function(d) {}
+                },
+                columns: [{
+                        data: 'DT_RowIndex',
+                        name: 'DT_RowIndex',
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
+                        data: 'nama',
+                        name: 'nama'
+                    },
+                    {
+                        data: 'nip',
+                        name: 'nip'
+                    },
+                    {
+                        data: 'telepon',
+                        name: 'telepon'
+                    },
+                    {
+                        data: 'jabatan',
+                        name: 'jabatan'
+                    },
+                    {
+                        data: 'unit',
+                        name: 'unit'
+                    },
+                    {
+                        data: 'avg_skor_level_4',
+                        name: 'avg_skor_level_4'
+                    },
+                    {
+                        data: 'kriteria_dampak',
+                        name: 'kriteria_dampak'
+                    }
+                ]
+            });
+        });
+    </script>
+@endpush

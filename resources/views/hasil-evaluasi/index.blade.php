@@ -58,7 +58,6 @@
 
 @push('css')
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs5/dt-1.12.0/datatables.min.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
 @endpush
 
 @push('js')
@@ -69,24 +68,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script>
         $(document).ready(function() {
-            @if (session('success'))
-                toastr.success("{{ session('success') }}", "Success", {
-                    closeButton: true,
-                    progressBar: true,
-                    positionClass: "toast-top-right",
-                    timeOut: 5000,
-                });
-            @endif
-
-            @if (session('error'))
-                toastr.error("{{ session('error') }}", "Error", {
-                    closeButton: true,
-                    progressBar: true,
-                    positionClass: "toast-top-right",
-                    timeOut: 5000,
-                });
-            @endif
-
             $('#data-table').DataTable({
                 processing: true,
                 serverSide: true,
