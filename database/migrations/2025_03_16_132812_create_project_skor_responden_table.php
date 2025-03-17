@@ -10,11 +10,11 @@ return new class extends Migration {
             $table->id();
             $table->foreignId('project_id')->constrained('project')->onDelete('cascade');
             $table->foreignId('project_responden_id')->constrained('project_responden')->onDelete('cascade');
-            $table->float('skor_level_3_alumni')->nullable();
-            $table->float('skor_level_4_alumni')->nullable();
+            $table->float('skor_level_3_alumni')->default(0);
+            $table->float('skor_level_4_alumni')->default(0);
             $table->json('log_data_alumni')->nullable();
-            $table->float('skor_level_3_atasan')->nullable();
-            $table->float('skor_level_4_atasan')->nullable();
+            $table->float('skor_level_3_atasan')->default(0);
+            $table->float('skor_level_4_atasan')->default(0);
             $table->json('log_data_atasan')->nullable();
             $table->timestamps();
         });
