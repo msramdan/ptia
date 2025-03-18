@@ -312,7 +312,7 @@ class HasilEvaluasiController extends Controller implements HasMiddleware
         $avgNilai = round(($totalAlumni + $totalAtasan), 2);
 
         $html .= "<tr class='avg-row'>
-            <td colspan='5'>Rata-rata Nilai Alumni & Atasan</td>
+            <td colspan='5'>Total Nilai Alumni & Atasan</td>
             <td>$avgNilai</td>
           </tr>";
 
@@ -328,25 +328,45 @@ class HasilEvaluasiController extends Controller implements HasMiddleware
             ->select('project.*', 'users.name as user_name')
             ->where('project.id', $id)
             ->first();
+
         if (!$project) {
             abort(404, 'Project tidak ditemukan');
+        }
+
+        // Ambil data sekunder untuk perbandingan nilai kinerja awal dan akhir
+        $dataSekunder = DB::table('project_data_sekunder')
+            ->where('project_id', $id)
+            ->select('nilai_kinerja_awal', 'nilai_kinerja_akhir')
+            ->first();
+
+        $bobotAspekSekunder = 0;
+
+        if ($dataSekunder && $dataSekunder->nilai_kinerja_akhir > $dataSekunder->nilai_kinerja_awal) {
+            // Jika ada kenaikan, ambil bobot_aspek_sekunder dari project_bobot_aspek_sekunder
+            $bobot = DB::table('project_bobot_aspek_sekunder')
+                ->where('project_id', $id)
+                ->value('bobot_aspek_sekunder');
+
+            $bobotAspekSekunder = $bobot ?? 0;
         }
 
         if (request()->ajax()) {
             $data = DB::table('project_skor_responden')
                 ->join('project_responden', 'project_responden.id', '=', 'project_skor_responden.project_responden_id')
                 ->join('project', 'project.id', '=', 'project_skor_responden.project_id')
-                ->join('indikator_dampak', function ($join) {
+                ->join('indikator_dampak', function ($join) use ($bobotAspekSekunder) {
                     $join->on('indikator_dampak.diklat_type_id', '=', 'project.diklat_type_id')
                         ->whereRaw('
                             (COALESCE(project_skor_responden.skor_level_4_alumni, 0) +
-                             COALESCE(project_skor_responden.skor_level_4_atasan, 0))
-                            > indikator_dampak.nilai_minimal
+                             COALESCE(project_skor_responden.skor_level_4_atasan, 0) +
+                             ?) > indikator_dampak.nilai_minimal
                             AND
-                            (COALESCE(project_skor_responden.skor_level_4_alumni, 0) +
-                             COALESCE(project_skor_responden.skor_level_4_atasan, 0))
-                            <= indikator_dampak.nilai_maksimal
-                        ');
+                            LEAST(
+                                (COALESCE(project_skor_responden.skor_level_4_alumni, 0) +
+                                 COALESCE(project_skor_responden.skor_level_4_atasan, 0) +
+                                 ?), 100
+                            ) <= indikator_dampak.nilai_maksimal
+                        ', [$bobotAspekSekunder, $bobotAspekSekunder]);
                 })
                 ->where('project_skor_responden.project_id', $id)
                 ->select([
@@ -363,7 +383,8 @@ class HasilEvaluasiController extends Controller implements HasMiddleware
                     DB::raw('
                     ROUND(
                         (COALESCE(project_skor_responden.skor_level_4_alumni, 0) +
-                         COALESCE(project_skor_responden.skor_level_4_atasan, 0)),
+                         COALESCE(project_skor_responden.skor_level_4_atasan, 0) +
+                         ' . $bobotAspekSekunder . '),
                         2
                     ) AS avg_skor_level_4
                 '),
@@ -373,6 +394,7 @@ class HasilEvaluasiController extends Controller implements HasMiddleware
 
             return DataTables::of($data)->addIndexColumn()->toJson();
         }
+
         return view('hasil-evaluasi.detail-skor-level4', compact('project'));
     }
 
@@ -380,6 +402,23 @@ class HasilEvaluasiController extends Controller implements HasMiddleware
     {
 
         $respondenId = $request->query('project_responden_id');
+        $project_id = $request->query('project_id');
+        // Ambil data sekunder untuk perbandingan nilai kinerja awal dan akhir
+        $dataSekunder = DB::table('project_data_sekunder')
+            ->where('project_id', $project_id)
+            ->select('nilai_kinerja_awal', 'nilai_kinerja_akhir')
+            ->first();
+
+        $bobotAspekSekunder = 0;
+
+        if ($dataSekunder && $dataSekunder->nilai_kinerja_akhir > $dataSekunder->nilai_kinerja_awal) {
+            // Jika ada kenaikan, ambil bobot_aspek_sekunder dari project_bobot_aspek_sekunder
+            $bobot = DB::table('project_bobot_aspek_sekunder')
+                ->where('project_id', $project_id)
+                ->value('bobot_aspek_sekunder');
+
+            $bobotAspekSekunder = $bobot ?? 0;
+        }
 
         $data = DB::select("WITH delta_data AS (
                 SELECT
@@ -533,11 +572,16 @@ class HasilEvaluasiController extends Controller implements HasMiddleware
               </tr>";
         }
 
-        $avgNilai = round(($totalAlumni + $totalAtasan), 2);
+        $html .= "<tr class='total-row'>
+        <td colspan='5'>Data Sekunder</td>
+        <td>$bobotAspekSekunder</td>
+      </tr>";
+
+        $total = round(($totalAlumni + $totalAtasan + $bobotAspekSekunder), 2);
 
         $html .= "<tr class='avg-row'>
-            <td colspan='5'>Rata-rata Nilai Alumni & Atasan</td>
-            <td>$avgNilai</td>
+            <td colspan='5'>Total Nilai</td>
+            <td>$total</td>
           </tr>";
 
         $html .= '</table>';

@@ -153,7 +153,7 @@
                         name: 'avg_skor_level_4',
                         className: "text-center skor-clickable",
                         render: function(data, type, row) {
-                            return `<a href="#" class="skor-detail"  data-id="${row.project_responden_id}">${data}</a>`;
+                            return `<a href="#" class="skor-detail"  data-id="${row.project_responden_id}" data-projectId="${row.project_id}">${data}</a>`;
                         }
                     },
                     {
@@ -172,6 +172,7 @@
                     url: "{{ route('detail-level-4.responden') }}",
                     type: "GET",
                     data: {
+                        project_id: projectId,
                         project_responden_id: respondenId
                     },
                     success: function(response) {
