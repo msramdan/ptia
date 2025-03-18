@@ -265,7 +265,10 @@ class RespondenKuesionerController extends Controller
             if ($validatedData['remark'] === 'Alumni') {
                 $updateData['nama_atasan'] = $validatedData['atasan'] ?? null;
                 $updateData['telepon_atasan'] = $validatedData['no_wa'] ?? null;
-                $updateData['deadline_pengisian_atasan'] = now()->addDays((int) env('DEADLINE_PENGISIAN', 7))->format('Y-m-d');
+                // Ambil nilai deadline dari tabel setting
+                $setting = \App\Models\Setting::first();
+                $deadlineDays = $setting ? (int) $setting->deadline_pengisian : 7; // Default ke 7 jika tidak ada data
+                $updateData['deadline_pengisian_atasan'] = now()->addDays($deadlineDays)->format('Y-m-d');
             }
 
             // Update status di project_responden

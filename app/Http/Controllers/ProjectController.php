@@ -31,16 +31,16 @@ class ProjectController extends Controller implements HasMiddleware
     {
         if (request()->ajax()) {
             $projects = DB::table('project')
-            ->join('users', 'project.user_id', '=', 'users.id')
-            ->join('diklat_type', 'project.diklat_type_id', '=', 'diklat_type.id')
-            ->select(
-                'project.*',
-                'users.name as user_name',
-                'users.email',
-                'users.avatar',
-                'diklat_type.nama_diklat_type'
-            )
-            ->orderBy('project.id', 'desc');
+                ->join('users', 'project.user_id', '=', 'users.id')
+                ->join('diklat_type', 'project.diklat_type_id', '=', 'diklat_type.id')
+                ->select(
+                    'project.*',
+                    'users.name as user_name',
+                    'users.email',
+                    'users.avatar',
+                    'diklat_type.nama_diklat_type'
+                )
+                ->orderBy('project.id', 'desc');
             return DataTables::of($projects)
                 ->addIndexColumn()
                 ->addColumn('kuesioner', function ($row) {
@@ -713,9 +713,10 @@ class ProjectController extends Controller implements HasMiddleware
                 return to_route('project.index')->with('error', __('Status sudah Pelaksanaan, tidak bisa diubah lagi.'));
             }
 
-            // Ambil jumlah hari dari ENV, default 7 jika tidak diset
-            $deadlineDays = (int) env('DEADLINE_PENGISIAN', 7);
-            $deadlineDate = now()->addDays($deadlineDays)->toDateString(); // Format YYYY-MM-DD
+            // Ambil nilai deadline dari tabel setting
+            $setting = \App\Models\Setting::first(); // Ambil data setting pertama
+            $deadlineDays = $setting ? (int) $setting->deadline_pengisian : 7; // Default ke 7 jika tidak ada data
+            $deadlineDate = now()->addDays($deadlineDays)->toDateString();
 
             // Update status proyek
             $updated = DB::table('project')->where('id', $id)->update(['status' => 'Pelaksanaan']);
@@ -745,6 +746,4 @@ class ProjectController extends Controller implements HasMiddleware
             return to_route('project.index')->with('error', __('Terjadi kesalahan: ') . $e->getMessage());
         }
     }
-
-
 }

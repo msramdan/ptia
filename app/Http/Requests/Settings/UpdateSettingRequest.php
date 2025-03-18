@@ -31,6 +31,7 @@ class UpdateSettingRequest extends FormRequest
             'jam_selesai' => ['sometimes', 'required', 'date_format:H:i', 'after:jam_mulai'],
             'hari_jalan_cron' => ['required', 'array', 'min:1'],
             'hari_jalan_cron.*' => ['integer', 'in:0,1,2,3,4,5,6'],
+            'deadline_pengisian' => 'required|integer|min:1',
         ];
     }
 
@@ -74,6 +75,10 @@ class UpdateSettingRequest extends FormRequest
             'hari_jalan_cron.min' => 'Pilih minimal satu hari untuk menjalankan cron.',
             'hari_jalan_cron.*.integer' => 'Hari yang dipilih tidak valid.',
             'hari_jalan_cron.*.in' => 'Hari yang dipilih harus antara Minggu (0) hingga Sabtu (6).',
+
+            'deadline_pengisian.required' => 'Deadline pengisian wajib diisi.',
+            'deadline_pengisian.integer' => 'Deadline pengisian harus berupa angka.',
+            'deadline_pengisian.min' => 'Deadline pengisian minimal adalah 1 hari.',
         ];
     }
 }

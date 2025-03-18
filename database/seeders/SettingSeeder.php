@@ -23,6 +23,7 @@ class SettingSeeder extends Seeder
             'jam_mulai' => '07:00:00',
             'jam_selesai' => '17:00:00',
             'hari_jalan_cron' => json_encode(["1", "2", "3", "4", "5"]),
+            'deadline_pengisian' => 7,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
