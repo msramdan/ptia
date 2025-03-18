@@ -23,6 +23,7 @@ return new class extends Migration
             $table->time('jam_mulai')->default('07:00:00');
             $table->time('jam_selesai')->default('17:00:00');
             $table->json('hari_jalan_cron')->nullable();
+            $table->integer('deadline_pengisian')->default(7);
             $table->timestamps();
         });
     }

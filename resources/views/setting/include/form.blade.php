@@ -266,5 +266,20 @@
         </div>
     </div>
 
+    <div class="col-md-6">
+        <div class="form-group">
+            <label for="deadline_pengisian">{{ __('Deadline Pengisian (hari)') }}</label>
+            <input type="number" name="deadline_pengisian" id="deadline_pengisian"
+                class="form-control @error('deadline_pengisian') is-invalid @enderror"
+                value="{{ isset($setting) ? $setting->deadline_pengisian : old('deadline_pengisian', 7) }}"
+                placeholder="{{ __('Masukkan jumlah hari deadline') }}" min="1" required />
+            @error('deadline_pengisian')
+                <span class="text-danger">
+                    {{ $message }}
+                </span>
+            @enderror
+            <div class="form-text">{{ __('Jumlah hari untuk deadline pengisian kuesioner') }}</div>
+        </div>
+    </div>
 
 </div>
