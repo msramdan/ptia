@@ -161,7 +161,12 @@
                         name: 'kriteria_dampak',
                         className: 'text-start'
                     }
-                ]
+                ],
+                drawCallback: function(settings) {
+                    var api = this.api();
+                    var avgSkor = api.ajax.json().average_skor_level_4; // Ambil nilai dari response
+                    $("#avg-skor-level-4").text(avgSkor); // Update tampilan
+                }
             });
 
             // Event listener untuk klik skor
@@ -186,28 +191,6 @@
                 });
             });
 
-        });
-    </script>
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            function calculateAverage() {
-                let totalSkor = 0;
-                let count = 0;
-
-                document.querySelectorAll("#data-table tbody tr").forEach(row => {
-                    let skorCell = row.cells[6]; // Kolom skor Level 3 (indeks ke-6)
-                    let skorValue = parseFloat(skorCell.textContent) || 0;
-
-                    totalSkor += skorValue;
-                    count++;
-                });
-
-                let avgSkor = count > 0 ? (totalSkor / count).toFixed(2) : 0;
-                document.getElementById("avg-skor-level-4").textContent = avgSkor;
-            }
-
-            // Panggil fungsi setelah tabel dimuat
-            setTimeout(calculateAverage, 1000);
         });
     </script>
 @endpush

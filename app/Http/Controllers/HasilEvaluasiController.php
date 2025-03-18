@@ -145,14 +145,14 @@ class HasilEvaluasiController extends Controller implements HasMiddleware
                 ->join('indikator_dampak', function ($join) {
                     $join->on('indikator_dampak.diklat_type_id', '=', 'project.diklat_type_id')
                         ->whereRaw('
-                            (COALESCE(project_skor_responden.skor_level_3_alumni, 0) +
-                             COALESCE(project_skor_responden.skor_level_3_atasan, 0))
-                            > indikator_dampak.nilai_minimal
-                            AND
-                            (COALESCE(project_skor_responden.skor_level_3_alumni, 0) +
-                             COALESCE(project_skor_responden.skor_level_3_atasan, 0))
-                            <= indikator_dampak.nilai_maksimal
-                        ');
+                        (COALESCE(project_skor_responden.skor_level_3_alumni, 0) +
+                         COALESCE(project_skor_responden.skor_level_3_atasan, 0))
+                        > indikator_dampak.nilai_minimal
+                        AND
+                        (COALESCE(project_skor_responden.skor_level_3_alumni, 0) +
+                         COALESCE(project_skor_responden.skor_level_3_atasan, 0))
+                        <= indikator_dampak.nilai_maksimal
+                    ');
                 })
                 ->where('project_skor_responden.project_id', $id)
                 ->select([
@@ -167,20 +167,28 @@ class HasilEvaluasiController extends Controller implements HasMiddleware
                     'project_responden.unit',
                     'project.diklat_type_id',
                     DB::raw('
-                        LEAST(100, ROUND(
-                            (COALESCE(project_skor_responden.skor_level_3_alumni, 0) +
-                             COALESCE(project_skor_responden.skor_level_3_atasan, 0)),
-                            2
-                        )) AS avg_skor_level_3
-                    '),
+                    LEAST(100, ROUND(
+                        (COALESCE(project_skor_responden.skor_level_3_alumni, 0) +
+                         COALESCE(project_skor_responden.skor_level_3_atasan, 0)),
+                        2
+                    )) AS avg_skor_level_3
+                '),
                     'indikator_dampak.kriteria_dampak'
                 ])
                 ->get();
 
-            return DataTables::of($data)->addIndexColumn()->toJson();
+            // Hitung rata-rata dari semua `avg_skor_level_3`
+            $average = $data->avg('avg_skor_level_3');
+
+            return DataTables::of($data)
+                ->with('average_skor_level_3', round($average, 2)) // Kirim rata-rata ke frontend
+                ->addIndexColumn()
+                ->toJson();
         }
+
         return view('hasil-evaluasi.detail-skor-level3', compact('project'));
     }
+
 
     public function getDetailSkorLevel3(Request $request)
     {
@@ -421,6 +429,12 @@ class HasilEvaluasiController extends Controller implements HasMiddleware
                     'indikator_dampak.kriteria_dampak'
                 ])
                 ->get();
+            // Hitung rata-rata dari semua `avg_skor_level_3`
+            $average = $data->avg('avg_skor_level_4');
+            return DataTables::of($data)
+                ->with('average_skor_level_4', round($average, 2)) // Kirim rata-rata ke frontend
+                ->addIndexColumn()
+                ->toJson();
 
             return DataTables::of($data)->addIndexColumn()->toJson();
         }
