@@ -74,17 +74,24 @@ Route::middleware(['auth', 'web'])->group(function () {
         Route::get('/detail-level-4', 'getDetailSkorLevel4')->name('detail-level-4.responden');
     });
 
-
     Route::prefix('penyebaran-kuesioner')->controller(PenyebaranKuesionerController::class)->group(function () {
         Route::get('/', 'index')->name('penyebaran-kuesioner.index');
+
         // Responden Alumni
         Route::get('/responden-alumni/show/{id}', 'showRespondenAlumni')->name('penyebaran-kuesioner.responden-alumni.show');
+
         // Responden Atasan
         Route::get('/responden-atasan/show/{id}', 'showRespondenAtasan')->name('penyebaran-kuesioner.responden-atasan.show');
+
         // Update Telepon Responden
         Route::post('/responden/update-telepon', 'updateTelepon')->name('penyebaran-kuesioner.update.telepon');
+
+        // Update Deadline Responden
+        Route::post('/responden/update-deadline', 'updateDeadline')->name('penyebaran-kuesioner.update.deadline');
+
         // Kirim Notifikasi WhatsApp
         Route::post('/send-wa', 'sendNotifWa')->name('penyebaran-kuesioner.send.wa');
+
         // Log Pengiriman WhatsApp
         Route::get('/log-wa', 'getLogNotifWa')->name('penyebaran-kuesioner.log.wa');
     });

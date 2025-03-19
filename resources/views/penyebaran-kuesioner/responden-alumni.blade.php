@@ -27,6 +27,30 @@
         </div>
     </div>
 
+    {{-- Modal update deadline --}}
+    <div class="modal fade" id="editDeadlineModal" tabindex="-1" aria-labelledby="editDeadlineLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editDeadlineLabel">Update deadline pengisian - <span
+                            id="deadlineNamaResponden"></span></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="deadlineRespondenId">
+                    <div class="mb-3">
+                        <label for="deadlineTanggal" class="form-label">Tanggal deadline</label>
+                        <input type="hidden" class="form-control" id="remark" value="Alumni" autocomplete="off">
+                        <input type="date" class="form-control" id="deadlineTanggal" autocomplete="off">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-primary" id="saveDeadlineBtn">Simpan</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Modal Log Pengiriman -->
     <div class="modal fade" id="logWaModal" tabindex="-1" aria-labelledby="logWaModalLabel" aria-hidden="true">
@@ -112,6 +136,7 @@
                                             <th>{{ __('Unit') }}</th>
                                             <th>{{ __('Nilai Post Test') }}</th>
                                             <th>{{ __('Nilai Kenaikan Pre Post') }}</th>
+                                            <th>{{ __('Deadline') }}</th>
                                             <th>{{ __('Aksi') }}</th>
                                         </tr>
                                     </thead>
@@ -214,6 +239,10 @@
                         name: 'nilai_post_test'
                     },
                     {
+                        data: 'deadline_pengisian_alumni',
+                        name: 'deadline_pengisian_alumni'
+                    },
+                    {
                         data: 'action',
                         name: 'action'
                     }
@@ -284,6 +313,69 @@
             });
         });
     </script>
+
+    <script>
+        $(document).on("click", ".edit-deadline-btn", function() {
+            let idResponden = $(this).data("id");
+            let deadlineTanggal = $(this).data("deadline");
+            let namaResponden = $(this).data("nama");
+
+            $("#deadlineRespondenId").val(idResponden);
+            $("#deadlineTanggal").val(deadlineTanggal);
+            $("#deadlineNamaResponden").text(namaResponden);
+
+            $("#editDeadlineModal").modal("show");
+        });
+
+        $("#saveDeadlineBtn").on("click", function() {
+            let id = $("#deadlineRespondenId").val();
+            let deadline = $("#deadlineTanggal").val();
+            let remark = $("#remark").val();
+
+            $.ajax({
+                url: "{{ route('penyebaran-kuesioner.update.deadline') }}",
+                type: "POST",
+                data: {
+                    _token: "{{ csrf_token() }}",
+                    id: id,
+                    deadline: deadline,
+                    remark: remark,
+                },
+                success: function(response) {
+                    if (response.success) {
+                        Swal.fire({
+                            icon: "success",
+                            title: "Berhasil!",
+                            text: response.message,
+                            timer: 2000,
+                            showConfirmButton: false
+                        }).then(() => {
+                            $("#editDeadlineModal").modal("hide");
+                            $("#data-table").DataTable().ajax.reload(null, false);
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Oops...",
+                            text: "Terjadi kesalahan!",
+                        });
+                    }
+                },
+                error: function(xhr) {
+                    let errorMessage = "Gagal mengupdate deadline.";
+                    if (xhr.responseJSON && xhr.responseJSON.errors) {
+                        errorMessage = Object.values(xhr.responseJSON.errors).join("\n");
+                    }
+                    Swal.fire({
+                        icon: "error",
+                        title: "Validasi Gagal!",
+                        text: errorMessage,
+                    });
+                },
+            });
+        });
+    </script>
+
 
     <script>
         $(document).on("click", ".send-wa-btn", function() {

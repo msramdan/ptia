@@ -301,6 +301,41 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
         }
     }
 
+    public function updateDeadline(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'id' => 'required|exists:project_responden,id',
+            'deadline' => 'required|date_format:Y-m-d',
+            'remark' => 'required|in:Alumni,Atasan',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validasi gagal!',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        try {
+            $fieldToUpdate = $request->remark === 'Alumni' ? 'deadline_pengisian_alumni' : 'deadline_pengisian_atasan';
+
+            DB::table('project_responden')
+                ->where('id', $request->id)
+                ->update([$fieldToUpdate => $request->deadline]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Deadline pengisian berhasil diperbarui!',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat memperbarui data!',
+            ], 500);
+        }
+    }
+
     public function sendNotifWa(Request $request)
     {
         $validator = Validator::make($request->all(), [

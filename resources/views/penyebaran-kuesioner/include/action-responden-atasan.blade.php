@@ -1,7 +1,8 @@
 <td>
 
     <a href="#" class="btn btn-warning btn-sm edit-telepon-btn" data-id="{{ $model->id }}"
-        data-telepon="{{ $model->telepon_atasan }}" data-nama="{{ $model->nama_atasan }}"  title="Edit No. Telepon Atasan Langsung">
+        data-telepon="{{ $model->telepon_atasan }}" data-nama="{{ $model->nama_atasan }}"
+        title="Edit No. Telepon Atasan Langsung">
         <i class="fas fa-phone"></i>
     </a>
 
@@ -24,8 +25,15 @@
         <i class="fas fa-clipboard-list" aria-hidden="true"></i>
     </a>
     <a href="#" class="btn btn-secondary btn-sm log-wa-btn" title="Log pengiriman pesan WA"
-        data-id="{{ $model->id }}" data-remark="Atasan"  data-nama="{{ $model->nama_atasan }}">
+        data-id="{{ $model->id }}" data-remark="Atasan" data-nama="{{ $model->nama_atasan }}">
         <i class="fa fa-history" aria-hidden="true"></i>
+    </a>
+
+    <a href="#" class="btn btn-sm edit-deadline-btn"
+        style="background-color: #C0C0C0; color: black; border-color: #C0C0C0;" data-id="{{ $model->id }}"
+        data-deadline="{{ $model->deadline_pengisian_atasan }}" data-nama="{{ $model->nama_atasan }}"
+        title="Update deadline pengisian kuesioner">
+        <i class="fas fa-calendar-alt"></i>
     </a>
 
 </td>

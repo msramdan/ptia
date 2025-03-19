@@ -29,4 +29,13 @@
         <i class="fa fa-history" aria-hidden="true"></i>
     </a>
 
+
+    <a href="#" class="btn btn-sm edit-deadline-btn"
+        style="background-color: #C0C0C0; color: black; border-color: #C0C0C0;" data-id="{{ $model->id }}"
+        data-deadline="{{ $model->deadline_pengisian_alumni }}" data-nama="{{ $model->nama }}"
+        title="Update deadline pengisian kuesioner">
+        <i class="fas fa-calendar-alt"></i>
+    </a>
+
+
 </td>
