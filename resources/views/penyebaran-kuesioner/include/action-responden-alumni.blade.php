@@ -5,6 +5,13 @@
         <i class="fas fa-phone"></i>
     </a>
 
+    <a href="#" class="btn btn-sm edit-deadline-btn"
+        style="background-color: #C0C0C0; color: black; border-color: #C0C0C0;" data-id="{{ $model->id }}"
+        data-deadline="{{ $model->deadline_pengisian_alumni }}" data-nama="{{ $model->nama }}"
+        title="Update deadline pengisian kuesioner">
+        <i class="fas fa-calendar-alt"></i>
+    </a>
+
     <a href="#" class="btn btn-primary btn-sm send-wa-btn" title="Kirim link Kuesioner ke WhatsApp Alumni"
         data-id="{{ $model->id }}" data-remark="Alumni" data-nama="{{ $model->nama }}"
         data-telepon="{{ $model->telepon }}">
@@ -30,12 +37,7 @@
     </a>
 
 
-    <a href="#" class="btn btn-sm edit-deadline-btn"
-        style="background-color: #C0C0C0; color: black; border-color: #C0C0C0;" data-id="{{ $model->id }}"
-        data-deadline="{{ $model->deadline_pengisian_alumni }}" data-nama="{{ $model->nama }}"
-        title="Update deadline pengisian kuesioner">
-        <i class="fas fa-calendar-alt"></i>
-    </a>
+
 
 
 </td>

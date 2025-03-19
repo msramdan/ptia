@@ -6,9 +6,16 @@
         <i class="fas fa-phone"></i>
     </a>
 
-    <a href="#" class="btn btn-primary btn-sm send-wa-btn" title="Kirim link Kuesioner ke WhatsApp Atasan Langsung"
-        data-id="{{ $model->id }}" data-remark="Atasan" data-nama="{{ $model->nama_atasan }}"
-        data-telepon="{{ $model->telepon_atasan }}">
+    <a href="#" class="btn btn-sm edit-deadline-btn"
+        style="background-color: #C0C0C0; color: black; border-color: #C0C0C0;" data-id="{{ $model->id }}"
+        data-deadline="{{ $model->deadline_pengisian_atasan }}" data-nama="{{ $model->nama_atasan }}"
+        title="Update deadline pengisian kuesioner">
+        <i class="fas fa-calendar-alt"></i>
+    </a>
+
+    <a href="#" class="btn btn-primary btn-sm send-wa-btn"
+        title="Kirim link Kuesioner ke WhatsApp Atasan Langsung" data-id="{{ $model->id }}" data-remark="Atasan"
+        data-nama="{{ $model->nama_atasan }}" data-telepon="{{ $model->telepon_atasan }}">
         <i class="fas fa-paper-plane"></i>
     </a>
 
@@ -29,11 +36,6 @@
         <i class="fa fa-history" aria-hidden="true"></i>
     </a>
 
-    <a href="#" class="btn btn-sm edit-deadline-btn"
-        style="background-color: #C0C0C0; color: black; border-color: #C0C0C0;" data-id="{{ $model->id }}"
-        data-deadline="{{ $model->deadline_pengisian_atasan }}" data-nama="{{ $model->nama_atasan }}"
-        title="Update deadline pengisian kuesioner">
-        <i class="fas fa-calendar-alt"></i>
-    </a>
+
 
 </td>
