@@ -446,9 +446,29 @@
                 return value.replace(/[^0-9]/g, ''); // Hanya menyisakan angka
             }
 
+            function validateNoWa() {
+                let noWa = $('#no_wa').val();
+                let regex = /^(0|62)\d{9,13}$/;
+                let errorMsg = $('#no_wa_error');
+                let isValid = regex.test(noWa); // Cek validasi
+
+                if (!isValid) {
+                    if (errorMsg.length === 0) {
+                        $('#no_wa').after(
+                            '<small id="no_wa_error" class="text-danger">Nomor WhatsApp harus diawali dengan 0 atau 62 dan memiliki panjang 10-15 digit.</small>'
+                            );
+                    }
+                } else {
+                    errorMsg.remove();
+                }
+
+                $('#submitButton').prop('disabled', !isValid); // Matikan tombol jika error
+            }
+
             $('#no_wa').on('input', function() {
                 let noWa = cleanNumber($(this).val());
                 $(this).val(noWa);
+                validateNoWa();
             });
 
             $('#no_wa').on('paste', function(e) {
@@ -456,25 +476,18 @@
                 let pastedData = (e.originalEvent || e).clipboardData.getData('text');
                 let cleanedData = cleanNumber(pastedData);
                 $(this).val(cleanedData);
+                validateNoWa();
             });
 
             $('#no_wa').on('blur', function() {
-                let noWa = $(this).val();
-                let regex = /^(0|62)\d{9,13}$/;
-                let errorMsg = $('#no_wa_error');
-
-                if (!regex.test(noWa)) {
-                    if (errorMsg.length === 0) {
-                        $(this).after(
-                            '<small id="no_wa_error" class="text-danger">Nomor WhatsApp harus diawali dengan 0 atau 62 dan memiliki panjang 10-15 digit.</small>'
-                            );
-                    }
-                } else {
-                    errorMsg.remove();
-                }
+                validateNoWa();
             });
+
+            // Cek validasi saat halaman dimuat
+            validateNoWa();
         });
     </script>
+
 </body>
 
 </html>
