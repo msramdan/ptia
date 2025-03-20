@@ -312,6 +312,29 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function() {
+            function cleanNumber(value) {
+                return value.replace(/[^0-9]/g, ''); // Hanya menyisakan angka
+            }
+
+            function validateNoWa() {
+                let noWa = $('#no_wa').val();
+                let regex = /^(0|62)\d{9,13}$/;
+                let errorMsg = $('#no_wa_error');
+                let isValid = regex.test(noWa); // Cek validasi
+
+                if (!isValid) {
+                    if (errorMsg.length === 0) {
+                        $('#no_wa').after(
+                            '<small id="no_wa_error" class="text-danger">Nomor WhatsApp harus diawali dengan 0 atau 62 dan memiliki panjang 10-15 digit.</small>'
+                        );
+                    }
+                } else {
+                    errorMsg.remove();
+                }
+
+                checkFormValidity(); // Pastikan form dicek ulang
+            }
+
             function checkFormValidity() {
                 let allChecked = true;
                 let allTextareaFilled = true;
@@ -355,7 +378,7 @@
                             warningMessage.html(warningText).show();
                             allTextareaFilled = false;
                         } else {
-                            textarea.removeClass("border-danger"); // Hapus border merah jika ada isi
+                            textarea.removeClass("border-danger");
                         }
                     } else {
                         textarea.removeClass("border-danger").removeAttr("required");
@@ -364,9 +387,10 @@
                 });
 
                 let atasanFilled = $("#atasan").val().trim() !== "";
-                let noWaFilled = $("#no_wa").val().trim() !== "";
+                let noWa = $("#no_wa").val().trim();
+                let noWaValid = /^(0|62)\d{9,13}$/.test(noWa); // Validasi nomor WA
 
-                if (allChecked && allTextareaFilled && atasanFilled && noWaFilled) {
+                if (allChecked && allTextareaFilled && atasanFilled && noWaValid) {
                     $("#submitButton").prop("disabled", false);
                     $("#alertMessage").hide();
                 } else {
@@ -408,7 +432,7 @@
                             textarea.addClass("border-danger").attr("required", true);
                             warningMessage.html(warningText).show();
                         } else {
-                            textarea.removeClass("border-danger"); // Hapus border merah jika ada isi
+                            textarea.removeClass("border-danger");
                         }
                     } else {
                         textarea.removeClass("border-danger").removeAttr("required");
@@ -425,68 +449,40 @@
 
             $("textarea").on("input", function() {
                 let textarea = $(this);
-
-                // Hapus border merah jika textarea sudah terisi
                 if (textarea.val().trim() !== "") {
                     textarea.removeClass("border-danger");
                 }
-
                 checkFormValidity();
             });
 
             $("#atasan, #no_wa").on("input", checkFormValidity);
 
-            checkTextareaRequirement();
-            checkFormValidity();
-        });
-    </script>
-    <script>
-        $(document).ready(function() {
-            function cleanNumber(value) {
-                return value.replace(/[^0-9]/g, ''); // Hanya menyisakan angka
-            }
-
-            function validateNoWa() {
-                let noWa = $('#no_wa').val();
-                let regex = /^(0|62)\d{9,13}$/;
-                let errorMsg = $('#no_wa_error');
-                let isValid = regex.test(noWa); // Cek validasi
-
-                if (!isValid) {
-                    if (errorMsg.length === 0) {
-                        $('#no_wa').after(
-                            '<small id="no_wa_error" class="text-danger">Nomor WhatsApp harus diawali dengan 0 atau 62 dan memiliki panjang 10-15 digit.</small>'
-                            );
-                    }
-                } else {
-                    errorMsg.remove();
-                }
-
-                $('#submitButton').prop('disabled', !isValid); // Matikan tombol jika error
-            }
-
-            $('#no_wa').on('input', function() {
+            $("#no_wa").on("input", function() {
                 let noWa = cleanNumber($(this).val());
                 $(this).val(noWa);
                 validateNoWa();
             });
 
-            $('#no_wa').on('paste', function(e) {
-                e.preventDefault(); // Mencegah paste bawaan untuk mengontrol format
+            $("#no_wa").on("paste", function(e) {
+                e.preventDefault();
                 let pastedData = (e.originalEvent || e).clipboardData.getData('text');
                 let cleanedData = cleanNumber(pastedData);
                 $(this).val(cleanedData);
                 validateNoWa();
             });
 
-            $('#no_wa').on('blur', function() {
+            $("#no_wa").on("blur", function() {
                 validateNoWa();
             });
 
             // Cek validasi saat halaman dimuat
+            checkTextareaRequirement();
+            checkFormValidity();
             validateNoWa();
         });
     </script>
+
+
 
 </body>
 
