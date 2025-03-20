@@ -440,6 +440,41 @@
             checkFormValidity();
         });
     </script>
+    <script>
+        $(document).ready(function() {
+            function cleanNumber(value) {
+                return value.replace(/[^0-9]/g, ''); // Hanya menyisakan angka
+            }
+
+            $('#no_wa').on('input', function() {
+                let noWa = cleanNumber($(this).val());
+                $(this).val(noWa);
+            });
+
+            $('#no_wa').on('paste', function(e) {
+                e.preventDefault(); // Mencegah paste bawaan untuk mengontrol format
+                let pastedData = (e.originalEvent || e).clipboardData.getData('text');
+                let cleanedData = cleanNumber(pastedData);
+                $(this).val(cleanedData);
+            });
+
+            $('#no_wa').on('blur', function() {
+                let noWa = $(this).val();
+                let regex = /^(0|62)\d{9,13}$/;
+                let errorMsg = $('#no_wa_error');
+
+                if (!regex.test(noWa)) {
+                    if (errorMsg.length === 0) {
+                        $(this).after(
+                            '<small id="no_wa_error" class="text-danger">Nomor WhatsApp harus diawali dengan 0 atau 62 dan memiliki panjang 10-15 digit.</small>'
+                            );
+                    }
+                } else {
+                    errorMsg.remove();
+                }
+            });
+        });
+    </script>
 </body>
 
 </html>
