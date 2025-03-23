@@ -5,6 +5,7 @@ use App\Http\Controllers\Cron\{
     AutoCreateProjectController,
     NotifikasiCronAlumniController,
     NotifikasiCronAtasanController,
+    AutoInsertKuesionerAtasanController
 };
 use App\Http\Controllers\{
     ProfileController,
@@ -38,6 +39,7 @@ Route::get('/', function () {
 Route::get('/kirim-notifikasi-alumni', [NotifikasiCronAlumniController::class, 'kirimNotifikasi']);
 Route::get('/kirim-notifikasi-atasan', [NotifikasiCronAtasanController::class, 'kirimNotifikasi']);
 Route::get('/auto-create-project', [AutoCreateProjectController::class, 'autoCreate']);
+Route::get('/auto-insert-kuesiober-atasan', [AutoInsertKuesionerAtasanController::class, 'insertData']);
 
 // Share kuesioner
 Route::get('/responden-kuesioner/{id}/{target}', [RespondenKuesionerController::class, 'index'])->name('responden-kuesioner.index');
