@@ -124,10 +124,49 @@
                     <div class="card">
                         <div class="card-body">
                             <h5>Daftar Responden Alumni</h5>
+
+                            <!-- Button untuk Update Deadline -->
+                            <button id="update-deadline-btn" class="btn mb-3"
+                                style="background-color: #C0C0C0; color: black; border-color: #C0C0C0;" disabled>
+                                <i class="fas fa-calendar-alt"></i> Update Deadline
+                            </button>
+
+                            <!-- Modal Bootstrap 5 -->
+                            <div class="modal fade" id="updateDeadlineModal" tabindex="-1"
+                                aria-labelledby="updateDeadlineModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="updateDeadlineModalLabel">Update Deadline</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <form id="update-deadline-form">
+                                                <div class="mb-3">
+                                                    <label for="deadline-date" class="form-label">Pilih Tanggal
+                                                        Deadline</label>
+                                                    <input type="date" class="form-control" id="deadline-date"
+                                                        name="deadline-date" required>
+                                                </div>
+                                            </form>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary"
+                                                data-bs-dismiss="modal">Tutup</button>
+                                            <button type="button" class="btn btn-primary"
+                                                id="submit-deadline">Submit</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Tabel -->
                             <div class="table-responsive p-1">
                                 <table class="table table-striped" id="data-table" width="100%">
                                     <thead>
                                         <tr>
+                                            <th><input type="checkbox" id="select-all"></th>
                                             <th>#</th>
                                             <th>{{ __('Nama peserta') }}</th>
                                             <th>{{ __('NIP') }}</th>
@@ -144,9 +183,9 @@
                                     </tbody>
                                 </table>
                             </div>
-
                         </div>
                     </div>
+
                 </div>
             </div>
         </section>
@@ -195,15 +234,33 @@
     <script>
         $(document).ready(function() {
             var projectId = @json($project->id);
-            $('#data-table').DataTable({
+            var selectedIds = []; // Array untuk menyimpan ID yang dipilih
+            var isSelectAll = false; // Status untuk menandai apakah "Select All" aktif
+
+            var table = $('#data-table').DataTable({
                 processing: true,
                 serverSide: true,
+                stateSave: true, // Menyimpan state tabel, termasuk pagination
+                pageLength: 10, // Default per page 10
                 ajax: {
                     url: "{{ route('penyebaran-kuesioner.responden-alumni.show', ':id') }}".replace(':id',
                         projectId),
                     data: function(d) {}
                 },
                 columns: [{
+                        data: 'id', // Asumsi Anda memiliki kolom ID
+                        name: 'id',
+                        orderable: false,
+                        searchable: false,
+                        render: function(data, type, row) {
+                            // Cek apakah ID sudah dipilih
+                            var isChecked = selectedIds.includes(data
+                        .toString()); // Pastikan ID diubah ke string
+                            return '<input type="checkbox" class="select-checkbox" value="' + data +
+                                '" ' + (isChecked ? 'checked' : '') + '>';
+                        }
+                    },
+                    {
                         data: 'DT_RowIndex',
                         name: 'DT_RowIndex',
                         orderable: false,
@@ -247,6 +304,174 @@
                         name: 'action'
                     }
                 ],
+                drawCallback: function(settings) {
+                    // Pulihkan state checkbox saat pindah halaman
+                    $('.select-checkbox').each(function() {
+                        var id = $(this).val();
+                        if (selectedIds.includes(id
+                        .toString())) { // Pastikan ID diubah ke string
+                            $(this).prop('checked', true);
+                        } else {
+                            $(this).prop('checked', false);
+                        }
+                    });
+
+                    // Update status "Select All"
+                    updateSelectAllStatus();
+                    // Update status button "Update Deadline"
+                    updateUpdateDeadlineButton();
+                }
+            });
+
+            // Fungsi untuk mengupdate status "Select All"
+            function updateSelectAllStatus() {
+                // Ambil semua data dari server untuk memeriksa apakah semua data terpilih
+                $.ajax({
+                    url: "{{ route('penyebaran-kuesioner.responden-alumni.show', ':id') }}".replace(':id',
+                        projectId),
+                    data: {
+                        length: -1
+                    }, // Request semua data
+                    success: function(response) {
+                        var allDataIds = response.data.map(function(item) {
+                            return item.id.toString(); // Pastikan ID diubah ke string
+                        });
+
+                        // Cek apakah semua data terpilih
+                        var allSelected = allDataIds.every(function(id) {
+                            return selectedIds.includes(id);
+                        });
+
+                        // Update status "Select All"
+                        $('#select-all').prop('checked', allSelected);
+                        isSelectAll = allSelected;
+                    }
+                });
+            }
+
+            // Event listener untuk "select all"
+            $('#select-all').on('click', function() {
+                isSelectAll = this.checked;
+
+                if (isSelectAll) {
+                    // Ambil semua data dari server (tanpa pagination)
+                    $.ajax({
+                        url: "{{ route('penyebaran-kuesioner.responden-alumni.show', ':id') }}"
+                            .replace(':id', projectId),
+                        data: {
+                            length: -1
+                        }, // Request semua data
+                        success: function(response) {
+                            selectedIds = response.data.map(function(item) {
+                                return item.id
+                            .toString(); // Pastikan ID diubah ke string
+                            });
+
+                            // Centang semua checkbox
+                            $('.select-checkbox').prop('checked', true);
+                            table.draw(false); // Redraw tabel tanpa reset pagination
+                            // Update status button "Update Deadline"
+                            updateUpdateDeadlineButton();
+                        }
+                    });
+                } else {
+                    // Kosongkan selectedIds dan uncheck semua checkbox
+                    selectedIds = [];
+                    $('.select-checkbox').prop('checked', false);
+                    table.draw(false); // Redraw tabel tanpa reset pagination
+                    // Update status button "Update Deadline"
+                    updateUpdateDeadlineButton();
+                }
+            });
+
+            // Event listener untuk checkbox individual
+            $('#data-table tbody').on('change', '.select-checkbox', function() {
+                var id = $(this).val();
+
+                if ($(this).is(':checked')) {
+                    if (!selectedIds.includes(id.toString())) { // Pastikan ID diubah ke string
+                        selectedIds.push(id.toString());
+                    }
+                } else {
+                    selectedIds = selectedIds.filter(function(item) {
+                        return item !== id.toString(); // Pastikan ID diubah ke string
+                    });
+                }
+
+                // Update status "Select All"
+                updateSelectAllStatus();
+                // Update status button "Update Deadline"
+                updateUpdateDeadlineButton();
+            });
+
+            // Fungsi untuk mengupdate status button "Update Deadline"
+            function updateUpdateDeadlineButton() {
+                if (selectedIds.length > 0) {
+                    $('#update-deadline-btn').prop('disabled', false);
+                } else {
+                    $('#update-deadline-btn').prop('disabled', true);
+                }
+            }
+
+            // Event listener untuk button "Update Deadline"
+            $('#update-deadline-btn').on('click', function() {
+                $('#updateDeadlineModal').modal('show');
+            });
+
+            // Event listener untuk tombol submit di modal
+            $('#submit-deadline').on('click', function() {
+                var deadline = $('#deadline-date').val(); // Ambil nilai tanggal
+
+                if (!deadline) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Harap pilih tanggal deadline.',
+                    });
+                    return;
+                }
+
+                // Kirim data ke server
+                $.ajax({
+                    url: "{{ route('update-deadline') }}", // Route untuk update deadline
+                    method: 'POST',
+                    data: {
+                        ids: selectedIds,
+                        deadline: deadline,
+                        remark: 'Alumni', // Ganti dengan 'Atasan' jika diperlukan
+                        _token: "{{ csrf_token() }}"
+                    },
+                    success: function(response) {
+                        if (response.status) {
+                            // Jika berhasil, tampilkan SweetAlert sukses
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Berhasil',
+                                text: response.message,
+                            }).then(() => {
+                                $('#updateDeadlineModal').modal(
+                                'hide'); // Sembunyikan modal
+                                $('#deadline-date').val(''); // Reset input tanggal
+                                table.draw(false); // Refresh tabel
+                            });
+                        } else {
+                            // Jika gagal, tampilkan SweetAlert error
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: response.message,
+                            });
+                        }
+                    },
+                    error: function(xhr) {
+                        // Jika terjadi error pada AJAX, tampilkan SweetAlert error
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: 'Terjadi kesalahan. Silakan coba lagi.',
+                        });
+                    }
+                });
             });
         });
     </script>
@@ -375,7 +600,6 @@
             });
         });
     </script>
-
 
     <script>
         $(document).on("click", ".send-wa-btn", function() {

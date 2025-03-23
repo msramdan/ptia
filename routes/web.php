@@ -91,6 +91,9 @@ Route::middleware(['auth', 'web'])->group(function () {
         // Update Deadline Responden
         Route::post('/responden/update-deadline', 'updateDeadline')->name('penyebaran-kuesioner.update.deadline');
 
+        // Update Deadline Responden selected
+        Route::post('/responden/update-deadline-selected', 'updateDeadlineSelected')->name('update-deadline');
+
         // Kirim Notifikasi WhatsApp
         Route::post('/send-wa', 'sendNotifWa')->name('penyebaran-kuesioner.send.wa');
 
