@@ -13,11 +13,11 @@
         <link rel="shortcut icon" href="{{ asset('storage/uploads/favicons/' . $settingApp->favicon) }}"
             type="image/x-icon">
     @endif
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="https://registrasi.bpkp.go.id/ptia/assets/temalogin/css/iofrm-style.css">
-    <link rel="stylesheet" href="https://registrasi.bpkp.go.id/ptia/assets/temalogin/css/iofrm-theme22.css">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('assets/bootstrap/css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/font-awesome/css/all.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/temalogin/css/iofrm-style.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/temalogin/css/iofrm-theme22.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/toastr/css/toastr.min.css') }}">
 </head>
 
 <body>
@@ -25,18 +25,16 @@
         <div class="row">
             <div class="col-md-6 img-holder">
                 <div class="bg"
-                    style="background: rgb(235, 245, 255);
-                           background: radial-gradient(circle, rgb(60, 130, 200) 0%, rgb(40, 90, 150) 100%);">
+                    style="background: rgb(235, 245, 255); background: radial-gradient(circle, rgb(60, 130, 200) 0%, rgb(40, 90, 150) 100%);">
                 </div>
                 <div
-                    style="width:100%;height:100%;z-index:0;top:0;left:0;position:fixed;background:url('https://registrasi.bpkp.go.id/ptia/assets/temalogin/images/pattern-3.svg') no-repeat center bottom fixed;background-size: cover;">
+                    style="width:100%;height:100%;z-index:0;top:0;left:0;position:fixed;background:url('{{ asset('assets/temalogin/images/pattern-3.svg') }}') no-repeat center bottom fixed;background-size: cover;">
                 </div>
             </div>
 
             <div class="col-md-6 form-holder">
                 <div class="form-content">
                     <div class="form-items p-4" style="border-radius:10px;">
-
                         <div class="text-center">
                             @if ($settingApp?->logo_login)
                                 <img src="{{ asset('storage/uploads/logo-logins/' . $settingApp->logo_login) }}"
@@ -56,7 +54,6 @@
                                 <i class="fa fa-eye position-absolute toggle-password"
                                     style="top: 50%; right: 10px; transform: translateY(-50%); cursor: pointer; color: #6c757d;"></i>
                             </div>
-
                             <div class="mb-3">
                                 {!! NoCaptcha::display() !!}
                                 {!! NoCaptcha::renderJs() !!}
@@ -74,18 +71,12 @@
         </div>
     </div>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- jQuery -->
-    <script src="https://registrasi.bpkp.go.id/ptia/assets/temalogin/js/jquery.min.js"></script>
-    <!-- Toastr JS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-    <!-- SweetAlert -->
-    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-    <!-- Custom Scripts -->
+    <script src="{{ asset('assets/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ asset('assets/temalogin/js/jquery.min.js') }}"></script>
+    <script src="{{ asset('assets/toastr/js/toastr.min.js') }}"></script>
+    <script src="{{ asset('assets/sweetalert/js/sweetalert.min.js') }}"></script>
     <script>
         $(document).ready(function() {
-            // Show error notifications if there are any
             @if ($errors->any())
                 @foreach ($errors->all() as $error)
                     toastr.error("{{ $error }}", "Error", {
@@ -97,7 +88,6 @@
                 @endforeach
             @endif
 
-            // Toggle password visibility
             $('.toggle-password').on('click', function() {
                 const passwordField = $('#password');
                 const type = passwordField.attr('type') === 'password' ? 'text' : 'password';
