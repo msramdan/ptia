@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\URL;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 
 class PenyebaranKuesionerController extends Controller implements HasMiddleware
@@ -500,6 +501,123 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
             DB::table('project_responden')
                 ->where('id', $id)
                 ->update($updateData);
+        }
+    }
+
+    /**
+     * Method untuk generate PDF Persiapan Evaluasi.
+     *
+     * @param string $id ID Project
+     * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
+     */
+    public function exportPersiapanPdf($id)
+    {
+        try {
+            // 1. Ambil Data Project Utama menggunakan DB Facade
+            $project = DB::table('project')
+                ->join('users', 'project.user_id', '=', 'users.id')
+                ->select('project.*', 'users.name as user_name')
+                ->where('project.id', $id)
+                ->first();
+
+            if (!$project) {
+                Log::warning('Gagal generate PDF Persiapan: Project tidak ditemukan - ID ' . $id);
+                return redirect()->route('penyebaran-kuesioner.index')->with('error', 'Data Project tidak ditemukan.');
+            }
+            $namaPembuat = $project->user_name;
+
+            if ($project->created_at) {
+                try {
+                    $project->created_at = Carbon::parse($project->created_at);
+                } catch (\Exception $dateError) {
+                    // Tangani jika format tanggal tidak valid, set ke null atau default
+                    Log::warning('Format tanggal created_at tidak valid untuk project ID ' . $id . ': ' . $project->created_at);
+                    $project->created_at = null; // Atau biarkan sebagai string jika format() tidak dipanggil di view
+                }
+            }
+
+            // 2. Ambil Data Kuesioner (Kode tetap sama)
+            $kuesionerAlumni = DB::table('project_kuesioner')
+                ->select('project_kuesioner.*', 'aspek.aspek as aspek_nama', 'aspek.kriteria')
+                ->join('aspek', 'project_kuesioner.aspek_id', '=', 'aspek.id')
+                ->where('project_kuesioner.project_id', $id)
+                ->where('project_kuesioner.remark', 'Alumni')
+                ->orderBy('project_kuesioner.id')
+                ->get();
+
+            $kuesionerAtasan = DB::table('project_kuesioner')
+                ->select('project_kuesioner.*', 'aspek.aspek as aspek_nama', 'aspek.kriteria')
+                ->join('aspek', 'project_kuesioner.aspek_id', '=', 'aspek.id')
+                ->where('project_kuesioner.project_id', $id)
+                ->where('project_kuesioner.remark', 'Atasan')
+                ->orderBy('project_kuesioner.id')
+                ->get();
+
+            // 3. Ambil Data Pesan WA (Kode tetap sama)
+            $pesanWa = DB::table('project_pesan_wa')
+                ->where('project_id', $id)
+                ->first();
+            $templateAlumni = $pesanWa ? $pesanWa->text_pesan_alumni : 'Template Pesan Alumni belum diatur.';
+            $templateAtasan = $pesanWa ? $pesanWa->text_pesan_atasan : 'Template Pesan Atasan belum diatur.';
+
+            // 4. Hitung Data Progress (KOREKSI FINAL - Menyamakan Total Alumni dengan Index Page)
+            $statusTarget = 'sudah'; // Target status case-insensitive
+
+            // Progress Alumni
+            // Total Alumni = Total SEMUA responden untuk project ini (agar % sama dgn index)
+            $totalAlumni = DB::table('project_responden')
+                ->where('project_id', $id)
+                // ---> TIDAK ADA filter nama_atasan untuk total ini <---
+                ->count();
+            // Yang Mengisi Alumni = Semua responden project yang status_alumni = 'Sudah' (Case Insensitive)
+            $mengisiAlumni = DB::table('project_responden')
+                ->where('project_id', $id)
+                ->whereRaw('LOWER(status_pengisian_kuesioner_alumni) = ?', [$statusTarget])
+                ->count();
+            $persenAlumni = $totalAlumni > 0 ? round(($mengisiAlumni / $totalAlumni) * 100, 2) : 0;
+
+            // Progress Atasan (Definisi total & mengisi tetap sama)
+            // Total Atasan = Responden dengan nama_atasan IS NOT NULL
+            $totalAtasan = DB::table('project_responden')
+                ->where('project_id', $id)
+                ->whereNotNull('nama_atasan')
+                ->count();
+            // Yang Mengisi Atasan = Responden dengan nama_atasan IS NOT NULL DAN status_atasan = 'Sudah' (Case Insensitive)
+            $mengisiAtasan = DB::table('project_responden')
+                ->where('project_id', $id)
+                ->whereNotNull('nama_atasan')
+                ->whereRaw('LOWER(status_pengisian_kuesioner_atasan) = ?', [$statusTarget])
+                ->count();
+            $persenAtasan = $totalAtasan > 0 ? round(($mengisiAtasan / $totalAtasan) * 100, 2) : 0;
+
+            // 5. Siapkan Data untuk View PDF (Kode tetap sama)
+            $data = [
+                'project' => $project,
+                'namaPembuat' => $namaPembuat,
+                'kuesionerAlumni' => $kuesionerAlumni,
+                'kuesionerAtasan' => $kuesionerAtasan,
+                'templateAlumni' => $templateAlumni,
+                'templateAtasan' => $templateAtasan,
+                'totalAlumni' => $totalAlumni,
+                'mengisiAlumni' => $mengisiAlumni,
+                'persenAlumni' => $persenAlumni,
+                'totalAtasan' => $totalAtasan,
+                'mengisiAtasan' => $mengisiAtasan,
+                'persenAtasan' => $persenAtasan,
+                'logoUrl' => 'assets/logo_bpkp.jpg',
+                'tanggalCetak' => Carbon::now()->isoFormat('D MMMM YYYY'), // Format tanggal Indonesia
+            ];
+
+            // 6. Generate PDF (Kode tetap sama)
+            $pdf = Pdf::loadView('penyebaran-kuesioner.export-persiapan-pdf', $data);
+            $pdf->setPaper('a4', 'portrait');
+
+            // 7. Kirim PDF ke Browser (Kode tetap sama)
+            $namaFile = 'Persiapan-Evaluasi-' . preg_replace('/[^A-Za-z0-9\-]/', '', $project->kaldikID) . '.pdf';
+            return $pdf->stream($namaFile);
+        } catch (\Exception $e) {
+            Log::error('Gagal generate PDF Persiapan: ID ' . $id . ' Pesan: ' . $e->getMessage() . "\n" . $e->getTraceAsString());
+            return redirect()->route('penyebaran-kuesioner.index')->with('error', 'Terjadi kesalahan saat membuat file PDF. Silakan cek log.');
         }
     }
 }

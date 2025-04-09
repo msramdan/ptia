@@ -99,6 +99,10 @@ Route::middleware(['auth', 'web'])->group(function () {
 
         // Log Pengiriman WhatsApp
         Route::get('/log-wa', 'getLogNotifWa')->name('penyebaran-kuesioner.log.wa');
+
+        // Export-pdf
+        Route::get('/{id}/export-persiapan-pdf', 'exportPersiapanPdf')
+            ->name('penyebaran-kuesioner.export-persiapan-pdf');
     });
 
     // Route khusus untuk Data Sekunder
