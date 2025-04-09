@@ -1,12 +1,10 @@
 </div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"
-    integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ=="
-    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="{{ asset('assets/jquery/js/jquery.min.js') }}"></script>
 <script src="{{ asset('mazer') }}/static/js/components/dark.js"></script>
 <script src="{{ asset('mazer') }}/extensions/perfect-scrollbar/perfect-scrollbar.min.js"></script>
 <script src="{{ asset('mazer') }}/compiled/js/app.js"></script>
 {{-- socket IO --}}
-<script src=" {{ asset('libvelixs') }}/client-dist/socket.io.js"></script>
+<script src="{{ asset('libvelixs') }}/client-dist/socket.io.js"></script>
 <script>
     let limit_attempts = {{ config('app.attemp_socket') }};
     let attempts = 0;
@@ -40,4 +38,5 @@
 </script>
 @stack('js')
 </body>
+
 </html>
