@@ -604,7 +604,7 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
                 'totalAtasan' => $totalAtasan,
                 'mengisiAtasan' => $mengisiAtasan,
                 'persenAtasan' => $persenAtasan,
-                'logoUrl' => 'assets/logo_bpkp.jpg',
+                'logoUrl' => '/storage/app/public/BPKP_Logo.png',
                 'tanggalCetak' => Carbon::now()->isoFormat('D MMMM YYYY'), // Format tanggal Indonesia
             ];
 
