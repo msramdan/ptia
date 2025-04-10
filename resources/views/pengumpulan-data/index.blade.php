@@ -35,7 +35,6 @@
                                             <th rowspan="2">{{ __('Jenis Diklat') }}</th>
                                             <th colspan="2" class="text-center">{{ __('Alumni') }}</th>
                                             <th colspan="2" class="text-center">{{ __('Atasan') }}</th>
-                                            <th rowspan="2">{{ __('Aksi') }}</th>
                                         </tr>
                                         <tr>
                                             <th class="text-center">Keterisian</th>
@@ -132,11 +131,6 @@
                 {
                     data: 'data_atasan',
                     name: 'data_atasan',
-                    className: 'text-center',
-                },
-                {
-                    data: 'action',
-                    name: 'action',
                     className: 'text-center',
                 }
             ],

@@ -108,8 +108,7 @@ class PengumpulanDataController extends Controller implements HasMiddleware
                             <span>' . e($row->user_name) . '</span>
                         </div>';
                 })
-                ->addColumn('action', 'penyebaran-kuesioner.include.action')
-                ->rawColumns(['action', 'data_alumni', 'data_atasan', 'keterisian_alumni', 'keterisian_atasan', 'user'])
+                ->rawColumns(['data_alumni', 'data_atasan', 'keterisian_alumni', 'keterisian_atasan', 'user'])
                 ->toJson();
         }
 
