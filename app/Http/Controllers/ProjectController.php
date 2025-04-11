@@ -895,9 +895,9 @@ class ProjectController extends Controller implements HasMiddleware
                 'tanggalCetak' => $tanggalCetak,
             ];
 
-            // 9. Generate PDF menggunakan view baru (misal: 'project.export-management')
+            // 9. Generate PDF menggunakan view baru (misal: 'project.export-pdf')
             // Kita akan buat view ini di langkah berikutnya
-            $pdf = Pdf::loadView('project.export-management-pdf', $data); // <-- Nama view baru!
+            $pdf = Pdf::loadView('project.export-pdf', $data); // <-- Nama view baru!
             $pdf->setPaper('a4', 'portrait');
 
             // 10. Atur nama file & kirim ke browser

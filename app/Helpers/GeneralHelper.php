@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\URL;
+use Carbon\Carbon;
 
 function is_active_submenu(string|array $route): string
 {
@@ -279,5 +280,13 @@ function sendNotifWa($notifikasi, $nomor, $remark)
         }
     } catch (Exception $e) {
         return ['status' => false, 'message' => 'Gagal mengirim pesan', 'error' => $e->getMessage()];
+    }
+}
+
+if (!function_exists('formatTanggalIndonesia')) {
+    function formatTanggalIndonesia($tanggal)
+    {
+        Carbon::setLocale('id');
+        return Carbon::parse($tanggal)->translatedFormat('d F Y');
     }
 }

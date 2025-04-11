@@ -9,7 +9,7 @@ use Illuminate\Http\{JsonResponse, RedirectResponse};
 use Illuminate\Routing\Controllers\{HasMiddleware, Middleware};
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Http;
+use App\Models\Setting;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\URL;
 use Carbon\Carbon;
@@ -510,9 +510,9 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
      * @param  int  $id The Project ID
      * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
      */
-    public function exportPdf($id)
+    public function exportPenyebaranKuesionerPdf($id)
     {
-        try {
+        // try {
             // 1. Ambil data project utama
             $project = DB::table('project')
                 ->join('users', 'project.user_id', '=', 'users.id')
@@ -608,7 +608,7 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
 
             // 7. Generate PDF
             // Nama view blade yang sudah dibuat: project.export-pdf
-            $pdf = Pdf::loadView('project.export-pdf', $data);
+            $pdf = Pdf::loadView('penyebaran-kuesioner.export-pdf', $data);
             $pdf->setPaper('a4', 'portrait'); // Atur ukuran kertas dan orientasi jika perlu
 
             // 8. Atur nama file PDF yang akan diunduh
@@ -619,10 +619,11 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
             return $pdf->stream($filename); // Gunakan stream untuk menampilkan di browser dulu
 
 
-        } catch (\Exception $e) {
-            // Handle error jika terjadi kesalahan saat generate PDF
-            Log::error('Error generating PDF for project ID ' . $id . ': ' . $e->getMessage() . "\n" . $e->getTraceAsString());
-            return redirect()->route('project.index')->with('error', 'Gagal membuat PDF: Terjadi kesalahan internal. Silakan cek log.');
-        }
+        // } catch (\Exception $e) {
+        //     dd($e->getMessage());
+        //     // Handle error jika terjadi kesalahan saat generate PDF
+        //     Log::error('Error generating PDF for project ID ' . $id . ': ' . $e->getMessage() . "\n" . $e->getTraceAsString());
+        //     return redirect()->route('penyebaran-kuesioner.index')->with('error', 'Gagal membuat PDF: Terjadi kesalahan internal. Silakan cek log.');
+        // }
     }
 }

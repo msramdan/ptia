@@ -305,7 +305,8 @@
         <b>PERSIAPAN EVALUASI PASCA PEMBELAJARAN</b><br>
         <b>{{ $project->kaldikDesc ?? 'Nama Pelatihan Belum Ada' }}</b><br>
         Kode Project: {{ $project->kaldikID ?? '-' }}
-        {{ $project->created_at ? $project->created_at->format('Y-m-d') : '' }}
+        {{ $project->created_at ? formatTanggalIndonesia($project->created_at) : '' }}
+
     </div>
 
     <div class="section-title">A. Alumni</div>

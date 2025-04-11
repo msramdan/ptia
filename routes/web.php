@@ -101,8 +101,8 @@ Route::middleware(['auth', 'web'])->group(function () {
         Route::get('/log-wa', 'getLogNotifWa')->name('penyebaran-kuesioner.log.wa');
 
         // Export-pdf
-        Route::get('/{id}/export-persiapan-pdf', 'exportPersiapanPdf')
-            ->name('penyebaran-kuesioner.export-persiapan-pdf');
+        Route::get('/{id}/export-penyebaran-kuesioner-pdf', 'exportPenyebaranKuesionerPdf')
+            ->name('penyebaran-kuesioner.export-pdf');
     });
 
     // Route khusus untuk Data Sekunder
