@@ -38,7 +38,7 @@
                                     <thead>
                                         <tr>
                                             <th rowspan="2">#</th>
-                                            <th rowspan="2">{{ __('Dibuat Oleh') }}</th>
+                                            <th rowspan="2">{{ __('Evaluator') }}</th>
                                             <th rowspan="2">{{ __('Kode Diklat') }}</th>
                                             <th rowspan="2">{{ __('Nama Diklat') }}</th>
                                             <th rowspan="2">{{ __('Jenis Diklat') }}</th>

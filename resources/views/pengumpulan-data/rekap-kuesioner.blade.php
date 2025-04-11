@@ -36,7 +36,7 @@
                                     <td>: {{ $project->kaldikDesc ?? '-' }}</td>
                                 </tr>
                                 <tr>
-                                    <td><strong>Dibuat Oleh</strong></td>
+                                    <td><strong>Evaluator</strong></td>
                                     <td>: {{ $project->user_name ?? '-' }}</td>
                                 </tr>
                                 <tr>

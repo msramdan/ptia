@@ -8,6 +8,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controllers\{HasMiddleware, Middleware};
+use App\Exports\RekapHasilEvaluasiExport;
+use Maatwebsite\Excel\Facades\Excel;
+
 
 class HasilEvaluasiController extends Controller implements HasMiddleware
 {
@@ -631,5 +634,10 @@ class HasilEvaluasiController extends Controller implements HasMiddleware
         $html .= '</table>';
 
         echo $html;
+    }
+
+    public function exportExcel()
+    {
+        return Excel::download(new RekapHasilEvaluasiExport(), 'rekap-hasil-evaluasi.xlsx');
     }
 }

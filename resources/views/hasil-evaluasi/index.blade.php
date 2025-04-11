@@ -25,12 +25,15 @@
                 <div class="col-md-12">
                     <div class="card">
                         <div class="card-body">
+                            <a href="{{ route('hasil-evaluasi.export-excel') }}" class="btn btn-success mb-4">
+                                <i class="fas fa-file-excel"></i> Export ke Excel
+                            </a>
                             <div class="table-responsive p-1">
                                 <table class="table table-striped" id="data-table" width="100%">
                                     <thead>
                                         <tr>
                                             <th rowspan="2">#</th>
-                                            <th rowspan="2">{{ __('Dibuat Oleh') }}</th>
+                                            <th rowspan="2">{{ __('Evaluator') }}</th>
                                             <th rowspan="2">{{ __('Kode Diklat') }}</th>
                                             <th rowspan="2">{{ __('Nama Diklat') }}</th>
                                             <th rowspan="2">{{ __('Jenis Diklat') }}</th>
@@ -115,4 +118,3 @@
         });
     </script>
 @endpush
-

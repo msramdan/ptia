@@ -299,7 +299,7 @@
         </tr>
     </table>
 
-    <div class="creator-info">Dokumen dibuat oleh: {{ $namaPembuat }} pada {{ $tanggalCetak }}</div>
+    <div class="creator-info">Dokumen Evaluator: {{ $namaPembuat }} pada {{ $tanggalCetak }}</div>
 
     <div class="doc-title"> {{-- Tambahkan class ini --}}
         <b>PERSIAPAN EVALUASI PASCA PEMBELAJARAN</b><br>

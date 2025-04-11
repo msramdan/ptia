@@ -39,7 +39,7 @@
                                     <thead>
                                         <tr>
                                             <th>#</th>
-                                            <th>{{ __('Dibuat Oleh') }}</th>
+                                            <th>{{ __('Evaluator') }}</th>
                                             <th>{{ __('Kode Diklat') }}</th>
                                             <th>{{ __('Nama Diklat') }}</th>
                                             <th>{{ __('Jenis Diklat') }}</th>
