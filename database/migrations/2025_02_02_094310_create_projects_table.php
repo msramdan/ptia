@@ -18,7 +18,7 @@ return new class extends Migration
             $table->bigInteger('kaldikID');
             $table->text('diklatTypeName');
             $table->text('kaldikDesc');
-            $table->foreignId('user_id')->constrained('users')->restrictOnDelete();
+            $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
             $table->enum('status', ['Persiapan', 'Pelaksanaan'])->default('Persiapan');
             $table->timestamps();
         });

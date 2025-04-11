@@ -182,14 +182,6 @@ class ProjectController extends Controller implements HasMiddleware
                 throw new \Exception("No kriteria responden data found.");
             }
 
-            DB::table('project_kriteria_responden')->insert([
-                'project_id'              => $projectId,
-                'nilai_post_test'         => $kriteriaResponden->nilai_post_test,
-                'nilai_post_test_minimal' => $kriteriaResponden->nilai_post_test_minimal,
-                'created_at'              => now(),
-                'updated_at'              => now(),
-            ]);
-
             // 3. Insert data ke tabel project_responden dari API
             $statusValues = json_decode($kriteriaResponden->nilai_post_test, true);
             $statusQuery = implode('&', array_map(fn($status) => 'status=' . urlencode($status), $statusValues));
@@ -207,33 +199,62 @@ class ProjectController extends Controller implements HasMiddleware
 
             $respondenData = $response->json();
 
-            if (!isset($respondenData['data']) || !is_array($respondenData['data'])) {
-                throw new \Exception("Format data responden dari API tidak valid.");
-            }
+            DB::table('project_kriteria_responden')->insert([
+                'project_id'                        => $projectId,
+                'nilai_post_test'                   => $kriteriaResponden->nilai_post_test,
+                'nilai_post_test_minimal'           => $kriteriaResponden->nilai_post_test_minimal,
+                'total_peserta'                     => $respondenData['total'],
+                'total_termasuk_responden'          => $respondenData['total_include'],
+                'total_tidak_termasuk_responden'    => $respondenData['total_exclude'],
+                'created_at'                        => now(),
+                'updated_at'                        => now(),
+            ]);
 
             $insertData = [];
-
-
-            foreach ($respondenData['data'] as $responden) {
-                $insertData[] = [
-                    'project_id'       => $projectId,
-                    'peserta_id'       => $responden['pesertaID'],
-                    'nama'             => $responden['pesertaNama'],
-                    'nip'              => $responden['pesertaNIP'],
-                    'telepon'          => $responden['pesertaTelepon'],
-                    'jabatan'          => trim($responden['jabatanFullName']),
-                    'unit'            => $responden['unitName'],
-                    'nilai_pre_test'   => $responden['pesertaNilaiPreTest'],
-                    'nilai_post_test'  => $responden['pesertaNilaiPostTest'],
-                    'token'            => Str::random(12),
-                    'created_at'       => now(),
-                    'updated_at'       => now(),
-                ];
+            if (isset($respondenData['data_include']) && is_array($respondenData['data_include'])) {
+                foreach ($respondenData['data_include'] as $responden) {
+                    $insertData[] = [
+                        'project_id'       => $projectId,
+                        'peserta_id'       => $responden['pesertaID'],
+                        'nama'             => $responden['pesertaNama'],
+                        'nip'              => $responden['pesertaNIP'],
+                        'telepon'          => $responden['pesertaTelepon'],
+                        'jabatan'          => trim($responden['jabatanFullName']),
+                        'unit'            => $responden['unitName'],
+                        'nilai_pre_test'   => $responden['pesertaNilaiPreTest'],
+                        'nilai_post_test'  => $responden['pesertaNilaiPostTest'],
+                        'token'            => Str::random(12),
+                        'created_at'       => now(),
+                        'updated_at'       => now(),
+                    ];
+                }
+            }
+            if (!empty($insertData)) {
+                DB::table('project_responden')->insert($insertData);
             }
 
 
-            if (!empty($insertData)) {
-                DB::table('project_responden')->insert($insertData);
+            $insertExcludeData = [];
+            if (isset($respondenData['data_exclude']) && is_array($respondenData['data_exclude'])) {
+                foreach ($respondenData['data_exclude'] as $responden) {
+                    $insertExcludeData[] = [
+                        'project_id'       => $projectId,
+                        'peserta_id'       => $responden['pesertaID'],
+                        'nama'             => $responden['pesertaNama'],
+                        'nip'              => $responden['pesertaNIP'],
+                        'telepon'          => $responden['pesertaTelepon'] ?? null,
+                        'jabatan'          => trim($responden['jabatanFullName']),
+                        'unit'             => $responden['unitName'],
+                        'nilai_pre_test'   => $responden['pesertaNilaiPreTest'] ?? null,
+                        'nilai_post_test'  => $responden['pesertaNilaiPostTest'] ?? null,
+                        'created_at'       => now(),
+                        'updated_at'       => now(),
+                    ];
+                }
+
+                if (!empty($insertExcludeData)) {
+                    DB::table('project_responden_exclude')->insert($insertExcludeData);
+                }
             }
 
             // 4. Insert data ke tabel project_pesan_wa
@@ -500,9 +521,16 @@ class ProjectController extends Controller implements HasMiddleware
     public function showResponden($id): View|JsonResponse
     {
         if (request()->ajax()) {
-            $respondens = DB::table('project_responden')
-                ->where('project_id', $id)
-                ->get();
+            $table = request()->get('table');
+            if ($table === 'exclude') {
+                $respondens = DB::table('project_responden_exclude')
+                    ->where('project_id', $id)
+                    ->get();
+            } else {
+                $respondens = DB::table('project_responden')
+                    ->where('project_id', $id)
+                    ->get();
+            }
 
             return DataTables::of($respondens)
                 ->addIndexColumn()
@@ -540,16 +568,11 @@ class ProjectController extends Controller implements HasMiddleware
 
         try {
             $nilai_post_test =  $request->nilai_post_test ?? [];
-            $updated = DB::table('project_kriteria_responden')
-                ->where('id', $id)
-                ->update([
-                    'nilai_post_test' => json_encode($nilai_post_test), // Simpan dalam format JSON
-                    'nilai_post_test_minimal' => $request->nilai_post_test_minimal,
-                    'updated_at' => now(),
-                ]);
+
 
             // Hapus data lama di `project_responden` berdasarkan `project_id`
             DB::table('project_responden')->where('project_id', $request->project_id)->delete();
+            DB::table('project_responden_exclude')->where('project_id', $request->project_id)->delete();
 
             // Hit API untuk mendapatkan data responden
             $statusQuery = implode('&', array_map(fn($status) => 'status=' . urlencode($status), $nilai_post_test));
@@ -567,33 +590,64 @@ class ProjectController extends Controller implements HasMiddleware
 
             $respondenData = $response->json();
 
-            if (!isset($respondenData['data']) || !is_array($respondenData['data'])) {
-                throw new \Exception("Format data responden dari API tidak valid.");
-            }
+            $updated = DB::table('project_kriteria_responden')
+                ->where('id', $id)
+                ->update([
+                    'nilai_post_test' => json_encode($nilai_post_test), // Simpan dalam format JSON
+                    'nilai_post_test_minimal' => $request->nilai_post_test_minimal,
+                    'total_peserta'                     => $respondenData['total'],
+                    'total_termasuk_responden'          => $respondenData['total_include'],
+                    'total_tidak_termasuk_responden'    => $respondenData['total_exclude'],
+                    'updated_at' => now(),
+                ]);
 
             $insertData = [];
-
-            foreach ($respondenData['data'] as $responden) {
-                $insertData[] = [
-                    'project_id'         => $request->project_id,
-                    'peserta_id'         => $responden['pesertaID'],
-                    'nama'               => $responden['pesertaNama'],
-                    'nip'                => $responden['pesertaNIP'],
-                    'telepon'            => $responden['pesertaTelepon'],
-                    'jabatan'            => trim($responden['jabatanFullName']),
-                    'unit'               => $responden['unitName'],
-                    'nilai_pre_test'     => $responden['pesertaNilaiPreTest'],
-                    'nilai_post_test'    => $responden['pesertaNilaiPostTest'],
-                    'token'            => Str::random(12),
-                    'created_at'         => now(),
-                    'updated_at'         => now(),
-                ];
+            if (isset($respondenData['data_include']) && is_array($respondenData['data_include'])) {
+                foreach ($respondenData['data_include'] as $responden) {
+                    $insertData[] = [
+                        'project_id'         => $request->project_id,
+                        'peserta_id'         => $responden['pesertaID'],
+                        'nama'               => $responden['pesertaNama'],
+                        'nip'                => $responden['pesertaNIP'],
+                        'telepon'            => $responden['pesertaTelepon'],
+                        'jabatan'            => trim($responden['jabatanFullName']),
+                        'unit'               => $responden['unitName'],
+                        'nilai_pre_test'     => $responden['pesertaNilaiPreTest'],
+                        'nilai_post_test'    => $responden['pesertaNilaiPostTest'],
+                        'token'            => Str::random(12),
+                        'created_at'         => now(),
+                        'updated_at'         => now(),
+                    ];
+                }
             }
 
-            // Insert batch untuk efisiensi
             if (!empty($insertData)) {
                 DB::table('project_responden')->insert($insertData);
             }
+
+            $insertExcludeData = [];
+            if (isset($respondenData['data_exclude']) && is_array($respondenData['data_exclude'])) {
+                foreach ($respondenData['data_exclude'] as $responden) {
+                    $insertExcludeData[] = [
+                        'project_id'       => $request->project_id,
+                        'peserta_id'       => $responden['pesertaID'],
+                        'nama'             => $responden['pesertaNama'],
+                        'nip'              => $responden['pesertaNIP'],
+                        'telepon'          => $responden['pesertaTelepon'] ?? null,
+                        'jabatan'          => trim($responden['jabatanFullName']),
+                        'unit'             => $responden['unitName'],
+                        'nilai_pre_test'   => $responden['pesertaNilaiPreTest'] ?? null,
+                        'nilai_post_test'  => $responden['pesertaNilaiPostTest'] ?? null,
+                        'created_at'       => now(),
+                        'updated_at'       => now(),
+                    ];
+                }
+
+                if (!empty($insertExcludeData)) {
+                    DB::table('project_responden_exclude')->insert($insertExcludeData);
+                }
+            }
+
 
             DB::commit();
 
@@ -751,12 +805,6 @@ class ProjectController extends Controller implements HasMiddleware
         }
     }
 
-    /**
-     * Export project details to PDF based on Management-Project.pdf structure.
-     *
-     * @param  int  $id The Project ID
-     * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
-     */
     public function exportPdf($id)
     {
         try {

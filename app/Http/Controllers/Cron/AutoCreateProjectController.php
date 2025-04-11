@@ -90,13 +90,7 @@ class AutoCreateProjectController extends Controller
                     throw new \Exception("❌ Tidak ada data kriteria responden.");
                 }
 
-                DB::table('project_kriteria_responden')->insert([
-                    'project_id'              => $projectId,
-                    'nilai_post_test'         => $kriteriaResponden->nilai_post_test,
-                    'nilai_post_test_minimal' => $kriteriaResponden->nilai_post_test_minimal,
-                    'created_at'              => now(),
-                    'updated_at'              => now(),
-                ]);
+
 
                 // Ambil data responden dari API
                 $statusValues = json_decode($kriteriaResponden->nilai_post_test, true);
@@ -113,29 +107,72 @@ class AutoCreateProjectController extends Controller
                     throw new \Exception("⚠️ Gagal mengambil data responden dari API.");
                 }
 
-                $respondenData = $response->json()['data'] ?? [];
-                if (!is_array($respondenData)) {
+                $respondenData = $response->json();
+
+                // Validasi struktur data
+                if (
+                    !isset($respondenData['data_include'], $respondenData['data_exclude']) ||
+                    !is_array($respondenData['data_include']) ||
+                    !is_array($respondenData['data_exclude'])
+                ) {
                     throw new \Exception("⚠️ Format data responden dari API tidak valid.");
                 }
 
-                $insertData = collect($respondenData)->map(fn($responden) => [
-                    'project_id'       => $projectId,
-                    'peserta_id'       => $responden['pesertaID'],
-                    'nama'             => $responden['pesertaNama'],
-                    'nip'              => $responden['pesertaNIP'],
-                    'telepon'          => $responden['pesertaTelepon'],
-                    'jabatan'          => trim($responden['jabatanFullName']),
-                    'unit'             => $responden['unitName'],
-                    'nilai_pre_test'   => $responden['pesertaNilaiPreTest'],
-                    'nilai_post_test'  => $responden['pesertaNilaiPostTest'],
-                    'token'            => Str::random(12),
-                    'created_at'       => now(),
-                    'updated_at'       => now(),
-                ])->toArray();
+                // Simpan ke project_kriteria_responden
+                DB::table('project_kriteria_responden')->insert([
+                    'project_id'                    => $projectId,
+                    'nilai_post_test'              => $kriteriaResponden->nilai_post_test,
+                    'nilai_post_test_minimal'      => $kriteriaResponden->nilai_post_test_minimal,
+                    'total_peserta'                => $respondenData['total'] ?? 0,
+                    'total_termasuk_responden'     => $respondenData['total_include'] ?? 0,
+                    'total_tidak_termasuk_responden' => $respondenData['total_exclude'] ?? 0,
+                    'created_at'                   => now(),
+                    'updated_at'                   => now(),
+                ]);
 
-                if (!empty($insertData)) {
-                    DB::table('project_responden')->insert($insertData);
+                // Data responden termasuk (INCLUDE)
+                $includeData = collect($respondenData['data_include'])->map(function ($responden) use ($projectId) {
+                    return [
+                        'project_id'       => $projectId,
+                        'peserta_id'       => $responden['pesertaID'],
+                        'nama'             => $responden['pesertaNama'],
+                        'nip'              => $responden['pesertaNIP'],
+                        'telepon'          => $responden['pesertaTelepon'],
+                        'jabatan'          => trim($responden['jabatanFullName']),
+                        'unit'             => $responden['unitName'],
+                        'nilai_pre_test'   => $responden['pesertaNilaiPreTest'],
+                        'nilai_post_test'  => $responden['pesertaNilaiPostTest'],
+                        'token'            => Str::random(12),
+                        'created_at'       => now(),
+                        'updated_at'       => now(),
+                    ];
+                })->toArray();
+
+                if (!empty($includeData)) {
+                    DB::table('project_responden')->insert($includeData);
                 }
+
+                // Data responden TIDAK termasuk (EXCLUDE)
+                $excludeData = collect($respondenData['data_exclude'])->map(function ($responden) use ($projectId) {
+                    return [
+                        'project_id'       => $projectId,
+                        'peserta_id'       => $responden['pesertaID'],
+                        'nama'             => $responden['pesertaNama'],
+                        'nip'              => $responden['pesertaNIP'],
+                        'telepon'          => $responden['pesertaTelepon'] ?? null,
+                        'jabatan'          => trim($responden['jabatanFullName']),
+                        'unit'             => $responden['unitName'],
+                        'nilai_pre_test'   => $responden['pesertaNilaiPreTest'] ?? null,
+                        'nilai_post_test'  => $responden['pesertaNilaiPostTest'] ?? null,
+                        'created_at'       => now(),
+                        'updated_at'       => now(),
+                    ];
+                })->toArray();
+
+                if (!empty($excludeData)) {
+                    DB::table('project_responden_exclude')->insert($excludeData);
+                }
+
 
                 // Insert ke project_pesan_wa
                 $pesanWa = DB::table('pesan_wa')->first();

@@ -101,7 +101,8 @@
                                         <div>
                                             <p class="mb-0 text-secondary"> <b>Total Peserta</b></p>
                                             <h4 class="my-1 text-primary">
-                                                <a href="/hotspotactives" class=""> 60 Data </a>
+                                                <a href="/hotspotactives" class="">
+                                                    {{ $kriteriaResponden->total_peserta }} Data </a>
                                             </h4>
 
                                         </div>
@@ -119,7 +120,7 @@
                                         <div>
                                             <p class="mb-0 text-secondary"><b>Termasuk Responden</b></p>
                                             <h4 class="my-1 text-primary"><a href="/active-ppps" class="">
-                                                    40 Data </a>
+                                                    {{ $kriteriaResponden->total_termasuk_responden }} Data </a>
                                             </h4>
 
                                         </div>
@@ -137,7 +138,7 @@
                                         <div>
                                             <p class="mb-0 text-secondary"><b>Tidak Termasuk Responden</b></p>
                                             <h4 class="my-1 text-primary"><a href="/non-active-ppps" class="">
-                                                    20 Data </a>
+                                                    {{ $kriteriaResponden->total_tidak_termasuk_responden }} Data </a>
                                             </h4>
 
                                         </div>
@@ -250,6 +251,53 @@
                 ajax: {
                     url: "{{ route('project.responden.show', ':id') }}".replace(':id', projectId),
                     data: function(d) {}
+                },
+                columns: [{
+                        data: 'DT_RowIndex',
+                        name: 'DT_RowIndex',
+                        orderable: false,
+                        searchable: false,
+                    },
+                    {
+                        data: 'nama',
+                        name: 'nama',
+                    },
+                    {
+                        data: 'nip',
+                        name: 'nip',
+                    },
+                    {
+                        data: 'telepon',
+                        name: 'telepon',
+                    },
+                    {
+                        data: 'jabatan',
+                        name: 'jabatan',
+                    },
+                    {
+                        data: 'unit',
+                        name: 'unit',
+                    },
+                    {
+                        data: 'nilai_pre_test',
+                        name: 'nilai_pre_test',
+                    },
+                    {
+                        data: 'nilai_post_test',
+                        name: 'nilai_post_test',
+                    },
+                ],
+            });
+
+            // Tabel Tidak Termasuk Responden
+            $('#data-table3').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url: "{{ route('project.responden.show', ':id') }}".replace(':id', projectId),
+                    data: function(d) {
+                        d.table = 'exclude'; // Parameter untuk membedakan tabel
+                    }
                 },
                 columns: [{
                         data: 'DT_RowIndex',

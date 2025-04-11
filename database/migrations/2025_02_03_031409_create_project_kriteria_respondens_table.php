@@ -16,6 +16,9 @@ return new class extends Migration
             $table->foreignId('project_id')->constrained('project')->restrictOnUpdate()->cascadeOnDelete();
 			$table->json('nilai_post_test');
 			$table->double('nilai_post_test_minimal');
+            $table->integer('total_peserta');
+            $table->integer('total_termasuk_responden');
+            $table->integer('total_tidak_termasuk_responden');
             $table->timestamps();
         });
     }
