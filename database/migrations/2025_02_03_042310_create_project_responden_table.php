@@ -32,6 +32,10 @@ return new class extends Migration {
             $table->timestamp('last_send_atasan_at')->nullable();
             $table->date('deadline_pengisian_atasan')->nullable(); // Hanya tanggal, tanpa jam
             $table->string('token', 12);
+            $table->text('hasil_intervie_alumni')->nullable();
+            $table->string('evidence_intervie_alumni', 255)->nullable();
+            $table->text('hasil_intervie_atasan')->nullable();
+            $table->string('evidence_intervie_atasan', 255)->nullable();
             $table->timestamps();
         });
     }
