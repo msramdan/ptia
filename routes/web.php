@@ -148,5 +148,7 @@ Route::middleware(['auth', 'web'])->group(function () {
         Route::put('/bobot/update', 'updateBobot')->name('project.bobot.update');
         // Update Status
         Route::put('/update-status/{id}', 'updateStatus')->name('project.updateStatus');
+        // Export PDF
+        Route::get('/{id}/export-pdf', 'exportPdf')->name('project.exportPdf');
     });
 });

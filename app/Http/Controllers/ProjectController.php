@@ -10,6 +10,10 @@ use Illuminate\Routing\Controllers\{HasMiddleware, Middleware};
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Http;
+use App\Models\Setting;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class ProjectController extends Controller implements HasMiddleware
 {
@@ -744,6 +748,165 @@ class ProjectController extends Controller implements HasMiddleware
             \Log::error('Gagal mengupdate status proyek: ' . $e->getMessage());
 
             return to_route('project.index')->with('error', __('Terjadi kesalahan: ') . $e->getMessage());
+        }
+    }
+
+    /**
+     * Export project details to PDF based on Management-Project.pdf structure.
+     *
+     * @param  int  $id The Project ID
+     * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
+     */
+    public function exportPdf($id)
+    {
+        try {
+            // 1. Ambil data project utama
+            $project = DB::table('project')
+                ->join('users', 'project.user_id', '=', 'users.id')
+                ->join('diklat_type', 'project.diklat_type_id', '=', 'diklat_type.id')
+                ->select(
+                    'project.*',
+                    'users.name as user_name',
+                    'diklat_type.nama_diklat_type'
+                )
+                ->where('project.id', $id)
+                ->first();
+
+            if (!$project) {
+                Log::warning('Gagal generate PDF: Project tidak ditemukan - ID ' . $id);
+                return redirect()->route('project.index')->with('error', 'Project tidak ditemukan.');
+            }
+
+            // Parse tanggal created_at jika ada
+            $projectCreatedAt = $project->created_at ? Carbon::parse($project->created_at)->format('Y-m-d') : 'N/A';
+
+
+            // 2. Ambil Data Kriteria Responden (Section A)
+            $kriteriaResponden = DB::table('project_kriteria_responden')
+                ->where('project_id', $id)
+                ->first();
+            // Decode JSON kriteria nilai post test
+            $kriteriaNilaiPostTest = [];
+            if ($kriteriaResponden && is_string($kriteriaResponden->nilai_post_test)) {
+                $decoded = json_decode($kriteriaResponden->nilai_post_test, true);
+                if (is_array($decoded)) {
+                    $kriteriaNilaiPostTest = $decoded;
+                }
+            }
+            // !!! NOTE: Asumsi ada kolom 'nilai_pre_test_minimal' di tabel project_kriteria_responden
+            //     Jika tidak ada, variabel ini akan null.
+
+            // 4. Ambil Data Daftar Responden Alumni (Section C)
+            $daftarResponden = DB::table('project_responden')
+                ->where('project_id', $id)
+                ->select('nip', 'nama', 'jabatan', 'telepon', 'unit', /* 'pangkat' -> tidak ada di tabel? */)
+                ->orderBy('nama') // Urutkan berdasarkan nama
+                ->get();
+
+            // 5. Ambil Data Kuesioner (Section D)
+            $kuesionerAlumni = DB::table('project_kuesioner')
+                ->join('aspek', 'project_kuesioner.aspek_id', '=', 'aspek.id')
+                ->select(
+                    'project_kuesioner.pertanyaan',
+                    'aspek.aspek as aspek_nama',
+                    'aspek.kriteria',
+                    DB::raw("CONCAT('KU', DATE_FORMAT(project_kuesioner.created_at, '%m%d%H%i%s')) as kode_kuesioner") // Contoh Kode Kuesioner
+                )
+                ->where('project_kuesioner.project_id', $id)
+                ->where('project_kuesioner.remark', 'Alumni')
+                ->orderBy('project_kuesioner.id')
+                ->get();
+
+            $kuesionerAtasan = DB::table('project_kuesioner')
+                ->join('aspek', 'project_kuesioner.aspek_id', '=', 'aspek.id')
+                ->select(
+                    'project_kuesioner.pertanyaan',
+                    'aspek.aspek as aspek_nama',
+                    'aspek.kriteria',
+                    DB::raw("CONCAT('KU', DATE_FORMAT(project_kuesioner.created_at, '%m%d%H%i%s')) as kode_kuesioner") // Contoh Kode Kuesioner
+                )
+                ->where('project_kuesioner.project_id', $id)
+                ->where('project_kuesioner.remark', 'Atasan')
+                ->orderBy('project_kuesioner.id')
+                ->get();
+
+            // 6. Ambil Data Bobot (Section E)
+            $bobotAspek = DB::table('project_bobot_aspek')
+                ->where('project_id', $id)
+                ->orderBy('level')
+                ->orderBy('id') // Urutkan berdasarkan level dan id
+                ->get();
+            $bobotLevel3 = $bobotAspek->where('level', 3);
+            $bobotLevel4 = $bobotAspek->where('level', 4);
+
+            $bobotSekunder = DB::table('project_bobot_aspek_sekunder')
+                ->where('project_id', $id)
+                ->first();
+
+            // 7. Data Tambahan (Logo, Tanggal Cetak)
+            $setting = Setting::first();
+            $logoPath = null; // Default null
+            $logoUrl = null;  // Default null
+
+            // Coba ambil logo dari setting database
+            if ($setting && $setting->logo_instansi) {
+                $dbLogoPath = public_path('storage/uploads/logos/' . $setting->logo_instansi); // Sesuaikan path storage Anda
+                if (file_exists($dbLogoPath)) {
+                    $logoPath = $dbLogoPath; // Gunakan logo dari DB jika ada dan file-nya eksis
+                }
+            }
+
+            // Jika logo dari DB tidak ditemukan/tidak valid, coba fallback ke logo statis
+            if (!$logoPath) {
+                $staticLogoPath = public_path('assets/BPKP_Logo.png'); // Path logo statis di public/assets
+                if (file_exists($staticLogoPath)) {
+                    $logoPath = $staticLogoPath; // Gunakan logo statis jika ada
+                } else {
+                    Log::warning('Logo dinamis maupun statis (public/assets/BPKP_Logo.png) tidak ditemukan.');
+                }
+            }
+
+            // Encode logo ke base64 jika path valid
+            if ($logoPath) {
+                try {
+                    $logoUrl = 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath));
+                } catch (\Exception $e) {
+                    Log::error('Gagal membaca file logo: ' . $logoPath . ' - Error: ' . $e->getMessage());
+                    $logoUrl = null; // Set null jika gagal baca file
+                }
+            }
+
+            $tanggalCetak = Carbon::now()->translatedFormat('d F Y H:i');
+
+
+            // 8. Siapkan data untuk view
+            $data = [
+                'project' => $project,
+                'projectCreatedAt' => $projectCreatedAt,
+                'kriteriaResponden' => $kriteriaResponden,
+                'kriteriaNilaiPostTest' => $kriteriaNilaiPostTest,
+                'daftarResponden' => $daftarResponden, // Data Section C
+                'kuesionerAlumni' => $kuesionerAlumni, // Data Section D.a
+                'kuesionerAtasan' => $kuesionerAtasan, // Data Section D.b
+                'bobotLevel3' => $bobotLevel3,         // Data Section E (Level 3)
+                'bobotLevel4' => $bobotLevel4,         // Data Section E (Level 4)
+                'bobotSekunder' => $bobotSekunder,     // Data Section E (Sekunder)
+                'logoUrl' => $logoUrl,
+                'tanggalCetak' => $tanggalCetak,
+            ];
+
+            // 9. Generate PDF menggunakan view baru (misal: 'project.export-management')
+            // Kita akan buat view ini di langkah berikutnya
+            $pdf = Pdf::loadView('project.export-management-pdf', $data); // <-- Nama view baru!
+            $pdf->setPaper('a4', 'portrait');
+
+            // 10. Atur nama file & kirim ke browser
+            $filename = 'Penyebaran-Kuesioner-' . Str::slug($project->kaldikDesc ?? 'project') . '-' . $project->kaldikID . '.pdf';
+            return $pdf->stream($filename); // Tampilkan di browser
+
+        } catch (\Exception $e) {
+            Log::error('Error generating PDF Management Project ID ' . $id . ': ' . $e->getMessage() . "\n" . $e->getTraceAsString());
+            return redirect()->route('project.index')->with('error', 'Gagal membuat PDF: Terjadi kesalahan internal. Silakan cek log.');
         }
     }
 }
