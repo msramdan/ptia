@@ -93,8 +93,66 @@
 
                         </div>
                     </div>
+                    <section class="row">
+                        <div class="col-xl-4 col-sm-6 box-col-3">
+                            <div class="card radius-10 border-start border-0 border-3 border-primary">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center">
+                                        <div>
+                                            <p class="mb-0 text-secondary"> <b>Total Peserta</b></p>
+                                            <h4 class="my-1 text-primary">
+                                                <a href="/hotspotactives" class=""> 60 Data </a>
+                                            </h4>
+
+                                        </div>
+                                        <div class="widgets-icons-2 rounded-circle bg-gradient-scooter text-white ms-auto">
+                                            <i class="fa fa-wifi"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-4 col-sm-6 box-col-3">
+                            <div class="card radius-10 border-start border-0 border-3 border-primary">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center">
+                                        <div>
+                                            <p class="mb-0 text-secondary"><b>Termasuk Responden</b></p>
+                                            <h4 class="my-1 text-primary"><a href="/active-ppps" class="">
+                                                    40 Data </a>
+                                            </h4>
+
+                                        </div>
+                                        <div class="widgets-icons-2 rounded-circle bg-gradient-scooter text-white ms-auto">
+                                            <i class="fa fa-check"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-4 col-sm-6 box-col-3">
+                            <div class="card radius-10 border-start border-0 border-3 border-primary">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center">
+                                        <div>
+                                            <p class="mb-0 text-secondary"><b>Tidak Termasuk Responden</b></p>
+                                            <h4 class="my-1 text-primary"><a href="/non-active-ppps" class="">
+                                                    20 Data </a>
+                                            </h4>
+
+                                        </div>
+                                        <div class="widgets-icons-2 rounded-circle bg-gradient-scooter text-white ms-auto">
+                                            <i class="fa fa-times"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
                     <div class="card">
                         <div class="card-body">
+
                             <h5>Daftar Responden</h5>
                             <div class="table-responsive p-1">
                                 <table class="table table-striped" id="data-table" width="100%">
@@ -114,7 +172,31 @@
                                     </tbody>
                                 </table>
                             </div>
-
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5>Daftar Tidak Termasuk Responden</h5>
+                            <div class="table-responsive p-1">
+                                <table class="table table-striped" id="data-table3" width="100%">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>{{ __('Nama peserta') }}</th>
+                                            <th>{{ __('NIP') }}</th>
+                                            <th>{{ __('No.Telepon') }}</th>
+                                            <th>{{ __('Jabatan') }}</th>
+                                            <th>{{ __('Unit') }}</th>
+                                            <th>{{ __('Nilai Pre Test') }}</th>
+                                            <th>{{ __('Nilai Post Post') }}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>

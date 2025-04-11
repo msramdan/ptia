@@ -2,11 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\PembuatanProject;
-use App\Http\Requests\PembuatanProjects\{StorePembuatanProjectRequest, UpdatePembuatanProjectRequest};
 use Illuminate\Contracts\View\View;
-use Yajra\DataTables\Facades\DataTables;
-use Illuminate\Http\{JsonResponse, RedirectResponse};
+use Illuminate\Http\{JsonResponse};
 use Illuminate\Routing\Controllers\{HasMiddleware, Middleware};
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -120,12 +117,6 @@ class PembuatanProjectController extends Controller implements HasMiddleware
         ], $response->status());
     }
 
-    /**
-     * Export project details to PDF.
-     *
-     * @param  int  $id The Project ID
-     * @return \Illuminate\Http\Response
-     */
     public function exportPdf($id) // 3. Definisikan method exportPdf
     {
         try {
