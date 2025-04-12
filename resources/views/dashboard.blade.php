@@ -128,11 +128,6 @@
         }
     </style>
     <style>
-        /* Year Filter Styles */
-        .year-filter-container {
-            max-width: 500px;
-        }
-
         .filter-icon {
             font-size: 1.25rem;
             color: #e74c3c;
@@ -216,7 +211,20 @@
                 margin-top: 0.5rem;
             }
         }
+
+        .card-body i {
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover i {
+            transform: scale(1.2);
+        }
+
+        .card-text {
+            font-size: 1.1rem;
+        }
     </style>
+
     <div class="page-heading">
         <div class="heading-with-logo">
             <img src="{{ asset('assets/BPKP_Logo.png') }}" alt="BPKP Logo" class="header-logo" style="width: 140px">
@@ -260,33 +268,72 @@
                     </div>
                 </div>
 
-                <!-- Year Filter Section -->
-                <div class="year-filter-container mb-4">
-                    <div class="card">
-                        <div class="card-body py-2">
-                            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
-                                <div class="d-flex align-items-center">
-                                    <i class="fas fa-calendar-alt filter-icon me-2"></i>
-                                    <h5 class="filter-title mb-0">Filter Tahun</h5>
-                                    <div class="year-selector ms-3">
-                                        <select class="form-select year-select" aria-label="Pilih Tahun">
-                                            <option value="2025" selected>2025</option>
-                                            <option value="2026">2026</option>
-                                            <option value="2027">2027</option>
-                                        </select>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="card text-center">
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                                            <div class="d-flex align-items-center">
+                                                <i class="fas fa-calendar-alt filter-icon me-2"></i>
+                                                <h5 class="filter-title mb-0">Filter Tahun</h5>
+                                                <div class="year-selector ms-3">
+                                                    <select class="form-select year-select" aria-label="Pilih Tahun">
+                                                        <option value="2025" selected>2025</option>
+                                                        <option value="2026">2026</option>
+                                                        <option value="2027">2027</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <button class="btn btn-pdf-report">
+                                                <i class="fas fa-file-pdf me-1"></i> General Report
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
+                            </div>
 
-                                <button class="btn btn-pdf-report">
-                                    <i class="fas fa-file-pdf me-2"></i> General Report
-                                </button>
+                            <div class="col-6">
+                                <div class="card text-center shadow-sm border-0">
+                                    <div class="card-body">
+                                        <i class="fas fa-folder-open fa-2x text-primary mb-2"></i>
+                                        <h6 class="card-title">Total Project</h6>
+                                        <p class="card-text fw-bold">12</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="card text-center shadow-sm border-0">
+                                    <div class="card-body">
+                                        <i class="fas fa-users fa-2x text-success mb-2"></i>
+                                        <h6 class="card-title">Total Responden</h6>
+                                        <p class="card-text fw-bold">850</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="card text-center shadow-sm border-0">
+                                    <div class="card-body">
+                                        <i class="fas fa-user-graduate fa-2x text-warning mb-2"></i>
+                                        <h6 class="card-title">Keterisian Alumni</h6>
+                                        <p class="card-text fw-bold">78%</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="card text-center shadow-sm border-0">
+                                    <div class="card-body">
+                                        <i class="fas fa-user-tie fa-2x text-danger mb-2"></i>
+                                        <h6 class="card-title">Keterisian Atasan</h6>
+                                        <p class="card-text fw-bold">64%</p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-
-                <div class="row">
                     <div class="col-md-4">
                         <div class="card text-center">
                             <div class="card-body">
@@ -306,7 +353,6 @@
                         </div>
                     </div>
 
-                    <!-- New Gauge for Level 4 -->
                     <div class="col-md-4">
                         <div class="card text-center">
                             <div class="card-body">
@@ -326,6 +372,7 @@
                         </div>
                     </div>
                 </div>
+
             </div>
         </section>
     </div>
