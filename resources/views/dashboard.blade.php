@@ -267,12 +267,11 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="row">
                     <div class="col-md-4">
                         <div class="row">
                             <div class="col-12">
-                                <div class="card text-center">
+                                <div class="card">
                                     <div class="card-body">
                                         <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
                                             <div class="d-flex align-items-center">
@@ -336,7 +335,7 @@
 
                     <div class="col-md-4">
                         <div class="card text-center">
-                            <div class="card-body">
+                            <div class="card-body" style="min-height: 300px; max-height: 440px; overflow-y: hidden;">
                                 <div class="gauge-container">
                                     <div class="gauge-header">
                                         <div class="gauge-title">Skor Dampak Level 3</div>
@@ -355,7 +354,7 @@
 
                     <div class="col-md-4">
                         <div class="card text-center">
-                            <div class="card-body">
+                            <div class="card-body" style="min-height: 300px; max-height: 440px; overflow-y: hidden;">
                                 <div class="gauge-container">
                                     <div class="gauge-header">
                                         <div class="gauge-title">Skor Dampak Level 4</div>
