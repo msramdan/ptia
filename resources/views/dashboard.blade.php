@@ -127,6 +127,96 @@
             }
         }
     </style>
+    <style>
+        /* Year Filter Styles */
+        .year-filter-container {
+            max-width: 500px;
+        }
+
+        .filter-icon {
+            font-size: 1.25rem;
+            color: #e74c3c;
+        }
+
+        .filter-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .year-selector {
+            width: 120px;
+        }
+
+        .year-select {
+            background-color: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .year-select:focus {
+            border-color: #e74c3c;
+            box-shadow: 0 0 0 0.25rem rgba(231, 76, 60, 0.25);
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .year-filter-container {
+                max-width: 100%;
+            }
+
+            .year-selector {
+                width: 100px;
+            }
+        }
+
+        .btn-pdf-report {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            white-space: nowrap;
+        }
+
+        .btn-pdf-report:hover {
+            background-color: #c0392b;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-pdf-report:active {
+            transform: translateY(0);
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .year-filter-container .card-body {
+                padding: 0.75rem;
+            }
+
+            .year-selector {
+                min-width: 100px;
+            }
+
+            .btn-pdf-report {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.85rem;
+                width: 100%;
+                justify-content: center;
+                margin-top: 0.5rem;
+            }
+        }
+    </style>
     <div class="page-heading">
         <div class="heading-with-logo">
             <img src="{{ asset('assets/BPKP_Logo.png') }}" alt="BPKP Logo" class="header-logo" style="width: 140px">
@@ -137,8 +227,6 @@
         </div>
     </div>
 
-
-
     <div class="page-content">
         <section class="row">
             <div class="col-md-12">
@@ -148,6 +236,7 @@
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 @endif
+
                 <!-- Modal Pengumuman -->
                 <div class="modal fade" id="announcementModal" tabindex="-1" aria-labelledby="announcementModalLabel"
                     aria-hidden="true" data-bs-backdrop="static">
@@ -170,6 +259,32 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Year Filter Section -->
+                <div class="year-filter-container mb-4">
+                    <div class="card">
+                        <div class="card-body py-2">
+                            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-calendar-alt filter-icon me-2"></i>
+                                    <h5 class="filter-title mb-0">Filter Tahun</h5>
+                                    <div class="year-selector ms-3">
+                                        <select class="form-select year-select" aria-label="Pilih Tahun">
+                                            <option value="2025" selected>2025</option>
+                                            <option value="2026">2026</option>
+                                            <option value="2027">2027</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <button class="btn btn-pdf-report">
+                                    <i class="fas fa-file-pdf me-2"></i> General Report
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
 
                 <div class="row">
                     <div class="col-md-4">
