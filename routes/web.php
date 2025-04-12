@@ -15,6 +15,7 @@ use App\Http\Controllers\{
     IndikatorPersepsiController,
     PesanWaController,
     BobotAspekController,
+    DashboardController,
     KriteriaRespondenController,
     WaBlastController,
     SingleSenderController,
@@ -46,8 +47,10 @@ Route::get('/responden-kuesioner/{id}/{target}', [RespondenKuesionerController::
 Route::post('/responden-kuesioner', [RespondenKuesionerController::class, 'store'])->name('responden-kuesioner.store');
 
 Route::middleware(['auth', 'web'])->group(function () {
-    Route::get('/', fn() => view('dashboard'));
-    Route::get('/dashboard', fn() => view('dashboard'));
+    Route::get('/dashboard', function () {
+        return redirect()->route('dashboard');
+    });
+    Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/profile', ProfileController::class)->name('profile');
 
     Route::resources([
