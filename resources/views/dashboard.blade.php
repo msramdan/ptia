@@ -3,9 +3,141 @@
 @section('title', __('Dashboard'))
 
 @section('content')
+    <style>
+        .heading-with-logo {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            padding: 1rem 0;
+        }
+
+        .header-logo {
+            height: 4.375rem;
+            width: auto;
+            object-fit: contain;
+            filter: drop-shadow(0 0.125rem 0.25rem rgba(0, 0, 0, 0.1));
+        }
+
+        .heading-text {
+            border-left: 0.125rem solid #e74c3c;
+            padding-left: 1.25rem;
+        }
+
+        .page-heading h5 {
+            margin: 0;
+            color: #2c3e50;
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: 0.03125rem;
+        }
+
+        .page-heading p {
+            margin: 0.3125rem 0 0;
+            color: #7f8c8d;
+            font-size: 0.9375rem;
+            font-weight: 500;
+        }
+
+        .gauge-container {
+            position: relative;
+            width: 100%;
+            margin-bottom: 1.5rem;
+        }
+
+        .gauge-header {
+            margin-bottom: 1.25rem;
+        }
+
+        .gauge-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 0.3125rem;
+            text-align: center;
+        }
+
+        .gauge-value-display {
+            position: absolute;
+            bottom: 30%;
+            left: 0;
+            right: 0;
+            text-align: center;
+            z-index: 10;
+        }
+
+        .gauge-current-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 0.125rem;
+            text-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.1);
+            line-height: 1.2;
+        }
+
+        .gauge-value-label {
+            font-size: 0.875rem;
+            /* 14px */
+            color: #7f8c8d;
+            font-weight: 500;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .gauge-current-value.updated {
+            animation: pulse 0.5s ease-in-out;
+        }
+
+        @media (max-width: 48rem) {
+            .heading-with-logo {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.9375rem;
+            }
+
+            .header-logo {
+                height: 3.75rem;
+            }
+
+            .heading-text {
+                border-left: none;
+                padding-left: 0;
+                border-top: 0.125rem solid #e74c3c;
+                padding-top: 0.9375rem;
+                width: 100%;
+            }
+
+            .gauge-title {
+                font-size: 1rem;
+            }
+
+            .gauge-current-value {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
     <div class="page-heading">
-        <h3>Dashboard</h3>
+        <div class="heading-with-logo">
+            <img src="{{ asset('assets/BPKP_Logo.png') }}" alt="BPKP Logo" class="header-logo" style="width: 140px">
+            <div class="heading-text">
+                <h6>Badan Pengawasan Keuangan dan Pembangunan</h6>
+                <p>PUSDIKLATWAS BPKP - Post Training Impact Assesment</p>
+            </div>
+        </div>
     </div>
+
+
 
     <div class="page-content">
         <section class="row">
@@ -16,7 +148,6 @@
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 @endif
-
                 <!-- Modal Pengumuman -->
                 <div class="modal fade" id="announcementModal" tabindex="-1" aria-labelledby="announcementModalLabel"
                     aria-hidden="true" data-bs-backdrop="static">
@@ -40,10 +171,44 @@
                     </div>
                 </div>
 
-                <div class="card">
-                    <div class="card-body">
-                        <h4>Hi 👋, {{ auth()->user()->name }}</h4>
-                        <p>{{ __('You are logged in!') }}</p>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <div class="gauge-container">
+                                    <div class="gauge-header">
+                                        <div class="gauge-title">Skor Dampak Level 3</div>
+                                    </div>
+                                    <figure class="highcharts-figure">
+                                        <div id="container"></div>
+                                        <div class="gauge-value-display">
+                                            <div class="gauge-current-value" id="current-value">75%</div>
+                                            <div class="gauge-value-label">Skor Saat Ini</div>
+                                        </div>
+                                    </figure>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- New Gauge for Level 4 -->
+                    <div class="col-md-4">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <div class="gauge-container">
+                                    <div class="gauge-header">
+                                        <div class="gauge-title">Skor Dampak Level 4</div>
+                                    </div>
+                                    <figure class="highcharts-figure">
+                                        <div id="container-level4"></div>
+                                        <div class="gauge-value-display">
+                                            <div class="gauge-current-value" id="current-value-level4">65%</div>
+                                            <div class="gauge-value-label">Skor Saat Ini</div>
+                                        </div>
+                                    </figure>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -61,6 +226,231 @@
                     session()->forget('show_pengumuman');
                 @endphp
             @endif
+        });
+    </script>
+
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/highcharts-more.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/modules/export-data.js"></script>
+    <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Gauge untuk Level 3
+            const chartLevel3 = Highcharts.chart('container', {
+                chart: {
+                    type: 'gauge',
+                    plotBackgroundColor: null,
+                    plotBackgroundImage: null,
+                    plotBorderWidth: 0,
+                    plotShadow: false,
+                    height: '80%',
+                    backgroundColor: 'transparent'
+                },
+                exporting: {
+                    enabled: false
+                },
+                title: {
+                    text: null
+                },
+                credits: {
+                    enabled: false
+                },
+                pane: {
+                    startAngle: -90,
+                    endAngle: 89.9,
+                    background: null,
+                    center: ['50%', '75%'],
+                    size: '110%',
+                    borderWidth: 0
+                },
+                yAxis: {
+                    min: 0,
+                    max: 100,
+                    tickPixelInterval: 72,
+                    tickPosition: 'inside',
+                    tickColor: '#f8f9fa',
+                    tickLength: 15,
+                    tickWidth: 2,
+                    minorTickInterval: null,
+                    labels: {
+                        distance: 25,
+                        style: {
+                            fontSize: '12px',
+                            color: '#95a5a6'
+                        }
+                    },
+                    lineWidth: 0,
+                    plotBands: [{
+                            from: 0,
+                            to: 25,
+                            color: '#e74c3c',
+                            thickness: 20,
+                            borderRadius: 5
+                        },
+                        {
+                            from: 25,
+                            to: 50,
+                            color: '#f39c12',
+                            thickness: 20,
+                            borderRadius: 5
+                        },
+                        {
+                            from: 50,
+                            to: 75,
+                            color: '#3498db',
+                            thickness: 20,
+                            borderRadius: 5
+                        },
+                        {
+                            from: 75,
+                            to: 100,
+                            color: '#2ecc71',
+                            thickness: 20,
+                            borderRadius: 5
+                        }
+                    ]
+                },
+                series: [{
+                    name: 'Skor',
+                    data: [75],
+                    tooltip: {
+                        valueSuffix: ' %'
+                    },
+                    dataLabels: {
+                        enabled: false
+                    },
+                    dial: {
+                        radius: '80%',
+                        backgroundColor: '#34495e',
+                        baseWidth: 12,
+                        baseLength: '0%',
+                        rearLength: '0%',
+                        borderWidth: 1,
+                        borderColor: '#fff'
+                    },
+                    pivot: {
+                        backgroundColor: '#34495e',
+                        radius: 6,
+                        borderWidth: 1,
+                        borderColor: '#fff'
+                    }
+                }]
+            });
+
+            document.getElementById('current-value').textContent = chartLevel3.series[0].points[0].y + '%';
+
+            setTimeout(() => {
+                chartLevel3.series[0].points[0].update(75);
+            }, 1000);
+
+            // Gauge untuk Level 4
+            const chartLevel4 = Highcharts.chart('container-level4', {
+                chart: {
+                    type: 'gauge',
+                    plotBackgroundColor: null,
+                    plotBackgroundImage: null,
+                    plotBorderWidth: 0,
+                    plotShadow: false,
+                    height: '80%',
+                    backgroundColor: 'transparent'
+                },
+                exporting: {
+                    enabled: false
+                },
+                title: {
+                    text: null
+                },
+                credits: {
+                    enabled: false
+                },
+                pane: {
+                    startAngle: -90,
+                    endAngle: 89.9,
+                    background: null,
+                    center: ['50%', '75%'],
+                    size: '110%',
+                    borderWidth: 0
+                },
+                yAxis: {
+                    min: 0,
+                    max: 100,
+                    tickPixelInterval: 72,
+                    tickPosition: 'inside',
+                    tickColor: '#f8f9fa',
+                    tickLength: 15,
+                    tickWidth: 2,
+                    minorTickInterval: null,
+                    labels: {
+                        distance: 25,
+                        style: {
+                            fontSize: '12px',
+                            color: '#95a5a6'
+                        }
+                    },
+                    lineWidth: 0,
+                    plotBands: [{
+                            from: 0,
+                            to: 25,
+                            color: '#e74c3c',
+                            thickness: 20,
+                            borderRadius: 5
+                        },
+                        {
+                            from: 25,
+                            to: 50,
+                            color: '#f39c12',
+                            thickness: 20,
+                            borderRadius: 5
+                        },
+                        {
+                            from: 50,
+                            to: 75,
+                            color: '#3498db',
+                            thickness: 20,
+                            borderRadius: 5
+                        },
+                        {
+                            from: 75,
+                            to: 100,
+                            color: '#2ecc71',
+                            thickness: 20,
+                            borderRadius: 5
+                        }
+                    ]
+                },
+                series: [{
+                    name: 'Skor',
+                    data: [65],
+                    tooltip: {
+                        valueSuffix: ' %'
+                    },
+                    dataLabels: {
+                        enabled: false
+                    },
+                    dial: {
+                        radius: '80%',
+                        backgroundColor: '#34495e',
+                        baseWidth: 12,
+                        baseLength: '0%',
+                        rearLength: '0%',
+                        borderWidth: 1,
+                        borderColor: '#fff'
+                    },
+                    pivot: {
+                        backgroundColor: '#34495e',
+                        radius: 6,
+                        borderWidth: 1,
+                        borderColor: '#fff'
+                    }
+                }]
+            });
+
+            document.getElementById('current-value-level4').textContent = chartLevel4.series[0].points[0].y + '%';
+
+            setTimeout(() => {
+                chartLevel4.series[0].points[0].update(65);
+            }, 1000);
         });
     </script>
 @endpush
