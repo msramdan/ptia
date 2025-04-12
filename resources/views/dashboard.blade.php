@@ -279,10 +279,13 @@
                                                 <i class="fas fa-calendar-alt filter-icon me-2"></i>
                                                 <h5 class="filter-title mb-0">Filter Tahun</h5>
                                                 <div class="year-selector ms-3">
-                                                    <select class="form-select year-select" aria-label="Pilih Tahun">
-                                                        <option value="2025" selected>2025</option>
-                                                        <option value="2026">2026</option>
-                                                        <option value="2027">2027</option>
+                                                    <select class="form-select year-select" aria-label="Pilih Tahun"
+                                                        onchange="window.location.href='?tahun=' + this.value">
+                                                        @foreach ([2025, 2026, 2027] as $thn)
+                                                            <option value="{{ $thn }}"
+                                                                {{ $tahun == $thn ? 'selected' : '' }}>{{ $thn }}
+                                                            </option>
+                                                        @endforeach
                                                     </select>
                                                 </div>
                                             </div>
@@ -300,7 +303,7 @@
                                     <div class="card-body">
                                         <i class="fas fa-folder-open fa-2x text-primary mb-2"></i>
                                         <h6 class="card-title">Total Project</h6>
-                                        <p class="card-text fw-bold">12</p>
+                                        <p class="card-text fw-bold">{{ $jumlahProject }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -309,7 +312,7 @@
                                     <div class="card-body">
                                         <i class="fas fa-users fa-2x text-success mb-2"></i>
                                         <h6 class="card-title">Total Responden</h6>
-                                        <p class="card-text fw-bold">850</p>
+                                        <p class="card-text fw-bold">{{ $jumlahResponden }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -318,7 +321,7 @@
                                     <div class="card-body">
                                         <i class="fas fa-user-graduate fa-2x text-warning mb-2"></i>
                                         <h6 class="card-title">Keterisian Alumni</h6>
-                                        <p class="card-text fw-bold">78%</p>
+                                        <p class="card-text fw-bold">{{$persentaseSudah}} %</p>
                                     </div>
                                 </div>
                             </div>
@@ -327,7 +330,7 @@
                                     <div class="card-body">
                                         <i class="fas fa-user-tie fa-2x text-danger mb-2"></i>
                                         <h6 class="card-title">Keterisian Atasan</h6>
-                                        <p class="card-text fw-bold">64%</p>
+                                        <p class="card-text fw-bold">{{$persentaseSudahAtasan}} %</p>
                                     </div>
                                 </div>
                             </div>
@@ -655,7 +658,7 @@
             $('#data-table').DataTable({
                 processing: true,
                 serverSide: true,
-                ajax: "{{ route('hasil-evaluasi.index') }}",
+                ajax: "{{ route('dashboard') }}",
                 columns: [{
                         data: 'DT_RowIndex',
                         name: 'DT_RowIndex',
