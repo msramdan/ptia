@@ -3,6 +3,7 @@
 @section('title', __('Dashboard'))
 
 @section('content')
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs5/dt-1.12.0/datatables.min.css" />
     <style>
         .heading-with-logo {
             display: flex;
@@ -371,6 +372,40 @@
                         </div>
                     </div>
                 </div>
+                <section class="section">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h6>Table Data Hasil Evaluasi 2025</h6>
+                                    <div class="table-responsive p-1">
+                                        <table class="table table-striped" id="data-table" width="100%">
+                                            <thead>
+                                                <tr>
+                                                    <th rowspan="2">#</th>
+                                                    <th rowspan="2">{{ __('Evaluator') }}</th>
+                                                    <th rowspan="2">{{ __('Kode Diklat') }}</th>
+                                                    <th rowspan="2">{{ __('Nama Diklat') }}</th>
+                                                    <th rowspan="2">{{ __('Jenis Diklat') }}</th>
+                                                    <th colspan="2" class="text-center">{{ __('Level 3') }}</th>
+                                                    <th colspan="2" class="text-center">{{ __('Level 4') }}</th>
+                                                </tr>
+                                                <tr>
+                                                    <th class="text-center">Skor</th>
+                                                    <th class="text-center">Predikat</th>
+                                                    <th class="text-center">Skor</th>
+                                                    <th class="text-center">Predikat</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
 
             </div>
         </section>
@@ -613,5 +648,55 @@
                 chartLevel4.series[0].points[0].update(65);
             }, 1000);
         });
+    </script>
+    <script type="text/javascript" src="https://cdn.datatables.net/v/bs5/dt-1.12.0/datatables.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#data-table').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: "{{ route('hasil-evaluasi.index') }}",
+                columns: [{
+                        data: 'DT_RowIndex',
+                        name: 'DT_RowIndex',
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
+                        data: 'user',
+                        name: 'user'
+                    },
+                    {
+                        data: 'kaldikID',
+                        name: 'kaldikID'
+                    },
+                    {
+                        data: 'nama_project',
+                        name: 'nama_project'
+                    },
+                    {
+                        data: 'nama_diklat_type',
+                        name: 'nama_diklat_type'
+                    },
+                    {
+                        data: 'avg_skor_level_3',
+                        name: 'avg_skor_level_3'
+                    },
+                    {
+                        data: 'kriteria_dampak_level_3',
+                        name: 'kriteria_dampak_level_3'
+                    },
+                    {
+                        data: 'avg_skor_level_4',
+                        name: 'avg_skor_level_4'
+                    },
+                    {
+                        data: 'kriteria_dampak_level_4',
+                        name: 'kriteria_dampak_level_4'
+                    }
+                ]
+            });
+        });
+    </script>
     </script>
 @endpush
