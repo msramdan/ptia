@@ -210,13 +210,13 @@
                             var escapedHasil = $('<div>').text(row.hasil_intervie_alumni || '')
                                 .html();
                             var evidenceFileName = row.evidence_intervie_alumni ||
-                            ''; // Ambil nama file evidence
+                                ''; // Ambil nama file evidence
 
                             // Tentukan teks dan warna tombol berdasarkan keberadaan evidence
                             var buttonText = evidenceFileName ? 'Ganti Evidence' :
-                            'Upload Evidence';
+                                'Upload Evidence';
                             var buttonClass = evidenceFileName ? 'btn-success' :
-                            'btn-primary'; // Hijau jika ada, Biru jika tidak ada
+                                'btn-primary'; // Hijau jika ada, Biru jika tidak ada
                             var buttonTitle = evidenceFileName ? 'Ganti Evidence' :
                                 'Upload Evidence';
 
@@ -255,8 +255,9 @@
                 $('#evidenceAlumniFile').val('');
 
                 if (evidence) {
-                    $('#currentEvidenceLink').attr('href', '{{ asset('storage/interview_evidence') }}/' +
-                        evidence).text(evidence);
+                    $('#currentEvidenceLink').attr('href',
+                        '{{ asset('storage/uploads/data-interview-alumni') }}/' + evidence).text(
+                        evidence);
                     $('#currentEvidence').show();
                 } else {
                     $('#currentEvidence').hide();

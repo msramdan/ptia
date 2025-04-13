@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
@@ -13,6 +12,7 @@ use Illuminate\Routing\Controllers\Middleware;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\File;
 
 class DataInterviewController extends Controller implements HasMiddleware
 {
@@ -196,15 +196,21 @@ class DataInterviewController extends Controller implements HasMiddleware
                 }
 
                 $newFilename = $responden->project_id . '_' . $respondenId . '_alumni_' . time() . '.' . $file->getClientOriginalExtension();
-                $path = $file->storeAs('public/interview_evidence', $newFilename);
+                $destinationPath = storage_path('app/public/uploads/data-interview-alumni');
 
-                if (!$path) {
-                    throw new \Exception('Gagal menyimpan file.');
+                if (!File::exists($destinationPath)) {
+                    File::makeDirectory($destinationPath, 0755, true);
                 }
 
-                if ($filename && $filename !== $newFilename && Storage::exists('public/interview_evidence/' . $filename)) {
-                    Storage::delete('public/interview_evidence/' . $filename);
+                $file->move($destinationPath, $newFilename);
+
+                if ($filename && $filename !== $newFilename) {
+                    $oldPath = $destinationPath . '/' . $filename;
+                    if (File::exists($oldPath)) {
+                        File::delete($oldPath);
+                    }
                 }
+
                 $filename = $newFilename;
             }
 
@@ -262,15 +268,20 @@ class DataInterviewController extends Controller implements HasMiddleware
                 }
 
                 $newFilename = $responden->project_id . '_' . $respondenId . '_atasan_' . time() . '.' . $file->getClientOriginalExtension();
-                $path = $file->storeAs('public/interview_evidence', $newFilename);
+                $destinationPath = storage_path('app/public/uploads/data-interview-atasan/');
 
-                if (!$path) {
-                    throw new \Exception('Gagal menyimpan file.');
+                // Buat folder jika belum ada
+                if (!file_exists($destinationPath)) {
+                    mkdir($destinationPath, 0755, true);
                 }
 
-                if ($filename && $filename !== $newFilename && Storage::exists('public/interview_evidence/' . $filename)) {
-                    Storage::delete('public/interview_evidence/' . $filename);
+                $file->move($destinationPath, $newFilename);
+
+                // Hapus file lama jika berbeda
+                if ($filename && $filename !== $newFilename && file_exists($destinationPath . $filename)) {
+                    unlink($destinationPath . $filename);
                 }
+
                 $filename = $newFilename;
             }
 

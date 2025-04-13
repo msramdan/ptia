@@ -208,15 +208,15 @@
                             // Escape data
                             var escapedNama = $('<div>').text(row.nama || '').html(); // Nama Alumni
                             var escapedNamaAtasan = $('<div>').text(row.nama_atasan || '')
-                        .html(); // Nama Atasan (untuk modal)
+                                .html(); // Nama Atasan (untuk modal)
                             var escapedHasil = $('<div>').text(row.hasil_intervie_atasan || '')
                                 .html();
                             var evidenceFileName = row.evidence_intervie_atasan ||
-                            ''; // Ambil nama file evidence atasan
+                                ''; // Ambil nama file evidence atasan
 
                             // Tentukan teks dan warna tombol berdasarkan keberadaan evidence
                             var buttonText = evidenceFileName ? 'Ganti Evidence' :
-                            'Upload Evidence';
+                                'Upload Evidence';
                             var buttonClass = evidenceFileName ? 'btn-success' : 'btn-primary';
                             var buttonTitle = evidenceFileName ? 'Ganti Evidence' :
                                 'Upload Evidence';
@@ -255,8 +255,9 @@
                 $('#evidenceAtasanFile').val('');
 
                 if (evidence) {
-                    $('#currentEvidenceLink').attr('href', '{{ asset('storage/interview_evidence') }}/' +
-                        evidence).text(evidence);
+                    $('#currentEvidenceLink').attr('href',
+                        '{{ asset('storage/uploads/data-interview-atasan') }}/' + evidence).text(
+                        evidence);
                     $('#currentEvidence').show();
                 } else {
                     $('#currentEvidence').hide();
