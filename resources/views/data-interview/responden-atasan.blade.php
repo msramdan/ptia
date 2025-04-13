@@ -81,10 +81,9 @@
             </div>
         </section>
 
-        <!-- Modal untuk Upload Evidence Atasan -->
         <div class="modal fade" id="uploadEvidenceModal" tabindex="-1" aria-labelledby="uploadEvidenceLabel"
             aria-hidden="true">
-            <div class="modal-dialog modal-lg">
+            <div class="modal-dialog modal-lg"> {{-- Ukuran modal diperbesar --}}
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="uploadEvidenceLabel">Upload Evidence Interview Atasan - <span
@@ -96,15 +95,17 @@
                             @csrf
                             <input type="hidden" id="respondenId">
                             <div class="mb-3">
-                                <label for="hasilInterviewAtasanText" class="form-label">Catatan Hasil Interview</label>
-                                <textarea required name="hasil_interview_atasan_text" id="hasilInterviewAtasanText" class="form-control form-text-area"
-                                    placeholder="Masukkan catatan hasil interview..."></textarea>
+                                <label for="hasilInterviewAtasanText" class="form-label">Catatan Hasil Interview
+                                    (Opsional)</label>
+                                {{-- Textarea untuk CKEditor --}}
+                                <textarea name="hasil_interview_atasan_text" id="hasilInterviewAtasanText" class="form-control"></textarea>
                                 <div class="invalid-feedback" id="hasilInterviewAtasanTextError"></div>
                             </div>
                             <div class="mb-3">
                                 <label for="evidenceAtasanFile" class="form-label">File Evidence (Opsional)</label>
+                                {{-- Input file dengan accept diperbarui --}}
                                 <input type="file" name="evidence_atasan_file" id="evidenceAtasanFile"
-                                    class="form-control"
+                                    class="form-control" accept=".doc,.docx,.pdf,.xls,.xlsx,.jpg,.jpeg,.png"
                                     title="Pilih file evidence (doc, docx, pdf, xls, xlsx, jpg, jpeg, png)">
                                 <div class="invalid-feedback" id="evidenceAtasanFileError"></div>
                             </div>
@@ -139,13 +140,16 @@
             font-size: 0.9em;
         }
 
-        .form-text-area {
-            min-height: 100px;
-            font-size: 0.9em;
-        }
-
         .invalid-feedback {
             font-size: 0.8em;
+        }
+
+        .ck-editor__editable_inline {
+            min-height: 150px;
+        }
+
+        .modal-lg .modal-body {
+            overflow-y: auto;
         }
     </style>
 @endpush
@@ -156,7 +160,21 @@
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/v/bs5/dt-1.12.0/datatables.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script src="https://cdn.ckeditor.com/ckeditor5/41.4.2/classic/ckeditor.js"></script>
+
     <script>
+        let atasanEditor;
+
+        ClassicEditor
+            .create(document.querySelector('#hasilInterviewAtasanText'))
+            .then(editor => {
+                atasanEditor = editor;
+                console.log('CKEditor Atasan Ready');
+            })
+            .catch(error => {
+                console.error('Error initializing CKEditor Atasan:', error);
+            });
+
         $(document).ready(function() {
             @if (session('success'))
                 toastr.success("{{ session('success') }}", "Success", {
@@ -216,11 +234,13 @@
                             var hasilInterview = row.hasil_intervie_atasan || '';
 
                             // Tentukan teks dan warna tombol berdasarkan keberadaan evidence
-                            var buttonText = hasilInterview ? 'Ganti Evidence' :
+
+                            var buttonText = evidenceFileName ? 'Ganti Evidence' :
+                            'Upload Evidence';
+                            var buttonClass = evidenceFileName ? 'btn-success' : 'btn-primary';
+                            var buttonTitle = evidenceFileName ? 'Ganti Evidence' :
                                 'Upload Evidence';
-                            var buttonClass = hasilInterview ? 'btn-success' : 'btn-primary';
-                            var buttonTitle = hasilInterview ? 'Ganti Evidence' :
-                                'Upload Evidence';
+
 
                             // Bangun HTML tombol
                             var html =
