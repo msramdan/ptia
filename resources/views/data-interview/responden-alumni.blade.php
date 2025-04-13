@@ -184,29 +184,12 @@
         ClassicEditor
             .create(document.querySelector('#hasilInterviewAlumniText'), {
                 toolbar: [
-                    'bold',
-                    'italic',
-                    'underline',
-                    'bulletedList',
-                    'numberedList',
-                    'undo',
-                    'redo',
-                    'Table',
-                    'BlockQuote',
-                    'Heading'
+                    'bold', 'italic', 'link', 'underline', 'strikethrough', '|',
+                    'undo', 'redo', '|',
+                    'bulletedList', 'numberedList', '|',
+                    'blockQuote', '|',
+                    'insertTable', 'tableColumn', 'tableRow', 'mergeTableCells'
                 ],
-                removePlugins: [
-                    'Image',
-                    'ImageToolbar',
-                    'ImageCaption',
-                    'ImageStyle',
-                    'ImageUpload',
-                    'MediaEmbed',
-                    'Link',
-                    'CKFinder',
-                    'CKFinderUploadAdapter',
-                    'EasyImage'
-                ]
             })
             .then(editor => {
                 alumniEditor = editor;
