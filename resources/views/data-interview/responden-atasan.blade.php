@@ -101,16 +101,18 @@
                             </div>
                             <div class="mb-3">
                                 <label for="evidenceAtasanFile" class="form-label">File Evidence (Opsional)</label>
-                                <input type="file" name="evidence_atasan_file" id="evidenceAtasanFile"
-                                    class="form-control" accept=".doc,.docx,.pdf,.xls,.xlsx,.jpg,.jpeg,.png"
-                                    title="Pilih file evidence (doc, docx, pdf, xls, xlsx, jpg, jpeg, png)">
-                                <div class="invalid-feedback" id="evidenceAtasanFileError"></div>
-                            </div>
-                            <div class="mb-3" id="currentEvidence" style="display: none;">
-                                <label class="form-label">Evidence Saat Ini</label>
-                                <div>
-                                    <a href="#" id="currentEvidenceLink" target="_blank" class="text-primary"></a>
+                                <div class="input-group">
+                                    <input type="file" name="evidence_atasan_file" id="evidenceAtasanFile"
+                                        class="form-control" accept=".doc,.docx,.pdf,.xls,.xlsx,.jpg,.jpeg,.png"
+                                        title="Pilih file evidence (doc, docx, pdf, xls, xlsx, jpg, jpeg, png)">
+                                    <span class="input-group-text" id="currentEvidence" style="display: none;">
+                                        <a href="#" id="currentEvidenceLink" target="_blank"
+                                            class="text-decoration-none" data-bs-toggle="tooltip" data-bs-placement="top">
+                                            <i class="fas fa-download"></i>
+                                        </a>
+                                    </span>
                                 </div>
+                                <div class="invalid-feedback" id="evidenceAtasanFileError"></div>
                             </div>
                         </form>
                     </div>
@@ -158,7 +160,12 @@
     <script type="text/javascript" src="https://cdn.datatables.net/v/bs5/dt-1.12.0/datatables.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script src="https://cdn.ckeditor.com/ckeditor5/41.4.2/classic/ckeditor.js"></script>
-
+    <script>
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    </script>
     <script>
         let atasanEditor;
 
@@ -231,7 +238,7 @@
                             var hasilInterview = row.hasil_intervie_atasan || '';
 
                             var buttonText = hasilInterview ? 'Ganti Evidence' :
-                            'Upload Evidence';
+                                'Upload Evidence';
                             var buttonClass = hasilInterview ? 'btn-success' : 'btn-primary';
                             var buttonTitle = hasilInterview ? 'Ganti Evidence' :
                                 'Upload Evidence';
@@ -276,9 +283,12 @@
                 $('#evidenceAtasanFile').val('');
 
                 if (evidence) {
-                    $('#currentEvidenceLink').attr('href',
-                        '{{ asset('storage/uploads/data-interview-atasan') }}/' + evidence).text(
-                        evidence);
+                    let fileUrl = '{{ asset('storage/uploads/data-interview-atasan') }}/' + evidence;
+                    $('#currentEvidenceLink')
+                        .attr('href', fileUrl)
+                        .attr('title', 'Download ' + evidence)
+                        .tooltip('dispose') // Hapus tooltip lama (kalau ada)
+                        .tooltip(); // Inisialisasi tooltip baru
                     $('#currentEvidence').show();
                 } else {
                     $('#currentEvidence').hide();

@@ -168,7 +168,7 @@ class DataInterviewController extends Controller implements HasMiddleware
         ], [
             'evidence_alumni_file.mimes' => 'Format file harus doc, docx, pdf, xls, xlsx, jpg, jpeg, atau png.',
             'evidence_alumni_file.max' => 'Ukuran file maksimal 5MB.',
-            'hasil_interview_alumni_text.required' => 'Hasil interview alumni harus diisi.', // pesan error untuk field required
+            'hasil_interview_alumni_text.required' => 'Catatan hasil interview alumni harus diisi.', // pesan error untuk field required
         ]);
 
         if ($validator->fails()) {
@@ -237,7 +237,7 @@ class DataInterviewController extends Controller implements HasMiddleware
         ], [
             'evidence_atasan_file.mimes' => 'Format file harus doc, docx, pdf, xls, xlsx, jpg, jpeg, atau png.',
             'evidence_atasan_file.max' => 'Ukuran file maksimal 5MB.',
-            'hasil_interview_atasan_text.required' => 'Hasil interview atasan harus diisi.',
+            'hasil_interview_atasan_text.required' => 'Catatan hasil interview atasan harus diisi.',
         ]);
 
         if ($validator->fails()) {

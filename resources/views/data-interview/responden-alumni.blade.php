@@ -101,17 +101,20 @@
                             </div>
                             <div class="mb-3">
                                 <label for="evidenceAlumniFile" class="form-label">File Evidence (Opsional)</label>
-                                <input type="file" name="evidence_alumni_file" id="evidenceAlumniFile"
-                                    class="form-control" accept=".doc,.docx,.pdf,.xls,.xlsx,.jpg,.jpeg,.png"
-                                    title="Pilih file evidence (doc, docx, pdf, xls, xlsx, jpg, jpeg, png)">
+                                <div class="input-group">
+                                    <input type="file" name="evidence_alumni_file" id="evidenceAlumniFile"
+                                        class="form-control" accept=".doc,.docx,.pdf,.xls,.xlsx,.jpg,.jpeg,.png"
+                                        title="Pilih file evidence (doc, docx, pdf, xls, xlsx, jpg, jpeg, png)">
+                                    <span class="input-group-text" id="currentEvidenceAlumni" style="display: none;">
+                                        <a href="#" id="currentEvidenceAlumniLink" target="_blank"
+                                            class="text-decoration-none" data-bs-toggle="tooltip" data-bs-placement="top">
+                                            <i class="fas fa-download"></i>
+                                        </a>
+                                    </span>
+                                </div>
                                 <div class="invalid-feedback" id="evidenceAlumniFileError"></div>
                             </div>
-                            <div class="mb-3" id="currentEvidence" style="display: none;">
-                                <label class="form-label">Evidence Saat Ini</label>
-                                <div>
-                                    <a href="#" id="currentEvidenceLink" target="_blank" class="text-primary"></a>
-                                </div>
-                            </div>
+
                         </form>
                     </div>
                     <div class="modal-footer">
@@ -164,13 +167,16 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script src="https://cdn.ckeditor.com/ckeditor5/41.4.2/classic/ckeditor.js"></script>
     <script>
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    </script>
+    <script>
         let alumniEditor;
 
         ClassicEditor
-            .create(document.querySelector('#hasilInterviewAlumniText'), {
-                // Konfigurasi CKEditor tambahan jika perlu (misal: toolbar)
-                // toolbar: [ 'heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote' ],
-            })
+            .create(document.querySelector('#hasilInterviewAlumniText'), {})
             .then(editor => {
                 alumniEditor = editor;
                 console.log('CKEditor Alumni Ready');
@@ -283,12 +289,15 @@
                 $('#evidenceAlumniFile').val('');
 
                 if (evidence) {
-                    $('#currentEvidenceLink').attr('href',
-                        '{{ asset('storage/uploads/data-interview-alumni') }}/' + evidence).text(
-                        evidence);
-                    $('#currentEvidence').show();
+                    let fileUrl = '{{ asset('storage/uploads/data-interview-alumni') }}/' + evidence;
+                    $('#currentEvidenceAlumniLink')
+                        .attr('href', fileUrl)
+                        .attr('title', 'Download ' + evidence)
+                        .tooltip('dispose') // Hapus tooltip lama (kalau ada)
+                        .tooltip(); // Inisialisasi tooltip baru
+                    $('#currentEvidenceAlumni').show();
                 } else {
-                    $('#currentEvidence').hide();
+                    $('#currentEvidenceAlumni').hide();
                 }
 
                 $('#hasilInterviewAlumniTextError').text('');
