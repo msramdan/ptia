@@ -209,15 +209,15 @@
                             var escapedNama = $('<div>').text(row.nama || '').html();
                             var escapedHasil = $('<div>').text(row.hasil_intervie_alumni || '')
                                 .html();
-                            var evidenceFileName = row.evidence_intervie_alumni ||
-                                ''; // Ambil nama file evidence
+                            var evidenceFileName = row.evidence_intervie_alumni || '';
+                            var hasilInterview = row.hasil_intervie_alumni || '';
 
                             // Tentukan teks dan warna tombol berdasarkan keberadaan evidence
-                            var buttonText = evidenceFileName ? 'Ganti Evidence' :
+                            var buttonText = hasilInterview ? 'Ganti Evidence' :
                                 'Upload Evidence';
-                            var buttonClass = evidenceFileName ? 'btn-success' :
+                            var buttonClass = hasilInterview ? 'btn-success' :
                                 'btn-primary'; // Hijau jika ada, Biru jika tidak ada
-                            var buttonTitle = evidenceFileName ? 'Ganti Evidence' :
+                            var buttonTitle = hasilInterview ? 'Ganti Evidence' :
                                 'Upload Evidence';
 
                             // Bangun HTML tombol
