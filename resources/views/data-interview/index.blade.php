@@ -80,9 +80,9 @@
                 processing: true,
                 serverSide: true,
                 ajax: "{{ route('data-interview.index') }}",
-                language: {
-                    url: "//cdn.datatables.net/plug-ins/1.12.1/i18n/id.json"
-                },
+                // language: {
+                //     url: "{{ asset('assets/i18n/id.json') }}"
+                // },
                 columns: [{
                         data: 'DT_RowIndex',
                         name: 'DT_RowIndex',

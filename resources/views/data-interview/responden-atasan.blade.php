@@ -61,7 +61,7 @@
                                 </div>
                             @endif
 
-                            <div class="table-responsive">
+                            <div class="table-responsive p-1">
                                 <table class="table table-striped table-bordered" id="responden-atasan-table">
                                     <thead>
                                         <tr>
@@ -84,7 +84,7 @@
         <!-- Modal untuk Upload Evidence Atasan -->
         <div class="modal fade" id="uploadEvidenceModal" tabindex="-1" aria-labelledby="uploadEvidenceLabel"
             aria-hidden="true">
-            <div class="modal-dialog">
+            <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="uploadEvidenceLabel">Upload Evidence Interview Atasan - <span
@@ -96,9 +96,8 @@
                             @csrf
                             <input type="hidden" id="respondenId">
                             <div class="mb-3">
-                                <label for="hasilInterviewAtasanText" class="form-label">Catatan Hasil Interview
-                                    (Opsional)</label>
-                                <textarea name="hasil_interview_atasan_text" id="hasilInterviewAtasanText" class="form-control form-text-area"
+                                <label for="hasilInterviewAtasanText" class="form-label">Catatan Hasil Interview</label>
+                                <textarea required name="hasil_interview_atasan_text" id="hasilInterviewAtasanText" class="form-control form-text-area"
                                     placeholder="Masukkan catatan hasil interview..."></textarea>
                                 <div class="invalid-feedback" id="hasilInterviewAtasanTextError"></div>
                             </div>
@@ -176,9 +175,6 @@
                 processing: true,
                 serverSide: true,
                 ajax: "{{ route('data-interview.responden.atasan', ['project' => $project->id]) }}",
-                language: {
-                    url: "{{ asset('assets/i18n/id.json') }}"
-                },
                 columns: [{
                         data: 'DT_RowIndex',
                         name: 'DT_RowIndex',

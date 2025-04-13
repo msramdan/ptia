@@ -36,8 +36,4 @@
         <i class="fa fa-history" aria-hidden="true"></i>
     </a>
 
-
-
-
-
 </td>
