@@ -321,7 +321,7 @@
                                     <div class="card-body">
                                         <i class="fas fa-user-graduate fa-2x text-warning mb-2"></i>
                                         <h6 class="card-title">Keterisian Alumni</h6>
-                                        <p class="card-text fw-bold">{{$persentaseSudah}} %</p>
+                                        <p class="card-text fw-bold">{{ $persentaseSudah }} %</p>
                                     </div>
                                 </div>
                             </div>
@@ -330,7 +330,7 @@
                                     <div class="card-body">
                                         <i class="fas fa-user-tie fa-2x text-danger mb-2"></i>
                                         <h6 class="card-title">Keterisian Atasan</h6>
-                                        <p class="card-text fw-bold">{{$persentaseSudahAtasan}} %</p>
+                                        <p class="card-text fw-bold">{{ $persentaseSudahAtasan }} %</p>
                                     </div>
                                 </div>
                             </div>
@@ -655,10 +655,16 @@
     <script type="text/javascript" src="https://cdn.datatables.net/v/bs5/dt-1.12.0/datatables.min.js"></script>
     <script>
         $(document).ready(function() {
+            var tahun = "{{ $tahun }}";
             $('#data-table').DataTable({
                 processing: true,
                 serverSide: true,
-                ajax: "{{ route('dashboard') }}",
+                ajax: {
+                    url: "{{ route('dashboard') }}",
+                    data: function(d) {
+                        d.tahun = tahun;
+                    }
+                },
                 columns: [{
                         data: 'DT_RowIndex',
                         name: 'DT_RowIndex',
@@ -700,6 +706,5 @@
                 ]
             });
         });
-    </script>
     </script>
 @endpush
