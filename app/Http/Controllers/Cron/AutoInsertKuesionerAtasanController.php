@@ -18,7 +18,7 @@ class AutoInsertKuesionerAtasanController extends Controller
         $respondenList = DB::table('project_responden')
             ->whereDate('deadline_pengisian_atasan', '<', Carbon::now()->toDateString())
             ->where('status_pengisian_kuesioner_atasan', 'Belum')
-            ->limit(10)
+            ->limit(30)
             ->get();
 
         if ($respondenList->isEmpty()) {
