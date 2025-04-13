@@ -262,7 +262,8 @@ return [
             'permissions' => [
                 'data sekunder view',
                 'penyebaran kuesioner view',
-                'pengumpulan data view'
+                'pengumpulan data view',
+                'data interview view'
             ],
             'menus' => [
                 [
@@ -270,11 +271,13 @@ return [
                     'icon' => '<i class="bi bi-folder"></i>',
                     'route' => [
                         'data-sekunder*',
+                        'data-interview*',
                         'penyebaran-kuesioner*',
                         'pengumpulan-data*'
                     ],
                     'permissions' => [
                         'data sekunder view',
+                        'data interview view',
                         'penyebaran kuesioner view',
                         'pengumpulan data view'
                     ],
@@ -283,6 +286,11 @@ return [
                             'title' => 'Data Sekunder',
                             'route' => '/data-sekunder',
                             'permission' => 'data sekunder view'
+                        ],
+                        [
+                            'title' => 'Data Interview',
+                            'route' => '/data-interview',
+                            'permission' => 'data interview view'
                         ],
                         [
                             'title' => 'Penyebaran Kuesioner',

@@ -29,7 +29,8 @@ use App\Http\Controllers\{
     RespondenKuesionerController,
     SettingController,
     DataSekunderController,
-    HasilEvaluasiController
+    HasilEvaluasiController,
+    DataInterviewController
 };
 
 Route::get('/', function () {
@@ -109,11 +110,26 @@ Route::middleware(['auth', 'web'])->group(function () {
             ->name('penyebaran-kuesioner.export-pdf');
     });
 
+
     // Route khusus untuk Data Sekunder
     Route::prefix('data-sekunder')->controller(DataSekunderController::class)->group(function () {
         Route::get('/', 'index')->name('data-sekunder.index');
         Route::post('/', 'store')->name('data-sekunder.store');
         Route::get('/get/{project_id}', 'getDataSekunder')->name('data-sekunder.get');
+    });
+
+    Route::prefix('data-interview')->name('data-interview.')->group(function () {
+        Route::get('/', [DataInterviewController::class, 'index'])->name('index');
+
+        // Route untuk halaman detail responden Alumni
+        Route::get('/{project}/responden-alumni', [DataInterviewController::class, 'showRespondenAlumni'])->name('responden.alumni');
+
+        // Route untuk halaman detail responden Atasan
+        Route::get('/{project}/responden-atasan', [DataInterviewController::class, 'showRespondenAtasan'])->name('responden.atasan');
+
+        // Route untuk menyimpan evidence (akan digunakan di halaman detail)
+        Route::post('/responden/{responden}/alumni-evidence', [DataInterviewController::class, 'storeAlumniEvidence'])->name('storeAlumniEvidence');
+        Route::post('/responden/{responden}/atasan-evidence', [DataInterviewController::class, 'storeAtasanEvidence'])->name('storeAtasanEvidence');
     });
 
     Route::prefix('pengumpulan-data')->controller(PengumpulanDataController::class)->group(function () {
