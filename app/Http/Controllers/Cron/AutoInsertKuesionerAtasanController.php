@@ -4,44 +4,100 @@ namespace App\Http\Controllers\Cron;
 
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\URL;
 use App\Http\Controllers\Controller;
-use App\Models\User;
-use Illuminate\Support\Str;
+
 
 class AutoInsertKuesionerAtasanController extends Controller
 {
 
     public function insertData()
     {
-        // Ambil data dari project_responden yang deadline_pengisian_atasan lebih dari hari ini
+        $startTime = now();
+        sendNotifTelegram("🚀 Cron Job Auto Insert Kuesioner Atasan Expired Dimulai\n📅 Waktu Mulai: {$startTime}", 'Cron');
+
         $respondenList = DB::table('project_responden')
-            ->whereDate('deadline_pengisian_atasan', '<', Carbon::now()->toDateString()) // Cek yang sudah expired
-            ->where('status_pengisian_kuesioner_atasan', 'Belum') // Status masih "Belum"
+            ->whereDate('deadline_pengisian_atasan', '<', Carbon::now()->toDateString())
+            ->where('status_pengisian_kuesioner_atasan', 'Belum')
             ->limit(10)
             ->get();
 
-        // Looping setiap responden
+        if ($respondenList->isEmpty()) {
+            $endTime = now();
+            sendNotifTelegram("⚠️ Cron Job Selesai\nTidak ada data yang diproses\n📅 Waktu Selesai: {$endTime}", 'Cron');
+            return response()->json(['status' => true, 'message' => "Tidak ada data yang diproses."]);
+        }
+
+        $successCount = 0;
+        $failCount = 0;
+
         foreach ($respondenList as $responden) {
-            // Ambil data dari project_kuesioner yang terkait dengan project_id dan remark = 'Atasan'
             $kuesionerList = DB::table('project_kuesioner')
-                ->where('project_kuesioner.project_id', $responden->project_id)
-                ->where('project_kuesioner.remark', 'Atasan')
-                ->select('project_kuesioner.*')
+                ->where('project_id', $responden->project_id)
+                ->where('remark', 'Atasan')
                 ->get();
-            // Proses looping data project_kuesioner dan project_jawaban_kuesioner
-            foreach ($kuesionerList as $kuesioner) {
-                // DB::table('some_table')->insert([
-                //     'project_responden_id' => $responden->id,
-                //     'project_kuesioner_id' => $kuesioner->id,
-                //     'jawaban' => $kuesioner->jawaban ?? null,
-                //     'created_at' => now(),
-                //     'updated_at' => now(),
-                // ]);
+
+            $isRespondenSuccess = true; // Track if all inserts for this responden succeed
+
+            DB::beginTransaction(); // Start the transaction
+
+            try {
+                foreach ($kuesionerList as $kuesioner) {
+                    $jawabanAlumni = DB::table('project_jawaban_kuesioner')
+                        ->join('project_kuesioner', 'project_kuesioner.id', '=', 'project_jawaban_kuesioner.project_kuesioner_id')
+                        ->where('project_kuesioner.aspek_id', $kuesioner->aspek_id)
+                        ->where('project_kuesioner.project_id', $responden->project_id)
+                        ->where('project_jawaban_kuesioner.project_responden_id', $responden->id)
+                        ->where('project_jawaban_kuesioner.remark', 'Alumni')
+                        ->select(
+                            'project_jawaban_kuesioner.nilai_sebelum',
+                            'project_jawaban_kuesioner.nilai_sesudah',
+                            'project_jawaban_kuesioner.nilai_delta'
+                        )
+                        ->first();
+
+                    if ($jawabanAlumni) {
+                        $insertResult = DB::table('project_jawaban_kuesioner')->insert([
+                            'project_kuesioner_id' => $kuesioner->id,
+                            'project_responden_id' => $responden->id,
+                            'nilai_sebelum' => $jawabanAlumni->nilai_sebelum,
+                            'nilai_sesudah' => $jawabanAlumni->nilai_sesudah,
+                            'nilai_delta' => $jawabanAlumni->nilai_delta,
+                            'catatan' => null,
+                            'remark' => 'Atasan',
+                            'created_at' => now(),
+                            'updated_at' => now()
+                        ]);
+
+                        if (!$insertResult) {
+                            $isRespondenSuccess = false;
+                        }
+                    } else {
+                        $isRespondenSuccess = false;
+                    }
+                }
+
+                // If all inserts for this responden were successful, update the status
+                if ($isRespondenSuccess) {
+                    DB::table('project_responden')
+                        ->where('id', $responden->id)
+                        ->update(['status_pengisian_kuesioner_atasan' => 'Sudah']);
+                    $successCount++;
+                } else {
+                    $failCount++;
+                }
+
+                DB::commit(); // Commit the transaction
+            } catch (\Exception $e) {
+                DB::rollBack(); // Rollback the transaction if there is an error
+                $failCount++; // Mark this responden as failed
+                // Log the error for debugging purposes
+                \Log::error("Error processing responden {$responden->id}: " . $e->getMessage());
             }
         }
 
-        return response()->json(['message' => 'Data inserted successfully']);
+        $endTime = now();
+        sendNotifTelegram("✅ Cron Job Selesai\nBerhasil Create {$successCount} Responden, Gagal Create {$failCount} Responden\n📅 Waktu Selesai: {$endTime}", 'Cron');
+
+        return response()->json(['status' => true, 'message' => "Proses selesai."]);
     }
 }
