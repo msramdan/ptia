@@ -120,7 +120,7 @@ class DataInterviewController extends Controller implements HasMiddleware
 
             return DataTables::of($respondents)
                 ->addIndexColumn()
-                ->editColumn('hasil_intervie_alumni', fn($row) => $row->hasil_intervie_alumni ? Str::limit($row->hasil_intervie_alumni, 100) : '')
+                ->editColumn('hasil_intervie_alumni', fn($row) => $row->hasil_intervie_alumni ? $row->hasil_intervie_alumni : '')
                 ->toJson();
         }
 
@@ -155,7 +155,7 @@ class DataInterviewController extends Controller implements HasMiddleware
 
             return DataTables::of($respondents)
                 ->addIndexColumn()
-                ->editColumn('hasil_intervie_atasan', fn($row) => $row->hasil_intervie_atasan ? Str::limit($row->hasil_intervie_atasan, 100) : '')
+                ->editColumn('hasil_intervie_atasan', fn($row) => $row->hasil_intervie_atasan ? $row->hasil_intervie_atasan : '')
                 ->toJson();
         }
 
