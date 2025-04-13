@@ -165,9 +165,11 @@ class DataInterviewController extends Controller implements HasMiddleware
     public function storeAlumniEvidence(Request $request, $respondenId): JsonResponse
     {
         $validator = Validator::make($request->all(), [
+
             'evidence_alumni_file' => 'nullable|file|mimes:doc,docx,pdf,xls,xlsx,jpg,jpeg,png|max:5120',
             'hasil_interview_alumni_text' => 'nullable|string',
         ], [
+
             'evidence_alumni_file.mimes' => 'Format file harus doc, docx, pdf, xls, xlsx, jpg, jpeg, atau png.',
             'evidence_alumni_file.max' => 'Ukuran file maksimal 5MB.',
         ])->after(function ($validator) use ($request) {
@@ -185,6 +187,7 @@ class DataInterviewController extends Controller implements HasMiddleware
         if (!$responden) {
             return response()->json(['success' => false, 'message' => 'Responden tidak ditemukan.'], 404);
         }
+
 
         try {
             $filename = $responden->evidence_intervie_alumni;
