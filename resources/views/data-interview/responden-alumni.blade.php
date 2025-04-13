@@ -95,8 +95,7 @@
                             @csrf
                             <input type="hidden" id="respondenId">
                             <div class="mb-3">
-                                <label for="hasilInterviewAlumniText" class="form-label">Catatan Hasil Interview
-                                    (Opsional)</label>
+                                <label for="hasilInterviewAlumniText" class="form-label">Catatan Hasil Interview</label>
                                 <textarea name="hasil_interview_alumni_text" id="hasilInterviewAlumniText" class="form-control"></textarea>
                                 <div class="invalid-feedback" id="hasilInterviewAlumniTextError"></div>
                             </div>

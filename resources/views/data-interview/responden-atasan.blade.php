@@ -95,8 +95,7 @@
                             @csrf
                             <input type="hidden" id="respondenId">
                             <div class="mb-3">
-                                <label for="hasilInterviewAtasanText" class="form-label">Catatan Hasil Interview
-                                    (Opsional)</label>
+                                <label for="hasilInterviewAtasanText" class="form-label">Catatan Hasil Interview</label>
                                 {{-- Textarea untuk CKEditor --}}
                                 <textarea name="hasil_interview_atasan_text" id="hasilInterviewAtasanText" class="form-control"></textarea>
                                 <div class="invalid-feedback" id="hasilInterviewAtasanTextError"></div>
@@ -233,12 +232,10 @@
                                 '';
                             var hasilInterview = row.hasil_intervie_atasan || '';
 
-                            // Tentukan teks dan warna tombol berdasarkan keberadaan evidence
-
-                            var buttonText = evidenceFileName ? 'Ganti Evidence' :
+                            var buttonText = hasilInterview ? 'Ganti Evidence' :
                             'Upload Evidence';
-                            var buttonClass = evidenceFileName ? 'btn-success' : 'btn-primary';
-                            var buttonTitle = evidenceFileName ? 'Ganti Evidence' :
+                            var buttonClass = hasilInterview ? 'btn-success' : 'btn-primary';
+                            var buttonTitle = hasilInterview ? 'Ganti Evidence' :
                                 'Upload Evidence';
 
 
