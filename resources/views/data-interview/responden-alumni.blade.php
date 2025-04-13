@@ -299,10 +299,6 @@
 
             // Submit formulir modal dengan AJAX
             $('#saveEvidenceBtn').on('click', function() {
-                if (!confirm('Apakah Anda yakin ingin menyimpan evidence ini?')) {
-                    return;
-                }
-
                 if (alumniEditor) {
                     const editorData = alumniEditor.getData();
                     $('#hasilInterviewAlumniText').val(editorData);
@@ -311,7 +307,6 @@
                 var form = $('#uploadEvidenceForm');
                 var formData = new FormData(form[0]);
                 var respondenId = $('#respondenId').val();
-
                 $.ajax({
                     url: "{{ url('data-interview/responden') }}/" + respondenId +
                         "/alumni-evidence",

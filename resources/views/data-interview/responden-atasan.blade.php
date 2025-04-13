@@ -96,13 +96,11 @@
                             <input type="hidden" id="respondenId">
                             <div class="mb-3">
                                 <label for="hasilInterviewAtasanText" class="form-label">Catatan Hasil Interview</label>
-                                {{-- Textarea untuk CKEditor --}}
                                 <textarea name="hasil_interview_atasan_text" id="hasilInterviewAtasanText" class="form-control"></textarea>
                                 <div class="invalid-feedback" id="hasilInterviewAtasanTextError"></div>
                             </div>
                             <div class="mb-3">
                                 <label for="evidenceAtasanFile" class="form-label">File Evidence (Opsional)</label>
-                                {{-- Input file dengan accept diperbarui --}}
                                 <input type="file" name="evidence_atasan_file" id="evidenceAtasanFile"
                                     class="form-control" accept=".doc,.docx,.pdf,.xls,.xlsx,.jpg,.jpeg,.png"
                                     title="Pilih file evidence (doc, docx, pdf, xls, xlsx, jpg, jpeg, png)">
@@ -237,8 +235,6 @@
                             var buttonClass = hasilInterview ? 'btn-success' : 'btn-primary';
                             var buttonTitle = hasilInterview ? 'Ganti Evidence' :
                                 'Upload Evidence';
-
-
                             // Bangun HTML tombol
                             var html =
                                 '<button class="btn btn-sm ' + buttonClass +
@@ -269,6 +265,13 @@
 
                 $('#respondenId').val(id);
                 $('#respondenNama').text(nama);
+
+                if (atasanEditor) {
+                    atasanEditor.setData(hasil || '');
+                } else {
+                    $('#hasilInterviewAtasanText').val(hasil);
+                }
+
                 $('#hasilInterviewAtasanText').val(hasil);
                 $('#evidenceAtasanFile').val('');
 
@@ -289,14 +292,14 @@
 
             // Submit formulir modal dengan AJAX
             $('#saveEvidenceBtn').on('click', function() {
-                if (!confirm('Apakah Anda yakin ingin menyimpan evidence ini?')) {
-                    return;
+                if (atasanEditor) {
+                    const editorData = atasanEditor.getData();
+                    $('#hasilInterviewAtasanText').val(editorData);
                 }
 
                 var form = $('#uploadEvidenceForm');
                 var formData = new FormData(form[0]);
                 var respondenId = $('#respondenId').val();
-
                 $.ajax({
                     url: "{{ url('data-interview/responden') }}/" + respondenId +
                         "/atasan-evidence",

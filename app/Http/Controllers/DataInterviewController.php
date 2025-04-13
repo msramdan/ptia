@@ -120,7 +120,6 @@ class DataInterviewController extends Controller implements HasMiddleware
 
             return DataTables::of($respondents)
                 ->addIndexColumn()
-                ->editColumn('hasil_intervie_alumni', fn($row) => $row->hasil_intervie_alumni ? $row->hasil_intervie_alumni : '')
                 ->toJson();
         }
 
@@ -155,7 +154,6 @@ class DataInterviewController extends Controller implements HasMiddleware
 
             return DataTables::of($respondents)
                 ->addIndexColumn()
-                ->editColumn('hasil_intervie_atasan', fn($row) => $row->hasil_intervie_atasan ? $row->hasil_intervie_atasan : '')
                 ->toJson();
         }
 
@@ -165,19 +163,13 @@ class DataInterviewController extends Controller implements HasMiddleware
     public function storeAlumniEvidence(Request $request, $respondenId): JsonResponse
     {
         $validator = Validator::make($request->all(), [
-
             'evidence_alumni_file' => 'nullable|file|mimes:doc,docx,pdf,xls,xlsx,jpg,jpeg,png|max:5120',
-            'hasil_interview_alumni_text' => 'nullable|string',
+            'hasil_interview_alumni_text' => 'required|string',
         ], [
-
             'evidence_alumni_file.mimes' => 'Format file harus doc, docx, pdf, xls, xlsx, jpg, jpeg, atau png.',
             'evidence_alumni_file.max' => 'Ukuran file maksimal 5MB.',
-        ])->after(function ($validator) use ($request) {
-            if (!$request->hasFile('evidence_alumni_file') && !$request->input('hasil_interview_alumni_text')) {
-                $validator->errors()->add('evidence_alumni_file', 'Anda harus mengupload file atau mengisi hasil interview.');
-                $validator->errors()->add('hasil_interview_alumni_text', 'Anda harus mengisi hasil interview atau mengupload file.');
-            }
-        });
+            'hasil_interview_alumni_text.required' => 'Hasil interview alumni harus diisi.', // pesan error untuk field required
+        ]);
 
         if ($validator->fails()) {
             return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
@@ -241,16 +233,12 @@ class DataInterviewController extends Controller implements HasMiddleware
     {
         $validator = Validator::make($request->all(), [
             'evidence_atasan_file' => 'nullable|file|mimes:doc,docx,pdf,xls,xlsx,jpg,jpeg,png|max:5120',
-            'hasil_interview_atasan_text' => 'nullable|string',
+            'hasil_interview_atasan_text' => 'required|string',
         ], [
             'evidence_atasan_file.mimes' => 'Format file harus doc, docx, pdf, xls, xlsx, jpg, jpeg, atau png.',
             'evidence_atasan_file.max' => 'Ukuran file maksimal 5MB.',
-        ])->after(function ($validator) use ($request) {
-            if (!$request->hasFile('evidence_atasan_file') && !$request->input('hasil_interview_atasan_text')) {
-                $validator->errors()->add('evidence_atasan_file', 'Anda harus mengupload file atau mengisi hasil interview.');
-                $validator->errors()->add('hasil_interview_atasan_text', 'Anda harus mengisi hasil interview atau mengupload file.');
-            }
-        });
+            'hasil_interview_atasan_text.required' => 'Hasil interview atasan harus diisi.',
+        ]);
 
         if ($validator->fails()) {
             return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
