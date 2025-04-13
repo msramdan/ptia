@@ -321,7 +321,7 @@
                                     <div class="card-body">
                                         <i class="fas fa-user-graduate fa-2x text-warning mb-2"></i>
                                         <h6 class="card-title">Keterisian Alumni</h6>
-                                        <p class="card-text fw-bold">{{ $persentaseSudah }} %</p>
+                                        <p class="card-text fw-bold">({{$sudahAlumni}}) - {{ $persentaseSudah }} %</p>
                                     </div>
                                 </div>
                             </div>
@@ -330,7 +330,7 @@
                                     <div class="card-body">
                                         <i class="fas fa-user-tie fa-2x text-danger mb-2"></i>
                                         <h6 class="card-title">Keterisian Atasan</h6>
-                                        <p class="card-text fw-bold">{{ $persentaseSudahAtasan }} %</p>
+                                        <p class="card-text fw-bold">({{$sudahAtasan}}) - {{ $persentaseSudahAtasan }} %</p>
                                     </div>
                                 </div>
                             </div>

@@ -164,7 +164,9 @@ class DashboardController extends Controller
             'tahun',
             'jumlahProject',
             'jumlahResponden',
+            'sudahAlumni',
             'persentaseSudah',
+            'sudahAtasan',
             'persentaseSudahAtasan'
         ));
     }
