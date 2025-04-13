@@ -175,6 +175,12 @@
     <script>
         let alumniEditor;
 
+        function decodeHtmlEntities(str) {
+            const txt = document.createElement('textarea');
+            txt.innerHTML = str;
+            return txt.value;
+        }
+
         ClassicEditor
             .create(document.querySelector('#hasilInterviewAlumniText'), {})
             .then(editor => {
@@ -184,6 +190,7 @@
             .catch(error => {
                 console.error('Error initializing CKEditor Alumni:', error);
             });
+
         $(document).ready(function() {
             @if (session('success'))
                 toastr.success("{{ session('success') }}", "Success", {
@@ -280,12 +287,11 @@
                 $('#respondenNama').text(nama);
 
                 if (alumniEditor) {
-                    alumniEditor.setData(hasil || '');
+                    alumniEditor.setData(decodeHtmlEntities(hasil || ''));
                 } else {
-                    $('#hasilInterviewAlumniText').val(hasil);
+                    $('#hasilInterviewAlumniText').val(decodeHtmlEntities(hasil || ''));
                 }
 
-                $('#hasilInterviewAlumniText').val(hasil);
                 $('#evidenceAlumniFile').val('');
 
                 if (evidence) {
@@ -293,8 +299,8 @@
                     $('#currentEvidenceAlumniLink')
                         .attr('href', fileUrl)
                         .attr('title', 'Download ' + evidence)
-                        .tooltip('dispose') // Hapus tooltip lama (kalau ada)
-                        .tooltip(); // Inisialisasi tooltip baru
+                        .tooltip('dispose')
+                        .tooltip();
                     $('#currentEvidenceAlumni').show();
                 } else {
                     $('#currentEvidenceAlumni').hide();

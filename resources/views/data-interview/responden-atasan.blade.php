@@ -169,6 +169,12 @@
     <script>
         let atasanEditor;
 
+        function decodeHtmlEntities(str) {
+            const txt = document.createElement('textarea');
+            txt.innerHTML = str;
+            return txt.value;
+        }
+
         ClassicEditor
             .create(document.querySelector('#hasilInterviewAtasanText'))
             .then(editor => {
@@ -274,12 +280,11 @@
                 $('#respondenNama').text(nama);
 
                 if (atasanEditor) {
-                    atasanEditor.setData(hasil || '');
+                    atasanEditor.setData(decodeHtmlEntities(hasil || ''));
                 } else {
-                    $('#hasilInterviewAtasanText').val(hasil);
+                    $('#hasilInterviewAlumniText').val(decodeHtmlEntities(hasil || ''));
                 }
 
-                $('#hasilInterviewAtasanText').val(hasil);
                 $('#evidenceAtasanFile').val('');
 
                 if (evidence) {
@@ -287,8 +292,8 @@
                     $('#currentEvidenceLink')
                         .attr('href', fileUrl)
                         .attr('title', 'Download ' + evidence)
-                        .tooltip('dispose') // Hapus tooltip lama (kalau ada)
-                        .tooltip(); // Inisialisasi tooltip baru
+                        .tooltip('dispose')
+                        .tooltip();
                     $('#currentEvidence').show();
                 } else {
                     $('#currentEvidence').hide();
