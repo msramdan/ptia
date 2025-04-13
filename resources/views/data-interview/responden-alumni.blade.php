@@ -182,7 +182,32 @@
         }
 
         ClassicEditor
-            .create(document.querySelector('#hasilInterviewAlumniText'), {})
+            .create(document.querySelector('#hasilInterviewAlumniText'), {
+                toolbar: [
+                    'bold',
+                    'italic',
+                    'underline',
+                    'bulletedList',
+                    'numberedList',
+                    'undo',
+                    'redo',
+                    'Table',
+                    'BlockQuote',
+                    'Heading'
+                ],
+                removePlugins: [
+                    'Image',
+                    'ImageToolbar',
+                    'ImageCaption',
+                    'ImageStyle',
+                    'ImageUpload',
+                    'MediaEmbed',
+                    'Link',
+                    'CKFinder',
+                    'CKFinderUploadAdapter',
+                    'EasyImage'
+                ]
+            })
             .then(editor => {
                 alumniEditor = editor;
                 console.log('CKEditor Alumni Ready');

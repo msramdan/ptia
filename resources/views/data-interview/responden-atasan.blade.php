@@ -162,7 +162,7 @@
     <script src="https://cdn.ckeditor.com/ckeditor5/41.4.2/classic/ckeditor.js"></script>
     <script>
         var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
             return new bootstrap.Tooltip(tooltipTriggerEl);
         });
     </script>
@@ -176,7 +176,32 @@
         }
 
         ClassicEditor
-            .create(document.querySelector('#hasilInterviewAtasanText'))
+            .create(document.querySelector('#hasilInterviewAtasanText'), {
+                toolbar: [
+                    'bold',
+                    'italic',
+                    'underline',
+                    'bulletedList',
+                    'numberedList',
+                    'undo',
+                    'redo',
+                    'Table',
+                    'BlockQuote',
+                    'Heading'
+                ],
+                removePlugins: [
+                    'Image',
+                    'ImageToolbar',
+                    'ImageCaption',
+                    'ImageStyle',
+                    'ImageUpload',
+                    'MediaEmbed',
+                    'Link',
+                    'CKFinder',
+                    'CKFinderUploadAdapter',
+                    'EasyImage'
+                ]
+            })
             .then(editor => {
                 atasanEditor = editor;
                 console.log('CKEditor Atasan Ready');
@@ -184,7 +209,6 @@
             .catch(error => {
                 console.error('Error initializing CKEditor Atasan:', error);
             });
-
         $(document).ready(function() {
             @if (session('success'))
                 toastr.success("{{ session('success') }}", "Success", {
