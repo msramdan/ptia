@@ -295,9 +295,9 @@
                                                 </div>
                                             </div>
 
-                                            <button class="btn btn-pdf-report">
+                                            {{-- <button class="btn btn-pdf-report">
                                                 <i class="fas fa-file-pdf me-1"></i> General Report
-                                            </button>
+                                            </button> --}}
                                         </div>
                                     </div>
                                 </div>
