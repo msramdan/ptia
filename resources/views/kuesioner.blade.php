@@ -97,7 +97,8 @@
                 <!-- Hijau tua -->
                 <i class="fas fa-check-circle me-2 fa-lg" style="color: #28a745;"></i>
                 <div>
-                    Terima kasih! Anda telah mengisi kuesioner ini. Jawaban Anda sangat berarti bagi kami.
+                    Terima kasih! Anda telah mengisi kuesioner ini. Jawaban Anda sangat berarti bagi kami. <a href="{{ route('hasil-evaluasi-responden.index', ['id' => $encryptedId, 'token' => $token]) }}">
+                        <b>Lihat Skor Evaluasi</b> </a>
                 </div>
             </div>
         @else

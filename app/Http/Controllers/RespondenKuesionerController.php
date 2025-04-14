@@ -80,7 +80,7 @@ class RespondenKuesionerController extends Controller
 
             $sudahMengisi = ($statusPengisian === 'Sudah');
 
-            return view('kuesioner', compact('responden', 'target', 'kuesioner', 'isExpired', 'sudahMengisi'));
+            return view('kuesioner', compact('responden', 'target', 'kuesioner', 'isExpired', 'sudahMengisi', 'encryptedId','token'));
         } catch (\Exception $e) {
             abort(404);
         }
@@ -282,6 +282,17 @@ class RespondenKuesionerController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
+
+    public function hasilEvaluasi($encryptedId, Request $request)
+    {
+        try {
+            $id = decryptShort($encryptedId);
+            $token = $request->query('token');
+            return view('hasil_evaluasi_responden');
+        } catch (\Exception $e) {
+            abort(404);
         }
     }
 }

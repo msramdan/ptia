@@ -45,6 +45,7 @@ Route::get('/auto-insert-kuesiober-atasan', [AutoInsertKuesionerAtasanController
 
 // Share kuesioner
 Route::get('/responden-kuesioner/{id}/{target}', [RespondenKuesionerController::class, 'index'])->name('responden-kuesioner.index');
+Route::get('/hasil-evaluasi-responden/{id}', [RespondenKuesionerController::class, 'hasilEvaluasi'])->name('hasil-evaluasi-responden.index');
 Route::post('/responden-kuesioner', [RespondenKuesionerController::class, 'store'])->name('responden-kuesioner.store');
 
 Route::middleware(['auth', 'web'])->group(function () {
