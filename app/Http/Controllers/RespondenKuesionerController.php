@@ -80,7 +80,7 @@ class RespondenKuesionerController extends Controller
 
             $sudahMengisi = ($statusPengisian === 'Sudah');
 
-            return view('kuesioner', compact('responden', 'target', 'kuesioner', 'isExpired', 'sudahMengisi', 'encryptedId','token'));
+            return view('kuesioner', compact('responden', 'target', 'kuesioner', 'isExpired', 'sudahMengisi', 'encryptedId', 'token'));
         } catch (\Exception $e) {
             abort(404);
         }
@@ -102,6 +102,8 @@ class RespondenKuesionerController extends Controller
             'aspek_id' => 'required|array',
             'level' => 'required|array',
             'kriteria' => 'required|array',
+            'encryptedId' => 'required',
+            'token' => 'required',
         ]);
 
         try {
@@ -278,7 +280,10 @@ class RespondenKuesionerController extends Controller
 
             DB::commit();
 
-            return redirect()->back()->with('success', 'Jawaban berhasil disimpan dan status diperbarui!');
+            return redirect()->route('hasil-evaluasi-responden.index', [
+                'id' => $validatedData['encryptedId'],
+                'token' => $validatedData['token']
+            ])->with('success', 'Jawaban berhasil disimpan dan status diperbarui!');
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());

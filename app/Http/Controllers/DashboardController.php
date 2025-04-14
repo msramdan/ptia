@@ -113,6 +113,13 @@ class DashboardController extends Controller
                 ->addColumn('kriteria_dampak_level_3', fn($row) => e($row->kriteria_dampak_level_3 ?? '-'))
                 ->addColumn('kriteria_dampak_level_4', fn($row) => e($row->kriteria_dampak_level_4 ?? '-'))
                 ->rawColumns(['user', 'avg_skor_level_3', 'avg_skor_level_4'])
+                ->with([
+                    'summary' => [
+                        'avg_skor_level_3' => $projects->avg('avg_scores.avg_skor_level_3'),
+                        'avg_skor_level_4' => $projects->avg('avg_scores.final_avg_skor_level_4'),
+                        'count' => $projects->count()
+                    ]
+                ])
                 ->toJson();
         }
 

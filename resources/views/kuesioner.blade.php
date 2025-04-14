@@ -97,7 +97,8 @@
                 <!-- Hijau tua -->
                 <i class="fas fa-check-circle me-2 fa-lg" style="color: #28a745;"></i>
                 <div>
-                    Terima kasih! Anda telah mengisi kuesioner ini. Jawaban Anda sangat berarti bagi kami. <a href="{{ route('hasil-evaluasi-responden.index', ['id' => $encryptedId, 'token' => $token]) }}">
+                    Terima kasih! Anda telah mengisi kuesioner ini. Jawaban Anda sangat berarti bagi kami. <a
+                        href="{{ route('hasil-evaluasi-responden.index', ['id' => $encryptedId, 'token' => $token]) }}">
                         <b>Lihat Skor Evaluasi</b> </a>
                 </div>
             </div>
@@ -166,6 +167,12 @@
                         readonly style="background-color: #e9ecef;">
                     <input type="hidden" id="project_responden_id" name="project_responden_id" class="form-control"
                         value="{{ $responden->id }}" readonly style="background-color: #e9ecef;">
+                    <input type="hidden" id="token" name="token" class="form-control"
+                        value="{{ $token }}" readonly style="background-color: #e9ecef;">
+                    <input type="hidden" id="encryptedId" name="encryptedId" class="form-control"
+                        value="{{ $encryptedId }}" readonly style="background-color: #e9ecef;">
+
+
                     <input type="hidden" id="project_id" name="project_id" class="form-control"
                         value="{{ $responden->project_id }}" readonly style="background-color: #e9ecef;">
 

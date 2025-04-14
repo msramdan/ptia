@@ -224,6 +224,11 @@
         .card-text {
             font-size: 1.1rem;
         }
+
+        tfoot th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
     </style>
 
     <div class="page-heading">
@@ -321,7 +326,7 @@
                                     <div class="card-body">
                                         <i class="fas fa-user-graduate fa-2x text-warning mb-2"></i>
                                         <h6 class="card-title">Keterisian Alumni</h6>
-                                        <p class="card-text fw-bold">({{$sudahAlumni}}) - {{ $persentaseSudah }} %</p>
+                                        <p class="card-text fw-bold">({{ $sudahAlumni }}) - {{ $persentaseSudah }} %</p>
                                     </div>
                                 </div>
                             </div>
@@ -330,7 +335,8 @@
                                     <div class="card-body">
                                         <i class="fas fa-user-tie fa-2x text-danger mb-2"></i>
                                         <h6 class="card-title">Keterisian Atasan</h6>
-                                        <p class="card-text fw-bold">({{$sudahAtasan}}) - {{ $persentaseSudahAtasan }} %</p>
+                                        <p class="card-text fw-bold">({{ $sudahAtasan }}) - {{ $persentaseSudahAtasan }}
+                                            %</p>
                                     </div>
                                 </div>
                             </div>
@@ -347,7 +353,7 @@
                                     <figure class="highcharts-figure">
                                         <div id="container"></div>
                                         <div class="gauge-value-display">
-                                            <div class="gauge-current-value" id="current-value">75%</div>
+                                            <div class="gauge-current-value" id="current-value">0%</div>
                                             <div class="gauge-value-label">Skor Saat Ini</div>
                                         </div>
                                     </figure>
@@ -366,7 +372,7 @@
                                     <figure class="highcharts-figure">
                                         <div id="container-level4"></div>
                                         <div class="gauge-value-display">
-                                            <div class="gauge-current-value" id="current-value-level4">65%</div>
+                                            <div class="gauge-current-value" id="current-value-level4">0%</div>
                                             <div class="gauge-value-label">Skor Saat Ini</div>
                                         </div>
                                     </figure>
@@ -402,6 +408,15 @@
                                             </thead>
                                             <tbody>
                                             </tbody>
+                                            <tfoot>
+                                                <tr>
+                                                    <th colspan="5" style="text-align:right"></th>
+                                                    <th class="text-center"></th>
+                                                    <th></th>
+                                                    <th class="text-center"></th>
+                                                    <th></th>
+                                                </tr>
+                                            </tfoot>
                                         </table>
                                     </div>
                                 </div>
@@ -433,227 +448,216 @@
     <script src="https://code.highcharts.com/modules/exporting.js"></script>
     <script src="https://code.highcharts.com/modules/export-data.js"></script>
     <script src="https://code.highcharts.com/modules/accessibility.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Gauge untuk Level 3
-            const chartLevel3 = Highcharts.chart('container', {
-                chart: {
-                    type: 'gauge',
-                    plotBackgroundColor: null,
-                    plotBackgroundImage: null,
-                    plotBorderWidth: 0,
-                    plotShadow: false,
-                    height: '80%',
-                    backgroundColor: 'transparent'
-                },
-                exporting: {
-                    enabled: false
-                },
-                title: {
-                    text: null
-                },
-                credits: {
-                    enabled: false
-                },
-                pane: {
-                    startAngle: -90,
-                    endAngle: 89.9,
-                    background: null,
-                    center: ['50%', '75%'],
-                    size: '110%',
-                    borderWidth: 0
-                },
-                yAxis: {
-                    min: 0,
-                    max: 100,
-                    tickPixelInterval: 72,
-                    tickPosition: 'inside',
-                    tickColor: '#f8f9fa',
-                    tickLength: 15,
-                    tickWidth: 2,
-                    minorTickInterval: null,
-                    labels: {
-                        distance: 25,
-                        style: {
-                            fontSize: '12px',
-                            color: '#95a5a6'
-                        }
-                    },
-                    lineWidth: 0,
-                    plotBands: [{
-                            from: 0,
-                            to: 25,
-                            color: '#e74c3c',
-                            thickness: 20,
-                            borderRadius: 5
-                        },
-                        {
-                            from: 25,
-                            to: 50,
-                            color: '#f39c12',
-                            thickness: 20,
-                            borderRadius: 5
-                        },
-                        {
-                            from: 50,
-                            to: 75,
-                            color: '#3498db',
-                            thickness: 20,
-                            borderRadius: 5
-                        },
-                        {
-                            from: 75,
-                            to: 100,
-                            color: '#2ecc71',
-                            thickness: 20,
-                            borderRadius: 5
-                        }
-                    ]
-                },
-                series: [{
-                    name: 'Skor',
-                    data: [75],
-                    tooltip: {
-                        valueSuffix: ' %'
-                    },
-                    dataLabels: {
-                        enabled: false
-                    },
-                    dial: {
-                        radius: '80%',
-                        backgroundColor: '#34495e',
-                        baseWidth: 12,
-                        baseLength: '0%',
-                        rearLength: '0%',
-                        borderWidth: 1,
-                        borderColor: '#fff'
-                    },
-                    pivot: {
-                        backgroundColor: '#34495e',
-                        radius: 6,
-                        borderWidth: 1,
-                        borderColor: '#fff'
-                    }
-                }]
-            });
-
-            document.getElementById('current-value').textContent = chartLevel3.series[0].points[0].y + '%';
-
-            setTimeout(() => {
-                chartLevel3.series[0].points[0].update(75);
-            }, 1000);
-
-            // Gauge untuk Level 4
-            const chartLevel4 = Highcharts.chart('container-level4', {
-                chart: {
-                    type: 'gauge',
-                    plotBackgroundColor: null,
-                    plotBackgroundImage: null,
-                    plotBorderWidth: 0,
-                    plotShadow: false,
-                    height: '80%',
-                    backgroundColor: 'transparent'
-                },
-                exporting: {
-                    enabled: false
-                },
-                title: {
-                    text: null
-                },
-                credits: {
-                    enabled: false
-                },
-                pane: {
-                    startAngle: -90,
-                    endAngle: 89.9,
-                    background: null,
-                    center: ['50%', '75%'],
-                    size: '110%',
-                    borderWidth: 0
-                },
-                yAxis: {
-                    min: 0,
-                    max: 100,
-                    tickPixelInterval: 72,
-                    tickPosition: 'inside',
-                    tickColor: '#f8f9fa',
-                    tickLength: 15,
-                    tickWidth: 2,
-                    minorTickInterval: null,
-                    labels: {
-                        distance: 25,
-                        style: {
-                            fontSize: '12px',
-                            color: '#95a5a6'
-                        }
-                    },
-                    lineWidth: 0,
-                    plotBands: [{
-                            from: 0,
-                            to: 25,
-                            color: '#e74c3c',
-                            thickness: 20,
-                            borderRadius: 5
-                        },
-                        {
-                            from: 25,
-                            to: 50,
-                            color: '#f39c12',
-                            thickness: 20,
-                            borderRadius: 5
-                        },
-                        {
-                            from: 50,
-                            to: 75,
-                            color: '#3498db',
-                            thickness: 20,
-                            borderRadius: 5
-                        },
-                        {
-                            from: 75,
-                            to: 100,
-                            color: '#2ecc71',
-                            thickness: 20,
-                            borderRadius: 5
-                        }
-                    ]
-                },
-                series: [{
-                    name: 'Skor',
-                    data: [65],
-                    tooltip: {
-                        valueSuffix: ' %'
-                    },
-                    dataLabels: {
-                        enabled: false
-                    },
-                    dial: {
-                        radius: '80%',
-                        backgroundColor: '#34495e',
-                        baseWidth: 12,
-                        baseLength: '0%',
-                        rearLength: '0%',
-                        borderWidth: 1,
-                        borderColor: '#fff'
-                    },
-                    pivot: {
-                        backgroundColor: '#34495e',
-                        radius: 6,
-                        borderWidth: 1,
-                        borderColor: '#fff'
-                    }
-                }]
-            });
-
-            document.getElementById('current-value-level4').textContent = chartLevel4.series[0].points[0].y + '%';
-
-            setTimeout(() => {
-                chartLevel4.series[0].points[0].update(65);
-            }, 1000);
-        });
-    </script>
     <script type="text/javascript" src="https://cdn.datatables.net/v/bs5/dt-1.12.0/datatables.min.js"></script>
     <script>
+        // Deklarasikan chart di level global agar bisa diakses dari mana saja
+        var chartLevel3, chartLevel4;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Inisialisasi gauge dengan nilai 0
+            chartLevel3 = Highcharts.chart('container', {
+                chart: {
+                    type: 'gauge',
+                    plotBackgroundColor: null,
+                    plotBackgroundImage: null,
+                    plotBorderWidth: 0,
+                    plotShadow: false,
+                    height: '80%',
+                    backgroundColor: 'transparent'
+                },
+                exporting: {
+                    enabled: false
+                },
+                title: {
+                    text: null
+                },
+                credits: {
+                    enabled: false
+                },
+                pane: {
+                    startAngle: -90,
+                    endAngle: 89.9,
+                    background: null,
+                    center: ['50%', '75%'],
+                    size: '110%',
+                    borderWidth: 0
+                },
+                yAxis: {
+                    min: 0,
+                    max: 100,
+                    tickPixelInterval: 72,
+                    tickPosition: 'inside',
+                    tickColor: '#f8f9fa',
+                    tickLength: 15,
+                    tickWidth: 2,
+                    minorTickInterval: null,
+                    labels: {
+                        distance: 25,
+                        style: {
+                            fontSize: '12px',
+                            color: '#95a5a6'
+                        }
+                    },
+                    lineWidth: 0,
+                    plotBands: [{
+                            from: 0,
+                            to: 25,
+                            color: '#e74c3c',
+                            thickness: 20,
+                            borderRadius: 5
+                        },
+                        {
+                            from: 25,
+                            to: 50,
+                            color: '#f39c12',
+                            thickness: 20,
+                            borderRadius: 5
+                        },
+                        {
+                            from: 50,
+                            to: 75,
+                            color: '#3498db',
+                            thickness: 20,
+                            borderRadius: 5
+                        },
+                        {
+                            from: 75,
+                            to: 100,
+                            color: '#2ecc71',
+                            thickness: 20,
+                            borderRadius: 5
+                        }
+                    ]
+                },
+                series: [{
+                    name: 'Skor',
+                    data: [0], // Nilai awal 0
+                    tooltip: {
+                        valueSuffix: ' %'
+                    },
+                    dataLabels: {
+                        enabled: false
+                    },
+                    dial: {
+                        radius: '80%',
+                        backgroundColor: '#34495e',
+                        baseWidth: 12,
+                        baseLength: '0%',
+                        rearLength: '0%',
+                        borderWidth: 1,
+                        borderColor: '#fff'
+                    },
+                    pivot: {
+                        backgroundColor: '#34495e',
+                        radius: 6,
+                        borderWidth: 1,
+                        borderColor: '#fff'
+                    }
+                }]
+            });
+
+            chartLevel4 = Highcharts.chart('container-level4', {
+                chart: {
+                    type: 'gauge',
+                    plotBackgroundColor: null,
+                    plotBackgroundImage: null,
+                    plotBorderWidth: 0,
+                    plotShadow: false,
+                    height: '80%',
+                    backgroundColor: 'transparent'
+                },
+                exporting: {
+                    enabled: false
+                },
+                title: {
+                    text: null
+                },
+                credits: {
+                    enabled: false
+                },
+                pane: {
+                    startAngle: -90,
+                    endAngle: 89.9,
+                    background: null,
+                    center: ['50%', '75%'],
+                    size: '110%',
+                    borderWidth: 0
+                },
+                yAxis: {
+                    min: 0,
+                    max: 100,
+                    tickPixelInterval: 72,
+                    tickPosition: 'inside',
+                    tickColor: '#f8f9fa',
+                    tickLength: 15,
+                    tickWidth: 2,
+                    minorTickInterval: null,
+                    labels: {
+                        distance: 25,
+                        style: {
+                            fontSize: '12px',
+                            color: '#95a5a6'
+                        }
+                    },
+                    lineWidth: 0,
+                    plotBands: [{
+                            from: 0,
+                            to: 25,
+                            color: '#e74c3c',
+                            thickness: 20,
+                            borderRadius: 5
+                        },
+                        {
+                            from: 25,
+                            to: 50,
+                            color: '#f39c12',
+                            thickness: 20,
+                            borderRadius: 5
+                        },
+                        {
+                            from: 50,
+                            to: 75,
+                            color: '#3498db',
+                            thickness: 20,
+                            borderRadius: 5
+                        },
+                        {
+                            from: 75,
+                            to: 100,
+                            color: '#2ecc71',
+                            thickness: 20,
+                            borderRadius: 5
+                        }
+                    ]
+                },
+                series: [{
+                    name: 'Skor',
+                    data: [0], // Nilai awal 0
+                    tooltip: {
+                        valueSuffix: ' %'
+                    },
+                    dataLabels: {
+                        enabled: false
+                    },
+                    dial: {
+                        radius: '80%',
+                        backgroundColor: '#34495e',
+                        baseWidth: 12,
+                        baseLength: '0%',
+                        rearLength: '0%',
+                        borderWidth: 1,
+                        borderColor: '#fff'
+                    },
+                    pivot: {
+                        backgroundColor: '#34495e',
+                        radius: 6,
+                        borderWidth: 1,
+                        borderColor: '#fff'
+                    }
+                }]
+            });
+        });
+
         $(document).ready(function() {
             var tahun = "{{ $tahun }}";
             $('#data-table').DataTable({
@@ -703,7 +707,62 @@
                         data: 'kriteria_dampak_level_4',
                         name: 'kriteria_dampak_level_4'
                     }
-                ]
+                ],
+                footerCallback: function(row, data, start, end, display) {
+                    var api = this.api();
+
+                    // Mendapatkan data summary dari server
+                    $.ajax({
+                        url: "{{ route('dashboard') }}",
+                        data: {
+                            tahun: tahun,
+                            draw: 1,
+                            length: -1 // Untuk mendapatkan semua data
+                        },
+                        success: function(response) {
+                            if (response && response.summary) {
+                                var avgLevel3 = parseFloat(response.summary
+                                    .avg_skor_level_3) || 0;
+                                var avgLevel4 = parseFloat(response.summary
+                                    .avg_skor_level_4) || 0;
+
+                                // Update footer tabel
+                                $(api.column(5).footer()).html(
+                                    '<strong>' + avgLevel3.toFixed(2) + '</strong>'
+                                );
+                                $(api.column(7).footer()).html(
+                                    '<strong>' + avgLevel4.toFixed(2) + '</strong>'
+                                );
+
+                                // Update gauge Level 3
+                                if (chartLevel3) {
+                                    chartLevel3.series[0].points[0].update(avgLevel3);
+                                    document.getElementById('current-value').textContent =
+                                        avgLevel3.toFixed(2) + '%';
+                                }
+
+                                // Update gauge Level 4
+                                if (chartLevel4) {
+                                    chartLevel4.series[0].points[0].update(avgLevel4);
+                                    document.getElementById('current-value-level4')
+                                        .textContent = avgLevel4.toFixed(2) + '%';
+                                }
+                            }
+                        },
+                        error: function() {
+                            console.error('Gagal mengambil data rata-rata');
+                        }
+                    });
+                },
+                initComplete: function() {
+                    // Inisialisasi footer
+                    this.api().columns().every(function() {
+                        var column = this;
+                        if (column.index() === 5 || column.index() === 7) {
+                            $(column.footer()).html('<strong>Loading...</strong>');
+                        }
+                    });
+                }
             });
         });
     </script>
