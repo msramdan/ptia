@@ -125,7 +125,7 @@
                                         </tr>
                                         @foreach ($detailAlumniLevel3 as $item)
                                             <tr>
-                                                <td class="text-start">{{ $item['aspek'] ?? '-' }}</td>
+                                                <td class="text-start">{{ $item['aspek_nama'] ?? '-' }}</td>
                                                 <td>{{ $item['kriteria'] ?? '-' }}</td>
                                                 <td>{{ $item['average_nilai_delta'] ?? '-' }}</td>
                                                 <td>{{ $item['konversi'] ?? '-' }}</td>
@@ -149,7 +149,7 @@
                                         </tr>
                                         @foreach ($detailAtasanLevel3 as $item)
                                             <tr>
-                                                <td class="text-start">{{ $item['aspek'] ?? '-' }}</td>
+                                                <td class="text-start">{{ $item['aspek_nama'] ?? '-' }}</td>
                                                 <td>{{ $item['kriteria'] ?? '-' }}</td>
                                                 <td>{{ $item['average_nilai_delta'] ?? '-' }}</td>
                                                 <td>{{ $item['konversi'] ?? '-' }}</td>
@@ -210,7 +210,7 @@
                                         </tr>
                                         @foreach ($detailAlumniLevel4 as $item)
                                             <tr>
-                                                <td class="text-start">{{ $item['aspek'] ?? '-' }}</td>
+                                                <td class="text-start">{{ $item['aspek_nama'] ?? '-' }}</td>
                                                 <td>{{ $item['kriteria'] ?? '-' }}</td>
                                                 <td>{{ $item['average_nilai_delta'] ?? '-' }}</td>
                                                 <td>{{ $item['konversi'] ?? '-' }}</td>
@@ -234,7 +234,7 @@
                                         </tr>
                                         @foreach ($detailAtasanLevel4 as $item)
                                             <tr>
-                                                <td class="text-start">{{ $item['aspek'] ?? '-' }}</td>
+                                                <td class="text-start">{{ $item['aspek_nama'] ?? '-' }}</td>
                                                 <td>{{ $item['kriteria'] ?? '-' }}</td>
                                                 <td>{{ $item['average_nilai_delta'] ?? '-' }}</td>
                                                 <td>{{ $item['konversi'] ?? '-' }}</td>

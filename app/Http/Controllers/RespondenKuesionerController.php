@@ -300,7 +300,11 @@ class RespondenKuesionerController extends Controller
             // 1. Ambil data responden dan project
             $responden = DB::table('project_responden')
                 ->join('project', 'project_responden.project_id', '=', 'project.id')
-                ->select('project_responden.*', 'project.id as project_id', 'project.diklat_type_id') // Ambil project_id dan diklat_type_id
+                ->select(
+                    'project_responden.*', // Ambil semua kolom dari project_responden
+                    'project.id as project_id',
+                    'project.diklat_type_id'
+                )
                 ->where('project_responden.id', $id)
                 ->where('project_responden.token', $token) // Validasi token
                 ->first();
@@ -312,30 +316,60 @@ class RespondenKuesionerController extends Controller
             $projectId = $responden->project_id;
             $diklatTypeId = $responden->diklat_type_id;
 
-            // 2. Ambil data skor yang tersimpan (asumsi sudah dihitung di method store)
+            // 2. Ambil data skor yang tersimpan
             $skorData = DB::table('project_skor_responden')
                 ->where('project_responden_id', $id)
                 ->first();
 
             if (!$skorData) {
-                // Handle jika data skor belum ada (misalnya, tampilkan pesan error)
                 return redirect()->back()->with('error', 'Data skor evaluasi belum tersedia.');
             }
 
-            // 3. Ambil detail perhitungan dari log (jika perlu ditampilkan detailnya)
-            //    Ambil dari kolom log_data_alumni dan log_data_atasan
-            $detailAlumniLevel3 = json_decode($skorData->log_data_alumni, true) ?? [];
-            $detailAtasanLevel3 = json_decode($skorData->log_data_atasan, true) ?? [];
+            // 3. Ambil detail perhitungan dari log
+            $detailAlumni = json_decode($skorData->log_data_alumni, true) ?? [];
+            $detailAtasan = json_decode($skorData->log_data_atasan, true) ?? [];
 
-            // Filter berdasarkan level (contoh untuk Level 3)
-            $detailAlumniLevel3 = collect($detailAlumniLevel3)->where('level', '3')->values()->all();
-            $detailAtasanLevel3 = collect($detailAtasanLevel3)->where('level', '3')->values()->all();
+            // --- MODIFIKASI DIMULAI DI SINI ---
 
-            $detailAlumniLevel4 = json_decode($skorData->log_data_alumni, true) ?? [];
-            $detailAtasanLevel4 = json_decode($skorData->log_data_atasan, true) ?? [];
-            $detailAlumniLevel4 = collect($detailAlumniLevel4)->where('level', '4')->values()->all();
-            $detailAtasanLevel4 = collect($detailAtasanLevel4)->where('level', '4')->values()->all();
+            // 3.1. Kumpulkan semua aspek_id unik dari detail log
+            $allAspekIds = collect($detailAlumni)
+                ->merge($detailAtasan) // Gabungkan data alumni dan atasan
+                ->pluck('aspek_id')    // Ambil semua aspek_id
+                ->filter()             // Hapus nilai null/kosong
+                ->unique()             // Ambil ID yang unik
+                ->values()
+                ->all();
 
+            // 3.2. Buat Peta Nama Aspek (Aspek ID => Nama Aspek)
+            $aspekNamesMap = [];
+            if (!empty($allAspekIds)) {
+                // Query ke tabel 'aspek' untuk mendapatkan nama berdasarkan ID
+                // Pastikan tabel 'aspek' memiliki kolom 'id' dan 'aspek' (nama)
+                $aspekData = DB::table('aspek')
+                    ->whereIn('id', $allAspekIds)
+                    ->pluck('aspek', 'id'); // Hasilnya [id => nama_aspek]
+
+                $aspekNamesMap = $aspekData->all();
+            }
+
+            // 3.3. Fungsi untuk menambahkan nama aspek ke array detail
+            $injectAspectName = function ($details) use ($aspekNamesMap) {
+                return collect($details)->map(function ($item) use ($aspekNamesMap) {
+                    // Cari nama aspek berdasarkan aspek_id di peta
+                    $item['aspek_nama'] = $aspekNamesMap[$item['aspek_id']] ?? 'Aspek Tidak Ditemukan';
+                    return $item;
+                })->all();
+            };
+
+            // 3.4. Tambahkan nama aspek ke data detail Alumni dan Atasan
+            $detailAlumni = $injectAspectName($detailAlumni);
+            $detailAtasan = $injectAspectName($detailAtasan);
+
+            // 3.5 Pisahkan lagi berdasarkan level setelah nama ditambahkan
+            $detailAlumniLevel3 = collect($detailAlumni)->where('level', '3')->values()->all();
+            $detailAtasanLevel3 = collect($detailAtasan)->where('level', '3')->values()->all();
+            $detailAlumniLevel4 = collect($detailAlumni)->where('level', '4')->values()->all();
+            $detailAtasanLevel4 = collect($detailAtasan)->where('level', '4')->values()->all();
 
             // 4. Ambil data sekunder dan bobotnya untuk level 4
             $dataSekunder = DB::table('project_data_sekunder')
