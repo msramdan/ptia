@@ -104,7 +104,7 @@
                 <div id="collapseLevel3" class="accordion-collapse collapse show" aria-labelledby="headingLevel3"
                     data-bs-parent="#accordionEvaluasi">
                     <div class="accordion-body">
-                        <!-- Table Level 3 -->
+                        {{-- Bagian Tabel Level 3 --}}
                         <div class="table-responsive">
                             <table class="table table-sm table-bordered align-middle text-center">
                                 <thead class="table-light">
@@ -118,90 +118,58 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <!-- Alumni -->
-                                    <tr class="table-secondary text-start fw-bold">
-                                        <td colspan="6">Alumni</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="text-start">Motivasi</td>
-                                        <td>Delta Skor Persepsi</td>
-                                        <td>2</td>
-                                        <td>88</td>
-                                        <td>8.94</td>
-                                        <td>7.87</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="text-start">Kepercayaan Diri</td>
-                                        <td>Delta Skor Persepsi</td>
-                                        <td>0</td>
-                                        <td>0</td>
-                                        <td>10.48</td>
-                                        <td>0</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="text-start">Kemampuan Membagikan Keilmuan</td>
-                                        <td>Skor Persepsi</td>
-                                        <td>1</td>
-                                        <td>0</td>
-                                        <td>7.62</td>
-                                        <td>0</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="text-start">Kemampuan Implementasi Keilmuan</td>
-                                        <td>Delta Skor Persepsi</td>
-                                        <td>2</td>
-                                        <td>88</td>
-                                        <td>24.41</td>
-                                        <td>21.48</td>
-                                    </tr>
-                                    <tr class="fw-bold">
-                                        <td colspan="5" class="text-end">Total Nilai Alumni</td>
-                                        <td>29.35</td>
-                                    </tr>
+                                    {{-- Data Alumni Level 3 --}}
+                                    @if (!empty($detailAlumniLevel3))
+                                        <tr class="table-secondary text-start fw-bold">
+                                            <td colspan="6">Alumni</td>
+                                        </tr>
+                                        @foreach ($detailAlumniLevel3 as $item)
+                                            <tr>
+                                                <td class="text-start">{{ $item['aspek'] ?? '-' }}</td>
+                                                <td>{{ $item['kriteria'] ?? '-' }}</td>
+                                                <td>{{ $item['average_nilai_delta'] ?? '-' }}</td>
+                                                <td>{{ $item['konversi'] ?? '-' }}</td>
+                                                <td>{{ isset($item['bobot']) ? number_format($item['bobot'], 2) : '-' }}%
+                                                </td>
+                                                <td>{{ isset($item['nilai']) ? number_format($item['nilai'], 2) : '-' }}
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                        <tr class="fw-bold">
+                                            <td colspan="5" class="text-end">Total Nilai Alumni</td>
+                                            {{-- Ambil dari skorData jika ada --}}
+                                            <td>{{ number_format($skorData->skor_level_3_alumni ?? 0, 2) }}</td>
+                                        </tr>
+                                    @endif
 
-                                    <!-- Atasan -->
-                                    <tr class="table-secondary text-start fw-bold">
-                                        <td colspan="6">Atasan</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="text-start">Motivasi</td>
-                                        <td>Delta Skor Persepsi</td>
-                                        <td>0</td>
-                                        <td>0</td>
-                                        <td>8.44</td>
-                                        <td>0</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="text-start">Kepercayaan Diri</td>
-                                        <td>Delta Skor Persepsi</td>
-                                        <td>0</td>
-                                        <td>0</td>
-                                        <td>9.89</td>
-                                        <td>0</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="text-start">Kemampuan Membagikan Keilmuan</td>
-                                        <td>Skor Persepsi</td>
-                                        <td>4</td>
-                                        <td>100</td>
-                                        <td>7.18</td>
-                                        <td>7.18</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="text-start">Kemampuan Implementasi Keilmuan</td>
-                                        <td>Delta Skor Persepsi</td>
-                                        <td>3</td>
-                                        <td>100</td>
-                                        <td>23.04</td>
-                                        <td>23.04</td>
-                                    </tr>
-                                    <tr class="fw-bold">
-                                        <td colspan="5" class="text-end">Total Nilai Atasan</td>
-                                        <td>30.22</td>
-                                    </tr>
+                                    {{-- Data Atasan Level 3 --}}
+                                    @if (!empty($detailAtasanLevel3))
+                                        <tr class="table-secondary text-start fw-bold">
+                                            <td colspan="6">Atasan</td>
+                                        </tr>
+                                        @foreach ($detailAtasanLevel3 as $item)
+                                            <tr>
+                                                <td class="text-start">{{ $item['aspek'] ?? '-' }}</td>
+                                                <td>{{ $item['kriteria'] ?? '-' }}</td>
+                                                <td>{{ $item['average_nilai_delta'] ?? '-' }}</td>
+                                                <td>{{ $item['konversi'] ?? '-' }}</td>
+                                                <td>{{ isset($item['bobot']) ? number_format($item['bobot'], 2) : '-' }}%
+                                                </td>
+                                                <td>{{ isset($item['nilai']) ? number_format($item['nilai'], 2) : '-' }}
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                        <tr class="fw-bold">
+                                            <td colspan="5" class="text-end">Total Nilai Atasan</td>
+                                            {{-- Ambil dari skorData jika ada --}}
+                                            <td>{{ number_format($skorData->skor_level_3_atasan ?? 0, 2) }}</td>
+                                        </tr>
+                                    @endif
+
+                                    {{-- Total Keseluruhan Level 3 --}}
                                     <tr class="table-light fw-bold">
                                         <td colspan="5" class="text-end">Total Nilai Alumni & Atasan</td>
-                                        <td>59.57</td>
+                                        <td>{{ number_format($totalLevel3, 2) }}</td> {{-- Gunakan totalLevel3 --}}
                                     </tr>
                                 </tbody>
                             </table>
@@ -221,7 +189,7 @@
                 <div id="collapseLevel4" class="accordion-collapse collapse" aria-labelledby="headingLevel4"
                     data-bs-parent="#accordionEvaluasi">
                     <div class="accordion-body">
-                        <!-- Table Level 4 -->
+                        {{-- Bagian Tabel Level 4 --}}
                         <div class="table-responsive">
                             <table class="table table-sm table-bordered align-middle text-center">
                                 <thead class="table-light">
@@ -235,48 +203,64 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <!-- Alumni -->
-                                    <tr class="table-secondary text-start fw-bold">
-                                        <td colspan="6">Alumni</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="text-start">Hasil Pelatihan</td>
-                                        <td>Delta Skor Persepsi</td>
-                                        <td>1</td>
-                                        <td>63</td>
-                                        <td>37.95</td>
-                                        <td>23.91</td>
-                                    </tr>
-                                    <tr class="fw-bold">
-                                        <td colspan="5" class="text-end">Total Nilai Alumni</td>
-                                        <td>23.91</td>
-                                    </tr>
+                                    {{-- Data Alumni Level 4 --}}
+                                    @if (!empty($detailAlumniLevel4))
+                                        <tr class="table-secondary text-start fw-bold">
+                                            <td colspan="6">Alumni</td>
+                                        </tr>
+                                        @foreach ($detailAlumniLevel4 as $item)
+                                            <tr>
+                                                <td class="text-start">{{ $item['aspek'] ?? '-' }}</td>
+                                                <td>{{ $item['kriteria'] ?? '-' }}</td>
+                                                <td>{{ $item['average_nilai_delta'] ?? '-' }}</td>
+                                                <td>{{ $item['konversi'] ?? '-' }}</td>
+                                                <td>{{ isset($item['bobot']) ? number_format($item['bobot'], 2) : '-' }}%
+                                                </td>
+                                                <td>{{ isset($item['nilai']) ? number_format($item['nilai'], 2) : '-' }}
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                        <tr class="fw-bold">
+                                            <td colspan="5" class="text-end">Total Nilai Alumni</td>
+                                            {{-- Ambil dari skorData jika ada --}}
+                                            <td>{{ number_format($skorData->skor_level_4_alumni ?? 0, 2) }}</td>
+                                        </tr>
+                                    @endif
 
-                                    <!-- Atasan -->
-                                    <tr class="table-secondary text-start fw-bold">
-                                        <td colspan="6">Atasan</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="text-start">Hasil Pelatihan</td>
-                                        <td>Delta Skor Persepsi</td>
-                                        <td>3</td>
-                                        <td>100</td>
-                                        <td>35.82</td>
-                                        <td>35.82</td>
-                                    </tr>
-                                    <tr class="fw-bold">
-                                        <td colspan="5" class="text-end">Total Nilai Atasan</td>
-                                        <td>35.82</td>
-                                    </tr>
+                                    {{-- Data Atasan Level 4 --}}
+                                    @if (!empty($detailAtasanLevel4))
+                                        <tr class="table-secondary text-start fw-bold">
+                                            <td colspan="6">Atasan</td>
+                                        </tr>
+                                        @foreach ($detailAtasanLevel4 as $item)
+                                            <tr>
+                                                <td class="text-start">{{ $item['aspek'] ?? '-' }}</td>
+                                                <td>{{ $item['kriteria'] ?? '-' }}</td>
+                                                <td>{{ $item['average_nilai_delta'] ?? '-' }}</td>
+                                                <td>{{ $item['konversi'] ?? '-' }}</td>
+                                                <td>{{ isset($item['bobot']) ? number_format($item['bobot'], 2) : '-' }}%
+                                                </td>
+                                                <td>{{ isset($item['nilai']) ? number_format($item['nilai'], 2) : '-' }}
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                        <tr class="fw-bold">
+                                            <td colspan="5" class="text-end">Total Nilai Atasan</td>
+                                            {{-- Ambil dari skorData jika ada --}}
+                                            <td>{{ number_format($skorData->skor_level_4_atasan ?? 0, 2) }}</td>
+                                        </tr>
+                                    @endif
 
-                                    <!-- Final -->
+                                    {{-- Data Sekunder --}}
                                     <tr class="table-light fw-bold">
                                         <td colspan="5" class="text-end">Data Sekunder</td>
-                                        <td>26.23</td>
+                                        <td>{{ number_format($nilaiSekunder, 2) }}</td> {{-- Gunakan nilaiSekunder --}}
                                     </tr>
+
+                                    {{-- Total Keseluruhan Level 4 --}}
                                     <tr class="table-light fw-bold">
                                         <td colspan="5" class="text-end">Total Nilai</td>
-                                        <td>85.96</td>
+                                        <td>{{ number_format($totalLevel4, 2) }}</td> {{-- Gunakan totalLevel4 --}}
                                     </tr>
                                 </tbody>
                             </table>

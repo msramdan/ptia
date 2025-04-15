@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class RespondenKuesionerController extends Controller
 {
@@ -293,11 +294,93 @@ class RespondenKuesionerController extends Controller
     public function hasilEvaluasi($encryptedId, Request $request)
     {
         try {
-            $id = decryptShort($encryptedId);
+            $id = decryptShort($encryptedId); // ID dari project_responden
             $token = $request->query('token');
-            return view('hasil_evaluasi_responden');
+
+            // 1. Ambil data responden dan project
+            $responden = DB::table('project_responden')
+                ->join('project', 'project_responden.project_id', '=', 'project.id')
+                ->select('project_responden.*', 'project.id as project_id', 'project.diklat_type_id') // Ambil project_id dan diklat_type_id
+                ->where('project_responden.id', $id)
+                ->where('project_responden.token', $token) // Validasi token
+                ->first();
+
+            if (!$responden) {
+                abort(403, 'Data responden tidak ditemukan atau token tidak valid.');
+            }
+
+            $projectId = $responden->project_id;
+            $diklatTypeId = $responden->diklat_type_id;
+
+            // 2. Ambil data skor yang tersimpan (asumsi sudah dihitung di method store)
+            $skorData = DB::table('project_skor_responden')
+                ->where('project_responden_id', $id)
+                ->first();
+
+            if (!$skorData) {
+                // Handle jika data skor belum ada (misalnya, tampilkan pesan error)
+                return redirect()->back()->with('error', 'Data skor evaluasi belum tersedia.');
+            }
+
+            // 3. Ambil detail perhitungan dari log (jika perlu ditampilkan detailnya)
+            //    Ambil dari kolom log_data_alumni dan log_data_atasan
+            $detailAlumniLevel3 = json_decode($skorData->log_data_alumni, true) ?? [];
+            $detailAtasanLevel3 = json_decode($skorData->log_data_atasan, true) ?? [];
+
+            // Filter berdasarkan level (contoh untuk Level 3)
+            $detailAlumniLevel3 = collect($detailAlumniLevel3)->where('level', '3')->values()->all();
+            $detailAtasanLevel3 = collect($detailAtasanLevel3)->where('level', '3')->values()->all();
+
+            $detailAlumniLevel4 = json_decode($skorData->log_data_alumni, true) ?? [];
+            $detailAtasanLevel4 = json_decode($skorData->log_data_atasan, true) ?? [];
+            $detailAlumniLevel4 = collect($detailAlumniLevel4)->where('level', '4')->values()->all();
+            $detailAtasanLevel4 = collect($detailAtasanLevel4)->where('level', '4')->values()->all();
+
+
+            // 4. Ambil data sekunder dan bobotnya untuk level 4
+            $dataSekunder = DB::table('project_data_sekunder')
+                ->where('project_id', $projectId)
+                ->first();
+            $bobotSekunderObj = DB::table('project_bobot_aspek_sekunder')
+                ->where('project_id', $projectId)
+                ->first();
+
+            $nilaiSekunder = 0;
+            if ($dataSekunder && $bobotSekunderObj && $dataSekunder->nilai_kinerja_akhir > $dataSekunder->nilai_kinerja_awal) {
+                $nilaiSekunder = $bobotSekunderObj->bobot_aspek_sekunder ?? 0;
+            }
+
+            // 5. Hitung total skor
+            $totalLevel3 = ($skorData->skor_level_3_alumni ?? 0) + ($skorData->skor_level_3_atasan ?? 0);
+            $totalLevel4Primer = ($skorData->skor_level_4_alumni ?? 0) + ($skorData->skor_level_4_atasan ?? 0);
+            $totalLevel4 = $totalLevel4Primer + $nilaiSekunder;
+            // Batasi total skor maksimal 100
+            $totalLevel3 = min(round($totalLevel3, 2), 100);
+            $totalLevel4 = min(round($totalLevel4, 2), 100);
+
+
+            // 6. Kirim data ke view
+            return view('hasil_evaluasi_responden', compact(
+                'responden',
+                'detailAlumniLevel3',
+                'detailAtasanLevel3',
+                'detailAlumniLevel4',
+                'detailAtasanLevel4',
+                'skorData', // Mengirim objek skorData untuk akses mudah skor per level per remark
+                'nilaiSekunder',
+                'totalLevel3',
+                'totalLevel4Primer', // Jika ingin menampilkan total primer sebelum ditambah sekunder
+                'totalLevel4',
+                'encryptedId', // Kirim kembali untuk referensi jika perlu
+                'token' // Kirim kembali untuk referensi jika perlu
+            ));
+        } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
+            // Tangani jika dekripsi gagal (ID tidak valid)
+            abort(404, 'ID Responden tidak valid.');
         } catch (\Exception $e) {
-            abort(404);
+            // Tangani error lainnya
+            \Log::error('Error fetching evaluation results: ' . $e->getMessage()); // Log error
+            abort(500, 'Terjadi kesalahan saat memuat hasil evaluasi.');
         }
     }
 }
