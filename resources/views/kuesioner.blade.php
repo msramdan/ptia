@@ -160,15 +160,12 @@
             <div class="card mb-4">
                 <div class="card-header text-white"><strong>Form Kuesioner</strong></div>
                 <div class="card-body">
-                    <!-- Catatan bahwa field bertanda * wajib diisi -->
-                    <p class="text-danger mb-3"><strong>Catatan:</strong> Kolom dengan tanda <span
-                            class="text-danger">*</span> wajib diisi.</p>
                     <input type="hidden" id="remark" name="remark" class="form-control" value="{{ $target }}"
                         readonly style="background-color: #e9ecef;">
                     <input type="hidden" id="project_responden_id" name="project_responden_id" class="form-control"
                         value="{{ $responden->id }}" readonly style="background-color: #e9ecef;">
-                    <input type="hidden" id="token" name="token" class="form-control"
-                        value="{{ $token }}" readonly style="background-color: #e9ecef;">
+                    <input type="hidden" id="token" name="token" class="form-control" value="{{ $token }}"
+                        readonly style="background-color: #e9ecef;">
                     <input type="hidden" id="encryptedId" name="encryptedId" class="form-control"
                         value="{{ $encryptedId }}" readonly style="background-color: #e9ecef;">
 
@@ -185,21 +182,44 @@
 
                     <div class="mb-3">
                         <label class="form-label" style="margin-bottom: 2px;">
-                            <strong>Nama Atasan Langsung</strong> <span class="text-danger">*</span>
+                            <strong>Nama Atasan Langsung</strong>
                         </label>
                         <input type="text" class="form-control" id="atasan" name="atasan"
                             value="{{ $responden->nama_atasan ?? '' }}"
                             {{ $target == 'Atasan' || $responden->status_pengisian_kuesioner_alumni == 'Sudah' ? 'readonly style=background-color:#e9ecef;' : '' }}>
+
+                        @if (
+                            $target == 'Alumni' &&
+                                !empty($responden->nama_atasan) &&
+                                !empty($responden->telepon_atasan) &&
+                                !$sudahMengisi &&
+                                !$isExpired)
+                            <small class="text-muted d-block mt-1">
+                                <em>Jika Nama Atasan Langsung tidak sesuai, silakan perbaiki.</em>
+                            </small>
+                        @endif
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label" style="margin-bottom: 2px;">
-                            <strong>No. Whatsapp Atasan Langsung</strong> <span class="text-danger">*</span>
+                            <strong>No. Whatsapp Atasan Langsung</strong>
                         </label>
                         <input type="number" id="no_wa" name="no_wa" class="form-control"
                             placeholder="Contoh. 081234567890" value="{{ $responden->telepon_atasan ?? '' }}"
                             {{ $target == 'Atasan' || $responden->status_pengisian_kuesioner_alumni == 'Sudah' ? 'readonly style=background-color:#e9ecef;' : '' }}>
+
+                        @if (
+                            $target == 'Alumni' &&
+                                !empty($responden->nama_atasan) &&
+                                !empty($responden->telepon_atasan) &&
+                                !$sudahMengisi &&
+                                !$isExpired)
+                            <small class="text-muted d-block mt-1">
+                                <em>Jika Nomor Whatsapp Atasan Langsung tidak sesuai, silakan perbaiki.</em>
+                            </small>
+                        @endif
                     </div>
+
                 </div>
             </div>
 

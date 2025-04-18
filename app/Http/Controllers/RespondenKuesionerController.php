@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Http;
 
 class RespondenKuesionerController extends Controller
 {
@@ -38,6 +39,32 @@ class RespondenKuesionerController extends Controller
 
             if (!$responden) {
                 abort(404);
+            }
+            if (empty($responden->nama_atasan) || empty($responden->telepon_atasan)) {
+                $response = Http::get(config('stara.map_endpoint') . '/v3/data-pokok/atlas', [
+                    'api_token' => config('stara.map_api_token_atlas'),
+                    'nip' => $responden->nip,
+                ]);
+
+                if ($response->successful()) {
+                    $result = $response->json('result');
+
+                    $namaAtasan = $result['nama'] ?? null;
+                    $teleponAtasan = $result['nomorhp'] ?? null;
+
+                    if (!is_null($namaAtasan) || !is_null($teleponAtasan)) {
+                        // Update hanya jika ada data atasan
+                        DB::table('project_responden')
+                            ->where('id', $responden->id)
+                            ->update([
+                                'nama_atasan' => $namaAtasan,
+                                'telepon_atasan' => $teleponAtasan,
+                            ]);
+
+                        $responden->nama_atasan = $namaAtasan;
+                        $responden->telepon_atasan = $teleponAtasan;
+                    }
+                }
             }
 
             // Cek apakah token valid
