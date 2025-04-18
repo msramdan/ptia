@@ -772,19 +772,57 @@ class ProjectController extends Controller implements HasMiddleware
                 return to_route('project.index')->with('error', __('Status sudah Pelaksanaan, tidak bisa diubah lagi.'));
             }
 
+            $user = auth()->user();
+            if (!$user) {
+                throw new \Exception("User is not authenticated.");
+            }
+
             // Ambil nilai deadline dari tabel setting
-            $setting = \App\Models\Setting::first(); // Ambil data setting pertama
-            $deadlineDays = $setting ? (int) $setting->deadline_pengisian : 7; // Default ke 7 jika tidak ada data
+            $setting = \App\Models\Setting::first();
+            $deadlineDays = $setting ? (int) $setting->deadline_pengisian : 7;
             $deadlineDate = now()->addDays($deadlineDays)->toDateString();
 
-            // Update status proyek
-            $updated = DB::table('project')->where('id', $id)->update(['status' => 'Pelaksanaan']);
+            // Ambil data pesan WA untuk project ini
+            $pesanWa = DB::table('project_pesan_wa')->where('project_id', $project->id)->first();
+
+            if ($pesanWa) {
+                // Dummy kaldikDesc — sesuaikan dengan nilai yang sebenarnya dari proyek
+                $data['kaldikDesc'] = $project->nama_diklat ?? 'Nama Diklat'; // Atur fallback jika tidak ada
+
+                $textPesanAlumni = str_replace(
+                    ['{params_wa_pic}', '{params_pic}'],
+                    [$user->phone, $user->name],
+                    $pesanWa->text_pesan_alumni
+                );
+
+                $textPesanAtasan = str_replace(
+                    ['{params_wa_pic}', '{params_pic}'],
+                    [$user->phone, $user->name],
+                    $pesanWa->text_pesan_atasan
+                );
+
+                // Kalau mau disimpan kembali, bisa update:
+                DB::table('project_pesan_wa')
+                    ->where('project_id', $project->id)
+                    ->update([
+                        'text_pesan_alumni' => $textPesanAlumni,
+                        'text_pesan_atasan' => $textPesanAtasan,
+                    ]);
+            }
+
+            // Update status proyek + user login yang mengubah
+            $updated = DB::table('project')
+                ->where('id', $id)
+                ->update([
+                    'status' => 'Pelaksanaan',
+                    'user_id' => $user->id
+                ]);
 
             if (!$updated) {
                 throw new \Exception("Gagal mengupdate status proyek.");
             }
 
-            // Update deadline_pengisian_alumni untuk semua responden dalam proyek
+            // Update deadline_pengisian_alumni
             $respondensUpdated = DB::table('project_responden')
                 ->where('project_id', $id)
                 ->update(['deadline_pengisian_alumni' => $deadlineDate]);
@@ -793,18 +831,17 @@ class ProjectController extends Controller implements HasMiddleware
                 throw new \Exception("Gagal mengupdate deadline pengisian alumni.");
             }
 
-            DB::commit(); // Commit transaksi jika semua berhasil
+            DB::commit();
 
             return to_route('project.index')->with('success', __('Status berhasil diperbarui menjadi Pelaksanaan.'));
         } catch (\Exception $e) {
-            DB::rollBack(); // Rollback transaksi jika terjadi kesalahan
-
-            // Log error untuk debugging
+            DB::rollBack();
             \Log::error('Gagal mengupdate status proyek: ' . $e->getMessage());
 
             return to_route('project.index')->with('error', __('Terjadi kesalahan: ') . $e->getMessage());
         }
     }
+
 
     public function exportPdf($id)
     {
