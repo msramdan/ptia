@@ -153,7 +153,7 @@
             </div>
         </div>
 
-        <form action="{{ route('responden-kuesioner.store') }}" method="POST"
+        <form id="formKuesioner" action="{{ route('responden-kuesioner.store') }}" method="POST"
             @if ($sudahMengisi || $isExpired) style="pointer-events: none; opacity: 0.6;" @endif>
             @csrf
             <!-- Form Kuesioner -->
@@ -338,6 +338,16 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#formKuesioner').on('submit', function () {
+                var btn = $('#submitButton');
+                btn.prop('disabled', true);
+                btn.html('<i class="fas fa-spinner fa-spin"></i> Mengirim...');
+            });
+        });
+    </script>
+
     <script>
         $(document).ready(function() {
             function cleanNumber(value) {
