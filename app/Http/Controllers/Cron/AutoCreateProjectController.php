@@ -34,12 +34,6 @@ class AutoCreateProjectController extends Controller
             ->withBody(json_encode(['ready_generate' => $readyGenerate]), 'application/json')
             ->get($apiUrl . '?' . http_build_query($queryParams));
         $data = $response->json()['data'] ?? [];
-        $user = User::where('id', 1)->first();
-
-        if (!$user) {
-            sendNotifTelegram("⚠️ User dengan ID 1 tidak ditemukan.", 'Cron');
-            return response()->json(['status' => false, 'message' => "User dengan ID 1 tidak ditemukan."], 401);
-        }
 
         if (empty($data)) {
             $endTime = now();
@@ -76,7 +70,7 @@ class AutoCreateProjectController extends Controller
                     'kaldikID'       => $row['kaldikID'],
                     'diklatTypeName' => $row['diklatTypeName'],
                     'kaldikDesc'     => $row['kaldikDesc'],
-                    'user_id'        => $user->id,
+                    'user_id'        => null,
                     'created_at'     => now(),
                     'updated_at'     => now(),
                 ]);
@@ -183,13 +177,13 @@ class AutoCreateProjectController extends Controller
                 DB::table('project_pesan_wa')->insert([
                     'project_id'        => $projectId,
                     'text_pesan_alumni' => str_replace(
-                        ['{params_nama_diklat}', '{params_wa_pic}', '{params_pic}'],
-                        [$row['kaldikDesc'], $user->phone, $user->name],
+                        ['{params_nama_diklat}'],
+                        [$row['kaldikDesc']],
                         $pesanWa->text_pesan_alumni
                     ),
                     'text_pesan_atasan' => str_replace(
-                        ['{params_nama_diklat}', '{params_wa_pic}', '{params_pic}'],
-                        [$row['kaldikDesc'], $user->phone, $user->name],
+                        ['{params_nama_diklat}'],
+                        [$row['kaldikDesc']],
                         $pesanWa->text_pesan_atasan
                     ),
                     'created_at' => now(),

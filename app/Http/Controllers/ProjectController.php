@@ -35,7 +35,7 @@ class ProjectController extends Controller implements HasMiddleware
     {
         if (request()->ajax()) {
             $projects = DB::table('project')
-                ->join('users', 'project.user_id', '=', 'users.id')
+                ->leftJoin('users', 'project.user_id', '=', 'users.id')
                 ->join('diklat_type', 'project.diklat_type_id', '=', 'diklat_type.id')
                 ->select(
                     'project.*',
@@ -106,15 +106,21 @@ class ProjectController extends Controller implements HasMiddleware
                 })
 
                 ->addColumn('user', function ($row) {
+                    if (is_null($row->user_name) && is_null($row->email)) {
+                        return '<div class="text-muted text-center">-</div>';
+                    }
+
+                    $userName = $row->user_name ?? '-';
+                    $email = $row->email ?? '';
                     $avatar = $row->avatar
-                        ? asset("storage/uploads/avatars/$row->avatar")
-                        : "https://www.gravatar.com/avatar/" . md5(strtolower(trim($row->email))) . "&s=450";
+                        ? asset("storage/uploads/avatars/{$row->avatar}")
+                        : "https://www.gravatar.com/avatar/" . md5(strtolower(trim($email))) . "&s=450";
 
                     return '
                         <div class="d-flex align-items-center">
                             <img src="' . e($avatar) . '" class="img-thumbnail"
                                  style="width: 50px; height: 50px; border-radius: 5%; margin-right: 10px;">
-                            <span>' . e($row->user_name) . '</span>
+                            <span>' . e($userName) . '</span>
                         </div>';
                 })
                 ->addColumn('action', 'project.include.action')
@@ -147,11 +153,6 @@ class ProjectController extends Controller implements HasMiddleware
             }
 
             $kode_project = Str::upper(Str::random(8));
-            $user = auth()->user();
-
-            if (!$user) {
-                throw new \Exception("User is not authenticated.");
-            }
 
             // 1. Insert ke tabel project
             $diklatType = DB::table('diklat_type_mapping')
@@ -168,7 +169,7 @@ class ProjectController extends Controller implements HasMiddleware
                 'kaldikID'          => $data['kaldikID'],
                 'diklatTypeName'    => $data['diklatTypeName'],
                 'kaldikDesc'        => $data['kaldikDesc'],
-                'user_id'           => $user->id,
+                'user_id'           => null,
                 'created_at'        => now(),
                 'updated_at'        => now(),
             ]);
@@ -265,14 +266,14 @@ class ProjectController extends Controller implements HasMiddleware
             }
 
             $textPesanAlumni = str_replace(
-                ['{params_nama_diklat}', '{params_wa_pic}', '{params_pic}'],
-                [$data['kaldikDesc'], $user->phone, $user->name],
+                ['{params_nama_diklat}'],
+                [$data['kaldikDesc']],
                 $pesanWa->text_pesan_alumni
             );
 
             $textPesanAtasan = str_replace(
-                ['{params_nama_diklat}', '{params_wa_pic}', '{params_pic}'],
-                [$data['kaldikDesc'], $user->phone, $user->name],
+                ['{params_nama_diklat}'],
+                [$data['kaldikDesc']],
                 $pesanWa->text_pesan_atasan
             );
 
@@ -410,7 +411,7 @@ class ProjectController extends Controller implements HasMiddleware
     public function showKuesioner($id, $remark)
     {
         $project = DB::table('project')
-            ->join('users', 'project.user_id', '=', 'users.id')
+            ->leftJoin('users', 'project.user_id', '=', 'users.id')
             ->select('project.*', 'users.name as user_name')
             ->where('project.id', $id)
             ->first();
@@ -548,7 +549,7 @@ class ProjectController extends Controller implements HasMiddleware
         $kriteriaResponden->nilai_post_test = json_decode($kriteriaResponden->nilai_post_test, true);
 
         $project = DB::table('project')
-            ->join('users', 'project.user_id', '=', 'users.id')
+            ->leftJoin('users', 'project.user_id', '=', 'users.id')
             ->select('project.*', 'users.name as user_name')
             ->where('project.id', $id)
             ->first();
@@ -661,7 +662,7 @@ class ProjectController extends Controller implements HasMiddleware
     public function showPesanWa($id)
     {
         $project = DB::table('project')
-            ->join('users', 'project.user_id', '=', 'users.id')
+            ->leftJoin('users', 'project.user_id', '=', 'users.id')
             ->select('project.*', 'users.name as user_name')
             ->where('project.id', $id)
             ->first();
@@ -693,7 +694,7 @@ class ProjectController extends Controller implements HasMiddleware
     public function showBobot($id)
     {
         $project = DB::table('project')
-            ->join('users', 'project.user_id', '=', 'users.id')
+            ->leftJoin('users', 'project.user_id', '=', 'users.id')
             ->select('project.*', 'users.name as user_name')
             ->where('project.id', $id)
             ->first();
@@ -810,7 +811,7 @@ class ProjectController extends Controller implements HasMiddleware
         try {
             // 1. Ambil data project utama
             $project = DB::table('project')
-                ->join('users', 'project.user_id', '=', 'users.id')
+                ->leftJoin('users', 'project.user_id', '=', 'users.id')
                 ->join('diklat_type', 'project.diklat_type_id', '=', 'diklat_type.id')
                 ->select(
                     'project.*',
