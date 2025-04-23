@@ -287,6 +287,29 @@
                                     </tr>
                                 </tbody>
                             </table>
+                            {{-- Bagian Baru Predikat Level 4 --}}
+                            <div class="card mt-4 shadow-sm"
+                                style="border-left: 5px solid #198754; border-radius: 8px;"> {{-- Warna hijau success Bootstrap --}}
+                                <div class="card-body text-center p-3">
+                                    <h6 class="card-subtitle mb-2 text-muted" style="font-size: 0.9rem;">Predikat
+                                        Hasil Evaluasi Level 4</h6>
+                                    <p class="card-text fs-4 fw-bold mb-0" style="color: #198754; line-height: 1.2;">
+                                        {{-- Contoh ikon (sesuaikan dengan predikat Anda jika perlu) --}}
+                                        @if (Str::contains($predikatLevel4 ?? '', 'Sangat Berdampak', true))
+                                            <i class="fas fa-rocket me-1 text-danger"></i>
+                                        @elseif(Str::contains($predikatLevel4 ?? '', 'Cukup Berdampak', true))
+                                            <i class="fas fa-thumbs-up me-1 text-primary"></i>
+                                        @elseif(Str::contains($predikatLevel4 ?? '', 'Kurang Berdampak', true))
+                                            <i class="fas fa-battery-half me-1 text-secondary"></i>
+                                        @elseif(Str::contains($predikatLevel4 ?? '', 'Tidak Berdampak', true))
+                                            <i class="fas fa-ban me-1 text-muted"></i>
+                                        @endif
+
+                                        {{ $predikatLevel4 ?? 'Belum Ada Predikat' }}
+                                    </p>
+                                </div>
+                            </div>
+                            {{-- Akhir Bagian Baru Predikat Level 4 --}}
                         </div>
                     </div>
                 </div>
