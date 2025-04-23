@@ -353,7 +353,7 @@ class HasilEvaluasiController extends Controller implements HasMiddleware
         $avgNilai = round(($totalAlumni + $totalAtasan), 2);
 
         $html .= "<tr class='avg-row'>
-            <td colspan='5'>Total Nilai Alumni & Atasan</td>
+            <td colspan='5'>Total Nilai</td>
             <td>$avgNilai</td>
           </tr>";
 
