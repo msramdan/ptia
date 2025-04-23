@@ -136,7 +136,7 @@
                                             </tr>
                                         @endforeach
                                         <tr class="fw-bold">
-                                            <td colspan="5" class="text-end">Total Nilai Alumni</td>
+                                            <td colspan="5" class="text-end">Sub Total Nilai</td>
                                             {{-- Ambil dari skorData jika ada --}}
                                             <td>{{ number_format($skorData->skor_level_3_alumni ?? 0, 2) }}</td>
                                         </tr>
@@ -160,7 +160,7 @@
                                             </tr>
                                         @endforeach
                                         <tr class="fw-bold">
-                                            <td colspan="5" class="text-end">Total Nilai Atasan</td>
+                                            <td colspan="5" class="text-end">Sub Total Nilai</td>
                                             {{-- Ambil dari skorData jika ada --}}
                                             <td>{{ number_format($skorData->skor_level_3_atasan ?? 0, 2) }}</td>
                                         </tr>
@@ -168,7 +168,7 @@
 
                                     {{-- Total Keseluruhan Level 3 --}}
                                     <tr class="table-light fw-bold">
-                                        <td colspan="5" class="text-end">Total Nilai Alumni & Atasan</td>
+                                        <td colspan="5" class="text-end">Total Nilai</td>
                                         <td>{{ number_format($totalLevel3, 2) }}</td> {{-- Gunakan totalLevel3 --}}
                                     </tr>
                                 </tbody>
@@ -221,7 +221,7 @@
                                             </tr>
                                         @endforeach
                                         <tr class="fw-bold">
-                                            <td colspan="5" class="text-end">Total Nilai Alumni</td>
+                                            <td colspan="5" class="text-end">Sub Total Nilai</td>
                                             {{-- Ambil dari skorData jika ada --}}
                                             <td>{{ number_format($skorData->skor_level_4_alumni ?? 0, 2) }}</td>
                                         </tr>
@@ -245,7 +245,7 @@
                                             </tr>
                                         @endforeach
                                         <tr class="fw-bold">
-                                            <td colspan="5" class="text-end">Total Nilai Atasan</td>
+                                            <td colspan="5" class="text-end">Sub Total Nilai</td>
                                             {{-- Ambil dari skorData jika ada --}}
                                             <td>{{ number_format($skorData->skor_level_4_atasan ?? 0, 2) }}</td>
                                         </tr>

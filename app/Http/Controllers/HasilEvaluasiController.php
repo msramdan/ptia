@@ -345,7 +345,7 @@ class HasilEvaluasiController extends Controller implements HasMiddleware
             }
 
             $html .= "<tr class='total-row'>
-                <td colspan='5'>Total Nilai $remark</td>
+                <td colspan='5'>Sub Total Nilai</td>
                 <td>$totalNilai</td>
               </tr>";
         }
@@ -614,7 +614,7 @@ class HasilEvaluasiController extends Controller implements HasMiddleware
             }
 
             $html .= "<tr class='total-row'>
-                <td colspan='5'>Total Nilai $remark</td>
+                <td colspan='5'>Sub Total Nilai</td>
                 <td>$totalNilai</td>
               </tr>";
         }
