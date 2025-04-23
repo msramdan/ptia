@@ -136,7 +136,7 @@
                                             </tr>
                                         @endforeach
                                         <tr class="fw-bold">
-                                            <td colspan="5" class="text-end">Sub Total Nilai</td>
+                                            <td colspan="5" class="text-end">Total Nilai</td>
                                             {{-- Ambil dari skorData jika ada --}}
                                             <td>{{ number_format($skorData->skor_level_3_alumni ?? 0, 2) }}</td>
                                         </tr>
@@ -173,6 +173,29 @@
                                     </tr>
                                 </tbody>
                             </table>
+                            {{-- Bagian Baru untuk Predikat Level 3 --}}
+                            <div class="card mt-4 shadow-sm"
+                                style="border-left: 5px solid #0d6efd; border-radius: 8px;">
+                                <div class="card-body text-center p-3">
+                                    <h6 class="card-subtitle mb-2 text-muted" style="font-size: 0.9rem;">Predikat Hasil
+                                        Evaluasi Level 3</h6>
+                                    <p class="card-text fs-4 fw-bold mb-0" style="color: #0d6efd; line-height: 1.2;">
+                                        {{-- Tambahkan ikon berdasarkan predikat jika diinginkan --}}
+                                        @if (Str::contains($predikatLevel3 ?? '', 'Sangat Berdampak', true))
+                                            <i class="fas fa-star me-1 text-warning"></i>
+                                        @elseif(Str::contains($predikatLevel3 ?? '', 'Cukup Berdampak', true))
+                                            <i class="fas fa-check-circle me-1 text-success"></i>
+                                        @elseif(Str::contains($predikatLevel3 ?? '', 'Kurang Berdampak', true))
+                                            <i class="fas fa-exclamation-triangle me-1 text-warning"></i>
+                                        @elseif(Str::contains($predikatLevel3 ?? '', 'Tidak Berdampak', true))
+                                            <i class="fas fa-times-circle me-1 text-danger"></i>
+                                        @endif
+
+                                        {{ $predikatLevel3 ?? 'Belum Ada Predikat' }}
+                                    </p>
+                                </div>
+                            </div>
+                            {{-- Akhir Bagian Baru Predikat --}}
                         </div>
                     </div>
                 </div>

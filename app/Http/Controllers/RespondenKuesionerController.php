@@ -326,10 +326,11 @@ class RespondenKuesionerController extends Controller
             // 1. Ambil data responden dan project
             $responden = DB::table('project_responden')
                 ->join('project', 'project_responden.project_id', '=', 'project.id')
+                // Tidak perlu join diklat_type jika namanya hanya untuk predikat
                 ->select(
                     'project_responden.*', // Ambil semua kolom dari project_responden
                     'project.id as project_id',
-                    'project.diklat_type_id'
+                    'project.diklat_type_id' // Tetap ambil ID untuk query predikat
                 )
                 ->where('project_responden.id', $id)
                 ->where('project_responden.token', $token) // Validasi token
@@ -341,6 +342,9 @@ class RespondenKuesionerController extends Controller
 
             $projectId = $responden->project_id;
             $diklatTypeId = $responden->diklat_type_id;
+            // Ambil nama tipe diklat secara terpisah jika masih dibutuhkan di tempat lain view
+            $diklatTypeName = DB::table('diklat_type')->where('id', $diklatTypeId)->value('nama_diklat_type') ?? 'Tipe Diklat Tidak Diketahui';
+
 
             // 2. Ambil data skor yang tersimpan
             $skorData = DB::table('project_skor_responden')
@@ -348,56 +352,63 @@ class RespondenKuesionerController extends Controller
                 ->first();
 
             if (!$skorData) {
-                return redirect()->back()->with('error', 'Data skor evaluasi belum tersedia.');
+                // Jika data skor belum ada, kembalikan view dengan pesan atau data default
+                return view('hasil_evaluasi_responden', [
+                    'responden' => $responden,
+                    'detailAlumniLevel3' => [],
+                    'detailAtasanLevel3' => [],
+                    'detailAlumniLevel4' => [],
+                    'detailAtasanLevel4' => [],
+                    'skorData' => null, // Atau objek default
+                    'nilaiSekunder' => 0,
+                    'totalLevel3' => 0,
+                    'totalLevel4Primer' => 0,
+                    'totalLevel4' => 0,
+                    'predikatLevel3' => 'Data Skor Belum Tersedia', // Predikat default
+                    // 'diklatTypeName' => $diklatTypeName, // Tidak perlu dikirim jika hanya untuk predikat
+                    'encryptedId' => $encryptedId,
+                    'token' => $token
+                ])->with('warning', 'Data skor evaluasi belum tersedia.');
             }
 
-            // 3. Ambil detail perhitungan dari log
+
+            // 3. Ambil detail perhitungan dari log (Logika tetap sama)
             $detailAlumni = json_decode($skorData->log_data_alumni, true) ?? [];
             $detailAtasan = json_decode($skorData->log_data_atasan, true) ?? [];
 
-            // --- MODIFIKASI DIMULAI DI SINI ---
-
-            // 3.1. Kumpulkan semua aspek_id unik dari detail log
             $allAspekIds = collect($detailAlumni)
-                ->merge($detailAtasan) // Gabungkan data alumni dan atasan
-                ->pluck('aspek_id')    // Ambil semua aspek_id
-                ->filter()             // Hapus nilai null/kosong
-                ->unique()             // Ambil ID yang unik
+                ->merge($detailAtasan)
+                ->pluck('aspek_id')
+                ->filter()
+                ->unique()
                 ->values()
                 ->all();
 
-            // 3.2. Buat Peta Nama Aspek (Aspek ID => Nama Aspek)
             $aspekNamesMap = [];
             if (!empty($allAspekIds)) {
-                // Query ke tabel 'aspek' untuk mendapatkan nama berdasarkan ID
-                // Pastikan tabel 'aspek' memiliki kolom 'id' dan 'aspek' (nama)
                 $aspekData = DB::table('aspek')
                     ->whereIn('id', $allAspekIds)
-                    ->pluck('aspek', 'id'); // Hasilnya [id => nama_aspek]
-
+                    ->pluck('aspek', 'id');
                 $aspekNamesMap = $aspekData->all();
             }
 
-            // 3.3. Fungsi untuk menambahkan nama aspek ke array detail
             $injectAspectName = function ($details) use ($aspekNamesMap) {
                 return collect($details)->map(function ($item) use ($aspekNamesMap) {
-                    // Cari nama aspek berdasarkan aspek_id di peta
                     $item['aspek_nama'] = $aspekNamesMap[$item['aspek_id']] ?? 'Aspek Tidak Ditemukan';
                     return $item;
                 })->all();
             };
 
-            // 3.4. Tambahkan nama aspek ke data detail Alumni dan Atasan
             $detailAlumni = $injectAspectName($detailAlumni);
             $detailAtasan = $injectAspectName($detailAtasan);
 
-            // 3.5 Pisahkan lagi berdasarkan level setelah nama ditambahkan
             $detailAlumniLevel3 = collect($detailAlumni)->where('level', '3')->values()->all();
             $detailAtasanLevel3 = collect($detailAtasan)->where('level', '3')->values()->all();
             $detailAlumniLevel4 = collect($detailAlumni)->where('level', '4')->values()->all();
             $detailAtasanLevel4 = collect($detailAtasan)->where('level', '4')->values()->all();
 
-            // 4. Ambil data sekunder dan bobotnya untuk level 4
+
+            // 4. Ambil data sekunder (Logika tetap sama)
             $dataSekunder = DB::table('project_data_sekunder')
                 ->where('project_id', $projectId)
                 ->first();
@@ -410,36 +421,53 @@ class RespondenKuesionerController extends Controller
                 $nilaiSekunder = $bobotSekunderObj->bobot_aspek_sekunder ?? 0;
             }
 
-            // 5. Hitung total skor
+
+            // 5. Hitung total skor (Logika tetap sama)
             $totalLevel3 = ($skorData->skor_level_3_alumni ?? 0) + ($skorData->skor_level_3_atasan ?? 0);
             $totalLevel4Primer = ($skorData->skor_level_4_alumni ?? 0) + ($skorData->skor_level_4_atasan ?? 0);
             $totalLevel4 = $totalLevel4Primer + $nilaiSekunder;
-            // Batasi total skor maksimal 100
             $totalLevel3 = min(round($totalLevel3, 2), 100);
             $totalLevel4 = min(round($totalLevel4, 2), 100);
 
 
-            // 6. Kirim data ke view
+            // 6. Tentukan Predikat Level 3 (Logika tetap sama)
+            $predikatLevel3 = 'N/A';
+            if ($diklatTypeId && isset($totalLevel3)) {
+                $indikator = DB::table('indikator_dampak')
+                    ->where('diklat_type_id', $diklatTypeId)
+                    ->where('nilai_minimal', '<', $totalLevel3)
+                    ->where('nilai_maksimal', '>=', $totalLevel3)
+                    ->first();
+
+                if ($indikator) {
+                    $predikatLevel3 = $indikator->kriteria_dampak;
+                } else {
+                    Log::warning("Predikat tidak ditemukan untuk diklat_type_id: {$diklatTypeId} dengan skor level 3: {$totalLevel3}");
+                    $predikatLevel3 = 'Kriteria Predikat Tidak Ditemukan';
+                }
+            }
+
+            // 7. Kirim data ke view (Menghapus 'diklatTypeName' dari compact jika tidak dipakai lagi)
             return view('hasil_evaluasi_responden', compact(
                 'responden',
                 'detailAlumniLevel3',
                 'detailAtasanLevel3',
                 'detailAlumniLevel4',
                 'detailAtasanLevel4',
-                'skorData', // Mengirim objek skorData untuk akses mudah skor per level per remark
+                'skorData',
                 'nilaiSekunder',
-                'totalLevel3',
-                'totalLevel4Primer', // Jika ingin menampilkan total primer sebelum ditambah sekunder
+                'totalLevel3', // Masih dikirim jika diperlukan di bagian lain view
+                'totalLevel4Primer',
                 'totalLevel4',
-                'encryptedId', // Kirim kembali untuk referensi jika perlu
-                'token' // Kirim kembali untuk referensi jika perlu
+                'predikatLevel3', // Tetap kirim predikat
+                // 'diklatTypeName', // Dihapus dari compact
+                'encryptedId',
+                'token'
             ));
         } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
-            // Tangani jika dekripsi gagal (ID tidak valid)
             abort(404, 'ID Responden tidak valid.');
         } catch (\Exception $e) {
-            // Tangani error lainnya
-            \Log::error('Error fetching evaluation results: ' . $e->getMessage()); // Log error
+            Log::error('Error fetching evaluation results: ' . $e->getMessage() . ' in ' . $e->getFile() . ' on line ' . $e->getLine());
             abort(500, 'Terjadi kesalahan saat memuat hasil evaluasi.');
         }
     }
