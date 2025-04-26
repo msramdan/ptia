@@ -349,6 +349,15 @@ class RespondenKuesionerController extends Controller
                 ->first();
 
             if (!$skorData) {
+                // Ambil aturan predikat meskipun skor belum ada
+                $indikatorDampakRules = [];
+                if ($diklatTypeId) {
+                    $indikatorDampakRules = DB::table('indikator_dampak')
+                        ->where('diklat_type_id', $diklatTypeId)
+                        ->orderBy('nilai_minimal', 'asc')
+                        ->get();
+                }
+
                 return view('hasil_evaluasi_responden', [
                     'responden' => $responden,
                     'detailAlumniLevel3' => [],
@@ -361,57 +370,39 @@ class RespondenKuesionerController extends Controller
                     'totalLevel4Primer' => 0,
                     'totalLevel4' => 0,
                     'predikatLevel3' => 'Data Skor Belum Tersedia',
-                    'predikatLevel4' => 'Data Skor Belum Tersedia', // Tambahkan default untuk Level 4
-                    'diklatTypeName' => $diklatTypeName, // Kirim jika masih dibutuhkan di view
+                    'predikatLevel4' => 'Data Skor Belum Tersedia',
+                    'diklatTypeName' => $diklatTypeName,
+                    'indikatorDampakRules' => $indikatorDampakRules, // Kirim aturan
                     'encryptedId' => $encryptedId,
                     'token' => $token
                 ])->with('warning', 'Data skor evaluasi belum tersedia.');
             }
 
-
             // 3. Ambil detail perhitungan dari log (Logika tetap sama)
             $detailAlumni = json_decode($skorData->log_data_alumni, true) ?? [];
             $detailAtasan = json_decode($skorData->log_data_atasan, true) ?? [];
-
-            $allAspekIds = collect($detailAlumni)
-                ->merge($detailAtasan)
-                ->pluck('aspek_id')
-                ->filter()
-                ->unique()
-                ->values()
-                ->all();
-
+            $allAspekIds = collect($detailAlumni)->merge($detailAtasan)->pluck('aspek_id')->filter()->unique()->values()->all();
             $aspekNamesMap = [];
             if (!empty($allAspekIds)) {
-                $aspekData = DB::table('aspek')
-                    ->whereIn('id', $allAspekIds)
-                    ->pluck('aspek', 'id');
+                $aspekData = DB::table('aspek')->whereIn('id', $allAspekIds)->pluck('aspek', 'id');
                 $aspekNamesMap = $aspekData->all();
             }
-
             $injectAspectName = function ($details) use ($aspekNamesMap) {
                 return collect($details)->map(function ($item) use ($aspekNamesMap) {
                     $item['aspek_nama'] = $aspekNamesMap[$item['aspek_id']] ?? 'Aspek Tidak Ditemukan';
                     return $item;
                 })->all();
             };
-
             $detailAlumni = $injectAspectName($detailAlumni);
             $detailAtasan = $injectAspectName($detailAtasan);
-
             $detailAlumniLevel3 = collect($detailAlumni)->where('level', '3')->values()->all();
             $detailAtasanLevel3 = collect($detailAtasan)->where('level', '3')->values()->all();
             $detailAlumniLevel4 = collect($detailAlumni)->where('level', '4')->values()->all();
             $detailAtasanLevel4 = collect($detailAtasan)->where('level', '4')->values()->all();
 
             // 4. Ambil data sekunder (Logika tetap sama)
-            $dataSekunder = DB::table('project_data_sekunder')
-                ->where('project_id', $projectId)
-                ->first();
-            $bobotSekunderObj = DB::table('project_bobot_aspek_sekunder')
-                ->where('project_id', $projectId)
-                ->first();
-
+            $dataSekunder = DB::table('project_data_sekunder')->where('project_id', $projectId)->first();
+            $bobotSekunderObj = DB::table('project_bobot_aspek_sekunder')->where('project_id', $projectId)->first();
             $nilaiSekunder = 0;
             if ($dataSekunder && $bobotSekunderObj && $dataSekunder->nilai_kinerja_akhir > $dataSekunder->nilai_kinerja_awal) {
                 $nilaiSekunder = $bobotSekunderObj->bobot_aspek_sekunder ?? 0;
@@ -424,7 +415,6 @@ class RespondenKuesionerController extends Controller
             $totalLevel3 = min(round($totalLevel3, 2), 100);
             $totalLevel4 = min(round($totalLevel4, 2), 100);
 
-
             // 6. Tentukan Predikat Level 3
             $predikatLevel3 = 'N/A';
             if ($diklatTypeId && isset($totalLevel3)) {
@@ -433,7 +423,6 @@ class RespondenKuesionerController extends Controller
                     ->where('nilai_minimal', '<', $totalLevel3)
                     ->where('nilai_maksimal', '>=', $totalLevel3)
                     ->first();
-
                 if ($indikator3) {
                     $predikatLevel3 = $indikator3->kriteria_dampak;
                 } else {
@@ -443,14 +432,13 @@ class RespondenKuesionerController extends Controller
             }
 
             // 7. Tentukan Predikat Level 4
-            $predikatLevel4 = 'N/A'; // Default
+            $predikatLevel4 = 'N/A';
             if ($diklatTypeId && isset($totalLevel4)) {
                 $indikator4 = DB::table('indikator_dampak')
                     ->where('diklat_type_id', $diklatTypeId)
                     ->where('nilai_minimal', '<', $totalLevel4)
                     ->where('nilai_maksimal', '>=', $totalLevel4)
                     ->first();
-
                 if ($indikator4) {
                     $predikatLevel4 = $indikator4->kriteria_dampak;
                 } else {
@@ -459,7 +447,16 @@ class RespondenKuesionerController extends Controller
                 }
             }
 
-            // 8. Kirim data ke view
+            // 8. Ambil Aturan Predikat untuk Info View
+            $indikatorDampakRules = [];
+            if ($diklatTypeId) {
+                $indikatorDampakRules = DB::table('indikator_dampak')
+                    ->where('diklat_type_id', $diklatTypeId)
+                    ->orderBy('nilai_minimal', 'asc')
+                    ->get();
+            }
+
+            // 9. Kirim data ke view
             return view('hasil_evaluasi_responden', compact(
                 'responden',
                 'detailAlumniLevel3',
@@ -471,9 +468,10 @@ class RespondenKuesionerController extends Controller
                 'totalLevel3',
                 'totalLevel4Primer',
                 'totalLevel4',
-                'predikatLevel3', // Predikat Level 3
-                'predikatLevel4', // Predikat Level 4
-                'diklatTypeName', // Kirim nama jika masih dipakai di tempat lain
+                'predikatLevel3',
+                'predikatLevel4',
+                'diklatTypeName',
+                'indikatorDampakRules', // Kirim aturan predikat
                 'encryptedId',
                 'token'
             ));
