@@ -107,7 +107,6 @@ class DataInterviewController extends Controller implements HasMiddleware
         if (request()->ajax()) {
             $respondents = DB::table('project_responden')
                 ->where('project_id', $projectId)
-                ->whereNull('nama_atasan')
                 ->select(
                     'id',
                     'nama',
