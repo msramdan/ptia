@@ -26,14 +26,14 @@ services:
     ports:
       - "3308:3306"
     environment:
-      MYSQL_ROOT_PASSWORD: root  # Password root diubah
+      MYSQL_ROOT_PASSWORD: Admin9090!  # Password root diubah
       MYSQL_DATABASE: db_ptia
       MYSQL_USER: db_ptia
       MYSQL_PASSWORD: db_ptia
     volumes:
       - db_data:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pAdmin9090!"]
       interval: 5s
       timeout: 10s
       retries: 10
@@ -48,7 +48,7 @@ services:
       PMA_HOST: db-ptia
       PMA_PORT: 3306
       PMA_USER: root
-      PMA_PASSWORD: root  # Password disesuaikan
+      PMA_PASSWORD: Admin9090!
       UPLOAD_LIMIT: 128M
     depends_on:
       db:
