@@ -10,14 +10,17 @@ services:
       - "8000:80"
     volumes:
       - .:/var/www/html
-      - /var/www/html/vendor
-      - /var/www/html/storage
+      - vendor_data:/var/www/html/vendor  # Persistent vendor directory
+      - storage_data:/var/www/html/storage  # Persistent storage
+      - ./public:/var/www/html/public  # Mount public directory
     environment:
       - APACHE_RUN_USER=www-data
       - APACHE_RUN_GROUP=www-data
     depends_on:
       - db
     restart: unless-stopped
+    networks:
+      - app-network
 
   db:
     container_name: db-ptia
@@ -26,24 +29,27 @@ services:
     ports:
       - "3308:3306"
     environment:
-      MYSQL_ROOT_PASSWORD: Admin9090!  # Password root diubah
+      MYSQL_ROOT_PASSWORD: Admin9090!
       MYSQL_DATABASE: db_ptia
       MYSQL_USER: db_ptia
       MYSQL_PASSWORD: db_ptia
     volumes:
       - db_data:/var/lib/mysql
+      - ./mysql:/docker-entrypoint-initdb.d  # For initial SQL scripts
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pAdmin9090!"]
       interval: 5s
       timeout: 10s
       retries: 10
+    networks:
+      - app-network
 
   phpmyadmin:
     container_name: pma-ptia
     image: phpmyadmin/phpmyadmin
     restart: always
     ports:
-      - "8081:80"  # Port diubah dari 8080 ke 8081
+      - "8081:80"
     environment:
       PMA_HOST: db-ptia
       PMA_PORT: 3306
@@ -53,6 +59,14 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    networks:
+      - app-network
 
 volumes:
   db_data:
+  vendor_data:
+  storage_data:
+
+networks:
+  app-network:
+    driver: bridge
