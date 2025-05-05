@@ -1,15 +1,17 @@
 # Gunakan image resmi PHP dengan Apache
 FROM php:8.2-apache
 
-# Install dependencies dan ekstensi PHP yang dibutuhkan Laravel
+# Install dependencies dan ekstensi PHP (termasuk WebP support untuk GD)
 RUN apt-get update && apt-get install -y \
-    git curl zip unzip libpng-dev libonig-dev libxml2-dev libzip-dev \
+    git curl zip unzip libpng-dev libjpeg-dev libwebp-dev libfreetype-dev \
+    libonig-dev libxml2-dev libzip-dev \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
     && docker-php-ext-install pdo pdo_mysql mbstring zip exif pcntl bcmath gd
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Buat direktori storage dan cache terlebih dahulu
+# Buat direktori storage dan cache
 RUN mkdir -p /var/www/html/storage/framework/{sessions,views,cache} \
     && mkdir -p /var/www/html/bootstrap/cache
 
@@ -29,8 +31,10 @@ RUN sed -ri -e 's!/var/www/html!/var/www/html/public!g' /etc/apache2/sites-avail
 # Aktifkan modul Apache
 RUN a2enmod rewrite
 
-# Install dependencies Laravel
-RUN if [ -f "composer.json" ]; then composer install --no-dev --optimize-autoloader; fi
+# Install dependencies Laravel (termasuk optimasi untuk production)
+RUN if [ -f "composer.json" ]; then \
+    composer install --no-dev --optimize-autoloader --no-interaction; \
+    fi
 
 # Expose port 80
 EXPOSE 80
