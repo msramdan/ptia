@@ -2,6 +2,7 @@ version: '3.8'
 
 services:
   app:
+    container_name: apps-ptia
     build:
       context: .
       dockerfile: Dockerfile
@@ -19,17 +20,39 @@ services:
     restart: unless-stopped
 
   db:
+    container_name: db-ptia
     image: mysql:8
     restart: always
     ports:
       - "3308:3306"
     environment:
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: root  # Password root diubah
       MYSQL_DATABASE: db_ptia
       MYSQL_USER: db_ptia
       MYSQL_PASSWORD: db_ptia
     volumes:
       - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      interval: 5s
+      timeout: 10s
+      retries: 10
+
+  phpmyadmin:
+    container_name: pma-ptia
+    image: phpmyadmin/phpmyadmin
+    restart: always
+    ports:
+      - "8081:80"  # Port diubah dari 8080 ke 8081
+    environment:
+      PMA_HOST: db-ptia
+      PMA_PORT: 3306
+      PMA_USER: root
+      PMA_PASSWORD: root  # Password disesuaikan
+      UPLOAD_LIMIT: 128M
+    depends_on:
+      db:
+        condition: service_healthy
 
 volumes:
   db_data:
