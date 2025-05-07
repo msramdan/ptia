@@ -243,7 +243,7 @@
                 var projectId = $(this).data('id');
                 $('#project_id').val(projectId);
                 $.ajax({
-                    url: './data-sekunder/get/' + projectId,
+                    url: "{{ route('data-sekunder.get', ['project_id' => '__ID__']) }}".replace('__ID__', projectId),
                     type: 'GET',
                     dataType: 'json',
                     success: function(response) {

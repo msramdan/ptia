@@ -124,7 +124,7 @@
                 serverSide: true,
                 ajax: function(data, callback, settings) {
                     $.ajax({
-                        url: "./get-kaldik-data",
+                        url: "{{ route('kaldik.index') }}",
                         type: "GET",
                         data: {
                             limit: data.length,

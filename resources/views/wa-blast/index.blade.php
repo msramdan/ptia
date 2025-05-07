@@ -180,7 +180,7 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        url: './update-session-status',
+                        url: "{{ route('update.session.status') }}",
                         type: 'POST',
                         data: {
                             _token: '{{ csrf_token() }}',
