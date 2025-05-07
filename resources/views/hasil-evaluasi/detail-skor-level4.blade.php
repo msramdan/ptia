@@ -51,7 +51,7 @@
                                 </tr>
                             </table>
 
-                            <a href="/hasil-evaluasi" class="btn btn-secondary">
+                            <a href="{{route('hasil-evaluasi.index')}}" class="btn btn-secondary">
                                 <i class="fas fa-arrow-left"></i> {{ __('kembali') }}
                             </a>
                         </div>
