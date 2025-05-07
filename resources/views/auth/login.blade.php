@@ -19,6 +19,27 @@
     <link rel="stylesheet" href="{{ asset('assets/temalogin/css/iofrm-theme22.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/toastr/css/toastr.min.css') }}">
 </head>
+<style>
+    .captcha-wrapper {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        overflow: hidden;
+    }
+
+    .captcha-wrapper>div {
+        transform: scale(0.87);
+        transform-origin: center;
+    }
+
+    @media (max-width: 576px) {
+        .captcha-wrapper>div {
+            transform: scale(0.80);
+        }
+    }
+</style>
+
+
 
 <body>
     <div class="form-body without-side">
@@ -54,10 +75,11 @@
                                 <i class="fa fa-eye position-absolute toggle-password"
                                     style="top: 50%; right: 10px; transform: translateY(-50%); cursor: pointer; color: #6c757d;"></i>
                             </div>
-                            <div class="mb-3">
+                            <div class="mb-3 captcha-wrapper">
                                 {!! NoCaptcha::display() !!}
                                 {!! NoCaptcha::renderJs() !!}
                             </div>
+
                             <div class="d-grid">
                                 <button type="submit" class="btn btn-primary">Login</button>
                             </div>
