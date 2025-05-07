@@ -387,12 +387,6 @@
                 }
             });
         }
-
-        <script>
-    function getPesertaUrl(kaldikID) {
-        return "{{ route('peserta.diklat', ':id') }}".replace(':id', kaldikID);
-    }
-</script>
         // Modal Peserta - Fetch Peserta Data with AJAX
         function modalPeserta(kaldikID) {
             // Initialize DataTable
