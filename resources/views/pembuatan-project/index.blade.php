@@ -322,7 +322,7 @@
         // Modal Detail Diklat - Fetch Data with AJAX
         function modalDetail(kaldikID) {
             $.ajax({
-                url: `./get-kaldik-data/detail/${kaldikID}`,
+                url: "{{ route('kaldik.detail', ['kaldikID' => '__ID__']) }}".replace('__ID__', kaldikID),
                 type: "GET",
                 success: function(response) {
                     var tableBody = $('#detailDiklatTable tbody');
@@ -388,7 +388,11 @@
             });
         }
 
-
+        <script>
+    function getPesertaUrl(kaldikID) {
+        return "{{ route('peserta.diklat', ':id') }}".replace(':id', kaldikID);
+    }
+</script>
         // Modal Peserta - Fetch Peserta Data with AJAX
         function modalPeserta(kaldikID) {
             // Initialize DataTable
@@ -397,7 +401,7 @@
                 serverSide: true,
                 destroy: true, // Ensure the table is reinitialized every time the modal is opened
                 ajax: {
-                    url: `/get-kaldik-data/peserta/${kaldikID}`,
+                    url: "{{ route('peserta.diklat', ['kaldikID' => '__ID__']) }}".replace('__ID__', kaldikID),
                     type: "GET",
                     data: function(d) {
                         // Pass DataTable's internal parameters (pagination, search, etc.)
