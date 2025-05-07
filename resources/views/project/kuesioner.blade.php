@@ -230,7 +230,7 @@
                     $('#editAspek').val(data.aspek_id).change();
                     $('#editKriteria').val(data.kriteria).change();
                     $('#editPertanyaan').val(data.pertanyaan);
-                    $('#editForm').attr('action', `/project/kuesioner/update/${id}`);
+                    $('#editForm').attr('action', "{{ route('project.kuesioner.update', ['id' => '__ID__']) }}".replace('__ID__', id));
                     $('#editModal').modal('show');
                 },
                 error: function() {
