@@ -124,7 +124,7 @@
                 serverSide: true,
                 ajax: function(data, callback, settings) {
                     $.ajax({
-                        url: "/get-kaldik-data",
+                        url: "./get-kaldik-data",
                         type: "GET",
                         data: {
                             limit: data.length,
@@ -322,7 +322,7 @@
         // Modal Detail Diklat - Fetch Data with AJAX
         function modalDetail(kaldikID) {
             $.ajax({
-                url: `/get-kaldik-data/detail/${kaldikID}`,
+                url: `./get-kaldik-data/detail/${kaldikID}`,
                 type: "GET",
                 success: function(response) {
                     var tableBody = $('#detailDiklatTable tbody');

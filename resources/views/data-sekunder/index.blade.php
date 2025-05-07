@@ -243,7 +243,7 @@
                 var projectId = $(this).data('id');
                 $('#project_id').val(projectId);
                 $.ajax({
-                    url: '/data-sekunder/get/' + projectId,
+                    url: './data-sekunder/get/' + projectId,
                     type: 'GET',
                     dataType: 'json',
                     success: function(response) {

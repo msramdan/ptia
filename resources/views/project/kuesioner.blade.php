@@ -223,7 +223,7 @@
     <script>
         function openEditModal(id) {
             $.ajax({
-                url: `/project/kuesioner/edit/${id}`,
+                url: `./project/kuesioner/edit/${id}`,
                 type: "GET",
                 success: function(data) {
                     $('#editId').val(data.id);
@@ -251,7 +251,7 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        url: `/project/kuesioner/delete/${id}`,
+                        url: `./project/kuesioner/delete/${id}`,
                         type: "DELETE",
                         headers: {
                             'X-CSRF-TOKEN': '{{ csrf_token() }}'
