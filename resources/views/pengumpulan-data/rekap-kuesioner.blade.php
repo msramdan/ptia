@@ -14,7 +14,7 @@
                     </p>
                 </div>
                 <x-breadcrumb>
-                    <li class="breadcrumb-item"><a href="/">{{ __('Dashboard') }}</a></li>
+                    <li class="breadcrumb-item"><a href="{{route('dashboard')}}">{{ __('Dashboard') }}</a></li>
                     <li class="breadcrumb-item"><a
                             href="{{ route('pengumpulan-data.index') }}">{{ __('Pengumpulan Data') }}</a></li>
                     <li class="breadcrumb-item active" aria-current="page">{{ __('Rekap Kuesioner') }}</li>

@@ -15,7 +15,7 @@
 
                 <x-breadcrumb>
                     <li class="breadcrumb-item">
-                        <a href="/">{{ __('Dashboard') }}</a>
+                        <a href="{{route('dashboard')}}">{{ __('Dashboard') }}</a>
                     </li>
                     <li class="breadcrumb-item">
                         <a href="{{ route('wa-blast.index') }}">{{ __('Wa Blast') }}</a>
@@ -26,7 +26,7 @@
                 </x-breadcrumb>
             </div>
         </div>
-        
+
         <section class="section">
             <div class="row">
                 <div class="col-12 col-xl-8 col-lg-8">
@@ -99,14 +99,14 @@
                     </div>
                 </div>
             </div>
-        
+
             <div class="card">
                 <div class="card-body">
                     <h6 class="card-title">Logs</h6>
                     <div class="table-responsive text-nowrap">
                         <table class="table table-striped border-top">
                             <tbody id="logger">
-        
+
                             </tbody>
                         </table>
                     </div>

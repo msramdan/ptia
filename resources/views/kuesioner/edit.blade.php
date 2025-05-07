@@ -15,7 +15,7 @@
 
                 <x-breadcrumb>
                     <li class="breadcrumb-item">
-                        <a href="/">{{ __('Dashboard') }}</a>
+                        <a href="{{route('dashboard')}}">{{ __('Dashboard') }}</a>
                     </li>
                     <li class="breadcrumb-item">
                         <a href="{{ route('kuesioner.index') }}">{{ __('Kuesioner') }}</a>
@@ -37,7 +37,7 @@
                                 @method('PUT')
 
                                 @include('kuesioner.include.form')
-                                
+
                                 <a href="{{ route('kuesioner.index') }}" class="btn btn-secondary"><i class="fa fa-arrow-left" aria-hidden="true"></i> {{ __('Kembali') }}</a>
                                 <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> {{ __('Update') }}</button>
                             </form>

@@ -3,7 +3,7 @@
         <div class="sidebar-header position-relative">
             <div class="d-flex justify-content-between align-items-center">
                 <div class="logo">
-                    <a href="/">
+                    <a href="{{route('dashboard')}}">
                         @if ($settingApp?->logo)
                             <img src="{{ asset('storage/uploads/logos/' . $settingApp->logo) }}" alt="{{$settingApp->nama_aplikasi}}" style="height: 60px">
                         @endif
@@ -20,7 +20,7 @@
                 <hr>
                 @auth
                     <li class="sidebar-item{{ request()->is('/') || request()->is('dashboard') ? ' active' : '' }}">
-                        <a class="sidebar-link" href="/">
+                        <a class="sidebar-link" href="{{route('dashboard')}}">
                             <i class="bi bi-speedometer"></i>
                             <span> {{ __('Dashboard') }}</span>
                         </a>

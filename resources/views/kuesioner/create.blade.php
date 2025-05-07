@@ -15,7 +15,7 @@
 
                 <x-breadcrumb>
                     <li class="breadcrumb-item">
-                        <a href="/">{{ __('Dashboard') }}</a>
+                        <a href="{{route('dashboard')}}">{{ __('Dashboard') }}</a>
                     </li>
                     <li class="breadcrumb-item">
                         <a href="{{ route('kuesioner.index') }}">{{ __('Kuesioner') }}</a>
@@ -28,7 +28,7 @@
         </div>
 
         <section class="section">
-            
+
             <div class="row">
                 <div class="col-md-6">
                     <div class="card">
