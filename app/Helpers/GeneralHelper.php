@@ -193,6 +193,11 @@ function formatPesanWhatsApp($html, $notifikasi = null, $remark = null)
         $text = str_replace('{params_deadline}', $deadline, $text);
     }
 
+    if (strpos($text, '{nama_peserta}') !== false && $notifikasi && $remark) {
+        $namaPeserta = $notifikasi->nama ?? '-';
+        $text = str_replace('{nama_peserta}', $namaPeserta, $text);
+    }
+
     // Trim untuk menghapus spasi ekstra di awal & akhir
     return trim($text);
 }
