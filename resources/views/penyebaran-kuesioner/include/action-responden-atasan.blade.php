@@ -22,7 +22,7 @@
     @php
         $encryptedId = encryptShort($model->id);
         $encryptedTarget = encryptShort('Atasan');
-        $isBelum = $model->status_pengisian_kuesioner_alumni === 'Belum';
+        $isBelum = $model->status_pengisian_kuesioner_atasan === 'Belum';
         $routeParams = [
             'id' => $encryptedId,
             'target' => $encryptedTarget,
