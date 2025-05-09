@@ -161,8 +161,7 @@ function formatPesanWhatsApp($html, $notifikasi = null, $remark = null)
     if (strpos($text, '{params_link}') !== false && $notifikasi && $remark) {
         $encryptedId = encryptShort($notifikasi->id);
         $encryptedTarget = encryptShort($remark);
-        $url = URL::to(route('responden-kuesioner.index', ['id' => $encryptedId, 'target' => $encryptedTarget]));
-
+        $url = URL::to(route('responden-kuesioner.index', ['id' => $encryptedId, 'target' => $encryptedTarget ,  'token' => $notifikasi->token ]));
         $text = str_replace('{params_link}', $url, $text);
     }
 
