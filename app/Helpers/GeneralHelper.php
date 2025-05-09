@@ -103,6 +103,12 @@ function sendNotifTelegram($message, $remark)
 
 function generateMessage($notifikasi, $status, $url = null, $errorMessage = null, $remark = null)
 {
+    // Apply URL masking if needed
+    if ($url && env('IS_MASKING', false)) {
+        $path = parse_url($url, PHP_URL_PATH) . '?' . parse_url($url, PHP_URL_QUERY);
+        $url = 'https://registrasi.bpkp.go.id/eptia' . $path;
+    }
+
     if ($remark === 'Atasan') {
         return implode("\n", [
             $status ? "✅ *Sukses Kirim WA*" : "❌ *Gagal Kirim WA*",
