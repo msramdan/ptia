@@ -43,6 +43,7 @@ class NotifikasiCronAtasanController extends Controller
             ->join('project_pesan_wa', 'project_responden.project_id', '=', 'project_pesan_wa.project_id')
             ->join('project', 'project_responden.project_id', '=', 'project.id')
             ->where('project.status', 'Pelaksanaan')
+            ->where('project_responden.status_pengisian_kuesioner_alumni', 'Sudah')
             ->where('project_responden.status_pengisian_kuesioner_atasan', 'Belum')
             ->where('project_responden.try_send_wa_atasan', '<', 7)
             ->whereNotNull('project_responden.telepon_atasan')
@@ -72,7 +73,7 @@ class NotifikasiCronAtasanController extends Controller
 
         foreach ($notifikasiList as $notifikasi) {
             try {
-                $response = sendNotifWa($notifikasi, $notifikasi->telepon, $type);
+                $response = sendNotifWa($notifikasi, $notifikasi->telepon_atasan, $type);
                 $status = $response['status'];
                 $statusText = $status ? 'Sukses' : 'Gagal';
 
