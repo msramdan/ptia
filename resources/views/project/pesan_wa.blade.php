@@ -14,7 +14,7 @@
                 </div>
 
                 <x-breadcrumb>
-                    <li class="breadcrumb-item"><a href="{{route('dashboard')}}">{{ __('Dashboard') }}</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
                     <li class="breadcrumb-item"><a href="{{ route('project.index') }}">{{ __('Management Project') }}</a></li>
                     <li class="breadcrumb-item active" aria-current="page">{{ __('Pesan Wa') }}</li>
                 </x-breadcrumb>
@@ -78,10 +78,8 @@
                                 <a href="{{ route('project.index') }}" class="btn btn-secondary">
                                     <i class="fas fa-arrow-left"></i> {{ __('kembali') }}
                                 </a>
-                                @if ($project->status == 'Persiapan')
-                                    <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i>
-                                        {{ __('Update') }}</button>
-                                @endif
+                                <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i>
+                                    {{ __('Update') }}</button>
                             </form>
                         </div>
                     </div>
