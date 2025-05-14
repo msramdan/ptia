@@ -202,6 +202,7 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
         if (request()->ajax()) {
             $respondens = DB::table('project_responden as pr')
                 ->where('pr.project_id', $id)
+                ->where('pr.status_pengisian_kuesioner_alumni', 'Sudah')
                 ->whereNotNull('pr.nama_atasan')
                 ->whereNotNull('pr.telepon_atasan')
                 ->leftJoinSub(
