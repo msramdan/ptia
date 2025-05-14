@@ -42,7 +42,7 @@ class DataInterviewController extends Controller implements HasMiddleware
                     'dt.nama_diklat_type',
                     DB::raw('COUNT(pr.id) as total_responden'),
                     DB::raw('COUNT(CASE WHEN pr.nama_atasan IS NULL THEN pr.id END) as alumni_count'),
-                    DB::raw('SUM(CASE WHEN pr.nama_atasan IS NOT NULL AND project_responden.status_pengisian_kuesioner_alumni = "Sudah") as atasan_count')
+                    DB::raw('COUNT(CASE WHEN pr.nama_atasan IS NOT NULL AND project_responden.status_pengisian_kuesioner_alumni = "Sudah") as atasan_count')
 
                 )
                 ->where('p.status', 'Pelaksanaan')
