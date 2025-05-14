@@ -230,7 +230,7 @@ class AutoCreateProjectController extends Controller
                 ]);
 
                 // 7. Insert data ke table project_kuesioner
-                $kaldikDesc = $data['kaldikDesc'] ?? 'Pelatihan Default';
+                $kaldikDesc = $row['kaldikDesc'] ?? 'Pelatihan Default';
                 $pertanyaanList = DB::table('kuesioner')
                     ->join('aspek', 'kuesioner.aspek_id', '=', 'aspek.id')
                     ->where('aspek.diklat_type_id', $diklatType->diklat_type_id)

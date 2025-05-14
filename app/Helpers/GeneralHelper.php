@@ -103,6 +103,12 @@ function sendNotifTelegram($message, $remark)
 
 function generateMessage($notifikasi, $status, $url = null, $errorMessage = null, $remark = null)
 {
+    // Apply URL masking if needed
+    if ($url && env('IS_MASKING', false)) {
+        $path = parse_url($url, PHP_URL_PATH) . '?' . parse_url($url, PHP_URL_QUERY);
+        $url = 'https://registrasi.bpkp.go.id/eptia' . $path;
+    }
+
     if ($remark === 'Atasan') {
         return implode("\n", [
             $status ? "✅ *Sukses Kirim WA*" : "❌ *Gagal Kirim WA*",
@@ -161,8 +167,16 @@ function formatPesanWhatsApp($html, $notifikasi = null, $remark = null)
     if (strpos($text, '{params_link}') !== false && $notifikasi && $remark) {
         $encryptedId = encryptShort($notifikasi->id);
         $encryptedTarget = encryptShort($remark);
-        $url = URL::to(route('responden-kuesioner.index', ['id' => $encryptedId, 'target' => $encryptedTarget]));
 
+        $path = route('responden-kuesioner.index', [
+            'id' => $encryptedId,
+            'target' => $encryptedTarget,
+            'token' => $notifikasi->token
+        ], false); // Get relative path
+
+        $url = env('IS_MASKING', false)
+            ? 'https://registrasi.bpkp.go.id/eptia' . $path
+            : URL::to($path);
         $text = str_replace('{params_link}', $url, $text);
     }
 
@@ -177,6 +191,11 @@ function formatPesanWhatsApp($html, $notifikasi = null, $remark = null)
         }
 
         $text = str_replace('{params_deadline}', $deadline, $text);
+    }
+
+    if (strpos($text, '{nama_peserta}') !== false && $notifikasi && $remark) {
+        $namaPeserta = $notifikasi->nama ?? '-';
+        $text = str_replace('{nama_peserta}', $namaPeserta, $text);
     }
 
     // Trim untuk menghapus spasi ekstra di awal & akhir

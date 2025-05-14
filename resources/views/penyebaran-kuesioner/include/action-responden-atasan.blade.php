@@ -23,11 +23,21 @@
         $encryptedId = encryptShort($model->id);
         $encryptedTarget = encryptShort('Atasan');
         $isBelum = $model->status_pengisian_kuesioner_atasan === 'Belum';
+        $routeParams = [
+            'id' => $encryptedId,
+            'target' => $encryptedTarget,
+            'token' => $model->token,
+        ];
+
+        $baseUrl = env('IS_MASKING', false) ? 'https://registrasi.bpkp.go.id/eptia' : url('/');
+
+        $url = env('IS_MASKING', false)
+            ? $baseUrl . route('responden-kuesioner.index', $routeParams, false)
+            : route('responden-kuesioner.index', $routeParams);
     @endphp
 
-    <a href="{{ route('responden-kuesioner.index', ['id' => $encryptedId, 'target' => $encryptedTarget, 'token' => $model->token]) }}"
-        class="btn btn-{{ $isBelum ? 'danger' : 'success' }} btn-sm"
-        title="{{ $isBelum ? 'Atasan langsung belum melakukan pengisian Kuisioner klik untuk melihat kuesioner' : 'Kuisioner sudah diisi klik untuk melihat data' }}"
+    <a href="{{ $url }}" class="btn btn-{{ $isBelum ? 'danger' : 'success' }} btn-sm"
+        title="{{ $isBelum ? 'Peserta belum melakukan pengisian Kuisioner klik untuk melihat kuesioner' : 'Kuisioner sudah diisi klik untuk melihat data' }}"
         target="_blank">
         <i class="fas fa-clipboard-list" aria-hidden="true"></i>
     </a>
