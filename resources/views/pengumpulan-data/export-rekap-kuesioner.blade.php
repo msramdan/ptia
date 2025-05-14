@@ -15,7 +15,8 @@
             @endif
 
             @foreach ($groupedLevels as $level => $aspeks)
-                <th colspan="{{ count($aspeks) * 4 }}"
+                {{-- MODIFIKASI: colspan diubah dari count * 4 menjadi count * 5 --}}
+                <th colspan="{{ count($aspeks) * 5 }}"
                     style="background-color:#D3D3D3; color:#000; font-weight:bold; vertical-align:middle;">
                     LEVEL {{ $level }}
                 </th>
@@ -28,7 +29,8 @@
         <tr>
             @foreach ($groupedLevels as $level => $aspeks)
                 @foreach ($aspeks as $aspek)
-                    <th colspan="4"
+                    {{-- MODIFIKASI: colspan diubah dari 4 menjadi 5 --}}
+                    <th colspan="5"
                         style="background-color:#D3D3D3; color:#000; font-weight:bold; vertical-align:middle;">
                         {{ $aspek->aspek }}
                     </th>
@@ -46,6 +48,9 @@
                         Bobot</th>
                     <th style="background-color:#D3D3D3; color:#000; font-weight:bold; vertical-align:middle;">Nilai
                     </th>
+                    {{-- PENAMBAHAN: Header kolom Catatan --}}
+                    <th style="background-color:#D3D3D3; color:#000; font-weight:bold; vertical-align:middle;">Catatan
+                    </th>
                 @endforeach
             @endforeach
         </tr>
@@ -54,67 +59,76 @@
     <tbody>
         @foreach ($responden as $index => $respondenItem)
             @php
+                // MODIFIKASI: Query SQL diubah untuk mengambil catatan_aspek
                 $sql = "WITH delta_data AS (
                                             SELECT
-                                                project_jawaban_kuesioner.project_responden_id,
-                                                project_kuesioner.aspek_id,
-                                                project_kuesioner.aspek,
-                                                project_kuesioner.kriteria,
-                                                project.id AS project_id,
-                                                project.diklat_type_id,
-                                                project_jawaban_kuesioner.remark,
-                                                COUNT(project_jawaban_kuesioner.id) AS jumlah_data,
-                                                SUM(project_jawaban_kuesioner.nilai_sesudah - project_jawaban_kuesioner.nilai_sebelum) AS total_delta,
-                                                ROUND(AVG(project_jawaban_kuesioner.nilai_sesudah - project_jawaban_kuesioner.nilai_sebelum)) AS rata_rata_delta
-                                            FROM project_jawaban_kuesioner
-                                            JOIN project_kuesioner ON project_jawaban_kuesioner.project_kuesioner_id = project_kuesioner.id
-                                            JOIN project ON project_kuesioner.project_id = project.id
-                                            WHERE project_jawaban_kuesioner.project_responden_id = :responden_id
-                                                AND project_jawaban_kuesioner.remark = :remark
+                                                pjk.project_responden_id,
+                                                pk.aspek_id,
+                                                pk.aspek,
+                                                pk.kriteria,
+                                                p.id AS project_id,
+                                                p.diklat_type_id,
+                                                pjk.remark,
+                                                COUNT(pjk.id) AS jumlah_data,
+                                                SUM(pjk.nilai_sesudah - pjk.nilai_sebelum) AS total_delta,
+                                                ROUND(AVG(pjk.nilai_sesudah - pjk.nilai_sebelum)) AS rata_rata_delta
+                                            FROM project_jawaban_kuesioner pjk
+                                            JOIN project_kuesioner pk ON pjk.project_kuesioner_id = pk.id
+                                            JOIN project p ON pk.project_id = p.id
+                                            WHERE pjk.project_responden_id = :responden_id_sql_param
+                                                AND pjk.remark = :remark_sql_param
                                             GROUP BY
-                                                project_jawaban_kuesioner.project_responden_id,
-                                                project_kuesioner.aspek_id,
-                                                project_kuesioner.aspek,
-                                                project_kuesioner.kriteria,
-                                                project.diklat_type_id,
-                                                project_jawaban_kuesioner.remark
+                                                pjk.project_responden_id,
+                                                pk.aspek_id,
+                                                pk.aspek,
+                                                pk.kriteria,
+                                                p.id, -- Tambahkan p.id ke GROUP BY
+                                                p.diklat_type_id,
+                                                pjk.remark
                                         )
                                         SELECT
-                                            delta_data.*,
-                                            COALESCE(konversi.konversi, 0) AS konversi_nilai,
+                                            dd.*,
+                                            (SELECT GROUP_CONCAT(pjk_inner.catatan SEPARATOR '; ')
+                                                FROM project_jawaban_kuesioner pjk_inner
+                                                JOIN project_kuesioner pk_inner_q ON pjk_inner.project_kuesioner_id = pk_inner_q.id
+                                                WHERE pjk_inner.project_responden_id = dd.project_responden_id
+                                                AND pk_inner_q.aspek_id = dd.aspek_id
+                                                AND pjk_inner.remark = dd.remark
+                                                AND pjk_inner.catatan IS NOT NULL AND pjk_inner.catatan != '')
+AS catatan_aspek,
+                                            COALESCE(k.konversi, 0) AS konversi_nilai,
                                             COALESCE(
                                                 CASE
-                                                    WHEN delta_data.remark = 'Alumni' THEN project_bobot_aspek.bobot_alumni
-                                                    WHEN delta_data.remark = 'Atasan' THEN project_bobot_aspek.bobot_atasan_langsung
+                                                    WHEN dd.remark = 'Alumni' THEN pba.bobot_alumni
+                                                    WHEN dd.remark = 'Atasan' THEN pba.bobot_atasan_langsung
                                                     ELSE 0
                                                 END, 0
                                             ) AS bobot,
-                                            -- Perhitungan nilai
-                                            ROUND((COALESCE(konversi.konversi, 0) *
+                                            ROUND((COALESCE(k.konversi, 0) *
                                                    COALESCE(
                                                        CASE
-                                                           WHEN delta_data.remark = 'Alumni' THEN project_bobot_aspek.bobot_alumni
-                                                           WHEN delta_data.remark = 'Atasan' THEN project_bobot_aspek.bobot_atasan_langsung
+                                                           WHEN dd.remark = 'Alumni' THEN pba.bobot_alumni
+                                                           WHEN dd.remark = 'Atasan' THEN pba.bobot_atasan_langsung
                                                            ELSE 0
                                                        END, 0
                                                    ) / 100), 2) AS nilai
-                                        FROM delta_data
-                                        LEFT JOIN konversi
-                                            ON delta_data.diklat_type_id = konversi.diklat_type_id
-                                            AND delta_data.rata_rata_delta = konversi.skor
+                                        FROM delta_data dd
+                                        LEFT JOIN konversi k
+                                            ON dd.diklat_type_id = k.diklat_type_id
+                                            AND dd.rata_rata_delta = k.skor
                                             AND (
-                                                (delta_data.kriteria = 'Skor Persepsi' AND konversi.jenis_skor = 'Skor Persepsi')
+                                                (dd.kriteria = 'Skor Persepsi' AND k.jenis_skor = 'Skor Persepsi')
 OR
-                                                (delta_data.kriteria = 'Delta Skor Persepsi' AND konversi.jenis_skor = '∆ Skor Persepsi')
+                                                (dd.kriteria = 'Delta Skor Persepsi' AND k.jenis_skor = '∆ Skor Persepsi')
                                             )
-                                        LEFT JOIN project_bobot_aspek
-                                            ON delta_data.project_id = project_bobot_aspek.project_id
-                                            AND delta_data.aspek_id = project_bobot_aspek.aspek_id
-                                            AND delta_data.aspek = project_bobot_aspek.aspek;";
+                                        LEFT JOIN project_bobot_aspek pba
+                                            ON dd.project_id = pba.project_id
+                                            AND dd.aspek_id = pba.aspek_id
+                                            AND dd.aspek = pba.aspek";
 
                 $result = DB::select($sql, [
-                    'responden_id' => $respondenItem->id,
-                    'remark' => $remark,
+                    'responden_id_sql_param' => $respondenItem->id, // Ganti nama parameter binding
+                    'remark_sql_param' => $remark, // Ganti nama parameter binding
                 ]);
             @endphp
 
@@ -143,9 +157,10 @@ OR
                             {{ $nilai }}
                         </b>
                     </td>
+                    {{-- PENAMBAHAN: Sel untuk menampilkan catatan_aspek --}}
+                    <td>{{ $data->catatan_aspek ?? '-' }}</td>
                 @endforeach
 
-                {{-- Total Level 3 --}}
                 <td>
                     <b
                         title="Total level 3: {{ implode(' + ', collect($groupedLevels[3])->map(fn($aspek) => collect($result)->firstWhere('aspek', $aspek->aspek)->nilai ?? 0)->toArray()) }}">
@@ -153,8 +168,6 @@ OR
                     </b>
                 </td>
 
-
-                {{-- Looping Level 4 --}}
                 @php
                     $total_level_4 = 0;
                 @endphp
@@ -172,6 +185,8 @@ OR
                             {{ $nilai }}
                         </b>
                     </td>
+                    {{-- PENAMBAHAN: Sel untuk menampilkan catatan_aspek --}}
+                    <td>{{ $data->catatan_aspek ?? '-' }}</td>
                 @endforeach
                 <td>
                     <b
