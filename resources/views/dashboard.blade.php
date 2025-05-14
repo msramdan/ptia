@@ -5,13 +5,6 @@
 @section('content')
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs5/dt-1.12.0/datatables.min.css" />
     <style>
-        body[data-bs-theme="light"] .gauge-title {
-            color: #212529;
-        }
-
-        body[data-bs-theme="dark"] .gauge-title {
-            color: #f8f9fa;
-        }
 
         .heading-with-logo {
             display: flex;
@@ -76,7 +69,6 @@
         .gauge-current-value {
             font-size: 1.75rem;
             font-weight: 700;
-            color: #2c3e50;
             margin-bottom: 0.125rem;
             text-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.1);
             line-height: 1.2;
@@ -84,8 +76,6 @@
 
         .gauge-value-label {
             font-size: 0.875rem;
-            /* 14px */
-            color: #7f8c8d;
             font-weight: 500;
         }
 
