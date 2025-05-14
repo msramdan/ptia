@@ -141,6 +141,8 @@ class DataInterviewController extends Controller implements HasMiddleware
             $respondents = DB::table('project_responden')
                 ->where('project_id', $projectId)
                 ->whereNotNull('nama_atasan')
+                ->whereNotNull('telepon_atasan')
+                ->where('status_pengisian_kuesioner_alumni', 'Sudah')
                 ->select(
                     'id',
                     'nama',
