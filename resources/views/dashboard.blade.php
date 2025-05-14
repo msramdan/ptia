@@ -5,6 +5,14 @@
 @section('content')
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs5/dt-1.12.0/datatables.min.css" />
     <style>
+        body[data-bs-theme="light"] .gauge-title {
+            color: #212529;
+        }
+
+        body[data-bs-theme="dark"] .gauge-title {
+            color: #f8f9fa;
+        }
+
         .heading-with-logo {
             display: flex;
             align-items: center;
@@ -52,7 +60,6 @@
         .gauge-title {
             font-size: 1.125rem;
             font-weight: 600;
-            color: #2c3e50;
             margin-bottom: 0.3125rem;
             text-align: center;
         }
@@ -348,7 +355,7 @@
                             <div class="card-body" style="min-height: 300px; max-height: 440px; overflow-y: hidden;">
                                 <div class="gauge-container">
                                     <div class="gauge-header">
-                                        <div class="gauge-title">Skor Dampak Level 3</div>
+                                        <div class="gauge-title text-gray-900 dark:text-white">Skor Dampak Level 3</div>
                                     </div>
                                     <figure class="highcharts-figure">
                                         <div id="container"></div>
