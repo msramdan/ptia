@@ -193,6 +193,13 @@ function formatPesanWhatsApp($html, $notifikasi = null, $remark = null)
         $text = str_replace('{params_deadline}', $deadline, $text);
     }
 
+    if ($remark === 'Atasan') {
+        if (strpos($text, '{params_nama_atasan}') !== false && $notifikasi && $remark) {
+            $nama_atasan = $notifikasi->nama_atasan ?? '-';
+            $text = str_replace('{params_nama_atasan}', $nama_atasan, $text);
+        }
+    }
+
     if (strpos($text, '{nama_peserta}') !== false && $notifikasi && $remark) {
         $namaPeserta = $notifikasi->nama ?? '-';
         $text = str_replace('{nama_peserta}', $namaPeserta, $text);
