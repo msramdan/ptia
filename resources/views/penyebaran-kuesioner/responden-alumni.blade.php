@@ -68,6 +68,7 @@
                                 <th>Telepon</th>
                                 <th>Remark</th>
                                 <th>Status</th>
+                                <th>Log Pesan</th>
                                 <th>Tanggal</th>
                             </tr>
                         </thead>
@@ -88,7 +89,7 @@
                     </p>
                 </div>
                 <x-breadcrumb>
-                    <li class="breadcrumb-item"><a href="{{route('dashboard')}}">{{ __('Dashboard') }}</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
                     <li class="breadcrumb-item"><a
                             href="{{ route('penyebaran-kuesioner.index') }}">{{ __('Penyebaran Kuesioner') }}</a></li>
                     <li class="breadcrumb-item active" aria-current="page">{{ __('Responden') }}</li>
@@ -255,7 +256,7 @@
                         render: function(data, type, row) {
                             // Cek apakah ID sudah dipilih
                             var isChecked = selectedIds.includes(data
-                        .toString()); // Pastikan ID diubah ke string
+                                .toString()); // Pastikan ID diubah ke string
                             return '<input type="checkbox" class="select-checkbox" value="' + data +
                                 '" ' + (isChecked ? 'checked' : '') + '>';
                         }
@@ -309,7 +310,7 @@
                     $('.select-checkbox').each(function() {
                         var id = $(this).val();
                         if (selectedIds.includes(id
-                        .toString())) { // Pastikan ID diubah ke string
+                                .toString())) { // Pastikan ID diubah ke string
                             $(this).prop('checked', true);
                         } else {
                             $(this).prop('checked', false);
@@ -364,7 +365,7 @@
                         success: function(response) {
                             selectedIds = response.data.map(function(item) {
                                 return item.id
-                            .toString(); // Pastikan ID diubah ke string
+                                    .toString(); // Pastikan ID diubah ke string
                             });
 
                             // Centang semua checkbox
@@ -450,7 +451,7 @@
                                 text: response.message,
                             }).then(() => {
                                 $('#updateDeadlineModal').modal(
-                                'hide'); // Sembunyikan modal
+                                    'hide'); // Sembunyikan modal
                                 $('#deadline-date').val(''); // Reset input tanggal
                                 table.draw(false); // Refresh tabel
                             });
@@ -709,6 +710,10 @@
                                 return '<span class="badge bg-danger">Gagal</span>';
                             }
                         }
+                    },
+                    {
+                        data: "log_pesan",
+                        name: "log_pesan"
                     },
                     {
                         data: "created_at",

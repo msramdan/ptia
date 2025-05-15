@@ -69,6 +69,7 @@
                                 <th>Telepon</th>
                                 <th>Remark</th>
                                 <th>Status</th>
+                                <th>Log Pesan</th>
                                 <th>Tanggal</th>
                             </tr>
                         </thead>
@@ -89,7 +90,7 @@
                     </p>
                 </div>
                 <x-breadcrumb>
-                    <li class="breadcrumb-item"><a href="{{route('dashboard')}}">{{ __('Dashboard') }}</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
                     <li class="breadcrumb-item"><a
                             href="{{ route('penyebaran-kuesioner.index') }}">{{ __('Penyebaran Kuesioner') }}</a></li>
                     <li class="breadcrumb-item active" aria-current="page">{{ __('Responden') }}</li>
@@ -695,6 +696,10 @@
                                 return '<span class="badge bg-danger">Gagal</span>';
                             }
                         }
+                    },
+                    {
+                        data: "log_pesan",
+                        name: "log_pesan"
                     },
                     {
                         data: "created_at",
