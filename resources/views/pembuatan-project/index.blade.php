@@ -13,7 +13,7 @@
                     </p>
                 </div>
                 <x-breadcrumb>
-                    <li class="breadcrumb-item"><a href="{{route('dashboard')}}">{{ __('Dashboard') }}</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
                     <li class="breadcrumb-item active" aria-current="page">{{ __('Pembuatan Project') }}</li>
                 </x-breadcrumb>
             </div>
@@ -24,14 +24,28 @@
                 <div class="col-md-12">
                     <div class="card">
                         <div class="card-body">
+                            {{-- Filter Jenis Diklat --}}
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <label for="filter_jenis_diklat_pembuatan" class="form-label">Filter Jenis
+                                        Diklat</label>
+                                    <select class="form-select" id="filter_jenis_diklat_pembuatan">
+                                        <option value="">Semua Jenis Diklat</option>
+                                        @foreach ($jenisDiklatList as $jenis)
+                                            <option value="{{ $jenis }}">{{ $jenis }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+
                             <div class="table-responsive p-1">
-                                <table class="table table-striped" id="data-table" width="100%">
+                                <table class="table table-striped" id="data-table-pembuatan" width="100%">
                                     <thead>
                                         <tr>
                                             <th>#</th>
                                             <th>{{ __('Kode Diklat') }}</th>
                                             <th>{{ __('Nama Diklat') }}</th>
-                                            <th>{{ __('Jenis DIklat') }}</th>
+                                            <th>{{ __('Jenis Diklat') }}</th>
                                             <th>{{ __('Tanggal Diklat') }}</th>
                                             <th>{{ __('Status Generate') }}</th>
                                             <th>{{ __('Aksi') }}</th>
@@ -57,8 +71,7 @@
                 </div>
                 <div class="modal-body">
                     <table class="table table-bordered" id="detailDiklatTable">
-                        <tbody>
-                        </tbody>
+                        <tbody></tbody>
                     </table>
                 </div>
                 <div class="modal-footer">
@@ -68,6 +81,7 @@
         </div>
     </div>
 
+    <!-- Modal Peserta Diklat -->
     <div class="modal fade" id="modalPesertaDiklat" tabindex="-1" aria-labelledby="modalPesertaDiklatLabel"
         aria-hidden="true">
         <div class="modal-dialog modal-xl">
@@ -89,9 +103,7 @@
                                 <th>{{ __('Nilai Post-Test') }}</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <!-- Data will be populated here -->
-                        </tbody>
+                        <tbody></tbody>
                     </table>
                 </div>
                 <div class="modal-footer">
@@ -119,132 +131,141 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/locale/id.min.js"></script>
     <script>
         $(document).ready(function() {
-            $('#data-table').DataTable({
-                processing: true,
-                serverSide: true,
-                ajax: function(data, callback, settings) {
-                    $.ajax({
+            var dataTablePembuatan; // Deklarasi di scope yang lebih luas
+
+            function loadDataTablePembuatanProject() {
+                var selectedJenisDiklat = $('#filter_jenis_diklat_pembuatan').val();
+
+                if ($.fn.DataTable.isDataTable('#data-table-pembuatan')) {
+                    dataTablePembuatan.destroy();
+                }
+
+                dataTablePembuatan = $('#data-table-pembuatan').DataTable({
+                    processing: true,
+                    serverSide: true,
+                    ajax: {
                         url: "{{ route('kaldik.index') }}",
                         type: "GET",
-                        data: {
-                            limit: data.length,
-                            page: (data.start / data.length) + 1,
-                            search: data.search.value
+                        data: function(d) {
+                            d.limit = d.length;
+                            d.page = (d.start / d.length) + 1;
+                            d.search = d.search.value;
+                            if (selectedJenisDiklat) {
+                                d.jenis_diklat = selectedJenisDiklat;
+                            }
                         },
-                        success: function(response) {
-                            callback({
-                                recordsTotal: response.total,
-                                recordsFiltered: response.total,
-                                data: response.data.map(function(item) {
-                                    // Function to format date in Y-m-d format
-                                    function formatDate(dateString) {
-                                        var date = new Date(dateString);
-                                        var year = date.getFullYear();
-                                        var month = ('0' + (date
-                                            .getMonth() + 1)).slice(-2);
-                                        var day = ('0' + date.getDate())
-                                            .slice(-2);
-                                        return `${year}-${month}-${day}`;
+                        dataSrc: function(response) {
+                            return response.data.map(function(item) {
+                                // Function to format date in Y-m-d format
+                                function formatDate(dateString) {
+                                    var date = new Date(dateString);
+                                    var year = date.getFullYear();
+                                    var month = ('0' + (date.getMonth() + 1)).slice(-2);
+                                    var day = ('0' + date.getDate()).slice(-2);
+                                    return `${year}-${month}-${day}`;
+                                }
+
+                                // Function to format duration
+                                function formatDuration(endDate) {
+                                    const end = moment(endDate);
+                                    const now = moment();
+
+                                    if (end.isAfter(now)) {
+                                        return 'Masih berlangsung';
                                     }
 
-                                    // Menambahkan status generate
-                                    var statusGenerateClass = item
-                                        .status_generate === 'SUDAH' ?
-                                        'btn-success' : 'btn-danger';
-                                    var statusGenerateText = item
-                                        .status_generate === 'SUDAH' ?
-                                        'SUDAH' : 'BELUM';
-                                    moment.locale(
-                                        'id'); // Set bahasa Indonesia
+                                    const duration = moment.duration(now.diff(end));
+                                    const years = duration.years();
+                                    const months = duration.months();
+                                    const days = duration.days();
 
-                                    function formatDuration(endDate) {
-                                        const end = moment(endDate);
-                                        const now = moment();
+                                    let result = '';
+                                    if (years > 0) result += `${years} tahun `;
+                                    if (months > 0) result += `${months} bulan `;
+                                    if (days > 0) result += `${days} hari `;
 
-                                        if (end.isAfter(now)) {
-                                            return 'Masih berlangsung';
-                                        }
+                                    const durationText = result.trim() + ' yang lalu';
 
-                                        const duration = moment.duration(now
-                                            .diff(end));
-                                        const years = duration.years();
-                                        const months = duration.months();
-                                        const days = duration.days();
-
-                                        let result = '';
-
-                                        if (years > 0) result +=
-                                            `${years} tahun `;
-                                        if (months > 0) result +=
-                                            `${months} bulan `;
-                                        if (days > 0) result +=
-                                            `${days} hari `;
-
-                                        const durationText = result.trim() +
-                                            ' yang lalu';
-
-                                        // Jika lebih dari 3 bulan, berikan warna merah
-                                        if (duration.asMonths() > 3) {
-                                            return `<span style="color:red">${durationText}</span>`;
-                                        }
-
-                                        return durationText;
+                                    if (duration.asMonths() > 3) {
+                                        return `<span style="color:red">${durationText}</span>`;
                                     }
-                                    return {
-                                        kaldikID: item.kaldikID,
-                                        kaldikDesc: item.kaldikDesc,
-                                        biayaName: item.biayaName,
-                                        diklatTypeName: item.diklatTypeName,
-                                        dateRange: formatDuration(item
-                                            .endDate),
-                                        statusGenerate: `<button class="btn ${statusGenerateClass} btn-sm">${statusGenerateText}</button>`,
-                                        actions: `<td class="text-center">
-                                <a href="javascript:" onclick="generateProject(${item.kaldikID},'${item.diklatTypeName}', '${item.kaldikDesc.replace(/'/g, "\\'")}')" data-bs-toggle="tooltip" data-bs-placement="top" title="Generate Project" class="btn btn-sm btn-icon btn-success mr-1">
-                                    <i class="fas fa-cogs"></i>
-                                </a>
-                                <a href="javascript:" onclick="modalDetail(${item.kaldikID})" data-bs-toggle="tooltip" data-bs-placement="top" title="Lihat Data Diklat" class="btn btn-sm btn-icon btn-primary mr-1">
-                                    <i class="fas fa-info-circle"></i>
-                                </a>
-                                <a href="javascript:" onclick="modalPeserta(${item.kaldikID})" data-bs-toggle="tooltip" data-bs-placement="top" title="Data Peserta" class="btn btn-sm btn-icon btn-danger">
-                                    <i class="fas fa-users"></i>
-                                </a>
-                            </td>`
-                                    };
-                                })
+
+                                    return durationText;
+                                }
+
+                                var statusGenerateClass = item.status_generate === 'SUDAH' ?
+                                    'btn-success' : 'btn-danger';
+                                var statusGenerateText = item.status_generate === 'SUDAH' ?
+                                    'SUDAH' : 'BELUM';
+                                moment.locale('id');
+
+                                return {
+                                    kaldikID: item.kaldikID,
+                                    kaldikDesc: item.kaldikDesc,
+                                    biayaName: item.biayaName,
+                                    diklatTypeName: item.diklatTypeName,
+                                    dateRange: formatDuration(item.endDate),
+                                    statusGenerate: `<button class="btn ${statusGenerateClass} btn-sm">${statusGenerateText}</button>`,
+                                    actions: `<td class="text-center">
+                                        <a href="javascript:" onclick="generateProject(${item.kaldikID},'${item.diklatTypeName}', '${item.kaldikDesc.replace(/'/g, "\\'")}')" data-bs-toggle="tooltip" data-bs-placement="top" title="Generate Project" class="btn btn-sm btn-icon btn-success mr-1">
+                                            <i class="fas fa-cogs"></i>
+                                        </a>
+                                        <a href="javascript:" onclick="modalDetail(${item.kaldikID})" data-bs-toggle="tooltip" data-bs-placement="top" title="Lihat Data Diklat" class="btn btn-sm btn-icon btn-primary mr-1">
+                                            <i class="fas fa-info-circle"></i>
+                                        </a>
+                                        <a href="javascript:" onclick="modalPeserta(${item.kaldikID})" data-bs-toggle="tooltip" data-bs-placement="top" title="Data Peserta" class="btn btn-sm btn-icon btn-danger">
+                                            <i class="fas fa-users"></i>
+                                        </a>
+                                    </td>`
+                                };
                             });
-                            $('[data-bs-toggle="tooltip"]').tooltip();
-                        }
-                    });
-                },
-                columns: [{
-                        data: null,
-                        render: function(data, type, row, meta) {
-                            return meta.row + meta.settings._iDisplayStart + 1;
                         },
-                        orderable: false,
-                        searchable: false
+                        dataFilter: function(data) {
+                            var json = jQuery.parseJSON(data);
+                            json.recordsTotal = json.total;
+                            json.recordsFiltered = json.total;
+                            return JSON.stringify(json);
+                        }
                     },
-                    {
-                        data: "kaldikID"
-                    },
-                    {
-                        data: "kaldikDesc"
-                    },
-                    {
-                        data: "diklatTypeName"
-                    },
-                    {
-                        data: "dateRange"
-                    },
-                    {
-                        data: "statusGenerate"
-                    },
-                    {
-                        data: "actions"
+                    columns: [{
+                            data: null,
+                            render: function(data, type, row, meta) {
+                                return meta.row + meta.settings._iDisplayStart + 1;
+                            },
+                            orderable: false,
+                            searchable: false
+                        },
+                        {
+                            data: "kaldikID"
+                        },
+                        {
+                            data: "kaldikDesc"
+                        },
+                        {
+                            data: "diklatTypeName"
+                        },
+                        {
+                            data: "dateRange"
+                        },
+                        {
+                            data: "statusGenerate"
+                        },
+                        {
+                            data: "actions"
+                        }
+                    ],
+                    drawCallback: function(settings) {
+                        $('[data-bs-toggle="tooltip"]').tooltip();
                     }
-                ]
+                });
+            }
+
+            $('#filter_jenis_diklat_pembuatan').on('change', function() {
+                loadDataTablePembuatanProject();
             });
 
+            // Load tabel saat halaman pertama kali dimuat
+            loadDataTablePembuatanProject();
         });
 
         function generateProject(kaldikID, diklatTypeName, kaldikDesc) {
@@ -260,16 +281,15 @@
                 reverseButtons: true
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // Tampilkan indikator loading
                     const loadingSwal = Swal.fire({
                         title: "Mohon tunggu, proses sedang berlangsung...",
                         html: `
-    <div style="width: 100%; text-align: center;">
-        <div class="progress" style="width: 100%; height: 20px;">
-            <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: 100%"></div>
-        </div>
-    </div>
-    `,
+                            <div style="width: 100%; text-align: center;">
+                                <div class="progress" style="width: 100%; height: 20px;">
+                                    <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: 100%"></div>
+                                </div>
+                            </div>
+                        `,
                         showConfirmButton: false,
                         willOpen: () => {
                             $(".progress-bar").css("width", "100%");
@@ -277,7 +297,6 @@
                         allowOutsideClick: false,
                         allowEscapeKey: false
                     });
-
 
                     $.ajax({
                         url: "{{ route('project.store') }}",
@@ -291,7 +310,7 @@
                         },
                         type: "POST",
                         success: function(response) {
-                            loadingSwal.close(); // Tutup loading
+                            loadingSwal.close();
                             Swal.fire({
                                 title: "Berhasil!",
                                 text: "Project berhasil dibuat!",
@@ -303,7 +322,7 @@
                             });
                         },
                         error: function(xhr) {
-                            loadingSwal.close(); // Tutup loading
+                            loadingSwal.close();
                             let errorMessage = "Terjadi kesalahan saat membuat project.";
                             if (xhr.responseJSON && xhr.responseJSON.message) {
                                 errorMessage = xhr.responseJSON.message;
@@ -319,7 +338,6 @@
             });
         }
 
-        // Modal Detail Diklat - Fetch Data with AJAX
         function modalDetail(kaldikID) {
             $.ajax({
                 url: "{{ route('kaldik.detail', ['kaldikID' => '__ID__']) }}".replace('__ID__', kaldikID),
@@ -333,7 +351,7 @@
                         if (dateString) {
                             var date = new Date(dateString);
                             var year = date.getFullYear();
-                            var month = ('0' + (date.getMonth() + 1)).slice(-2); // Month is 0-indexed
+                            var month = ('0' + (date.getMonth() + 1)).slice(-2);
                             var day = ('0' + date.getDate()).slice(-2);
                             return `${year}-${month}-${day}`;
                         }
@@ -368,44 +386,40 @@
                     `);
                     if (data.tgl_mulai_el && data.tgl_selesai_el) {
                         tableBody.append(`
-                        <tr>
-                            <td>{{ __('Tanggal Elearning') }}</td>
-                            <td>${formatDate(data.tgl_mulai_el)} s/d ${formatDate(data.tgl_selesai_el)}</td>
-                        </tr>
-                    `);
+                            <tr>
+                                <td>{{ __('Tanggal Elearning') }}</td>
+                                <td>${formatDate(data.tgl_mulai_el)} s/d ${formatDate(data.tgl_selesai_el)}</td>
+                            </tr>
+                        `);
                     }
-
                     if (data.tgl_mulai_tm && data.tgl_selesai_tm) {
                         tableBody.append(`
-                        <tr>
-                            <td>{{ __('Tanggal Tatap Muka') }}</td>
-                            <td>${formatDate(data.tgl_mulai_tm)} s/d ${formatDate(data.tgl_selesai_tm)}</td>
-                        </tr>
-                    `);
+                            <tr>
+                                <td>{{ __('Tanggal Tatap Muka') }}</td>
+                                <td>${formatDate(data.tgl_mulai_tm)} s/d ${formatDate(data.tgl_selesai_tm)}</td>
+                            </tr>
+                        `);
                     }
                     $('#modalDetailDiklat').modal('show');
                 }
             });
         }
-        // Modal Peserta - Fetch Peserta Data with AJAX
+
         function modalPeserta(kaldikID) {
-            // Initialize DataTable
             var table = $('#pesertaDiklatTable').DataTable({
                 processing: true,
                 serverSide: true,
-                destroy: true, // Ensure the table is reinitialized every time the modal is opened
+                destroy: true,
                 ajax: {
                     url: "{{ route('peserta.diklat', ['kaldikID' => '__ID__']) }}".replace('__ID__', kaldikID),
                     type: "GET",
                     data: function(d) {
-                        // Pass DataTable's internal parameters (pagination, search, etc.)
-                        d.page = (d.start / d.length) + 1; // Calculate current page
-                        d.limit = d.length; // Number of records per page
-                        d.search = d.search.value; // Current search query
+                        d.page = (d.start / d.length) + 1;
+                        d.limit = d.length;
+                        d.search = d.search.value;
                     },
                     dataSrc: function(response) {
-                        // Format the response data to DataTable's expected format
-                        return response.data; // Directly return the 'data' array from the response
+                        return response.data;
                     },
                     error: function(xhr, status, error) {
                         alert("Gagal mengambil data peserta!");
@@ -435,7 +449,6 @@
                 ]
             });
 
-            // Show the modal after the table has been initialized
             $('#modalPesertaDiklat').modal('show');
         }
     </script>

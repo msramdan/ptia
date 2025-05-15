@@ -1,4 +1,3 @@
-<!-- resources/views/hasil-evaluasi/index.blade.php -->
 @extends('layouts.app')
 
 @section('title', __('Hasil Evaluasi'))
@@ -14,7 +13,7 @@
                     </p>
                 </div>
                 <x-breadcrumb>
-                    <li class="breadcrumb-item"><a href="{{route('dashboard')}}">{{ __('Dashboard') }}</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
                     <li class="breadcrumb-item active" aria-current="page">{{ __('Hasil Evaluasi') }}</li>
                 </x-breadcrumb>
             </div>
@@ -25,11 +24,29 @@
                 <div class="col-md-12">
                     <div class="card">
                         <div class="card-body">
-                            <a href="{{ route('hasil-evaluasi.export-excel') }}" class="btn btn-success mb-4">
-                                <i class="fas fa-file-excel"></i> Export ke Excel
-                            </a>
+                            {{-- Filter Unit Kerja --}}
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <label for="filter_unit_kerja_hasil" class="form-label">Filter Unit Kerja</label>
+                                    <select class="form-select" id="filter_unit_kerja_hasil">
+                                        <option value="">Semua Unit Kerja</option>
+                                        @foreach ($unitKerjaList as $unit)
+                                            <option value="{{ $unit }}"
+                                                {{ $selectedUnitKerja == $unit ? 'selected' : '' }}>{{ $unit }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-md-8 text-end">
+                                    <a href="{{ route('hasil-evaluasi.export-excel') }}" class="btn btn-success mt-4">
+                                        <i class="fas fa-file-excel"></i> Export ke Excel
+                                    </a>
+                                </div>
+                            </div>
+
                             <div class="table-responsive p-1">
-                                <table class="table table-striped" id="data-table" width="100%">
+                                <table class="table table-striped" id="data-table-hasil-evaluasi" width="100%">
+                                    {{-- Ganti ID tabel --}}
                                     <thead>
                                         <tr>
                                             <th rowspan="2">#</th>
@@ -64,57 +81,76 @@
 @endpush
 
 @push('js')
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"
-        integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ=="
-        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/v/bs5/dt-1.12.0/datatables.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script>
         $(document).ready(function() {
-            $('#data-table').DataTable({
-                processing: true,
-                serverSide: true,
-                ajax: "{{ route('hasil-evaluasi.index') }}",
-                columns: [{
-                        data: 'DT_RowIndex',
-                        name: 'DT_RowIndex',
-                        orderable: false,
-                        searchable: false
+            var dataTableHasilEvaluasi; // Deklarasi variabel di scope yang lebih luas
+
+            function loadDataTableHasilEvaluasi() {
+                var selectedUnitKerja = $('#filter_unit_kerja_hasil').val();
+
+                if ($.fn.DataTable.isDataTable('#data-table-hasil-evaluasi')) {
+                    dataTableHasilEvaluasi.destroy();
+                }
+
+                dataTableHasilEvaluasi = $('#data-table-hasil-evaluasi').DataTable({
+                    processing: true,
+                    serverSide: true,
+                    ajax: {
+                        url: "{{ route('hasil-evaluasi.index') }}",
+                        data: function(d) {
+                            d.unit_kerja = selectedUnitKerja;
+                        }
                     },
-                    {
-                        data: 'user',
-                        name: 'user'
-                    },
-                    {
-                        data: 'kaldikID',
-                        name: 'kaldikID'
-                    },
-                    {
-                        data: 'nama_project',
-                        name: 'nama_project'
-                    },
-                    {
-                        data: 'nama_diklat_type',
-                        name: 'nama_diklat_type'
-                    },
-                    {
-                        data: 'avg_skor_level_3',
-                        name: 'avg_skor_level_3'
-                    },
-                    {
-                        data: 'kriteria_dampak_level_3',
-                        name: 'kriteria_dampak_level_3'
-                    },
-                    {
-                        data: 'avg_skor_level_4',
-                        name: 'avg_skor_level_4'
-                    },
-                    {
-                        data: 'kriteria_dampak_level_4',
-                        name: 'kriteria_dampak_level_4'
-                    }
-                ]
+                    columns: [{
+                            data: 'DT_RowIndex',
+                            name: 'DT_RowIndex',
+                            orderable: false,
+                            searchable: false
+                        },
+                        {
+                            data: 'user',
+                            name: 'user'
+                        },
+                        {
+                            data: 'kaldikID',
+                            name: 'kaldikID'
+                        },
+                        {
+                            data: 'nama_project',
+                            name: 'nama_project'
+                        },
+                        {
+                            data: 'nama_diklat_type',
+                            name: 'nama_diklat_type'
+                        },
+                        {
+                            data: 'avg_skor_level_3',
+                            name: 'avg_skor_level_3'
+                        },
+                        {
+                            data: 'kriteria_dampak_level_3',
+                            name: 'kriteria_dampak_level_3'
+                        },
+                        {
+                            data: 'avg_skor_level_4',
+                            name: 'avg_skor_level_4'
+                        },
+                        {
+                            data: 'kriteria_dampak_level_4',
+                            name: 'kriteria_dampak_level_4'
+                        }
+                    ]
+                });
+            }
+
+            $('#filter_unit_kerja_hasil').on('change', function() {
+                loadDataTableHasilEvaluasi();
             });
+
+            // Load tabel saat halaman pertama kali dimuat
+            loadDataTableHasilEvaluasi();
         });
     </script>
 @endpush

@@ -25,10 +25,20 @@ class HasilEvaluasiController extends Controller implements HasMiddleware
         ];
     }
 
-    public function index(): View|JsonResponse
+    public function index(Request $request): View|JsonResponse // Tambahkan Request $request
     {
+        $selectedUnitKerja = $request->input('unit_kerja');
+
+        $unitKerjaList = DB::table('project_data_sekunder')
+            ->select('unit_kerja')
+            ->whereNotNull('unit_kerja')
+            ->where('unit_kerja', '!=', '')
+            ->distinct()
+            ->orderBy('unit_kerja')
+            ->pluck('unit_kerja');
+
         if (request()->ajax()) {
-            $projects = DB::table('project')
+            $projectsQuery = DB::table('project')
                 ->select(
                     'project.id',
                     'project.kode_project',
@@ -104,8 +114,16 @@ class HasilEvaluasiController extends Controller implements HasMiddleware
                         COALESCE(avg_scores.final_avg_skor_level_4, 0) <= indikator_4.nilai_maksimal
                     ');
                 })
-                ->where('project.status', 'Pelaksanaan')
-                ->orderByDesc('project.id');
+                ->where('project.status', 'Pelaksanaan'); // Anda mungkin ingin menambahkan filter tahun juga di sini
+
+            if ($selectedUnitKerja) {
+                $projectsQuery->whereIn('project.id', function ($query) use ($selectedUnitKerja) {
+                    $query->select('project_id')
+                        ->from('project_data_sekunder')
+                        ->where('unit_kerja', $selectedUnitKerja);
+                });
+            }
+            $projects = $projectsQuery->orderByDesc('project.id');
 
 
             return DataTables::of($projects)
@@ -120,14 +138,14 @@ class HasilEvaluasiController extends Controller implements HasMiddleware
                                 <span>' . e($row->user_name) . '</span>
                             </div>';
                 })
-                ->addColumn('avg_skor_level_3', fn($row) => '<a href="' . e(url("/hasil-evaluasi/level-3/{$row->id}")) . '"  class="btn btn-link">' . e($row->avg_skor_level_3) . '</a>')
-                ->addColumn('avg_skor_level_4', fn($row) => '<a href="' . e(url("/hasil-evaluasi/level-4/{$row->id}")) . '"  class="btn btn-link">' . e($row->avg_skor_level_4) . '</a>')
+                ->addColumn('avg_skor_level_3', fn($row) => '<a href="' . e(url("/hasil-evaluasi/level-3/{$row->id}")) . '"  class="btn btn-link">' . e(number_format($row->avg_skor_level_3, 2)) . '</a>')
+                ->addColumn('avg_skor_level_4', fn($row) => '<a href="' . e(url("/hasil-evaluasi/level-4/{$row->id}")) . '"  class="btn btn-link">' . e(number_format($row->avg_skor_level_4, 2)) . '</a>')
                 ->addColumn('kriteria_dampak_level_3', fn($row) => e($row->kriteria_dampak_level_3 ?? '-'))
                 ->addColumn('kriteria_dampak_level_4', fn($row) => e($row->kriteria_dampak_level_4 ?? '-'))
                 ->rawColumns(['user', 'avg_skor_level_3', 'avg_skor_level_4'])
                 ->toJson();
         }
-        return view('hasil-evaluasi.index');
+        return view('hasil-evaluasi.index', compact('unitKerjaList', 'selectedUnitKerja'));
     }
 
     public function showLevel3($id)
