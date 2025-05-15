@@ -5,7 +5,6 @@
 @section('content')
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs5/dt-1.12.0/datatables.min.css" />
     <style>
-
         .heading-with-logo {
             display: flex;
             align-items: center;

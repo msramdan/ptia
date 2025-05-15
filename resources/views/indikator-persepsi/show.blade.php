@@ -43,7 +43,7 @@
                                         <td>{{ $indikatorPersepsi->indikator_persepsi }}</td>
                                     </tr>
                                     <tr>
-                                        <td class="fw-bold">{{ __('Kriteria Persepsi') }}</td>
+                                        <td class="fw-bold">{{ __('Predikat Persepsi') }}</td>
                                         <td>{{ $indikatorPersepsi->kriteria_persepsi }}</td>
                                     </tr>
                                     <tr>

@@ -66,7 +66,7 @@
                                             <th>{{ __('Diklat Type') }}</th>
                                             <th>{{ __('Aspek') }}</th>
                                             <th>{{ __('Indikator Persepsi') }}</th>
-                                            <th>{{ __('Kriteria Persepsi') }}</th>
+                                            <th>{{ __('Predikat Persepsi') }}</th>
                                             <th>{{ __('Aksi') }}</th>
                                         </tr>
                                     </thead>

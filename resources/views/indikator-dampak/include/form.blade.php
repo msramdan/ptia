@@ -45,8 +45,8 @@
     </div>
     <div class="col-md-6">
         <div class="form-group">
-            <label for="kriteria-dampak">{{ __('Kriteria Dampak') }}</label>
-            <input type="text" name="kriteria_dampak" id="kriteria-dampak" class="form-control @error('kriteria_dampak') is-invalid @enderror" value="{{ isset($indikatorDampak) ? $indikatorDampak->kriteria_dampak : old('kriteria_dampak') }}" placeholder="{{ __('Kriteria Dampak') }}" required />
+            <label for="kriteria-dampak">{{ __('Predikat Dampak') }}</label>
+            <input type="text" name="kriteria_dampak" id="kriteria-dampak" class="form-control @error('kriteria_dampak') is-invalid @enderror" value="{{ isset($indikatorDampak) ? $indikatorDampak->kriteria_dampak : old('kriteria_dampak') }}" placeholder="{{ __('Predikat Dampak') }}" required />
             @error('kriteria_dampak')
                 <span class="text-danger">
                     {{ $message }}

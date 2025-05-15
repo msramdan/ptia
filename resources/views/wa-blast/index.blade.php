@@ -1,20 +1,20 @@
 @extends('layouts.app')
 
-@section('title', __('Wa Blast'))
+@section('title', __('WA Blast'))
 
 @section('content')
     <div class="page-heading">
         <div class="page-title">
             <div class="row">
                 <div class="col-12 col-md-8 order-md-1 order-last">
-                    <h3>{{ __('Wa Blast') }}</h3>
+                    <h3>{{ __('WA Blast') }}</h3>
                     <p class="text-subtitle text-muted">
-                        {{ __('Berikut adalah daftar semua wa Blast.') }}
+                        {{ __('Berikut adalah daftar semua WA Blast.') }}
                     </p>
                 </div>
                 <x-breadcrumb>
                     <li class="breadcrumb-item"><a href="{{route('dashboard')}}">{{ __('Dashboard') }}</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">{{ __('Wa Blast') }}</li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ __('WA Blast') }}</li>
                 </x-breadcrumb>
             </div>
         </div>
@@ -25,19 +25,12 @@
                     <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal"
                         data-bs-target="#createWaBlastModal">
                         <i class="fas fa-plus"></i>
-                        {{ __('Tambah data wa blast') }}
+                        {{ __('Tambah data WA blast') }}
                     </button>
                 </div>
             @endcan
 
             <div class="row">
-                {{-- <div class="col-md-12">
-                    <div class="card">
-                        <div class="card-body">
-
-                        </div>
-                    </div>
-                </div> --}}
 
                 <div class="col-md-12">
                     <div class="card">
@@ -72,7 +65,7 @@
                 <form action="{{ route('wa-blast.store') }}" method="POST">
                     @csrf
                     <div class="modal-header">
-                        <h5 class="modal-title" id="createWaBlastModalLabel">{{ __('Tambah data Wa Blast') }}</h5>
+                        <h5 class="modal-title" id="createWaBlastModalLabel">{{ __('Tambah data WA Blast') }}</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">

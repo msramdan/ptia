@@ -192,7 +192,7 @@ return [
             ],
             'menus' => [
                 [
-                    'title' => 'Wa Blasting',
+                    'title' => 'WA Blasting',
                     'icon' => '<i class="bi bi-whatsapp"></i>',
                     'route' => [
                         'pesan-wa*',
@@ -211,12 +211,12 @@ return [
                             'permission' => 'pesan wa view'
                         ],
                         [
-                            'title' => 'Config Wa Blast',
+                            'title' => 'Config WA Blast',
                             'route' => '/wa-blast',
                             'permission' => 'wa blast view'
                         ],
                         [
-                            'title' => 'Single Sender',
+                            'title' => 'Test WA Blasting',
                             'route' => '/single-sender',
                             'permission' => 'single sender view'
                         ]
