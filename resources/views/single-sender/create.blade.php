@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', __('Create Single Sender'))
+@section('title', __('Test WA Blasting'))
 
 @section('content')
     <div class="page-heading">
@@ -18,7 +18,7 @@
                         <a href="{{route('dashboard')}}">{{ __('Dashboard') }}</a>
                     </li>
                     <li class="breadcrumb-item active" aria-current="page">
-                        {{ __('Create Single Sender') }}
+                        {{ __('Test WA Blasting') }}
                     </li>
                 </x-breadcrumb>
             </div>

@@ -3,6 +3,28 @@
 @section('title', __('WA Blast'))
 
 @section('content')
+    <style>
+        .form-switch {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-switch .form-check-input {
+            width: 3em;
+            height: 1.5em;
+        }
+
+        .form-check-input:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .form-check-label {
+            font-weight: normal;
+        }
+    </style>
+
     <div class="page-heading">
         <div class="page-title">
             <div class="row">
@@ -13,7 +35,7 @@
                     </p>
                 </div>
                 <x-breadcrumb>
-                    <li class="breadcrumb-item"><a href="{{route('dashboard')}}">{{ __('Dashboard') }}</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
                     <li class="breadcrumb-item active" aria-current="page">{{ __('WA Blast') }}</li>
                 </x-breadcrumb>
             </div>
@@ -99,23 +121,21 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
+        // Initialize Toastr
+        toastr.options = {
+            closeButton: true,
+            progressBar: true,
+            positionClass: "toast-top-right",
+            timeOut: 5000
+        };
+
         $(document).ready(function() {
             @if (session('success'))
-                toastr.success("{{ session('success') }}", "Success", {
-                    closeButton: true,
-                    progressBar: true,
-                    positionClass: "toast-top-right",
-                    timeOut: 5000,
-                });
+                toastr.success("{{ session('success') }}", "Success");
             @endif
 
             @if (session('error'))
-                toastr.error("{{ session('error') }}", "Error", {
-                    closeButton: true,
-                    progressBar: true,
-                    positionClass: "toast-top-right",
-                    timeOut: 5000,
-                });
+                toastr.error("{{ session('error') }}", "Error");
             @endif
         });
     </script>
@@ -128,27 +148,32 @@
                     data: 'DT_RowIndex',
                     name: 'DT_RowIndex',
                     orderable: false,
-                    searchable: false,
+                    searchable: false
                 },
                 {
                     data: 'session_name',
-                    name: 'session_name',
+                    name: 'session_name'
                 },
                 {
                     data: 'whatsapp_number',
-                    name: 'whatsapp_number',
+                    name: 'whatsapp_number'
                 },
                 {
                     data: 'api_key',
-                    name: 'api_key',
+                    name: 'api_key'
                 },
                 {
                     data: 'status',
-                    name: 'status',
+                    name: 'status'
                 },
                 {
                     data: 'is_aktif',
                     name: 'is_aktif',
+                    orderable: false,
+                    searchable: false,
+                    render: function(data, type, row) {
+                        return data;
+                    }
                 },
                 {
                     data: 'action',
@@ -158,40 +183,29 @@
                 }
             ],
         });
-    </script>
 
-    <script>
-        $(document).on('click', '.set-aktif-btn', function() {
-            var sessionId = $(this).data('id');
-            Swal.fire({
-                title: 'Are you sure?',
-                text: "Do you want to set this session as Aktif?",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Yes, set Aktif!',
-                cancelButtonText: 'No, cancel'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: "{{ route('update.session.status') }}",
-                        type: 'POST',
-                        data: {
-                            _token: '{{ csrf_token() }}',
-                            id: sessionId,
-                            is_aktif: 'Yes'
-                        },
-                        success: function(response) {
-                            if (response.success) {
-                                $('tr[data-id="' + sessionId + '"]').find('.status-column')
-                                    .text('Aktif');
-                                Swal.fire('Updated!', 'The session is now active.', 'success');
-                                location.reload();
-                            } else {
-                                Swal.fire('Error!', 'There was an issue updating the session.',
-                                    'error');
-                            }
-                        }
-                    });
+        // Handle switch toggle
+        $(document).on('change', '.toggle-aktif', function() {
+            let id = $(this).data('id');
+            let isAktif = $(this).is(':checked') ? 'Yes' : 'No';
+
+            $.ajax({
+                url: "{{ route('wa-blast.update-aktif') }}",
+                method: 'POST',
+                data: {
+                    id: id,
+                    is_aktif: isAktif,
+                    _token: "{{ csrf_token() }}"
+                },
+                success: function(response) {
+                    if (response.success) {
+                        $('#data-table').DataTable().ajax.reload(null, false);
+                        toastr.success('Status updated successfully', 'Success');
+                    }
+                },
+                error: function(xhr) {
+                    $('#data-table').DataTable().ajax.reload(null, false);
+                    toastr.error('Error updating status', 'Error');
                 }
             });
         });

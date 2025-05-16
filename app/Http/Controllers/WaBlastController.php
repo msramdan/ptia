@@ -39,12 +39,45 @@ class WaBlastController extends Controller implements HasMiddleware
                         return '<span class="badge bg-success">' . $row->status . '</span>';
                     }
                 })
+                ->addColumn('is_aktif', function ($row) {
+                    $disabled = $row->status == 'STOPPED' ? 'disabled' : '';
+                    $checked = $row->is_aktif == 'Yes' ? 'checked' : '';
+
+                    return '
+                <div class="form-check form-switch">
+                    <input class="form-check-input toggle-aktif" type="checkbox"
+                        data-id="' . $row->id . '"
+                        ' . $checked . '
+                        ' . $disabled . '>
+                    <label class="form-check-label">' . $row->is_aktif . '</label>
+                </div>';
+                })
                 ->addColumn('action', 'wa-blast.include.action')
-                ->rawColumns(['status', 'action'])
+                ->rawColumns(['status', 'is_aktif', 'action'])
                 ->toJson();
         }
 
         return view('wa-blast.index');
+    }
+
+    public function updateAktif(Request $request)
+    {
+        $request->validate([
+            'id' => 'required|exists:sessions,id',
+            'is_aktif' => 'required|string|in:Yes,No'
+        ]);
+
+        // First set all records to "No"
+        WaBlast::query()->update(['is_aktif' => 'No']);
+
+        // Then update the selected record if is_aktif is "Yes"
+        if ($request->is_aktif == 'Yes') {
+            $waBlast = WaBlast::find($request->id);
+            $waBlast->is_aktif = 'Yes';
+            $waBlast->save();
+        }
+
+        return response()->json(['success' => true]);
     }
 
     public function store(Request $request): RedirectResponse
@@ -78,37 +111,6 @@ class WaBlastController extends Controller implements HasMiddleware
             return to_route('wa-blast.index')->with('success', __('WA Blast berhasil dihapus.'));
         } catch (\Exception $e) {
             return to_route('wa-blast.index')->with('error', __("WA Blast tidak dapat dihapus karena terkait dengan tabel lain."));
-        }
-    }
-
-    public function updateSessionStatus(Request $request)
-    {
-        $request->validate([
-            'id' => 'required|exists:sessions,id',
-            'is_aktif' => 'required|in:Yes,No',
-        ]);
-
-        DB::beginTransaction();
-
-        try {
-            if ($request->is_aktif == 'Yes') {
-                DB::table('sessions')->update(['is_aktif' => 'No']);
-            }
-
-            $updated = DB::table('sessions')
-                ->where('id', $request->id)
-                ->update(['is_aktif' => $request->is_aktif]);
-
-            DB::commit();
-
-            if ($updated) {
-                return response()->json(['success' => true]);
-            }
-
-            return response()->json(['success' => false, 'message' => 'Sesi tidak ditemukan atau tidak diperbarui.'], 404);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json(['success' => false, 'message' => 'Terjadi kesalahan saat memperbarui sesi.'], 500);
         }
     }
 }
