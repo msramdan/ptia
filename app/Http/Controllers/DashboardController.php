@@ -13,7 +13,6 @@ class DashboardController extends Controller
     public function index(Request $request)
     {
         $tahun = $request->input('tahun', date('Y'));
-        $selectedUnitKerja = $request->input('unit_kerja');
         $selectedTriwulan = $request->input('triwulan'); // Ambil input triwulan
 
         $unitKerjaList = DB::table('project_data_sekunder')
@@ -127,14 +126,6 @@ class DashboardController extends Controller
                 $projectsQuery->whereBetween('project.created_at', [$startDate, $endDate]);
             }
 
-
-            if ($selectedUnitKerja) {
-                $projectsQuery->whereIn('project.id', function ($query) use ($selectedUnitKerja) {
-                    $query->select('project_id')
-                        ->from('project_data_sekunder')
-                        ->where('unit_kerja', $selectedUnitKerja);
-                });
-            }
             $projects = $projectsQuery->orderByDesc('project.id');
 
             return DataTables::of($projects)
@@ -170,13 +161,6 @@ class DashboardController extends Controller
             ->where('status', 'Pelaksanaan')
             ->whereYear('created_at', $tahun);
 
-        if ($selectedUnitKerja) {
-            $statsQuery->whereIn('id', function ($query) use ($selectedUnitKerja) {
-                $query->select('project_id')
-                    ->from('project_data_sekunder')
-                    ->where('unit_kerja', $selectedUnitKerja);
-            });
-        }
         // Filter Triwulan untuk stats
         if ($selectedTriwulan && $selectedTriwulan != 'all') {
             $startDate = Carbon::createFromDate($tahun, 1, 1)->startOfDay();
@@ -204,13 +188,6 @@ class DashboardController extends Controller
             ->join('project', 'project_responden.project_id', '=', 'project.id')
             ->where('project.status', 'Pelaksanaan')
             ->whereYear('project.created_at', $tahun);
-        if ($selectedUnitKerja) {
-            $respondenQuery->whereIn('project_responden.project_id', function ($query) use ($selectedUnitKerja) {
-                $query->select('project_id')
-                    ->from('project_data_sekunder')
-                    ->where('unit_kerja', $selectedUnitKerja);
-            });
-        }
         if ($selectedTriwulan && $selectedTriwulan != 'all') {
             // (Logika filter triwulan yang sama untuk respondenQuery)
             $startDate = Carbon::createFromDate($tahun, 1, 1)->startOfDay();
@@ -239,13 +216,6 @@ class DashboardController extends Controller
             ->where('project.status', 'Pelaksanaan')
             ->whereYear('project.created_at', $tahun)
             ->where('project_responden.status_pengisian_kuesioner_alumni', 'sudah');
-        if ($selectedUnitKerja) { /* ... filter unit kerja ... */
-            $sudahAlumniQuery->whereIn('project_responden.project_id', function ($query) use ($selectedUnitKerja) {
-                $query->select('project_id')
-                    ->from('project_data_sekunder')
-                    ->where('unit_kerja', $selectedUnitKerja);
-            });
-        }
         if ($selectedTriwulan && $selectedTriwulan != 'all') { /* ... filter triwulan ... */
             $startDate = Carbon::createFromDate($tahun, 1, 1)->startOfDay();
             $endDate = Carbon::createFromDate($tahun, 12, 31)->endOfDay();
@@ -273,13 +243,6 @@ class DashboardController extends Controller
             ->where('project.status', 'Pelaksanaan')
             ->whereYear('project.created_at', $tahun)
             ->whereNotNull('project_responden.nama_atasan');
-        if ($selectedUnitKerja) { /* ... filter unit kerja ... */
-            $totalAtasanQuery->whereIn('project_responden.project_id', function ($query) use ($selectedUnitKerja) {
-                $query->select('project_id')
-                    ->from('project_data_sekunder')
-                    ->where('unit_kerja', $selectedUnitKerja);
-            });
-        }
         if ($selectedTriwulan && $selectedTriwulan != 'all') { /* ... filter triwulan ... */
             $startDate = Carbon::createFromDate($tahun, 1, 1)->startOfDay();
             $endDate = Carbon::createFromDate($tahun, 12, 31)->endOfDay();
@@ -307,13 +270,7 @@ class DashboardController extends Controller
             ->whereYear('project.created_at', $tahun)
             ->whereNotNull('project_responden.nama_atasan')
             ->where('project_responden.status_pengisian_kuesioner_atasan', 'sudah');
-        if ($selectedUnitKerja) { /* ... filter unit kerja ... */
-            $sudahAtasanQuery->whereIn('project_responden.project_id', function ($query) use ($selectedUnitKerja) {
-                $query->select('project_id')
-                    ->from('project_data_sekunder')
-                    ->where('unit_kerja', $selectedUnitKerja);
-            });
-        }
+
         if ($selectedTriwulan && $selectedTriwulan != 'all') { /* ... filter triwulan ... */
             $startDate = Carbon::createFromDate($tahun, 1, 1)->startOfDay();
             $endDate = Carbon::createFromDate($tahun, 12, 31)->endOfDay();
@@ -346,7 +303,6 @@ class DashboardController extends Controller
             'sudahAtasan',
             'persentaseSudahAtasan',
             'unitKerjaList',
-            'selectedUnitKerja',
             'selectedTriwulan' // Kirim triwulan yang dipilih ke view
         ));
     }

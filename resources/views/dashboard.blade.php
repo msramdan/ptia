@@ -314,21 +314,6 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        {{-- Filter Unit Kerja (pindahkan ke sini jika ingin sejajar) --}}
-                                        <div class="d-flex align-items-center mt-3">
-                                            <i class="fas fa-building filter-icon me-2"></i>
-                                            <h5 class="filter-title mb-0">Unit Kerja</h5>
-                                            <div class="ms-3" style="min-width: 150px;">
-                                                <select class="form-select year-select" id="filter_unit_kerja">
-                                                    <option value="">Semua Unit Kerja</option>
-                                                    @foreach ($unitKerjaList as $unit)
-                                                        <option value="{{ $unit }}"
-                                                            {{ $selectedUnitKerja == $unit ? 'selected' : '' }}>
-                                                            {{ $unit }}</option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -484,13 +469,9 @@
         // Fungsi untuk memuat ulang DataTable dan Chart
         function reloadDataDashboard() {
             var selectedTahun = $('#filter_tahun').val();
-            var selectedUnitKerja = $('#filter_unit_kerja').val();
             var selectedTriwulan = $('#filter_triwulan').val(); // Ambil nilai triwulan
             var newUrl = "{{ route('dashboard') }}?tahun=" + selectedTahun;
 
-            if (selectedUnitKerja) {
-                newUrl += "&unit_kerja=" + selectedUnitKerja;
-            }
             if (selectedTriwulan && selectedTriwulan !== 'all') { // Tambahkan filter triwulan jika bukan 'all'
                 newUrl += "&triwulan=" + selectedTriwulan;
             }
@@ -799,12 +780,8 @@
             // Event listener untuk perubahan filter tahun, unit kerja, dan triwulan
             $('#filter_tahun, #filter_unit_kerja, #filter_triwulan').on('change', function() {
                 var selectedTahun = $('#filter_tahun').val();
-                var selectedUnitKerja = $('#filter_unit_kerja').val();
                 var selectedTriwulan = $('#filter_triwulan').val();
                 var newUrl = "{{ route('dashboard') }}?tahun=" + selectedTahun;
-                if (selectedUnitKerja) {
-                    newUrl += "&unit_kerja=" + selectedUnitKerja;
-                }
                 if (selectedTriwulan && selectedTriwulan !== 'all') {
                     newUrl += "&triwulan=" + selectedTriwulan;
                 }
