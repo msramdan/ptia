@@ -13,7 +13,7 @@
                     </p>
                 </div>
                 <x-breadcrumb>
-                    <li class="breadcrumb-item"><a href="{{route('dashboard')}}">{{ __('Dashboard') }}</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
                     <li class="breadcrumb-item active" aria-current="page">{{ __('Aspek') }}</li>
                 </x-breadcrumb>
             </div>
@@ -41,8 +41,9 @@
                                         <label for="filter_diklat_type">{{ __('Diklat Type') }}</label>
                                         <select class="form-select" name="filter_diklat_type" id="filter_diklat_type">
                                             <option value="">-- {{ __('All') }} --</option>
-                                            @foreach($diklatTypes as $type)
-                                                <option value="{{ $type->id }}" {{ isset($selectedDiklatType) && $selectedDiklatType == $type->id ? 'selected' : '' }}>
+                                            @foreach ($diklatTypes as $type)
+                                                <option value="{{ $type->id }}"
+                                                    {{ isset($selectedDiklatType) && $selectedDiklatType == $type->id ? 'selected' : '' }}>
                                                     {{ $type->nama_diklat_type }}
                                                 </option>
                                             @endforeach
@@ -119,11 +120,12 @@
             let table = $('#data-table').DataTable({
                 processing: true,
                 serverSide: true,
+                pageLength: 100,
                 ajax: {
                     url: "{{ route('aspek.index') }}",
                     data: function(d) {
                         d.diklatType = $('#filter_diklat_type').val() ||
-                        null; // Kirim null jika "All" dipilih
+                            null; // Kirim null jika "All" dipilih
                     }
                 },
                 columns: [{
