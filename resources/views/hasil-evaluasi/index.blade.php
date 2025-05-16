@@ -97,7 +97,7 @@
                         },
                         {
                             data: 'user',
-                            name: 'user'
+                            name: 'users.name'
                         },
                         {
                             data: 'kaldikID',
@@ -109,7 +109,7 @@
                         },
                         {
                             data: 'nama_diklat_type',
-                            name: 'nama_diklat_type'
+                            name: 'diklat_type.nama_diklat_type',
                         },
                         {
                             data: 'avg_skor_level_3',
