@@ -75,7 +75,7 @@
 
                                             @foreach ($groupedLevels as $level => $aspeks)
                                                 {{-- MODIFIKASI: colspan diubah dari count * 4 menjadi count * 5 --}}
-                                                <th colspan="{{ count($aspeks) * 5 }}" class="bg-info text-white">
+                                                <th colspan="{{ count($aspeks) * 5 }}" class="bg-secondary text-white">
                                                     LEVEL {{ $level }}
                                                 </th>
                                                 <th rowspan="3" class="bg-secondary text-white">Total LEVEL

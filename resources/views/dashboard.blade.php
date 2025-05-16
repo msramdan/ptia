@@ -272,45 +272,56 @@
                         <div class="row">
                             <div class="col-12">
                                 <div class="card">
-<div class="card-body">
-    <div class="row">
-        {{-- Filter Tahun --}}
-        <div class="col-md-6 mb-3 mb-md-0">
-            <div class="d-flex flex-column w-100">
-                <div class="d-flex align-items-center mb-1">
-                    <i class="fas fa-calendar-alt filter-icon me-2"></i>
-                    <h5 class="filter-title mb-0">Filter Tahun</h5>
-                </div>
-                <div class="year-selector w-100">
-                    <select class="form-select year-select w-100" aria-label="Pilih Tahun" id="filter_tahun">
-                        @foreach ([2024, 2025, 2026, 2027] as $thn)
-                            <option value="{{ $thn }}" {{ $tahun == $thn ? 'selected' : '' }}>{{ $thn }}</option>
-                        @endforeach
-                    </select>
-                </div>
-            </div>
-        </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="d-flex flex-column w-100">
+                                                    <div class="d-flex align-items-center mb-1">
+                                                        <i class="fas fa-calendar-alt filter-icon me-2"></i>
+                                                        <h5 class="filter-title mb-0">Filter Tahun</h5>
+                                                    </div>
+                                                    <div class="year-selector w-100">
+                                                        <select class="form-select year-select w-100"
+                                                            aria-label="Pilih Tahun" id="filter_tahun">
+                                                            @foreach ([2024, 2025, 2026, 2027] as $thn)
+                                                                <option value="{{ $thn }}"
+                                                                    {{ $tahun == $thn ? 'selected' : '' }}>
+                                                                    {{ $thn }}</option>
+                                                            @endforeach
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
 
-        {{-- Filter Triwulan --}}
-        <div class="col-md-6">
-            <div class="d-flex flex-column w-100">
-                <div class="d-flex align-items-center mb-1">
-                    <i class="fas fa-chart-pie filter-icon me-2"></i>
-                    <h5 class="filter-title mb-0">Triwulan</h5>
-                </div>
-                <div class="w-100">
-                    <select class="form-select year-select w-100" id="filter_triwulan">
-                        <option value="all" {{ $selectedTriwulan == 'all' ? 'selected' : '' }}>Semua Triwulan</option>
-                        <option value="1" {{ $selectedTriwulan == '1' ? 'selected' : '' }}>Triwulan 1</option>
-                        <option value="2" {{ $selectedTriwulan == '2' ? 'selected' : '' }}>Triwulan 2</option>
-                        <option value="3" {{ $selectedTriwulan == '3' ? 'selected' : '' }}>Triwulan 3</option>
-                        <option value="4" {{ $selectedTriwulan == '4' ? 'selected' : '' }}>Triwulan 4</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+                                            <div class="col-md-6">
+                                                <div class="d-flex flex-column w-100">
+                                                    <div class="d-flex align-items-center mb-1">
+                                                        <i class="fas fa-chart-pie filter-icon me-2"></i>
+                                                        <h5 class="filter-title mb-0">Triwulan</h5>
+                                                    </div>
+                                                    <div class="w-100">
+                                                        <select class="form-select year-select w-100" id="filter_triwulan">
+                                                            <option value="all"
+                                                                {{ $selectedTriwulan == 'all' ? 'selected' : '' }}>Semua
+                                                                Triwulan</option>
+                                                            <option value="1"
+                                                                {{ $selectedTriwulan == '1' ? 'selected' : '' }}>Triwulan 1
+                                                            </option>
+                                                            <option value="2"
+                                                                {{ $selectedTriwulan == '2' ? 'selected' : '' }}>Triwulan 2
+                                                            </option>
+                                                            <option value="3"
+                                                                {{ $selectedTriwulan == '3' ? 'selected' : '' }}>Triwulan 3
+                                                            </option>
+                                                            <option value="4"
+                                                                {{ $selectedTriwulan == '4' ? 'selected' : '' }}>Triwulan 4
+                                                            </option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-6">
@@ -355,7 +366,7 @@
 
                     <div class="col-md-4">
                         <div class="card text-center">
-                            <div class="card-body" style="min-height: 300px; max-height: 440px; overflow-y: hidden;">
+                            <div class="card-body" style="min-height: 300px; max-height: 465px; overflow-y: hidden;">
                                 <div class="gauge-container">
                                     <div class="gauge-header">
                                         <div class="gauge-title text-gray-900 dark:text-white">Skor Dampak Level 3</div>
@@ -374,7 +385,7 @@
 
                     <div class="col-md-4">
                         <div class="card text-center">
-                            <div class="card-body" style="min-height: 300px; max-height: 440px; overflow-y: hidden;">
+                            <div class="card-body" style="min-height: 300px; max-height: 465px; overflow-y: hidden;">
                                 <div class="gauge-container">
                                     <div class="gauge-header">
                                         <div class="gauge-title">Skor Dampak Level 4</div>
