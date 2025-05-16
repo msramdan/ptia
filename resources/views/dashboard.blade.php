@@ -405,7 +405,7 @@
                                         <table class="table table-striped" id="data-table" width="100%">
                                             <thead>
                                                 <tr>
-                                                    <th rowspan="2">#</th>
+                                                    <th rowspan="2">No</th>
                                                     <th rowspan="2">{{ __('Evaluator') }}</th>
                                                     <th rowspan="2">{{ __('Kode Diklat') }}</th>
                                                     <th rowspan="2">{{ __('Nama Diklat') }}</th>

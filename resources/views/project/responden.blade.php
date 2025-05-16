@@ -159,7 +159,7 @@
                                 <table class="table table-striped" id="data-table" width="100%">
                                     <thead>
                                         <tr>
-                                            <th>#</th>
+                                            <th>No</th>
                                             <th>{{ __('Nama peserta') }}</th>
                                             <th>{{ __('NIP') }}</th>
                                             <th>{{ __('No.Telepon') }}</th>
@@ -184,7 +184,7 @@
                                 <table class="table table-striped" id="data-table3" width="100%">
                                     <thead>
                                         <tr>
-                                            <th>#</th>
+                                            <th>No</th>
                                             <th>{{ __('Nama peserta') }}</th>
                                             <th>{{ __('NIP') }}</th>
                                             <th>{{ __('No.Telepon') }}</th>

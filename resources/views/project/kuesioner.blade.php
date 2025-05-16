@@ -137,7 +137,7 @@
                                 <table class="table table-striped" id="data-table" width="100%">
                                     <thead>
                                         <tr>
-                                            <th>#</th>
+                                            <th>No</th>
                                             <th>{{ __('Aspek') }}</th>
                                             <th>{{ __('Kriteria') }}</th>
                                             <th>{{ __('Pertanyaan') }}</th>

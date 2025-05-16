@@ -39,7 +39,7 @@
                                 <table class="table table-striped" id="data-table" width="100%">
                                     <thead>
                                         <tr>
-                                            <th>#</th>
+                                            <th>No</th>
                                             <th>{{ __('Avatar') }}</th>
                                             <th>{{ __('Nama') }}</th>
                                             <th>{{ __('Email') }}</th>

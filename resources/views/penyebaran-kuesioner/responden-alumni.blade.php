@@ -168,7 +168,7 @@
                                     <thead>
                                         <tr>
                                             <th><input type="checkbox" id="select-all"></th>
-                                            <th>#</th>
+                                            <th>No</th>
                                             <th>{{ __('Nama peserta') }}</th>
                                             <th>{{ __('NIP') }}</th>
                                             <th>{{ __('No.Telepon') }}</th>

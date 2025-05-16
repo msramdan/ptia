@@ -63,7 +63,7 @@
                                 <table class="table table-striped" id="data-table" width="100%">
                                     <thead>
                                         <tr>
-                                            <th rowspan="2">#</th>
+                                            <th rowspan="2">No</th>
                                             <th rowspan="2">{{ __('Nama peserta') }}</th>
                                             <th rowspan="2">{{ __('NIP') }}</th>
                                             <th rowspan="2">{{ __('No.Telepon') }}</th>

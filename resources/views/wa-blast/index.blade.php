@@ -39,7 +39,7 @@
                                 <table class="table table-striped datatables-basic" id="data-table" width="100%">
                                     <thead>
                                         <tr>
-                                            <th>#</th>
+                                            <th>No</th>
                                             <th>{{ __('Session Name') }}</th>
                                             <th>{{ __('Whatsapp Number') }}</th>
                                             <th>{{ __('Api Key') }}</th>
