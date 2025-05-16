@@ -155,7 +155,6 @@
             box-shadow: 0 0 0 0.25rem rgba(231, 76, 60, 0.25);
         }
 
-        /* Responsive Adjustments */
         @media (max-width: 768px) {
             .year-filter-container {
                 max-width: 100%;
@@ -190,7 +189,6 @@
             transform: translateY(0);
         }
 
-        /* Responsive Adjustments */
         @media (max-width: 768px) {
             .year-filter-container .card-body {
                 padding: 0.75rem;
@@ -276,13 +274,14 @@
                                 <div class="card">
                                     <div class="card-body">
                                         <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                                            {{-- Filter Tahun --}}
                                             <div class="d-flex align-items-center">
                                                 <i class="fas fa-calendar-alt filter-icon me-2"></i>
                                                 <h5 class="filter-title mb-0">Filter Tahun</h5>
                                                 <div class="year-selector ms-3">
                                                     <select class="form-select year-select" aria-label="Pilih Tahun"
-                                                        onchange="window.location.href='?tahun=' + this.value">
-                                                        @foreach ([2025, 2026, 2027] as $thn)
+                                                        id="filter_tahun">
+                                                        @foreach ([2024, 2025, 2026, 2027] as $thn)
                                                             <option value="{{ $thn }}"
                                                                 {{ $tahun == $thn ? 'selected' : '' }}>{{ $thn }}
                                                             </option>
@@ -290,15 +289,49 @@
                                                     </select>
                                                 </div>
                                             </div>
-
-                                            {{-- <button class="btn btn-pdf-report">
-                                                <i class="fas fa-file-pdf me-1"></i> General Report
-                                            </button> --}}
+                                            {{-- Filter Triwulan --}}
+                                            <div class="d-flex align-items-center">
+                                                <i class="fas fa-chart-pie filter-icon me-2"></i>
+                                                <h5 class="filter-title mb-0">Triwulan</h5>
+                                                <div class="ms-3" style="min-width: 150px;">
+                                                    <select class="form-select year-select" id="filter_triwulan">
+                                                        <option value="all"
+                                                            {{ $selectedTriwulan == 'all' ? 'selected' : '' }}>Semua
+                                                            Triwulan</option>
+                                                        <option value="1"
+                                                            {{ $selectedTriwulan == '1' ? 'selected' : '' }}>Triwulan 1
+                                                        </option>
+                                                        <option value="2"
+                                                            {{ $selectedTriwulan == '2' ? 'selected' : '' }}>Triwulan 2
+                                                        </option>
+                                                        <option value="3"
+                                                            {{ $selectedTriwulan == '3' ? 'selected' : '' }}>Triwulan 3
+                                                        </option>
+                                                        <option value="4"
+                                                            {{ $selectedTriwulan == '4' ? 'selected' : '' }}>Triwulan 4
+                                                        </option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {{-- Filter Unit Kerja (pindahkan ke sini jika ingin sejajar) --}}
+                                        <div class="d-flex align-items-center mt-3">
+                                            <i class="fas fa-building filter-icon me-2"></i>
+                                            <h5 class="filter-title mb-0">Unit Kerja</h5>
+                                            <div class="ms-3" style="min-width: 150px;">
+                                                <select class="form-select year-select" id="filter_unit_kerja">
+                                                    <option value="">Semua Unit Kerja</option>
+                                                    @foreach ($unitKerjaList as $unit)
+                                                        <option value="{{ $unit }}"
+                                                            {{ $selectedUnitKerja == $unit ? 'selected' : '' }}>
+                                                            {{ $unit }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-
                             <div class="col-6">
                                 <div class="card text-center shadow-sm border-0">
                                     <div class="card-body">
@@ -382,7 +415,7 @@
                         <div class="col-md-12">
                             <div class="card">
                                 <div class="card-body">
-                                    <h6>Table Data Hasil Evaluasi 2025</h6>
+                                    <h6>Table Data Hasil Evaluasi {{ $tahun }}</h6>
                                     <div class="table-responsive p-1">
                                         <table class="table table-striped" id="data-table" width="100%">
                                             <thead>
@@ -420,7 +453,6 @@
                         </div>
                     </div>
                 </section>
-
             </div>
         </section>
     </div>
@@ -446,224 +478,33 @@
     <script src="https://code.highcharts.com/modules/accessibility.js"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/v/bs5/dt-1.12.0/datatables.min.js"></script>
     <script>
-        // Deklarasikan chart di level global agar bisa diakses dari mana saja
         var chartLevel3, chartLevel4;
+        var dataTable;
 
-        document.addEventListener('DOMContentLoaded', function() {
-            // Inisialisasi gauge dengan nilai 0
-            chartLevel3 = Highcharts.chart('container', {
-                chart: {
-                    type: 'gauge',
-                    plotBackgroundColor: null,
-                    plotBackgroundImage: null,
-                    plotBorderWidth: 0,
-                    plotShadow: false,
-                    height: '80%',
-                    backgroundColor: 'transparent'
-                },
-                exporting: {
-                    enabled: false
-                },
-                title: {
-                    text: null
-                },
-                credits: {
-                    enabled: false
-                },
-                pane: {
-                    startAngle: -90,
-                    endAngle: 89.9,
-                    background: null,
-                    center: ['50%', '75%'],
-                    size: '110%',
-                    borderWidth: 0
-                },
-                yAxis: {
-                    min: 0,
-                    max: 100,
-                    tickPixelInterval: 72,
-                    tickPosition: 'inside',
-                    tickColor: '#f8f9fa',
-                    tickLength: 15,
-                    tickWidth: 2,
-                    minorTickInterval: null,
-                    labels: {
-                        distance: 25,
-                        style: {
-                            fontSize: '12px',
-                            color: '#95a5a6'
-                        }
-                    },
-                    lineWidth: 0,
-                    plotBands: [{
-                            from: 0,
-                            to: 25,
-                            color: '#e74c3c',
-                            thickness: 20,
-                            borderRadius: 5
-                        },
-                        {
-                            from: 25,
-                            to: 50,
-                            color: '#f39c12',
-                            thickness: 20,
-                            borderRadius: 5
-                        },
-                        {
-                            from: 50,
-                            to: 75,
-                            color: '#3498db',
-                            thickness: 20,
-                            borderRadius: 5
-                        },
-                        {
-                            from: 75,
-                            to: 100,
-                            color: '#2ecc71',
-                            thickness: 20,
-                            borderRadius: 5
-                        }
-                    ]
-                },
-                series: [{
-                    name: 'Skor',
-                    data: [0], // Nilai awal 0
-                    tooltip: {
-                        valueSuffix: ' %'
-                    },
-                    dataLabels: {
-                        enabled: false
-                    },
-                    dial: {
-                        radius: '80%',
-                        backgroundColor: '#34495e',
-                        baseWidth: 12,
-                        baseLength: '0%',
-                        rearLength: '0%',
-                        borderWidth: 1,
-                        borderColor: '#fff'
-                    },
-                    pivot: {
-                        backgroundColor: '#34495e',
-                        radius: 6,
-                        borderWidth: 1,
-                        borderColor: '#fff'
-                    }
-                }]
-            });
+        // Fungsi untuk memuat ulang DataTable dan Chart
+        function reloadDataDashboard() {
+            var selectedTahun = $('#filter_tahun').val();
+            var selectedUnitKerja = $('#filter_unit_kerja').val();
+            var selectedTriwulan = $('#filter_triwulan').val(); // Ambil nilai triwulan
+            var newUrl = "{{ route('dashboard') }}?tahun=" + selectedTahun;
 
-            chartLevel4 = Highcharts.chart('container-level4', {
-                chart: {
-                    type: 'gauge',
-                    plotBackgroundColor: null,
-                    plotBackgroundImage: null,
-                    plotBorderWidth: 0,
-                    plotShadow: false,
-                    height: '80%',
-                    backgroundColor: 'transparent'
-                },
-                exporting: {
-                    enabled: false
-                },
-                title: {
-                    text: null
-                },
-                credits: {
-                    enabled: false
-                },
-                pane: {
-                    startAngle: -90,
-                    endAngle: 89.9,
-                    background: null,
-                    center: ['50%', '75%'],
-                    size: '110%',
-                    borderWidth: 0
-                },
-                yAxis: {
-                    min: 0,
-                    max: 100,
-                    tickPixelInterval: 72,
-                    tickPosition: 'inside',
-                    tickColor: '#f8f9fa',
-                    tickLength: 15,
-                    tickWidth: 2,
-                    minorTickInterval: null,
-                    labels: {
-                        distance: 25,
-                        style: {
-                            fontSize: '12px',
-                            color: '#95a5a6'
-                        }
-                    },
-                    lineWidth: 0,
-                    plotBands: [{
-                            from: 0,
-                            to: 25,
-                            color: '#e74c3c',
-                            thickness: 20,
-                            borderRadius: 5
-                        },
-                        {
-                            from: 25,
-                            to: 50,
-                            color: '#f39c12',
-                            thickness: 20,
-                            borderRadius: 5
-                        },
-                        {
-                            from: 50,
-                            to: 75,
-                            color: '#3498db',
-                            thickness: 20,
-                            borderRadius: 5
-                        },
-                        {
-                            from: 75,
-                            to: 100,
-                            color: '#2ecc71',
-                            thickness: 20,
-                            borderRadius: 5
-                        }
-                    ]
-                },
-                series: [{
-                    name: 'Skor',
-                    data: [0], // Nilai awal 0
-                    tooltip: {
-                        valueSuffix: ' %'
-                    },
-                    dataLabels: {
-                        enabled: false
-                    },
-                    dial: {
-                        radius: '80%',
-                        backgroundColor: '#34495e',
-                        baseWidth: 12,
-                        baseLength: '0%',
-                        rearLength: '0%',
-                        borderWidth: 1,
-                        borderColor: '#fff'
-                    },
-                    pivot: {
-                        backgroundColor: '#34495e',
-                        radius: 6,
-                        borderWidth: 1,
-                        borderColor: '#fff'
-                    }
-                }]
-            });
-        });
+            if (selectedUnitKerja) {
+                newUrl += "&unit_kerja=" + selectedUnitKerja;
+            }
+            if (selectedTriwulan && selectedTriwulan !== 'all') { // Tambahkan filter triwulan jika bukan 'all'
+                newUrl += "&triwulan=" + selectedTriwulan;
+            }
 
-        $(document).ready(function() {
-            var tahun = "{{ $tahun }}";
-            $('#data-table').DataTable({
+            if ($.fn.DataTable.isDataTable('#data-table')) {
+                dataTable.destroy();
+            }
+
+            dataTable = $('#data-table').DataTable({
                 processing: true,
                 serverSide: true,
                 ajax: {
-                    url: "{{ route('dashboard') }}",
-                    data: function(d) {
-                        d.tahun = tahun;
-                    }
+                    url: newUrl,
+                    data: function(d) {}
                 },
                 columns: [{
                         data: 'DT_RowIndex',
@@ -706,52 +547,40 @@
                 ],
                 footerCallback: function(row, data, start, end, display) {
                     var api = this.api();
+                    var summary = api.ajax.json().summary; // Ambil summary dari respons
 
-                    // Mendapatkan data summary dari server
-                    $.ajax({
-                        url: "{{ route('dashboard') }}",
-                        data: {
-                            tahun: tahun,
-                            draw: 1,
-                            length: -1 // Untuk mendapatkan semua data
-                        },
-                        success: function(response) {
-                            if (response && response.summary) {
-                                var avgLevel3 = parseFloat(response.summary
-                                    .avg_skor_level_3) || 0;
-                                var avgLevel4 = parseFloat(response.summary
-                                    .avg_skor_level_4) || 0;
+                    if (summary) {
+                        var avgLevel3 = parseFloat(summary.avg_skor_level_3) || 0;
+                        var avgLevel4 = parseFloat(summary.avg_skor_level_4) || 0;
 
-                                // Update footer tabel
-                                $(api.column(5).footer()).html(
-                                    '<strong>' + avgLevel3.toFixed(2) + '</strong>'
-                                );
-                                $(api.column(7).footer()).html(
-                                    '<strong>' + avgLevel4.toFixed(2) + '</strong>'
-                                );
+                        $(api.column(5).footer()).html('<strong>' + avgLevel3.toFixed(2) + '</strong>');
+                        $(api.column(7).footer()).html('<strong>' + avgLevel4.toFixed(2) + '</strong>');
 
-                                // Update gauge Level 3
-                                if (chartLevel3) {
-                                    chartLevel3.series[0].points[0].update(avgLevel3);
-                                    document.getElementById('current-value').textContent =
-                                        avgLevel3.toFixed(2) + '%';
-                                }
-
-                                // Update gauge Level 4
-                                if (chartLevel4) {
-                                    chartLevel4.series[0].points[0].update(avgLevel4);
-                                    document.getElementById('current-value-level4')
-                                        .textContent = avgLevel4.toFixed(2) + '%';
-                                }
-                            }
-                        },
-                        error: function() {
-                            console.error('Gagal mengambil data rata-rata');
+                        if (chartLevel3) {
+                            chartLevel3.series[0].points[0].update(avgLevel3);
+                            document.getElementById('current-value').textContent = avgLevel3.toFixed(2) + '%';
                         }
-                    });
+                        if (chartLevel4) {
+                            chartLevel4.series[0].points[0].update(avgLevel4);
+                            document.getElementById('current-value-level4').textContent = avgLevel4.toFixed(2) +
+                                '%';
+                        }
+                    } else {
+                        // Fallback jika summary tidak ada
+                        $(api.column(5).footer()).html('<strong>N/A</strong>');
+                        $(api.column(7).footer()).html('<strong>N/A</strong>');
+                        if (chartLevel3) {
+                            chartLevel3.series[0].points[0].update(0);
+                            document.getElementById('current-value').textContent = '0%';
+                        }
+                        if (chartLevel4) {
+                            chartLevel4.series[0].points[0].update(0);
+                            document.getElementById('current-value-level4').textContent = '0%';
+                        }
+                    }
                 },
                 initComplete: function() {
-                    // Inisialisasi footer
+                    /* ... initComplete ... */
                     this.api().columns().every(function() {
                         var column = this;
                         if (column.index() === 5 || column.index() === 7) {
@@ -760,6 +589,232 @@
                     });
                 }
             });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            chartLevel3 = Highcharts.chart('container', {
+                /* ... konfigurasi chart ... */
+                chart: {
+                    type: 'gauge',
+                    plotBackgroundColor: null,
+                    plotBackgroundImage: null,
+                    plotBorderWidth: 0,
+                    plotShadow: false,
+                    height: '80%',
+                    backgroundColor: 'transparent'
+                },
+                exporting: {
+                    enabled: false
+                },
+                title: {
+                    text: null
+                },
+                credits: {
+                    enabled: false
+                },
+                pane: {
+                    startAngle: -90,
+                    endAngle: 89.9,
+                    background: null,
+                    center: ['50%', '75%'],
+                    size: '110%',
+                    borderWidth: 0
+                },
+                yAxis: {
+                    min: 0,
+                    max: 100,
+                    tickPixelInterval: 72,
+                    tickPosition: 'inside',
+                    tickColor: '#f8f9fa',
+                    tickLength: 15,
+                    tickWidth: 2,
+                    minorTickInterval: null,
+                    labels: {
+                        distance: 25,
+                        style: {
+                            fontSize: '12px',
+                            color: '#95a5a6'
+                        }
+                    },
+                    lineWidth: 0,
+                    plotBands: [{
+                            from: 0,
+                            to: 25,
+                            color: '#e74c3c',
+                            thickness: 20,
+                            borderRadius: 5
+                        },
+                        {
+                            from: 25,
+                            to: 50,
+                            color: '#f39c12',
+                            thickness: 20,
+                            borderRadius: 5
+                        },
+                        {
+                            from: 50,
+                            to: 75,
+                            color: '#3498db',
+                            thickness: 20,
+                            borderRadius: 5
+                        },
+                        {
+                            from: 75,
+                            to: 100,
+                            color: '#2ecc71',
+                            thickness: 20,
+                            borderRadius: 5
+                        }
+                    ]
+                },
+                series: [{
+                    name: 'Skor',
+                    data: [0],
+                    tooltip: {
+                        valueSuffix: ' %'
+                    },
+                    dataLabels: {
+                        enabled: false
+                    },
+                    dial: {
+                        radius: '80%',
+                        backgroundColor: '#34495e',
+                        baseWidth: 12,
+                        baseLength: '0%',
+                        rearLength: '0%',
+                        borderWidth: 1,
+                        borderColor: '#fff'
+                    },
+                    pivot: {
+                        backgroundColor: '#34495e',
+                        radius: 6,
+                        borderWidth: 1,
+                        borderColor: '#fff'
+                    }
+                }]
+            });
+
+            chartLevel4 = Highcharts.chart('container-level4', {
+                /* ... konfigurasi chart ... */
+                chart: {
+                    type: 'gauge',
+                    plotBackgroundColor: null,
+                    plotBackgroundImage: null,
+                    plotBorderWidth: 0,
+                    plotShadow: false,
+                    height: '80%',
+                    backgroundColor: 'transparent'
+                },
+                exporting: {
+                    enabled: false
+                },
+                title: {
+                    text: null
+                },
+                credits: {
+                    enabled: false
+                },
+                pane: {
+                    startAngle: -90,
+                    endAngle: 89.9,
+                    background: null,
+                    center: ['50%', '75%'],
+                    size: '110%',
+                    borderWidth: 0
+                },
+                yAxis: {
+                    min: 0,
+                    max: 100,
+                    tickPixelInterval: 72,
+                    tickPosition: 'inside',
+                    tickColor: '#f8f9fa',
+                    tickLength: 15,
+                    tickWidth: 2,
+                    minorTickInterval: null,
+                    labels: {
+                        distance: 25,
+                        style: {
+                            fontSize: '12px',
+                            color: '#95a5a6'
+                        }
+                    },
+                    lineWidth: 0,
+                    plotBands: [{
+                            from: 0,
+                            to: 25,
+                            color: '#e74c3c',
+                            thickness: 20,
+                            borderRadius: 5
+                        },
+                        {
+                            from: 25,
+                            to: 50,
+                            color: '#f39c12',
+                            thickness: 20,
+                            borderRadius: 5
+                        },
+                        {
+                            from: 50,
+                            to: 75,
+                            color: '#3498db',
+                            thickness: 20,
+                            borderRadius: 5
+                        },
+                        {
+                            from: 75,
+                            to: 100,
+                            color: '#2ecc71',
+                            thickness: 20,
+                            borderRadius: 5
+                        }
+                    ]
+                },
+                series: [{
+                    name: 'Skor',
+                    data: [0],
+                    tooltip: {
+                        valueSuffix: ' %'
+                    },
+                    dataLabels: {
+                        enabled: false
+                    },
+                    dial: {
+                        radius: '80%',
+                        backgroundColor: '#34495e',
+                        baseWidth: 12,
+                        baseLength: '0%',
+                        rearLength: '0%',
+                        borderWidth: 1,
+                        borderColor: '#fff'
+                    },
+                    pivot: {
+                        backgroundColor: '#34495e',
+                        radius: 6,
+                        borderWidth: 1,
+                        borderColor: '#fff'
+                    }
+                }]
+            });
+
+            // Event listener untuk perubahan filter tahun, unit kerja, dan triwulan
+            $('#filter_tahun, #filter_unit_kerja, #filter_triwulan').on('change', function() {
+                var selectedTahun = $('#filter_tahun').val();
+                var selectedUnitKerja = $('#filter_unit_kerja').val();
+                var selectedTriwulan = $('#filter_triwulan').val();
+                var newUrl = "{{ route('dashboard') }}?tahun=" + selectedTahun;
+                if (selectedUnitKerja) {
+                    newUrl += "&unit_kerja=" + selectedUnitKerja;
+                }
+                if (selectedTriwulan && selectedTriwulan !== 'all') {
+                    newUrl += "&triwulan=" + selectedTriwulan;
+                }
+                window.history.pushState({
+                    path: newUrl
+                }, '', newUrl);
+                reloadDataDashboard();
+            });
+
+            reloadDataDashboard(); // Panggil saat halaman dimuat
         });
     </script>
 @endpush
