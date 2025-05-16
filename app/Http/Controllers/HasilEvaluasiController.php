@@ -27,8 +27,6 @@ class HasilEvaluasiController extends Controller implements HasMiddleware
 
     public function index(Request $request): View|JsonResponse // Tambahkan Request $request
     {
-        $selectedUnitKerja = $request->input('unit_kerja');
-
         $unitKerjaList = DB::table('project_data_sekunder')
             ->select('unit_kerja')
             ->whereNotNull('unit_kerja')
@@ -115,14 +113,6 @@ class HasilEvaluasiController extends Controller implements HasMiddleware
                     ');
                 })
                 ->where('project.status', 'Pelaksanaan'); // Anda mungkin ingin menambahkan filter tahun juga di sini
-
-            if ($selectedUnitKerja) {
-                $projectsQuery->whereIn('project.id', function ($query) use ($selectedUnitKerja) {
-                    $query->select('project_id')
-                        ->from('project_data_sekunder')
-                        ->where('unit_kerja', $selectedUnitKerja);
-                });
-            }
             $projects = $projectsQuery->orderByDesc('project.id');
 
 
@@ -145,7 +135,7 @@ class HasilEvaluasiController extends Controller implements HasMiddleware
                 ->rawColumns(['user', 'avg_skor_level_3', 'avg_skor_level_4'])
                 ->toJson();
         }
-        return view('hasil-evaluasi.index', compact('unitKerjaList', 'selectedUnitKerja'));
+        return view('hasil-evaluasi.index', compact('unitKerjaList'));
     }
 
     public function showLevel3($id)

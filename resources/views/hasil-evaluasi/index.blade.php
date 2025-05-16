@@ -26,17 +26,6 @@
                         <div class="card-body">
                             {{-- Filter Unit Kerja --}}
                             <div class="row mb-3">
-                                <div class="col-md-4">
-                                    <label for="filter_unit_kerja_hasil" class="form-label">Filter Unit Kerja</label>
-                                    <select class="form-select" id="filter_unit_kerja_hasil">
-                                        <option value="">Semua Unit Kerja</option>
-                                        @foreach ($unitKerjaList as $unit)
-                                            <option value="{{ $unit }}"
-                                                {{ $selectedUnitKerja == $unit ? 'selected' : '' }}>{{ $unit }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                </div>
                                 <div class="col-md-8 text-end">
                                     <a href="{{ route('hasil-evaluasi.export-excel') }}" class="btn btn-success mt-4">
                                         <i class="fas fa-file-excel"></i> Export ke Excel
