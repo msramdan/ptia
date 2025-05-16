@@ -13,7 +13,7 @@
                     </p>
                 </div>
                 <x-breadcrumb>
-                    <li class="breadcrumb-item"><a href="{{route('dashboard')}}">{{ __('Dashboard') }}</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
                     <li class="breadcrumb-item active" aria-current="page">{{ __('Penyebaran Kuesioner') }}</li>
                 </x-breadcrumb>
             </div>
@@ -113,7 +113,7 @@
                 },
                 {
                     data: 'user',
-                    name: 'user',
+                    name: 'users.name'
                 },
                 {
                     data: 'kaldikID',

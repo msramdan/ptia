@@ -58,11 +58,17 @@ class DataInterviewController extends Controller implements HasMiddleware
 
             return DataTables::of($projects)
                 ->addIndexColumn()
-                ->addColumn('evaluator', function ($row) {
+                ->addColumn('user', function ($row) {
                     $avatar = $row->avatar
-                        ? asset("storage/uploads/avatars/{$row->avatar}")
-                        : "https://www.gravatar.com/avatar/" . md5(strtolower(trim($row->email))) . "?s=50";
-                    return '<div class="d-flex align-items-center"><img src="' . e($avatar) . '" class="img-thumbnail" style="width: 35px; height: 35px; border-radius: 50%; margin-right: 10px;"><span style="font-size: 0.9em;">' . e($row->user_name) . '</span></div>';
+                        ? asset("storage/uploads/avatars/$row->avatar")
+                        : "https://www.gravatar.com/avatar/" . md5(strtolower(trim($row->email))) . "&s=450";
+
+                    return '
+                    <div class="d-flex align-items-center">
+                        <img src="' . e($avatar) . '" class="img-thumbnail"
+                             style="width: 50px; height: 50px; border-radius: 5%; margin-right: 10px;">
+                        <span>' . e($row->user_name) . '</span>
+                    </div>';
                 })
                 ->addColumn('alumni', function ($row) {
                     $showAlumniUrl = route('data-interview.responden.alumni', ['project' => $row->id]);
@@ -86,7 +92,7 @@ class DataInterviewController extends Controller implements HasMiddleware
                                 </a>
                             </div>';
                 })
-                ->rawColumns(['evaluator', 'alumni', 'atasan'])
+                ->rawColumns(['user', 'alumni', 'atasan'])
                 ->toJson();
         }
         return view('data-interview.index');

@@ -208,7 +208,7 @@
                     },
                     {
                         data: 'user',
-                        name: 'user'
+                        name: 'users.name'
                     },
                     {
                         data: 'kaldikID',

@@ -13,7 +13,7 @@
                     </p>
                 </div>
                 <x-breadcrumb>
-                    <li class="breadcrumb-item"><a href="{{route('dashboard')}}">{{ __('Dashboard') }}</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
                     <li class="breadcrumb-item active" aria-current="page">{{ __('Data Interview') }}</li>
                 </x-breadcrumb>
             </div>
@@ -80,9 +80,6 @@
                 processing: true,
                 serverSide: true,
                 ajax: "{{ route('data-interview.index') }}",
-                // language: {
-                //     url: "{{ asset('assets/i18n/id.json') }}"
-                // },
                 columns: [{
                         data: 'DT_RowIndex',
                         name: 'DT_RowIndex',
@@ -90,10 +87,8 @@
                         searchable: false
                     },
                     {
-                        data: 'evaluator',
-                        name: 'u.name',
-                        orderable: false,
-                        searchable: false
+                        data: 'user',
+                        name: 'u.name'
                     },
                     {
                         data: 'kaldikID',
