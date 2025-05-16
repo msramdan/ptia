@@ -39,13 +39,9 @@ class PengumpulanDataController extends Controller implements HasMiddleware
                     'users.email',
                     'users.avatar',
                     'diklat_type.nama_diklat_type',
-                    // Total responden (semua)
                     DB::raw('COUNT(project_responden.id) as total_responden'),
-                    // Total yang sudah mengisi kuesioner alumni
                     DB::raw('SUM(CASE WHEN project_responden.status_pengisian_kuesioner_alumni = "Sudah" THEN 1 ELSE 0 END) as total_sudah_isi'),
-                    // Total responden atasan (hanya yang nama_atasan tidak null)
-                    DB::raw('SUM(CASE WHEN project_responden.nama_atasan IS NOT NULL THEN 1 ELSE 0 END) as total_responden_atasan'),
-                    // Total keterisian atasan (bandingkan dengan semua responden, tidak hanya yang nama_atasan tidak null)
+                    DB::raw('SUM(CASE WHEN project_responden.nama_atasan IS NOT NULL AND project_responden.status_pengisian_kuesioner_alumni = "Sudah" THEN 1 ELSE 0 END) as total_responden_atasan'),
                     DB::raw('SUM(CASE WHEN project_responden.status_pengisian_kuesioner_atasan = "Sudah" THEN 1 ELSE 0 END) as total_sudah_isi_atasan')
                 )
                 ->where('project.status', 'Pelaksanaan')
