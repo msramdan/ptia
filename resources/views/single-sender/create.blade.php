@@ -7,9 +7,9 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-12 col-md-8 order-md-1 order-last">
-                    <h3>{{ __('Single Sender') }}</h3>
+                    <h3>{{ __('Test WA Blasting') }}</h3>
                     <p class="text-subtitle text-muted">
-                        {{ __('Tambah data single Sender.') }}
+                        {{ __('Tools Test WA Blasting.') }}
                     </p>
                 </div>
 
