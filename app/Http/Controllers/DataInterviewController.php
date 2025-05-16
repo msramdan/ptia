@@ -36,6 +36,7 @@ class DataInterviewController extends Controller implements HasMiddleware
                     'p.id',
                     'p.kaldikID',
                     'p.kaldikDesc',
+                    'p.created_at',
                     'u.name as user_name',
                     'u.email',
                     'u.avatar',

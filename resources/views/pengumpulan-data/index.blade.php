@@ -33,6 +33,7 @@
                                             <th rowspan="2">{{ __('Kode Diklat') }}</th>
                                             <th rowspan="2">{{ __('Nama Diklat') }}</th>
                                             <th rowspan="2">{{ __('Jenis Diklat') }}</th>
+                                            <th rowspan="2">{{ __('Tgl Generate') }}</th>
                                             <th colspan="2" class="text-center">{{ __('Alumni') }}</th>
                                             <th colspan="2" class="text-center">{{ __('Atasan') }}</th>
                                         </tr>
@@ -114,6 +115,10 @@
                 {
                     data: 'nama_diklat_type',
                     name: 'diklat_type.nama_diklat_type',
+                },
+                {
+                    data: 'created_at',
+                    name: 'project.created_at',
                 },
                 {
                     data: 'keterisian_alumni',

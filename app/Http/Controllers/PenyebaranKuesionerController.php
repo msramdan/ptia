@@ -41,6 +41,7 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
                     'project.id',
                     'project.kaldikID',
                     'project.kaldikDesc',
+                    'project.created_at',
                     'users.name as user_name',
                     'users.email',
                     'users.avatar',

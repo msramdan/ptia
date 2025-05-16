@@ -14,7 +14,7 @@
                     </p>
                 </div>
                 <x-breadcrumb>
-                    <li class="breadcrumb-item"><a href="{{route('dashboard')}}">{{ __('Dashboard') }}</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
                     <li class="breadcrumb-item active" aria-current="page">{{ __('Management Project') }}</li>
                 </x-breadcrumb>
             </div>
@@ -43,6 +43,7 @@
                                             <th>{{ __('Kode Diklat') }}</th>
                                             <th>{{ __('Nama Diklat') }}</th>
                                             <th>{{ __('Jenis Diklat') }}</th>
+                                            <th>{{ __('Tgl Generate') }}</th>
                                             <th class="text-center">{{ __('Responden') }}</th>
                                             <th class="text-center">{{ __('Bobot') }}</th>
                                             <th class="text-center">{{ __('Pesan WA') }}</th>
@@ -123,6 +124,10 @@
                 {
                     data: 'nama_diklat_type',
                     name: 'diklat_type.nama_diklat_type',
+                },
+                {
+                    data: 'created_at',
+                    name: 'created_at',
                 },
                 {
                     data: 'responden',

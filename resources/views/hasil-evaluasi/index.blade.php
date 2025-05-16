@@ -40,6 +40,7 @@
                                             <th rowspan="2">{{ __('Kode Diklat') }}</th>
                                             <th rowspan="2">{{ __('Nama Diklat') }}</th>
                                             <th rowspan="2">{{ __('Jenis Diklat') }}</th>
+                                            <th rowspan="2">{{ __('Tgl Generate') }}</th>
                                             <th colspan="2" class="text-center">{{ __('Level 3') }}</th>
                                             <th colspan="2" class="text-center">{{ __('Level 4') }}</th>
                                         </tr>
@@ -110,6 +111,10 @@
                         {
                             data: 'nama_diklat_type',
                             name: 'diklat_type.nama_diklat_type',
+                        },
+                        {
+                            data: 'created_at',
+                            name: 'project.created_at',
                         },
                         {
                             data: 'avg_skor_level_3',

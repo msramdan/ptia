@@ -33,6 +33,7 @@
                                             <th>{{ __('Kode Diklat') }}</th>
                                             <th>{{ __('Nama Diklat') }}</th>
                                             <th>{{ __('Jenis Diklat') }}</th>
+                                            <th>{{ __('Tgl Generate') }}</th>
                                             <th class="text-center">{{ __('Alumni') }}</th>
                                             <th class="text-center">{{ __('Atasan') }}</th>
                                         </tr>
@@ -101,6 +102,10 @@
                     {
                         data: 'nama_diklat_type',
                         name: 'dt.nama_diklat_type'
+                    },
+                    {
+                        data: 'created_at',
+                        name: 'p.created_at',
                     },
                     {
                         data: 'alumni',

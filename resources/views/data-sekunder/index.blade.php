@@ -26,7 +26,7 @@
                     </p>
                 </div>
                 <x-breadcrumb>
-                    <li class="breadcrumb-item"><a href="{{route('dashboard')}}">{{ __('Dashboard') }}</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
                     <li class="breadcrumb-item active" aria-current="page">{{ __('Data Sekunder') }}</li>
                 </x-breadcrumb>
             </div>
@@ -46,6 +46,7 @@
                                             <th>{{ __('Kode Diklat') }}</th>
                                             <th>{{ __('Nama Diklat') }}</th>
                                             <th>{{ __('Jenis Diklat') }}</th>
+                                            <th>{{ __('Tgl Generate') }}</th>
                                             <th>{{ __('Data Sekunder') }}</th>
                                             <th>{{ __('Berkas') }}</th>
                                             <th>{{ __('Aksi') }}</th>
@@ -223,6 +224,10 @@
                         name: 'diklat_type.nama_diklat_type',
                     },
                     {
+                        data: 'created_at',
+                        name: 'created_at',
+                    },
+                    {
                         data: 'data_sekunder',
                         name: 'data_sekunder',
                         className: 'text-center',
@@ -243,7 +248,8 @@
                 var projectId = $(this).data('id');
                 $('#project_id').val(projectId);
                 $.ajax({
-                    url: "{{ route('data-sekunder.get', ['project_id' => '__ID__']) }}".replace('__ID__', projectId),
+                    url: "{{ route('data-sekunder.get', ['project_id' => '__ID__']) }}".replace(
+                        '__ID__', projectId),
                     type: 'GET',
                     dataType: 'json',
                     success: function(response) {
