@@ -66,6 +66,7 @@
                                             <th>{{ __('Kode Diklat') }}</th>
                                             <th>{{ __('Nama Diklat') }}</th>
                                             <th>{{ __('Jenis Diklat') }}</th>
+                                            <th>{{ __('Tgl Generate') }}</th>
                                             <th class="text-center">{{ __('Responden') }}</th>
                                             <th class="text-center">{{ __('Bobot') }}</th>
                                             <th class="text-center">{{ __('Pesan WA') }}</th>
@@ -117,9 +118,7 @@
                     timeOut: 5000,
                 });
             @endif
-
             var dataTable;
-
             function loadDataTable() {
                 var evaluator = $('#filter_evaluator').val();
                 var diklatType = $('#filter_diklat_type').val();

@@ -143,8 +143,7 @@ Route::middleware(['auth', 'web'])->group(function () {
 
     Route::get('/bobot-aspek', [BobotAspekController::class, 'index'])->name('bobot-aspek.index');
     Route::put('/bobot-aspek', [BobotAspekController::class, 'update'])->name('bobot-aspek.update');
-
-    Route::post('/update-session-status', [WaBlastController::class, 'updateSessionStatus'])->name('update.session.status');
+    Route::post('/wa-blast/update-aktif', [WaBlastController::class, 'updateAktif'])->name('wa-blast.update-aktif');
     Route::prefix('get-kaldik-data')->controller(PembuatanProjectController::class)->group(function () {
         Route::get('/', 'getKaldikData')->name('kaldik.index');
         Route::get('/detail/{kaldikID}', 'getDetail')->name('kaldik.detail');

@@ -147,7 +147,7 @@
                     },
                     {
                         data: 'konversi',
-                        name: 'konversi'
+                        name: 'konversi.konversi'
                     },
                     {
                         data: 'action',

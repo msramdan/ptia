@@ -33,6 +33,7 @@
                                             <th>{{ __('Kode Diklat') }}</th>
                                             <th>{{ __('Nama Diklat') }}</th>
                                             <th>{{ __('Jenis Diklat') }}</th>
+                                            <th>{{ __('Tgl Generate') }}</th>
                                             <th class="text-center">{{ __('Alumni') }}</th>
                                             <th class="text-center">{{ __('Atasan') }}</th>
                                         </tr>
@@ -81,9 +82,6 @@
                 serverSide: true,
                 pageLength: 100,
                 ajax: "{{ route('data-interview.index') }}",
-                // language: {
-                //     url: "{{ asset('assets/i18n/id.json') }}"
-                // },
                 columns: [{
                         data: 'DT_RowIndex',
                         name: 'DT_RowIndex',
@@ -91,10 +89,8 @@
                         searchable: false
                     },
                     {
-                        data: 'evaluator',
-                        name: 'u.name',
-                        orderable: false,
-                        searchable: false
+                        data: 'user',
+                        name: 'u.name'
                     },
                     {
                         data: 'kaldikID',
@@ -107,6 +103,10 @@
                     {
                         data: 'nama_diklat_type',
                         name: 'dt.nama_diklat_type'
+                    },
+                    {
+                        data: 'created_at',
+                        name: 'p.created_at',
                     },
                     {
                         data: 'alumni',

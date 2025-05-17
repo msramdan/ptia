@@ -41,17 +41,15 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
                     'project.id',
                     'project.kaldikID',
                     'project.kaldikDesc',
+                    'project.created_at',
                     'users.name as user_name',
                     'users.email',
                     'users.avatar',
                     'diklat_type.nama_diklat_type',
-                    // Total responden (semua)
+
                     DB::raw('COUNT(project_responden.id) as total_responden'),
-                    // Total yang sudah mengisi kuesioner alumni
                     DB::raw('SUM(CASE WHEN project_responden.status_pengisian_kuesioner_alumni = "Sudah" THEN 1 ELSE 0 END) as total_sudah_isi'),
-                    // Total responden atasan (hanya yang nama_atasan tidak null)
                     DB::raw('SUM(CASE WHEN project_responden.nama_atasan IS NOT NULL AND project_responden.status_pengisian_kuesioner_alumni = "Sudah" THEN 1 ELSE 0 END) as total_responden_atasan'),
-                    // Total keterisian atasan (bandingkan dengan semua responden, tidak hanya yang nama_atasan tidak null)
                     DB::raw('SUM(CASE WHEN project_responden.status_pengisian_kuesioner_atasan = "Sudah" THEN 1 ELSE 0 END) as total_sudah_isi_atasan')
                 )
                 ->where('project.status', 'Pelaksanaan')
@@ -507,12 +505,6 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
         }
     }
 
-    /**
-     * Export project details to PDF.
-     *
-     * @param  int  $id The Project ID
-     * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
-     */
     public function exportPenyebaranKuesionerPdf($id)
     {
         // try {

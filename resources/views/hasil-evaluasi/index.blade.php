@@ -20,19 +20,16 @@
         </div>
 
         <section class="section">
+            <div class="d-flex justify-content-end">
+                <a href="{{ route('hasil-evaluasi.export-excel') }}" class="btn btn-success  mb-3">
+                    <i class="fas fa-file-excel"></i> Export ke Excel
+                </a>
+            </div>
+
             <div class="row">
                 <div class="col-md-12">
                     <div class="card">
                         <div class="card-body">
-                            {{-- Filter Unit Kerja --}}
-                            <div class="row mb-3">
-                                <div class="col-md-8 text-end">
-                                    <a href="{{ route('hasil-evaluasi.export-excel') }}" class="btn btn-success mt-4">
-                                        <i class="fas fa-file-excel"></i> Export ke Excel
-                                    </a>
-                                </div>
-                            </div>
-
                             <div class="table-responsive p-1">
                                 <table class="table table-striped" id="data-table-hasil-evaluasi" width="100%">
                                     {{-- Ganti ID tabel --}}
@@ -43,6 +40,7 @@
                                             <th rowspan="2">{{ __('Kode Diklat') }}</th>
                                             <th rowspan="2">{{ __('Nama Diklat') }}</th>
                                             <th rowspan="2">{{ __('Jenis Diklat') }}</th>
+                                            <th rowspan="2">{{ __('Tgl Generate') }}</th>
                                             <th colspan="2" class="text-center">{{ __('Level 3') }}</th>
                                             <th colspan="2" class="text-center">{{ __('Level 4') }}</th>
                                         </tr>
@@ -101,7 +99,7 @@
                         },
                         {
                             data: 'user',
-                            name: 'user'
+                            name: 'users.name'
                         },
                         {
                             data: 'kaldikID',
@@ -113,7 +111,11 @@
                         },
                         {
                             data: 'nama_diklat_type',
-                            name: 'nama_diklat_type'
+                            name: 'diklat_type.nama_diklat_type',
+                        },
+                        {
+                            data: 'created_at',
+                            name: 'project.created_at',
                         },
                         {
                             data: 'avg_skor_level_3',

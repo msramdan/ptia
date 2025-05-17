@@ -46,6 +46,7 @@
                                             <th>{{ __('Kode Diklat') }}</th>
                                             <th>{{ __('Nama Diklat') }}</th>
                                             <th>{{ __('Jenis Diklat') }}</th>
+                                            <th>{{ __('Tgl Generate') }}</th>
                                             <th>{{ __('Data Sekunder') }}</th>
                                             <th>{{ __('Berkas') }}</th>
                                             <th>{{ __('Aksi') }}</th>
@@ -209,7 +210,7 @@
                     },
                     {
                         data: 'user',
-                        name: 'user'
+                        name: 'users.name'
                     },
                     {
                         data: 'kaldikID',
@@ -222,6 +223,10 @@
                     {
                         data: 'nama_diklat_type',
                         name: 'diklat_type.nama_diklat_type',
+                    },
+                    {
+                        data: 'created_at',
+                        name: 'created_at',
                     },
                     {
                         data: 'data_sekunder',
