@@ -93,6 +93,7 @@
         $('#data-table').DataTable({
             processing: true,
             serverSide: true,
+            pageLength: 100,
             ajax: "{{ route('pengumpulan-data.index') }}",
             columns: [{
                     data: 'DT_RowIndex',

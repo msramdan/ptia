@@ -3,7 +3,6 @@
 @section('title', __('Management Project'))
 
 @section('content')
-
     <div class="page-heading">
         <div class="page-title">
             <div class="row">
@@ -34,6 +33,30 @@
                 <div class="col-md-12">
                     <div class="card">
                         <div class="card-body">
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <label for="filter_evaluator" class="form-label">{{ __('Evaluator') }}</label>
+                                    <select class="form-select" id="filter_evaluator">
+                                        <option value="">{{ __('Semua Evaluator') }}</option>
+                                        @foreach ($evaluators as $user)
+                                            <option value="{{ $user->id }}"
+                                                {{ request('evaluator') == $user->id ? 'selected' : '' }}>
+                                                {{ $user->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="filter_diklat_type" class="form-label">{{ __('Jenis Diklat') }}</label>
+                                    <select class="form-select" id="filter_diklat_type">
+                                        <option value="">{{ __('Semua Jenis Diklat') }}</option>
+                                        @foreach ($diklatTypes as $type)
+                                            <option value="{{ $type->id }}"
+                                                {{ request('diklat_type') == $type->id ? 'selected' : '' }}>
+                                                {{ $type->nama_diklat_type }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
                             <div class="table-responsive p-1">
                                 <table class="table table-striped" id="data-table" width="100%">
                                     <thead>
@@ -95,61 +118,92 @@
                     timeOut: 5000,
                 });
             @endif
-        });
-    </script>
+            var dataTable;
+            function loadDataTable() {
+                var evaluator = $('#filter_evaluator').val();
+                var diklatType = $('#filter_diklat_type').val();
 
-    <script>
-        $('#data-table').DataTable({
-            processing: true,
-            serverSide: true,
-            ajax: "{{ route('project.index') }}",
-            columns: [{
-                    data: 'DT_RowIndex',
-                    name: 'DT_RowIndex',
-                    orderable: false,
-                    searchable: false,
-                },
-                {
-                    data: 'user',
-                    name: 'users.name'
-                },
-                {
-                    data: 'kaldikID',
-                    name: 'project.kaldikID',
-                },
-                {
-                    data: 'kaldikDesc',
-                    name: 'kaldikDesc',
-                },
-                {
-                    data: 'nama_diklat_type',
-                    name: 'diklat_type.nama_diklat_type',
-                },
-                {
-                    data: 'created_at',
-                    name: 'created_at',
-                },
-                {
-                    data: 'responden',
-                    name: 'responden',
-                },
-                {
-                    data: 'bobot',
-                    name: 'bobot',
-                },
-                {
-                    data: 'wa',
-                    name: 'wa',
-                },
-                {
-                    data: 'kuesioner',
-                    name: 'kuesioner',
-                },
-                {
-                    data: 'action',
-                    name: 'action',
+                if ($.fn.DataTable.isDataTable('#data-table')) {
+                    dataTable.destroy();
                 }
-            ],
+
+                dataTable = $('#data-table').DataTable({
+                    processing: true,
+                    serverSide: true,
+                    pageLength: 100,
+                    ajax: {
+                        url: "{{ route('project.index') }}",
+                        type: "GET",
+                        data: function(d) {
+                            d.evaluator = evaluator;
+                            d.diklat_type = diklatType;
+                        }
+                    },
+                    columns: [{
+                            data: 'DT_RowIndex',
+                            name: 'DT_RowIndex',
+                            orderable: false,
+                            searchable: false,
+                        },
+                        {
+                            data: 'user',
+                            name: 'user',
+                        },
+                        {
+                            data: 'kaldikID',
+                            name: 'project.kaldikID',
+                        },
+                        {
+                            data: 'kaldikDesc',
+                            name: 'kaldikDesc',
+                        },
+                        {
+                            data: 'nama_diklat_type',
+                            name: 'diklat_type.nama_diklat_type',
+                        },
+                        {
+                            data: 'responden',
+                            name: 'responden',
+                        },
+                        {
+                            data: 'bobot',
+                            name: 'bobot',
+                        },
+                        {
+                            data: 'wa',
+                            name: 'wa',
+                        },
+                        {
+                            data: 'kuesioner',
+                            name: 'kuesioner',
+                        },
+                        {
+                            data: 'action',
+                            name: 'action',
+                        }
+                    ]
+                });
+            }
+
+            function updateUrl() {
+                var evaluator = $('#filter_evaluator').val();
+                var diklatType = $('#filter_diklat_type').val();
+
+                var params = new URLSearchParams();
+                if (evaluator) params.append('evaluator', evaluator);
+                if (diklatType) params.append('diklat_type', diklatType);
+
+                var newUrl = window.location.pathname + (params.toString() ? '?' + params.toString() : '');
+                history.pushState(null, '', newUrl);
+                loadDataTable();
+            }
+
+            $('#filter_evaluator, #filter_diklat_type').on('change', function() {
+                updateUrl();
+            });
+
+            // Load tabel saat halaman pertama kali dimuat
+            loadDataTable();
         });
     </script>
 

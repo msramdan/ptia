@@ -13,7 +13,7 @@ class DashboardController extends Controller
     public function index(Request $request)
     {
         $tahun = $request->input('tahun', date('Y'));
-        $selectedTriwulan = $request->input('triwulan'); // Ambil input triwulan
+        $selectedTriwulan = $request->input('triwulan', 'all'); // Default ke 'all'
 
         $unitKerjaList = DB::table('project_data_sekunder')
             ->select('unit_kerja')
@@ -25,7 +25,7 @@ class DashboardController extends Controller
 
         if (request()->ajax()) {
             $projectsQuery = DB::table('project')
-                ->select( /* ... kolom select seperti sebelumnya ... */
+                ->select(
                     'project.id',
                     'project.kode_project',
                     'project.kaldikID',
@@ -39,9 +39,9 @@ class DashboardController extends Controller
                     DB::raw('COALESCE(avg_scores.final_avg_skor_level_4, 0) AS avg_skor_level_4'),
                     DB::raw("COALESCE(indikator_3.kriteria_dampak, '-') AS kriteria_dampak_level_3"),
                     DB::raw("COALESCE(indikator_4.kriteria_dampak, '-') AS kriteria_dampak_level_4"),
-                    'project.created_at' // Pastikan created_at ada untuk filter triwulan
+                    'project.created_at'
                 )
-                ->leftJoinSub( /* ... leftJoinSub avg_scores ... */
+                ->leftJoinSub(
                     DB::table('project_skor_responden')
                         ->select(
                             'project_skor_responden.project_id',
@@ -85,7 +85,7 @@ class DashboardController extends Controller
                 )
                 ->leftJoin('diklat_type', 'project.diklat_type_id', '=', 'diklat_type.id')
                 ->leftJoin('users', 'project.user_id', '=', 'users.id')
-                ->leftJoin('indikator_dampak AS indikator_3', /* ... join indikator_3 ... */ function ($join) {
+                ->leftJoin('indikator_dampak AS indikator_3', function ($join) {
                     $join->on('project.diklat_type_id', '=', 'indikator_3.diklat_type_id')
                         ->whereRaw('
                         COALESCE(avg_scores.avg_skor_level_3, 0) > indikator_3.nilai_minimal
@@ -93,7 +93,7 @@ class DashboardController extends Controller
                         COALESCE(avg_scores.avg_skor_level_3, 0) <= indikator_3.nilai_maksimal
                     ');
                 })
-                ->leftJoin('indikator_dampak AS indikator_4', /* ... join indikator_4 ... */ function ($join) {
+                ->leftJoin('indikator_dampak AS indikator_4', function ($join) {
                     $join->on('project.diklat_type_id', '=', 'indikator_4.diklat_type_id')
                         ->whereRaw('
                         COALESCE(avg_scores.final_avg_skor_level_4, 0) > indikator_4.nilai_minimal
@@ -110,16 +110,16 @@ class DashboardController extends Controller
                 $endDate = Carbon::createFromDate($tahun, 12, 31)->endOfDay();
 
                 switch ($selectedTriwulan) {
-                    case '1': // Triwulan 1 (1 Jan - Akhir Maret)
+                    case '1':
                         $endDate = Carbon::createFromDate($tahun, 3, 1)->endOfMonth()->endOfDay();
                         break;
-                    case '2': // Triwulan 2 (1 Jan - Akhir Juni)
+                    case '2':
                         $endDate = Carbon::createFromDate($tahun, 6, 1)->endOfMonth()->endOfDay();
                         break;
-                    case '3': // Triwulan 3 (1 Jan - Akhir September)
+                    case '3':
                         $endDate = Carbon::createFromDate($tahun, 9, 1)->endOfMonth()->endOfDay();
                         break;
-                    case '4': // Triwulan 4 (1 Jan - Akhir Desember)
+                    case '4':
                         $endDate = Carbon::createFromDate($tahun, 12, 1)->endOfMonth()->endOfDay();
                         break;
                 }
@@ -129,7 +129,6 @@ class DashboardController extends Controller
             $projects = $projectsQuery->orderByDesc('project.id');
 
             return DataTables::of($projects)
-                /* ... kolom DataTables seperti sebelumnya ... */
                 ->addIndexColumn()
                 ->addColumn('nama_project', fn($row) => e($row->kaldikDesc))
                 ->addColumn('user', function ($row) {
@@ -147,7 +146,7 @@ class DashboardController extends Controller
                 ->addColumn('kriteria_dampak_level_4', fn($row) => e($row->kriteria_dampak_level_4 ?? '-'))
                 ->rawColumns(['user', 'avg_skor_level_3', 'avg_skor_level_4'])
                 ->with([
-                    'summary' => [ // Perlu dihitung ulang berdasarkan filter triwulan juga
+                    'summary' => [
                         'avg_skor_level_3' => $projects->avg('avg_scores.avg_skor_level_3'),
                         'avg_skor_level_4' => $projects->avg('avg_scores.final_avg_skor_level_4'),
                         'count' => $projects->count()
@@ -156,15 +155,13 @@ class DashboardController extends Controller
                 ->toJson();
         }
 
-        // Hitung ulang summary stats dengan filter unit kerja dan triwulan jika ada
         $statsQuery = DB::table('project')
             ->where('status', 'Pelaksanaan')
             ->whereYear('created_at', $tahun);
 
-        // Filter Triwulan untuk stats
         if ($selectedTriwulan && $selectedTriwulan != 'all') {
             $startDate = Carbon::createFromDate($tahun, 1, 1)->startOfDay();
-            $endDate = Carbon::createFromDate($tahun, 12, 31)->endOfDay(); // Default untuk all
+            $endDate = Carbon::createFromDate($tahun, 12, 31)->endOfDay();
             switch ($selectedTriwulan) {
                 case '1':
                     $endDate = Carbon::createFromDate($tahun, 3, 1)->endOfMonth()->endOfDay();
@@ -183,13 +180,11 @@ class DashboardController extends Controller
         }
         $jumlahProject = $statsQuery->count();
 
-
         $respondenQuery = DB::table('project_responden')
             ->join('project', 'project_responden.project_id', '=', 'project.id')
             ->where('project.status', 'Pelaksanaan')
             ->whereYear('project.created_at', $tahun);
         if ($selectedTriwulan && $selectedTriwulan != 'all') {
-            // (Logika filter triwulan yang sama untuk respondenQuery)
             $startDate = Carbon::createFromDate($tahun, 1, 1)->startOfDay();
             $endDate = Carbon::createFromDate($tahun, 12, 31)->endOfDay();
             switch ($selectedTriwulan) {
@@ -210,13 +205,12 @@ class DashboardController extends Controller
         }
         $jumlahResponden = $respondenQuery->count();
 
-        // (Lanjutkan pola filter yang sama untuk $sudahAlumniQuery, $totalAtasanQuery, $sudahAtasanQuery)
         $sudahAlumniQuery = DB::table('project_responden')
             ->join('project', 'project_responden.project_id', '=', 'project.id')
             ->where('project.status', 'Pelaksanaan')
             ->whereYear('project.created_at', $tahun)
             ->where('project_responden.status_pengisian_kuesioner_alumni', 'sudah');
-        if ($selectedTriwulan && $selectedTriwulan != 'all') { /* ... filter triwulan ... */
+        if ($selectedTriwulan && $selectedTriwulan != 'all') {
             $startDate = Carbon::createFromDate($tahun, 1, 1)->startOfDay();
             $endDate = Carbon::createFromDate($tahun, 12, 31)->endOfDay();
             switch ($selectedTriwulan) {
@@ -243,7 +237,7 @@ class DashboardController extends Controller
             ->where('project.status', 'Pelaksanaan')
             ->whereYear('project.created_at', $tahun)
             ->whereNotNull('project_responden.nama_atasan');
-        if ($selectedTriwulan && $selectedTriwulan != 'all') { /* ... filter triwulan ... */
+        if ($selectedTriwulan && $selectedTriwulan != 'all') {
             $startDate = Carbon::createFromDate($tahun, 1, 1)->startOfDay();
             $endDate = Carbon::createFromDate($tahun, 12, 31)->endOfDay();
             switch ($selectedTriwulan) {
@@ -271,7 +265,7 @@ class DashboardController extends Controller
             ->whereNotNull('project_responden.nama_atasan')
             ->where('project_responden.status_pengisian_kuesioner_atasan', 'sudah');
 
-        if ($selectedTriwulan && $selectedTriwulan != 'all') { /* ... filter triwulan ... */
+        if ($selectedTriwulan && $selectedTriwulan != 'all') {
             $startDate = Carbon::createFromDate($tahun, 1, 1)->startOfDay();
             $endDate = Carbon::createFromDate($tahun, 12, 31)->endOfDay();
             switch ($selectedTriwulan) {
@@ -293,7 +287,6 @@ class DashboardController extends Controller
         $sudahAtasan = $sudahAtasanQuery->count();
         $persentaseSudahAtasan = $totalAtasan > 0 ? round(($sudahAtasan / $totalAtasan) * 100, 2) : 0;
 
-
         return view('dashboard', compact(
             'tahun',
             'jumlahProject',
@@ -303,7 +296,7 @@ class DashboardController extends Controller
             'sudahAtasan',
             'persentaseSudahAtasan',
             'unitKerjaList',
-            'selectedTriwulan' // Kirim triwulan yang dipilih ke view
+            'selectedTriwulan'
         ));
     }
 }

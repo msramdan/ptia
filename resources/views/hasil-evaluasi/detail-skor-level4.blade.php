@@ -26,7 +26,7 @@
                     </p>
                 </div>
                 <x-breadcrumb>
-                    <li class="breadcrumb-item"><a href="{{route('dashboard')}}">{{ __('Dashboard') }}</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
                     <li class="breadcrumb-item active" aria-current="page">{{ __('Hasil Evaluasi') }}</li>
                 </x-breadcrumb>
             </div>
@@ -51,7 +51,7 @@
                                 </tr>
                             </table>
 
-                            <a href="{{route('hasil-evaluasi.index')}}" class="btn btn-secondary">
+                            <a href="{{ route('hasil-evaluasi.index') }}" class="btn btn-secondary">
                                 <i class="fas fa-arrow-left"></i> {{ __('kembali') }}
                             </a>
                         </div>
@@ -111,6 +111,7 @@
             $('#data-table').DataTable({
                 processing: true,
                 serverSide: true,
+                pageLength: 100,
                 ajax: {
                     url: "{{ route('hasil-evaluasi.detail-skor.level4', ':id') }}".replace(':id',
                         projectId),

@@ -84,6 +84,7 @@
                 dataTableHasilEvaluasi = $('#data-table-hasil-evaluasi').DataTable({
                     processing: true,
                     serverSide: true,
+                    pageLength: 100,
                     ajax: {
                         url: "{{ route('hasil-evaluasi.index') }}",
                         data: function(d) {

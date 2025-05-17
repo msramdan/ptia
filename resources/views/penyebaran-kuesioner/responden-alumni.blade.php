@@ -242,7 +242,7 @@
                 processing: true,
                 serverSide: true,
                 stateSave: true, // Menyimpan state tabel, termasuk pagination
-                pageLength: 10, // Default per page 10
+                pageLength: 100, // Default per page 100
                 ajax: {
                     url: "{{ route('penyebaran-kuesioner.responden-alumni.show', ':id') }}".replace(':id',
                         projectId),
@@ -684,6 +684,7 @@
             $("#logWaTable").DataTable({
                 processing: true,
                 serverSide: true,
+                pageLength: 100,
                 ajax: {
                     url: "{{ route('penyebaran-kuesioner.log.wa') }}",
                     type: "GET",

@@ -105,6 +105,7 @@
         $('#data-table').DataTable({
             processing: true,
             serverSide: true,
+            pageLength: 100,
             ajax: "{{ route('penyebaran-kuesioner.index') }}",
             columns: [{
                     data: 'DT_RowIndex',

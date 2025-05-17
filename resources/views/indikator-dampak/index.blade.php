@@ -13,7 +13,7 @@
                     </p>
                 </div>
                 <x-breadcrumb>
-                    <li class="breadcrumb-item"><a href="{{route('dashboard')}}">{{ __('Dashboard') }}</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
                     <li class="breadcrumb-item active" aria-current="page">{{ __('Indikator Dampak') }}</li>
                 </x-breadcrumb>
             </div>
@@ -119,6 +119,7 @@
             let table = $('#data-table').DataTable({
                 processing: true,
                 serverSide: true,
+                pageLength: 100,
                 ajax: {
                     url: "{{ route('indikator-dampak.index') }}",
                     data: function(d) {

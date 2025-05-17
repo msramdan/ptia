@@ -200,6 +200,7 @@
             $('#data-table').DataTable({
                 processing: true,
                 serverSide: true,
+                pageLength: 100,
                 ajax: "{{ route('data-sekunder.index') }}",
                 columns: [{
                         data: 'DT_RowIndex',
