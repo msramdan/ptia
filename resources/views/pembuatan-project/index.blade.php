@@ -32,7 +32,9 @@
                                     <select class="form-select" id="filter_jenis_diklat_pembuatan">
                                         <option value="">Semua Jenis Diklat</option>
                                         @foreach ($jenisDiklatList as $jenis)
-                                            <option value="{{ $jenis }}">{{ $jenis }}</option>
+                                            <option value="{{ $jenis }}"
+                                                {{ request('jenis_diklat') == $jenis ? 'selected' : '' }}>
+                                                {{ $jenis }}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -143,6 +145,8 @@
                 dataTablePembuatan = $('#data-table-pembuatan').DataTable({
                     processing: true,
                     serverSide: true,
+                    pageLength: 100, // Set default entries to 100
+                    lengthMenu: [10, 25, 50, 100], // Allow users to select 10, 25, 50, or 100 entries
                     ajax: {
                         url: "{{ route('kaldik.index') }}",
                         type: "GET",
@@ -260,8 +264,18 @@
                 });
             }
 
-            $('#filter_jenis_diklat_pembuatan').on('change', function() {
+            function updateUrl() {
+                var jenisDiklat = $('#filter_jenis_diklat_pembuatan').val();
+                var params = new URLSearchParams();
+                if (jenisDiklat) params.append('jenis_diklat', jenisDiklat);
+
+                var newUrl = window.location.pathname + (params.toString() ? '?' + params.toString() : '');
+                history.pushState(null, '', newUrl);
                 loadDataTablePembuatanProject();
+            }
+
+            $('#filter_jenis_diklat_pembuatan').on('change', function() {
+                updateUrl();
             });
 
             // Load tabel saat halaman pertama kali dimuat
@@ -410,6 +424,7 @@
                 processing: true,
                 serverSide: true,
                 destroy: true,
+                pageLength: 100,
                 ajax: {
                     url: "{{ route('peserta.diklat', ['kaldikID' => '__ID__']) }}".replace('__ID__', kaldikID),
                     type: "GET",

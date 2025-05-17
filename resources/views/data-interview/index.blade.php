@@ -13,7 +13,7 @@
                     </p>
                 </div>
                 <x-breadcrumb>
-                    <li class="breadcrumb-item"><a href="{{route('dashboard')}}">{{ __('Dashboard') }}</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
                     <li class="breadcrumb-item active" aria-current="page">{{ __('Data Interview') }}</li>
                 </x-breadcrumb>
             </div>
@@ -79,6 +79,7 @@
             $('#data-table').DataTable({
                 processing: true,
                 serverSide: true,
+                pageLength: 100,
                 ajax: "{{ route('data-interview.index') }}",
                 // language: {
                 //     url: "{{ asset('assets/i18n/id.json') }}"

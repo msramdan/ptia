@@ -44,6 +44,12 @@ class ProjectController extends Controller implements HasMiddleware
                     'users.avatar',
                     'diklat_type.nama_diklat_type'
                 )
+                ->when(request('evaluator'), function ($query, $evaluator) {
+                    $query->where('project.user_id', $evaluator);
+                })
+                ->when(request('diklat_type'), function ($query, $diklatType) {
+                    $query->where('project.diklat_type_id', $diklatType);
+                })
                 ->orderBy('project.id', 'desc');
             return DataTables::of($projects)
                 ->addIndexColumn()
@@ -67,7 +73,6 @@ class ProjectController extends Controller implements HasMiddleware
                             </a>
                         </div>';
                 })
-
                 ->addColumn('responden', function ($row) {
                     $editResponden = route('project.responden.show', ['id' => $row->id]);
                     return '
@@ -91,7 +96,6 @@ class ProjectController extends Controller implements HasMiddleware
                             </a>
                         </div>';
                 })
-
                 ->addColumn('wa', function ($row) {
                     $editWa = route('project.pesan.wa.show', ['id' => $row->id]);
                     return '
@@ -104,18 +108,15 @@ class ProjectController extends Controller implements HasMiddleware
                             </a>
                         </div>';
                 })
-
                 ->addColumn('user', function ($row) {
                     if (is_null($row->user_name) && is_null($row->email)) {
                         return '<div class="text-muted text-center">-</div>';
                     }
-
                     $userName = $row->user_name ?? '-';
                     $email = $row->email ?? '';
                     $avatar = $row->avatar
                         ? asset("storage/uploads/avatars/{$row->avatar}")
                         : "https://www.gravatar.com/avatar/" . md5(strtolower(trim($email))) . "&s=450";
-
                     return '
                         <div class="d-flex align-items-center">
                             <img src="' . e($avatar) . '" class="img-thumbnail"
@@ -127,8 +128,20 @@ class ProjectController extends Controller implements HasMiddleware
                 ->rawColumns(['kuesioner', 'responden', 'bobot', 'user', 'wa', 'action'])
                 ->toJson();
         }
-
-        return view('project.index');
+        $evaluators = DB::table('users')
+            ->select('id', 'name')
+            ->whereExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('project')
+                    ->whereColumn('project.user_id', 'users.id');
+            })
+            ->orderBy('name')
+            ->get();
+        $diklatTypes = DB::table('diklat_type')
+            ->select('id', 'nama_diklat_type')
+            ->orderBy('nama_diklat_type')
+            ->get();
+        return view('project.index', compact('evaluators', 'diklatTypes'));
     }
 
     public function store(Request $request)
@@ -138,31 +151,23 @@ class ProjectController extends Controller implements HasMiddleware
             'diklatTypeName'   => 'required|string',
             'kaldikDesc' => 'required|string',
         ]);
-
         DB::beginTransaction();
-
         try {
             $existingProject = DB::table('project')->where('kaldikID', $data['kaldikID'])->first();
-
             if ($existingProject) {
                 return response()->json([
                     'status'  => false,
                     'message' => "Kaldik ID {$data['kaldikID']} sudah ada dalam manajemen project.",
-
                 ], 409);
             }
-
             $kode_project = Str::upper(Str::random(8));
-
             // 1. Insert ke tabel project
             $diklatType = DB::table('diklat_type_mapping')
                 ->where('diklatTypeName', $data['diklatTypeName'])
                 ->first();
-
             if (!$diklatType) {
                 throw new \Exception("Type diklat tidak di temukan");
             }
-
             $projectId = DB::table('project')->insertGetId([
                 'diklat_type_id'    => $diklatType->diklat_type_id,
                 'kode_project'      => $kode_project,
@@ -173,16 +178,13 @@ class ProjectController extends Controller implements HasMiddleware
                 'created_at'        => now(),
                 'updated_at'        => now(),
             ]);
-
             // 2. Insert data ke tabel project_kriteria_responden
             $kriteriaResponden = DB::table('kriteria_responden')
                 ->where('diklat_type_id', $diklatType->diklat_type_id)
                 ->first();
-
             if (!$kriteriaResponden) {
                 throw new \Exception("No kriteria responden data found.");
             }
-
             // 3. Insert data ke tabel project_responden dari API
             $statusValues = json_decode($kriteriaResponden->nilai_post_test, true);
             $statusQuery = implode('&', array_map(fn($status) => 'status=' . urlencode($status), $statusValues));
@@ -191,15 +193,11 @@ class ProjectController extends Controller implements HasMiddleware
                 'is_pagination' => 'No',
                 'post_test_minimal' => $kriteriaResponden->nilai_post_test_minimal,
             ]) . "&" . $statusQuery;
-
             $response = Http::get($apiUrl);
-
             if ($response->failed()) {
                 throw new \Exception("Gagal mengambil data responden dari API.");
             }
-
             $respondenData = $response->json();
-
             DB::table('project_kriteria_responden')->insert([
                 'project_id'                        => $projectId,
                 'nilai_post_test'                   => $kriteriaResponden->nilai_post_test,
@@ -210,7 +208,6 @@ class ProjectController extends Controller implements HasMiddleware
                 'created_at'                        => now(),
                 'updated_at'                        => now(),
             ]);
-
             $insertData = [];
             if (isset($respondenData['data_include']) && is_array($respondenData['data_include'])) {
                 foreach ($respondenData['data_include'] as $responden) {
@@ -233,8 +230,6 @@ class ProjectController extends Controller implements HasMiddleware
             if (!empty($insertData)) {
                 DB::table('project_responden')->insert($insertData);
             }
-
-
             $insertExcludeData = [];
             if (isset($respondenData['data_exclude']) && is_array($respondenData['data_exclude'])) {
                 foreach ($respondenData['data_exclude'] as $responden) {
@@ -252,31 +247,25 @@ class ProjectController extends Controller implements HasMiddleware
                         'updated_at'       => now(),
                     ];
                 }
-
                 if (!empty($insertExcludeData)) {
                     DB::table('project_responden_exclude')->insert($insertExcludeData);
                 }
             }
-
             // 4. Insert data ke tabel project_pesan_wa
             $pesanWa = DB::table('pesan_wa')->first();
-
             if (!$pesanWa) {
                 throw new \Exception("Config pesan WA tidak ditemukan");
             }
-
             $textPesanAlumni = str_replace(
                 ['{params_nama_diklat}'],
                 [$data['kaldikDesc']],
                 $pesanWa->text_pesan_alumni
             );
-
             $textPesanAtasan = str_replace(
                 ['{params_nama_diklat}'],
                 [$data['kaldikDesc']],
                 $pesanWa->text_pesan_atasan
             );
-
             DB::table('project_pesan_wa')->insert([
                 'project_id'        => $projectId,
                 'text_pesan_alumni' => $textPesanAlumni,
@@ -284,18 +273,15 @@ class ProjectController extends Controller implements HasMiddleware
                 'created_at'        => now(),
                 'updated_at'        => now(),
             ]);
-
             // 5.Insert data ke table project_bobot_aspek
             $dataBobot = DB::table('bobot_aspek')
                 ->join('aspek', 'bobot_aspek.aspek_id', '=', 'aspek.id')
                 ->select('bobot_aspek.aspek_id', 'bobot_aspek.bobot_alumni', 'bobot_aspek.bobot_atasan_langsung', 'aspek.level', 'aspek.aspek')
                 ->where('aspek.diklat_type_id', $diklatType->diklat_type_id)
                 ->get();
-
             if ($dataBobot->isEmpty()) {
                 throw new \Exception("No bobot aspek found.");
             }
-
             $insertData = $dataBobot->map(function ($item) use ($projectId) {
                 return [
                     'project_id' => $projectId,
@@ -307,23 +293,19 @@ class ProjectController extends Controller implements HasMiddleware
                 ];
             })->toArray();
             DB::table('project_bobot_aspek')->insert($insertData);
-
             // 6.insert data ke table project_bobot_aspek_sekunder
             $dataBobotSekunder = DB::table('bobot_aspek_sekunder')
                 ->where('diklat_type_id', $diklatType->diklat_type_id)
                 ->first();
-
             if (!$dataBobotSekunder) {
                 throw new \Exception("No bobot aspek sekunder found.");
             }
-
             DB::table('project_bobot_aspek_sekunder')->insert([
                 'project_id' => $projectId,
                 'bobot_aspek_sekunder' => $dataBobotSekunder->bobot_aspek_sekunder,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
-
             // 7. Insert data ke table project_kuesioner
             $kaldikDesc = $data['kaldikDesc'] ?? 'Pelatihan Default';
             $pertanyaanList = DB::table('kuesioner')
@@ -331,7 +313,6 @@ class ProjectController extends Controller implements HasMiddleware
                 ->where('aspek.diklat_type_id', $diklatType->diklat_type_id)
                 ->select('aspek.id as aspek_id', 'aspek.level', 'aspek.aspek', 'aspek.kriteria', 'kuesioner.pertanyaan')
                 ->get();
-
             $kuesionerData = [];
             foreach ($pertanyaanList as $pertanyaanItem) {
                 $pertanyaanAlumni = str_replace(
@@ -339,7 +320,6 @@ class ProjectController extends Controller implements HasMiddleware
                     ["Saya", $kaldikDesc],
                     $pertanyaanItem->pertanyaan
                 );
-
                 $kuesionerData[] = [
                     'project_id'  => $projectId,
                     'aspek_id'    => $pertanyaanItem->aspek_id,
@@ -351,13 +331,11 @@ class ProjectController extends Controller implements HasMiddleware
                     'created_at'  => now(),
                     'updated_at'  => now(),
                 ];
-
                 $pertanyaanAtasan = str_replace(
                     ["{params_target}", "{params_nama_diklat}"],
                     ["Alumni", $kaldikDesc],
                     $pertanyaanItem->pertanyaan
                 );
-
                 $kuesionerData[] = [
                     'project_id'  => $projectId,
                     'aspek_id'    => $pertanyaanItem->aspek_id,
@@ -370,10 +348,8 @@ class ProjectController extends Controller implements HasMiddleware
                     'updated_at'  => now(),
                 ];
             }
-
             DB::table('project_kuesioner')->insert($kuesionerData);
             DB::commit();
-
             return response()->json([
                 'status'  => true,
                 'message' => 'Project berhasil dibuat',
@@ -385,7 +361,6 @@ class ProjectController extends Controller implements HasMiddleware
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
-
             return response()->json([
                 'status'  => false,
                 'message' => 'Gagal membuat project: ' . $e->getMessage(),
@@ -397,7 +372,6 @@ class ProjectController extends Controller implements HasMiddleware
     {
         try {
             $deleted = DB::table('project')->where('id', $id)->delete();
-
             if ($deleted) {
                 return to_route('project.index')->with('success', __('Project berhasil dihapus.'));
             } else {
@@ -415,7 +389,6 @@ class ProjectController extends Controller implements HasMiddleware
             ->select('project.*', 'users.name as user_name')
             ->where('project.id', $id)
             ->first();
-
         $kuesioners = DB::table('project_kuesioner')
             ->join('aspek', 'project_kuesioner.aspek_id', '=', 'aspek.id')
             ->select(
@@ -425,13 +398,10 @@ class ProjectController extends Controller implements HasMiddleware
             ->where('project_kuesioner.project_id', $id)
             ->where('project_kuesioner.remark', $remark)
             ->get();
-
         $aspeks = DB::table('aspek')
             ->select('id', 'aspek')
             ->where('diklat_type_id', $project->diklat_type_id)
             ->get();
-
-
         return view('project.kuesioner', compact('project', 'kuesioners', 'remark', 'aspeks'));
     }
 
@@ -443,18 +413,14 @@ class ProjectController extends Controller implements HasMiddleware
             'aspek' => 'required',
             'pertanyaan' => 'required|string',
         ]);
-
         DB::beginTransaction();
-
         try {
             $dataAspek = DB::table('aspek')
                 ->where('id', $request->aspek)
                 ->first();
-
             if (!$dataAspek) {
                 return back()->with('error', 'Aspek tidak ditemukan!');
             }
-
             DB::table('project_kuesioner')->insert([
                 'project_id' => $validated['project_id'],
                 'aspek_id' => $validated['aspek'],
@@ -466,7 +432,6 @@ class ProjectController extends Controller implements HasMiddleware
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
-
             DB::commit();
             return back()->with('success', 'Kuesioner berhasil ditambahkan!');
         } catch (\Exception $e) {
@@ -484,16 +449,13 @@ class ProjectController extends Controller implements HasMiddleware
     public function updateKuesioner(Request $request, $id)
     {
         DB::beginTransaction();
-
         try {
             $dataAspek = DB::table('aspek')
                 ->where('id', $request->aspek)
                 ->first();
-
             if (!$dataAspek) {
                 return back()->with('error', 'Aspek tidak ditemukan!');
             }
-
             DB::table('project_kuesioner')
                 ->where('id', $id)
                 ->update([
@@ -504,7 +466,6 @@ class ProjectController extends Controller implements HasMiddleware
                     'pertanyaan' => $request->pertanyaan,
                     'updated_at' => now(),
                 ]);
-
             DB::commit();
             return back()->with('success', 'Kuesioner berhasil diperbarui!');
         } catch (\Exception $e) {
@@ -532,28 +493,22 @@ class ProjectController extends Controller implements HasMiddleware
                     ->where('project_id', $id)
                     ->get();
             }
-
             return DataTables::of($respondens)
                 ->addIndexColumn()
                 ->toJson();
         }
-
         $kriteriaResponden = DB::table('project_kriteria_responden')
             ->where('project_id', $id)
             ->first();
-
         if (!$kriteriaResponden) {
             abort(404, 'Kriteria Responden tidak ditemukan');
         }
-
         $kriteriaResponden->nilai_post_test = json_decode($kriteriaResponden->nilai_post_test, true);
-
         $project = DB::table('project')
             ->leftJoin('users', 'project.user_id', '=', 'users.id')
             ->select('project.*', 'users.name as user_name')
             ->where('project.id', $id)
             ->first();
-
         return view('project.responden', compact('project', 'kriteriaResponden'));
     }
 
@@ -564,17 +519,12 @@ class ProjectController extends Controller implements HasMiddleware
             'nilai_post_test.*' => 'in:Turun,Tetap,Naik',
             'nilai_post_test_minimal' => 'required|numeric',
         ]);
-
         DB::beginTransaction();
-
         try {
             $nilai_post_test =  $request->nilai_post_test ?? [];
-
-
             // Hapus data lama di `project_responden` berdasarkan `project_id`
             DB::table('project_responden')->where('project_id', $request->project_id)->delete();
             DB::table('project_responden_exclude')->where('project_id', $request->project_id)->delete();
-
             // Hit API untuk mendapatkan data responden
             $statusQuery = implode('&', array_map(fn($status) => 'status=' . urlencode($status), $nilai_post_test));
             $apiUrl = config('services.pusdiklatwas.endpoint') . "/len-peserta-diklat/{$request->kaldikID}?" . http_build_query([
@@ -582,15 +532,11 @@ class ProjectController extends Controller implements HasMiddleware
                 'is_pagination' => 'No',
                 'post_test_minimal' => $request->nilai_post_test_minimal,
             ]) . "&" . $statusQuery;
-
             $response = Http::get($apiUrl);
-
             if ($response->failed()) {
                 throw new \Exception("Gagal mengambil data responden dari API.");
             }
-
             $respondenData = $response->json();
-
             $updated = DB::table('project_kriteria_responden')
                 ->where('id', $id)
                 ->update([
@@ -601,7 +547,6 @@ class ProjectController extends Controller implements HasMiddleware
                     'total_tidak_termasuk_responden'    => $respondenData['total_exclude'],
                     'updated_at' => now(),
                 ]);
-
             $insertData = [];
             if (isset($respondenData['data_include']) && is_array($respondenData['data_include'])) {
                 foreach ($respondenData['data_include'] as $responden) {
@@ -621,11 +566,9 @@ class ProjectController extends Controller implements HasMiddleware
                     ];
                 }
             }
-
             if (!empty($insertData)) {
                 DB::table('project_responden')->insert($insertData);
             }
-
             $insertExcludeData = [];
             if (isset($respondenData['data_exclude']) && is_array($respondenData['data_exclude'])) {
                 foreach ($respondenData['data_exclude'] as $responden) {
@@ -643,15 +586,11 @@ class ProjectController extends Controller implements HasMiddleware
                         'updated_at'       => now(),
                     ];
                 }
-
                 if (!empty($insertExcludeData)) {
                     DB::table('project_responden_exclude')->insert($insertExcludeData);
                 }
             }
-
-
             DB::commit();
-
             return back()->with($updated ? 'success' : 'error', $updated ? 'Kriteria responden berhasil diperbarui!' : 'Kriteria responden gagal diperbarui!');
         } catch (\Exception $e) {
             DB::rollBack();
@@ -666,7 +605,6 @@ class ProjectController extends Controller implements HasMiddleware
             ->select('project.*', 'users.name as user_name')
             ->where('project.id', $id)
             ->first();
-
         $pesanWa = DB::table('project_pesan_wa')
             ->where('project_pesan_wa.project_id', $id)
             ->first();
@@ -679,7 +617,6 @@ class ProjectController extends Controller implements HasMiddleware
             'text_pesan_alumni' => 'required|string',
             'text_pesan_atasan' => 'required|string',
         ]);
-
         $updated = DB::table('project_pesan_wa')
             ->where('id', $id)
             ->update([
@@ -687,7 +624,6 @@ class ProjectController extends Controller implements HasMiddleware
                 'text_pesan_atasan' => $request->text_pesan_atasan,
                 'updated_at' => now(),
             ]);
-
         return back()->with($updated ? 'success' : 'error', $updated ? 'Pesan WA berhasil diperbarui!' : 'Pesan WA gagal diperbarui!');
     }
 
@@ -698,21 +634,17 @@ class ProjectController extends Controller implements HasMiddleware
             ->select('project.*', 'users.name as user_name')
             ->where('project.id', $id)
             ->first();
-
         $bobotAspek = DB::table('project_bobot_aspek')
             ->join('aspek', 'project_bobot_aspek.aspek_id', '=', 'aspek.id')
             ->select('project_bobot_aspek.*', 'aspek.aspek as aspek_nama', 'aspek.level')
             ->where('project_bobot_aspek.project_id', $id)
             ->get();
-
         $dataSecondary = DB::table('project_bobot_aspek_sekunder')
             ->select('project_bobot_aspek_sekunder.*')
             ->where('project_bobot_aspek_sekunder.project_id', $id)
             ->first();
-
         $level3 = $bobotAspek->where('level', 3);
         $level4 = $bobotAspek->where('level', 4);
-
         return view('project.bobot', compact('project', 'level3', 'level4', 'dataSecondary'));
     }
 
@@ -731,7 +663,6 @@ class ProjectController extends Controller implements HasMiddleware
                     }
                 }
             }
-
             // Update Level 4
             if ($request->has('level4')) {
                 foreach ($request->level4 as $data) {
@@ -744,7 +675,6 @@ class ProjectController extends Controller implements HasMiddleware
                     }
                 }
             }
-
             // Update project_bobot_aspek_sekunder
             if ($request->has('bobot_aspek_sekunder_id') && !empty($request->bobot_aspek_sekunder_id)) {
                 DB::table('project_bobot_aspek_sekunder')->where('id', $request->bobot_aspek_sekunder_id)->update([
@@ -753,7 +683,6 @@ class ProjectController extends Controller implements HasMiddleware
                 ]);
             }
         });
-
         return redirect()->back()->with('success', 'Bobot aspek berhasil diperbarui.');
     }
 
@@ -761,46 +690,36 @@ class ProjectController extends Controller implements HasMiddleware
     {
         try {
             DB::beginTransaction(); // Mulai transaksi
-
             $project = DB::table('project')->where('id', $id)->first();
-
             if (!$project) {
                 return to_route('project.index')->with('error', __('Project tidak ditemukan.'));
             }
-
             if ($project->status === 'Pelaksanaan') {
                 return to_route('project.index')->with('error', __('Status sudah Pelaksanaan, tidak bisa diubah lagi.'));
             }
-
             $user = auth()->user();
             if (!$user) {
                 throw new \Exception("User is not authenticated.");
             }
-
             // Ambil nilai deadline dari tabel setting
             $setting = \App\Models\Setting::first();
             $deadlineDays = $setting ? (int) $setting->deadline_pengisian : 7;
             $deadlineDate = now()->addDays($deadlineDays)->toDateString();
-
             // Ambil data pesan WA untuk project ini
             $pesanWa = DB::table('project_pesan_wa')->where('project_id', $project->id)->first();
-
             if ($pesanWa) {
                 // Dummy kaldikDesc — sesuaikan dengan nilai yang sebenarnya dari proyek
                 $data['kaldikDesc'] = $project->nama_diklat ?? 'Nama Diklat'; // Atur fallback jika tidak ada
-
                 $textPesanAlumni = str_replace(
                     ['{params_wa_pic}', '{params_pic}'],
                     [$user->phone, $user->name],
                     $pesanWa->text_pesan_alumni
                 );
-
                 $textPesanAtasan = str_replace(
                     ['{params_wa_pic}', '{params_pic}'],
                     [$user->phone, $user->name],
                     $pesanWa->text_pesan_atasan
                 );
-
                 // Kalau mau disimpan kembali, bisa update:
                 DB::table('project_pesan_wa')
                     ->where('project_id', $project->id)
@@ -809,7 +728,6 @@ class ProjectController extends Controller implements HasMiddleware
                         'text_pesan_atasan' => $textPesanAtasan,
                     ]);
             }
-
             // Update status proyek + user login yang mengubah
             $updated = DB::table('project')
                 ->where('id', $id)
@@ -817,31 +735,24 @@ class ProjectController extends Controller implements HasMiddleware
                     'status' => 'Pelaksanaan',
                     'user_id' => $user->id
                 ]);
-
             if (!$updated) {
                 throw new \Exception("Gagal mengupdate status proyek.");
             }
-
             // Update deadline_pengisian_alumni
             $respondensUpdated = DB::table('project_responden')
                 ->where('project_id', $id)
                 ->update(['deadline_pengisian_alumni' => $deadlineDate]);
-
             if ($respondensUpdated === 0) {
                 throw new \Exception("Gagal mengupdate deadline pengisian alumni.");
             }
-
             DB::commit();
-
             return to_route('project.index')->with('success', __('Status berhasil diperbarui menjadi Pelaksanaan.'));
         } catch (\Exception $e) {
             DB::rollBack();
             \Log::error('Gagal mengupdate status proyek: ' . $e->getMessage());
-
             return to_route('project.index')->with('error', __('Terjadi kesalahan: ') . $e->getMessage());
         }
     }
-
 
     public function exportPdf($id)
     {
@@ -852,21 +763,17 @@ class ProjectController extends Controller implements HasMiddleware
                 ->join('diklat_type', 'project.diklat_type_id', '=', 'diklat_type.id')
                 ->select(
                     'project.*',
-                    'users.name as user_name',
+                    'users.name as user Mendes, Julia; Ristanti, Rika A.; Widodo, Joko; Subowo, Agus; Lestari, Tika; Nurhayati, Ani; Santoso, Budi; Hartono, Dedy; Pratama, Eko; Wulandari, Fitri name',
                     'diklat_type.nama_diklat_type'
                 )
                 ->where('project.id', $id)
                 ->first();
-
             if (!$project) {
                 Log::warning('Gagal generate PDF: Project tidak ditemukan - ID ' . $id);
                 return redirect()->route('project.index')->with('error', 'Project tidak ditemukan.');
             }
-
             // Parse tanggal created_at jika ada
             $projectCreatedAt = $project->created_at ? Carbon::parse($project->created_at)->format('Y-m-d') : 'N/A';
-
-
             // 2. Ambil Data Kriteria Responden (Section A)
             $kriteriaResponden = DB::table('project_kriteria_responden')
                 ->where('project_id', $id)
@@ -881,14 +788,12 @@ class ProjectController extends Controller implements HasMiddleware
             }
             // !!! NOTE: Asumsi ada kolom 'nilai_pre_test_minimal' di tabel project_kriteria_responden
             //     Jika tidak ada, variabel ini akan null.
-
             // 4. Ambil Data Daftar Responden Alumni (Section C)
             $daftarResponden = DB::table('project_responden')
                 ->where('project_id', $id)
                 ->select('nip', 'nama', 'jabatan', 'telepon', 'unit', /* 'pangkat' -> tidak ada di tabel? */)
                 ->orderBy('nama') // Urutkan berdasarkan nama
                 ->get();
-
             // 5. Ambil Data Kuesioner (Section D)
             $kuesionerAlumni = DB::table('project_kuesioner')
                 ->join('aspek', 'project_kuesioner.aspek_id', '=', 'aspek.id')
@@ -902,7 +807,6 @@ class ProjectController extends Controller implements HasMiddleware
                 ->where('project_kuesioner.remark', 'Alumni')
                 ->orderBy('project_kuesioner.id')
                 ->get();
-
             $kuesionerAtasan = DB::table('project_kuesioner')
                 ->join('aspek', 'project_kuesioner.aspek_id', '=', 'aspek.id')
                 ->select(
@@ -915,7 +819,6 @@ class ProjectController extends Controller implements HasMiddleware
                 ->where('project_kuesioner.remark', 'Atasan')
                 ->orderBy('project_kuesioner.id')
                 ->get();
-
             // 6. Ambil Data Bobot (Section E)
             $bobotAspek = DB::table('project_bobot_aspek')
                 ->where('project_id', $id)
@@ -924,16 +827,13 @@ class ProjectController extends Controller implements HasMiddleware
                 ->get();
             $bobotLevel3 = $bobotAspek->where('level', 3);
             $bobotLevel4 = $bobotAspek->where('level', 4);
-
             $bobotSekunder = DB::table('project_bobot_aspek_sekunder')
                 ->where('project_id', $id)
                 ->first();
-
             // 7. Data Tambahan (Logo, Tanggal Cetak)
             $setting = Setting::first();
             $logoPath = null; // Default null
             $logoUrl = null;  // Default null
-
             // Coba ambil logo dari setting database
             if ($setting && $setting->logo_instansi) {
                 $dbLogoPath = public_path('storage/uploads/logos/' . $setting->logo_instansi); // Sesuaikan path storage Anda
@@ -941,7 +841,6 @@ class ProjectController extends Controller implements HasMiddleware
                     $logoPath = $dbLogoPath; // Gunakan logo dari DB jika ada dan file-nya eksis
                 }
             }
-
             // Jika logo dari DB tidak ditemukan/tidak valid, coba fallback ke logo statis
             if (!$logoPath) {
                 $staticLogoPath = public_path('assets/BPKP_Logo.png'); // Path logo statis di public/assets
@@ -951,7 +850,6 @@ class ProjectController extends Controller implements HasMiddleware
                     Log::warning('Logo dinamis maupun statis (public/assets/BPKP_Logo.png) tidak ditemukan.');
                 }
             }
-
             // Encode logo ke base64 jika path valid
             if ($logoPath) {
                 try {
@@ -961,10 +859,7 @@ class ProjectController extends Controller implements HasMiddleware
                     $logoUrl = null; // Set null jika gagal baca file
                 }
             }
-
             $tanggalCetak = Carbon::now()->translatedFormat('d F Y H:i');
-
-
             // 8. Siapkan data untuk view
             $data = [
                 'project' => $project,
@@ -980,16 +875,13 @@ class ProjectController extends Controller implements HasMiddleware
                 'logoUrl' => $logoUrl,
                 'tanggalCetak' => $tanggalCetak,
             ];
-
             // 9. Generate PDF menggunakan view baru (misal: 'project.export-pdf')
             // Kita akan buat view ini di langkah berikutnya
             $pdf = Pdf::loadView('project.export-pdf', $data); // <-- Nama view baru!
             $pdf->setPaper('a4', 'portrait');
-
             // 10. Atur nama file & kirim ke browser
             $filename = 'Penyebaran-Kuesioner-' . Str::slug($project->kaldikDesc ?? 'project') . '-' . $project->kaldikID . '.pdf';
             return $pdf->stream($filename); // Tampilkan di browser
-
         } catch (\Exception $e) {
             Log::error('Error generating PDF Management Project ID ' . $id . ': ' . $e->getMessage() . "\n" . $e->getTraceAsString());
             return redirect()->route('project.index')->with('error', 'Gagal membuat PDF: Terjadi kesalahan internal. Silakan cek log.');

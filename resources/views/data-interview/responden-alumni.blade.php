@@ -13,7 +13,7 @@
                     </p>
                 </div>
                 <x-breadcrumb>
-                    <li class="breadcrumb-item"><a href="{{route('dashboard')}}">{{ __('Dashboard') }}</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
                     <li class="breadcrumb-item"><a href="{{ route('data-interview.index') }}">{{ __('Data Interview') }}</a>
                     </li>
                     <li class="breadcrumb-item active" aria-current="page">{{ __('Responden Alumni') }}</li>
@@ -86,7 +86,7 @@
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="uploadEvidenceLabel">Upload Evidence Interview - <span
+                        <h5 class="modal-title" id="uploadEvidenceLabel">Input Interview Interview - <span
                                 id="respondenNama"></span></h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
@@ -216,6 +216,7 @@
             var table = $('#responden-alumni-table').DataTable({
                 processing: true,
                 serverSide: true,
+                pageLength: 100,
                 ajax: "{{ route('data-interview.responden.alumni', ['project' => $project->id]) }}",
                 columns: [{
                         data: 'DT_RowIndex',
@@ -255,12 +256,12 @@
                             var hasilInterview = row.hasil_intervie_alumni || '';
 
                             // Tentukan teks dan warna tombol berdasarkan keberadaan evidence
-                            var buttonText = hasilInterview ? 'Ganti Evidence' :
-                                'Upload Evidence';
+                            var buttonText = hasilInterview ? 'Edit Interview' :
+                                'Input Interview';
                             var buttonClass = hasilInterview ? 'btn-success' :
                                 'btn-primary'; // Hijau jika ada, Biru jika tidak ada
-                            var buttonTitle = hasilInterview ? 'Ganti Evidence' :
-                                'Upload Evidence';
+                            var buttonTitle = hasilInterview ? 'Edit Interview' :
+                                'Input Interview';
 
                             // Bangun HTML tombol
                             var html =
