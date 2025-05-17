@@ -285,7 +285,7 @@ class DashboardController extends Controller
             $sudahAtasanQuery->whereBetween('project.created_at', [$startDate, $endDate]);
         }
         $sudahAtasan = $sudahAtasanQuery->count();
-        $persentaseSudahAtasan = $totalAtasan > 0 ? round(($sudahAtasan / $totalAtasan) * 100, 2) : 0;
+        $persentaseSudahAtasan = $totalAtasan > 0 ? round(($sudahAtasan / $sudahAlumni) * 100, 2) : 0;
 
         return view('dashboard', compact(
             'tahun',
