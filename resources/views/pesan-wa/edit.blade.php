@@ -15,7 +15,7 @@
 
                 <x-breadcrumb>
                     <li class="breadcrumb-item">
-                        <a href="{{route('dashboard')}}">{{ __('Dashboard') }}</a>
+                        <a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a>
                     </li>
                     <li class="breadcrumb-item active">
                         {{ __('Pesan Wa') }}
@@ -62,8 +62,10 @@
                                     </div>
                                 </div>
 
-                                <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i>
-                                    {{ __('Update') }}</button>
+                                @can('pesan wa edit')
+                                    <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i>
+                                        {{ __('Update') }}</button>
+                                @endcan
                             </form>
                         </div>
                     </div>

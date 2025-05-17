@@ -15,7 +15,7 @@
 
                 <x-breadcrumb>
                     <li class="breadcrumb-item">
-                        <a href="{{route('dashboard')}}">{{ __('Dashboard') }}</a>
+                        <a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a>
                     </li>
                     <li class="breadcrumb-item active" aria-current="page">
                         {{ __('Setting') }}
@@ -29,12 +29,14 @@
                 <div class="col-md-12">
                     <div class="card">
                         <div class="card-body">
-                            <form action="{{ route('setting.update', $setting->id) }}" method="POST" enctype="multipart/form-data">
+                            <form action="{{ route('setting.update', $setting->id) }}" method="POST"
+                                enctype="multipart/form-data">
                                 @csrf
                                 @method('PUT')
-
                                 @include('setting.include.form')
-                                <button type="submit" class="btn btn-primary">{{ __('Update') }}</button>
+                                @can('setting edit')
+                                    <button type="submit" class="btn btn-primary">{{ __('Update') }}</button>
+                                @endcan
                             </form>
                         </div>
                     </div>
@@ -47,26 +49,26 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
 @endpush
 @push('js')
-<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-<script>
-    $(document).ready(function() {
-        @if (session('success'))
-            toastr.success("{{ session('success') }}", "Success", {
-                closeButton: true,
-                progressBar: true,
-                positionClass: "toast-top-right",
-                timeOut: 5000,
-            });
-        @endif
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            @if (session('success'))
+                toastr.success("{{ session('success') }}", "Success", {
+                    closeButton: true,
+                    progressBar: true,
+                    positionClass: "toast-top-right",
+                    timeOut: 5000,
+                });
+            @endif
 
-        @if (session('error'))
-            toastr.error("{{ session('error') }}", "Error", {
-                closeButton: true,
-                progressBar: true,
-                positionClass: "toast-top-right",
-                timeOut: 5000,
-            });
-        @endif
-    });
-</script>
+            @if (session('error'))
+                toastr.error("{{ session('error') }}", "Error", {
+                    closeButton: true,
+                    progressBar: true,
+                    positionClass: "toast-top-right",
+                    timeOut: 5000,
+                });
+            @endif
+        });
+    </script>
 @endpush

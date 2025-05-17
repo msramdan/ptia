@@ -15,7 +15,7 @@
 
                 <x-breadcrumb>
                     <li class="breadcrumb-item">
-                        <a href="{{route('dashboard')}}">{{ __('Dashboard') }}</a>
+                        <a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a>
                     </li>
                     <li class="breadcrumb-item active">
                         {{ __('Bobot Aspek') }}
@@ -168,9 +168,11 @@
                                         </tr>
                                     </tbody>
                                 </table>
-                                <button type="submit" id="submit-btn" class="btn btn-primary"><i
-                                        class="fas fa-save"></i>
-                                    Update</button>
+                                @can('bobot aspek edit')
+                                    <button type="submit" id="submit-btn" class="btn btn-primary"><i
+                                            class="fas fa-save"></i>
+                                        Update</button>
+                                @endcan
                             </form>
                         </div>
                     </div>

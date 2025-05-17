@@ -81,7 +81,7 @@
 
                 <x-breadcrumb>
                     <li class="breadcrumb-item">
-                        <a href="{{route('dashboard')}}">{{ __('Dashboard') }}</a>
+                        <a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a>
                     </li>
                     <li class="breadcrumb-item active" aria-current="page">
                         {{ __('Kriteria Responden') }}
@@ -159,9 +159,10 @@
                                         </div>
                                     </div>
                                 </div>
-
-                                <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i>
-                                    {{ __('Update') }}</button>
+                                @can('kriteria responden edit')
+                                    <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i>
+                                        {{ __('Update') }}</button>
+                                @endcan
                             </form>
                         </div>
                     </div>
