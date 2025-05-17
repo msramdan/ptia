@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Validation\ValidationException;
 
 class RespondenKuesionerController extends Controller
 {
@@ -132,6 +133,23 @@ class RespondenKuesionerController extends Controller
             'encryptedId' => 'required',
             'token' => 'required',
         ]);
+        // tambahakan validasi jika sudah isi gk boleh isi lagi mau itu alumni atau atasan
+        $responden = DB::table('project_responden')
+            ->where('id', $validatedData['project_responden_id'])
+            ->first();
+
+        if ($validatedData['remark'] === 'Alumni' && $responden->status_pengisian_kuesioner_alumni === 'Sudah') {
+            throw ValidationException::withMessages([
+                'remark' => ['Kuesioner sudah diisi oleh Alumni.']
+            ]);
+        }
+
+        if ($validatedData['remark'] === 'Atasan' && $responden->status_pengisian_kuesioner_atasan === 'Sudah') {
+            throw ValidationException::withMessages([
+                'remark' => ['Kuesioner sudah diisi oleh Atasan.']
+            ]);
+        }
+
 
         try {
 
