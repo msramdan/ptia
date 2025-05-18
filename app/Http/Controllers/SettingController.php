@@ -48,9 +48,10 @@ class SettingController extends Controller implements HasMiddleware
     {
         $validated = $request->validated();
 
-        $validated['logo'] = $this->imageService->upload(name: 'logo', path: $this->logoPath, defaultImage: $setting->logo ?? null);
-        $validated['logo_login'] = $this->imageService->upload(name: 'logo_login', path: $this->logoLoginPath, defaultImage: $setting->logo_login ?? null);
-        $validated['favicon'] = $this->imageService->upload(name: 'favicon', path: $this->faviconPath, defaultImage: $setting->favicon ?? null);
+        $setting = Setting::first();
+        $validated['logo'] = $this->imageService->upload(name: 'logo', path: $this->logoPath, defaultImage: $setting ? $setting->logo : null);
+        $validated['logo_login'] = $this->imageService->upload(name: 'logo_login', path: $this->logoLoginPath, defaultImage: $setting ? $setting->logo_login : null);
+        $validated['favicon'] = $this->imageService->upload(name: 'favicon', path: $this->faviconPath, defaultImage: $setting ? $setting->favicon : null);
 
         if ($request->has('jam_mulai')) {
             $validated['jam_mulai'] = Carbon::parse($validated['jam_mulai'])->format('H:i');
@@ -63,7 +64,6 @@ class SettingController extends Controller implements HasMiddleware
             $validated['hari_jalan_cron'] = array_map('intval', $validated['hari_jalan_cron']);
         }
 
-        $setting = Setting::first();
         if ($setting) {
             $setting->update($validated);
         } else {

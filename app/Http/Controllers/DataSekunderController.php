@@ -51,6 +51,12 @@ class DataSekunderController extends Controller implements HasMiddleware
                     'project_data_sekunder.berkas'
                 )
                 ->where('project.status', 'Pelaksanaan')
+                ->when(request('evaluator'), function ($query, $evaluator) {
+                    $query->where('project.user_id', $evaluator);
+                })
+                ->when(request('diklat_type'), function ($query, $diklatType) {
+                    $query->where('project.diklat_type_id', $diklatType);
+                })
                 ->orderBy('project.id', 'desc');
 
             return DataTables::of($projects)
@@ -61,56 +67,66 @@ class DataSekunderController extends Controller implements HasMiddleware
                         : "https://www.gravatar.com/avatar/" . md5(strtolower(trim($row->email))) . "&s=450";
 
                     return '
-                    <div class="d-flex align-items-center">
-                        <img src="' . e($avatar) . '" class="img-thumbnail"
-                             style="width: 50px; height: 50px; border-radius: 5%; margin-right: 10px;">
-                        <span>' . e($row->user_name) . '</span>
-                    </div>';
+                <div class="d-flex align-items-center">
+                    <img src="' . e($avatar) . '" class="img-thumbnail"
+                         style="width: 50px; height: 50px; border-radius: 5%; margin-right: 10px;">
+                    <span>' . e($row->user_name) . '</span>
+                </div>';
                 })
                 ->addColumn('berkas', function ($row) {
                     if ($row->berkas) {
                         $url = asset("storage/uploads/berkas/$row->berkas");
                         return '<a href="' . e($url) . '" target="_blank" class="btn btn-sm btn-success" title="Download Berkas">
-                                    <i class="fas fa-download"></i>
-                                </a>';
+                                <i class="fas fa-download"></i>
+                            </a>';
                     }
                     return '-';
                 })
                 ->addColumn('data_sekunder', function ($row) {
                     if ($row->nilai_kinerja_awal !== null && $row->nilai_kinerja_akhir !== null) {
-                        // Menentukan status perubahan
-                        if ($row->nilai_kinerja_akhir > $row->nilai_kinerja_awal) {
-                            $status = '<span class="badge bg-success"><i class="fas fa-arrow-up"></i> Meningkat</span>';
-                        } elseif ($row->nilai_kinerja_akhir < $row->nilai_kinerja_awal) {
-                            $status = '<span class="badge bg-danger"><i class="fas fa-arrow-down"></i> Menurun</span>';
-                        } else {
-                            $status = '<span class="badge bg-secondary"><i class="fas fa-minus"></i> Tetap</span>';
-                        }
+                        $status = $row->nilai_kinerja_akhir > $row->nilai_kinerja_awal
+                            ? '<span class="badge bg-success"><i class="fas fa-arrow-up"></i> Meningkat</span>'
+                            : ($row->nilai_kinerja_akhir < $row->nilai_kinerja_awal
+                                ? '<span class="badge bg-danger"><i class="fas fa-arrow-down"></i> Menurun</span>'
+                                : '<span class="badge bg-secondary"><i class="fas fa-minus"></i> Tetap</span>');
 
                         return '
-                        <td class="text-center">
-                            ' . e($row->nilai_kinerja_awal) . '-' . e($row->nilai_kinerja_akhir) . '
-                            <hr style="margin:5px">
-                            ' . $status . '
-                        </td>';
+                    <td class="text-center">
+                        ' . e($row->nilai_kinerja_awal) . '-' . e($row->nilai_kinerja_akhir) . '
+                        <hr style="margin:5px">
+                        ' . $status . '
+                    </td>';
                     }
                     return '-';
                 })
                 ->addColumn('action', function ($row) {
                     return '
-                    <div class="text-center">
-                        <button style="width: 140px"  title="Input Data Sekunder" class="btn btn-sm btn-primary btn-action" data-id="' . $row->id . '">
-                            <i class="fas fa-pencil"></i> Data Sekunder
-                        </button>
-                    </div>';
+                <div class="text-center">
+                    <button style="width: 140px" title="Input Data Sekunder" class="btn btn-sm btn-primary btn-action" data-id="' . $row->id . '">
+                        <i class="fas fa-pencil"></i> Data Sekunder
+                    </button>
+                </div>';
                 })
                 ->rawColumns(['user', 'berkas', 'data_sekunder', 'action'])
                 ->toJson();
         }
 
+        $evaluators = DB::table('users')
+            ->select('id', 'name')
+            ->whereExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('project')
+                    ->whereColumn('project.user_id', 'users.id');
+            })
+            ->orderBy('name')
+            ->get();
 
+        $diklatTypes = DB::table('diklat_type')
+            ->select('id', 'nama_diklat_type')
+            ->orderBy('nama_diklat_type')
+            ->get();
 
-        return view('data-sekunder.index');
+        return view('data-sekunder.index', compact('evaluators', 'diklatTypes'));
     }
 
     public function store(Request $request): RedirectResponse
