@@ -46,6 +46,12 @@ class DataInterviewController extends Controller implements HasMiddleware
                     DB::raw('COUNT(CASE WHEN pr.nama_atasan IS NOT NULL AND pr.status_pengisian_kuesioner_alumni = "Sudah" THEN pr.id END) as atasan_count')
                 )
                 ->where('p.status', 'Pelaksanaan')
+                ->when($request->evaluator, function ($query, $evaluator) {
+                    $query->where('p.user_id', $evaluator);
+                })
+                ->when($request->diklat_type, function ($query, $diklatType) {
+                    $query->where('p.diklat_type_id', $diklatType);
+                })
                 ->groupBy(
                     'p.id',
                     'p.kaldikID',
@@ -96,7 +102,24 @@ class DataInterviewController extends Controller implements HasMiddleware
                 ->rawColumns(['user', 'alumni', 'atasan'])
                 ->toJson();
         }
-        return view('data-interview.index');
+
+        // Ambil data untuk filter
+        $evaluators = DB::table('users')
+            ->select('id', 'name')
+            ->whereExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('project')
+                    ->whereColumn('project.user_id', 'users.id');
+            })
+            ->orderBy('name')
+            ->get();
+
+        $diklatTypes = DB::table('diklat_type')
+            ->select('id', 'nama_diklat_type')
+            ->orderBy('nama_diklat_type')
+            ->get();
+
+        return view('data-interview.index', compact('evaluators', 'diklatTypes'));
     }
 
     public function showRespondenAlumni($projectId): View|JsonResponse

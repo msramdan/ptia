@@ -143,6 +143,7 @@
         $('#data-table').DataTable({
             processing: true,
             serverSide: true,
+            pageLength: 100,
             ajax: "{{ route('wa-blast.index') }}",
             columns: [{
                     data: 'DT_RowIndex',

@@ -46,79 +46,91 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
                     'users.email',
                     'users.avatar',
                     'diklat_type.nama_diklat_type',
-
                     DB::raw('COUNT(project_responden.id) as total_responden'),
                     DB::raw('SUM(CASE WHEN project_responden.status_pengisian_kuesioner_alumni = "Sudah" THEN 1 ELSE 0 END) as total_sudah_isi'),
                     DB::raw('SUM(CASE WHEN project_responden.nama_atasan IS NOT NULL AND project_responden.status_pengisian_kuesioner_alumni = "Sudah" THEN 1 ELSE 0 END) as total_responden_atasan'),
                     DB::raw('SUM(CASE WHEN project_responden.status_pengisian_kuesioner_atasan = "Sudah" THEN 1 ELSE 0 END) as total_sudah_isi_atasan')
                 )
                 ->where('project.status', 'Pelaksanaan')
+                ->when(request('evaluator'), function ($query, $evaluator) {
+                    $query->where('project.user_id', $evaluator);
+                })
+                ->when(request('diklat_type'), function ($query, $diklatType) {
+                    $query->where('project.diklat_type_id', $diklatType);
+                })
                 ->groupBy('project.id', 'users.name', 'users.email', 'users.avatar')
                 ->orderBy('project.id', 'desc');
-
 
             return DataTables::of($projects)
                 ->addIndexColumn()
                 ->addColumn('responden_alumni', function ($row) {
                     $showAlumni = route('penyebaran-kuesioner.responden-alumni.show', ['id' => $row->id]);
                     return '
-                        <div class="text-center">
-                            <a href="' . $showAlumni . '"
-                               class="btn btn-sm btn-warning"
-                               style="width: 120px;"
-                               data-toggle="tooltip" data-placement="left" title="Atur Bobot">
-                                <i class="fas fa-users"></i> ' . $row->total_responden . ' Alumni
-                            </a>
-                        </div>';
+                    <div class="text-center">
+                        <a href="' . $showAlumni . '"
+                           class="btn btn-sm btn-warning"
+                           style="width: 120px;"
+                           data-toggle="tooltip" data-placement="left" title="Atur Bobot">
+                            <i class="fas fa-users"></i> ' . $row->total_responden . ' Alumni
+                        </a>
+                    </div>';
                 })
-
                 ->addColumn('keterisian_alumni', function ($row) {
-                    $total = $row->total_responden ?: 1; // Hindari pembagian dengan nol
+                    $total = $row->total_responden ?: 1;
                     $sudah = $row->total_sudah_isi;
                     $persentase = round(($sudah / $total) * 100, 2);
-
                     return "$sudah Alumni<br>($persentase%)";
                 })
-
                 ->addColumn('responden_atasan', function ($row) {
                     $showAtasan = route('penyebaran-kuesioner.responden-atasan.show', ['id' => $row->id]);
                     return '
-                        <div class="text-center">
-                             <a href="' . $showAtasan . '"
-                               class="btn btn-sm btn-warning"
-                               style="width: 120px;"
-                               data-toggle="tooltip" data-placement="left" title="Atur Bobot">
-                                 <i class="fas fa-users"></i> ' . $row->total_responden_atasan . ' Atasan
-                            </a>
-                        </div>';
+                    <div class="text-center">
+                         <a href="' . $showAtasan . '"
+                           class="btn btn-sm btn-warning"
+                           style="width: 120px;"
+                           data-toggle="tooltip" data-placement="left" title="Atur Bobot">
+                             <i class="fas fa-users"></i> ' . $row->total_responden_atasan . ' Atasan
+                        </a>
+                    </div>';
                 })
-
                 ->addColumn('keterisian_atasan', function ($row) {
                     $total = $row->total_responden_atasan ?: 1;
                     $sudah = $row->total_sudah_isi_atasan;
                     $persentase = round(($sudah / $total) * 100, 2);
-
                     return "$sudah Atasan<br>($persentase%)";
                 })
-
                 ->addColumn('user', function ($row) {
                     $avatar = $row->avatar
                         ? asset("storage/uploads/avatars/$row->avatar")
                         : "https://www.gravatar.com/avatar/" . md5(strtolower(trim($row->email))) . "&s=450";
-
                     return '
-                        <div class="d-flex align-items-center">
-                            <img src="' . e($avatar) . '" class="img-thumbnail"
-                                 style="width: 50px; height: 50px; border-radius: 5%; margin-right: 10px;">
-                            <span>' . e($row->user_name) . '</span>
-                        </div>';
+                    <div class="d-flex align-items-center">
+                        <img src="' . e($avatar) . '" class="img-thumbnail"
+                             style="width: 50px; height: 50px; border-radius: 5%; margin-right: 10px;">
+                        <span>' . e($row->user_name) . '</span>
+                    </div>';
                 })
                 ->addColumn('action', 'penyebaran-kuesioner.include.action')
                 ->rawColumns(['action', 'responden_alumni', 'responden_atasan', 'keterisian_alumni', 'keterisian_atasan', 'user'])
                 ->toJson();
         }
 
-        return view('penyebaran-kuesioner.index');
+        $evaluators = DB::table('users')
+            ->select('id', 'name')
+            ->whereExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('project')
+                    ->whereColumn('project.user_id', 'users.id');
+            })
+            ->orderBy('name')
+            ->get();
+
+        $diklatTypes = DB::table('diklat_type')
+            ->select('id', 'nama_diklat_type')
+            ->orderBy('nama_diklat_type')
+            ->get();
+
+        return view('penyebaran-kuesioner.index', compact('evaluators', 'diklatTypes'));
     }
 
     public function showRespondenAlumni($id): View|JsonResponse

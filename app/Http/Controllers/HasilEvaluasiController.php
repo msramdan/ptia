@@ -25,16 +25,8 @@ class HasilEvaluasiController extends Controller implements HasMiddleware
         ];
     }
 
-    public function index(Request $request): View|JsonResponse // Tambahkan Request $request
+    public function index(Request $request): View|JsonResponse
     {
-        $unitKerjaList = DB::table('project_data_sekunder')
-            ->select('unit_kerja')
-            ->whereNotNull('unit_kerja')
-            ->where('unit_kerja', '!=', '')
-            ->distinct()
-            ->orderBy('unit_kerja')
-            ->pluck('unit_kerja');
-
         if (request()->ajax()) {
             $projectsQuery = DB::table('project')
                 ->select(
@@ -60,33 +52,10 @@ class HasilEvaluasiController extends Controller implements HasMiddleware
                             DB::raw("LEAST(100, COALESCE(ROUND(AVG((COALESCE(skor_level_3_alumni, 0) + COALESCE(skor_level_3_atasan, 0))), 2), 0)) AS avg_skor_level_3"),
                             DB::raw("LEAST(100, COALESCE(ROUND(AVG((COALESCE(skor_level_4_alumni, 0) + COALESCE(skor_level_4_atasan, 0))), 2), 0)) AS base_avg_skor_level_4"),
                             DB::raw(
-                                "COALESCE((
-                                SELECT bobot_aspek_sekunder
-                                FROM project_bobot_aspek_sekunder
-                                WHERE project_bobot_aspek_sekunder.project_id = project_skor_responden.project_id
-                                AND EXISTS (
-                                    SELECT 1
-                                    FROM project_data_sekunder
-                                    WHERE project_data_sekunder.project_id = project_skor_responden.project_id
-                                    AND project_data_sekunder.nilai_kinerja_awal < project_data_sekunder.nilai_kinerja_akhir
-                                )
-                            ), 0) AS bobot_aspek_sekunder"
+                                "COALESCE((SELECT bobot_aspek_sekunder FROM project_bobot_aspek_sekunder WHERE project_bobot_aspek_sekunder.project_id = project_skor_responden.project_id AND EXISTS (SELECT 1 FROM project_data_sekunder WHERE project_data_sekunder.project_id = project_skor_responden.project_id AND project_data_sekunder.nilai_kinerja_awal < project_data_sekunder.nilai_kinerja_akhir)), 0) AS bobot_aspek_sekunder"
                             ),
                             DB::raw(
-                                "LEAST(100,
-                                (COALESCE(ROUND(AVG((COALESCE(skor_level_4_alumni, 0) + COALESCE(skor_level_4_atasan, 0))), 2), 0) +
-                                COALESCE((
-                                    SELECT bobot_aspek_sekunder
-                                    FROM project_bobot_aspek_sekunder
-                                    WHERE project_bobot_aspek_sekunder.project_id = project_skor_responden.project_id
-                                    AND EXISTS (
-                                        SELECT 1
-                                        FROM project_data_sekunder
-                                        WHERE project_data_sekunder.project_id = project_skor_responden.project_id
-                                        AND project_data_sekunder.nilai_kinerja_awal < project_data_sekunder.nilai_kinerja_akhir
-                                    )
-                                ), 0))
-                            ) AS final_avg_skor_level_4"
+                                "LEAST(100, (COALESCE(ROUND(AVG((COALESCE(skor_level_4_alumni, 0) + COALESCE(skor_level_4_atasan, 0))), 2), 0) + COALESCE((SELECT bobot_aspek_sekunder FROM project_bobot_aspek_sekunder WHERE project_bobot_aspek_sekunder.project_id = project_skor_responden.project_id AND EXISTS (SELECT 1 FROM project_data_sekunder WHERE project_data_sekunder.project_id = project_skor_responden.project_id AND project_data_sekunder.nilai_kinerja_awal < project_data_sekunder.nilai_kinerja_akhir)), 0))) AS final_avg_skor_level_4"
                             )
                         )
                         ->groupBy('project_skor_responden.project_id'),
@@ -99,23 +68,21 @@ class HasilEvaluasiController extends Controller implements HasMiddleware
                 ->leftJoin('users', 'project.user_id', '=', 'users.id')
                 ->leftJoin('indikator_dampak AS indikator_3', function ($join) {
                     $join->on('project.diklat_type_id', '=', 'indikator_3.diklat_type_id')
-                        ->whereRaw('
-                        COALESCE(avg_scores.avg_skor_level_3, 0) > indikator_3.nilai_minimal
-                        AND
-                        COALESCE(avg_scores.avg_skor_level_3, 0) <= indikator_3.nilai_maksimal
-                    ');
+                        ->whereRaw('COALESCE(avg_scores.avg_skor_level_3, 0) > indikator_3.nilai_minimal AND COALESCE(avg_scores.avg_skor_level_3, 0) <= indikator_3.nilai_maksimal');
                 })
                 ->leftJoin('indikator_dampak AS indikator_4', function ($join) {
                     $join->on('project.diklat_type_id', '=', 'indikator_4.diklat_type_id')
-                        ->whereRaw('
-                        COALESCE(avg_scores.final_avg_skor_level_4, 0) > indikator_4.nilai_minimal
-                        AND
-                        COALESCE(avg_scores.final_avg_skor_level_4, 0) <= indikator_4.nilai_maksimal
-                    ');
+                        ->whereRaw('COALESCE(avg_scores.final_avg_skor_level_4, 0) > indikator_4.nilai_minimal AND COALESCE(avg_scores.final_avg_skor_level_4, 0) <= indikator_4.nilai_maksimal');
                 })
-                ->where('project.status', 'Pelaksanaan'); // Anda mungkin ingin menambahkan filter tahun juga di sini
-            $projects = $projectsQuery->orderByDesc('project.id');
+                ->where('project.status', 'Pelaksanaan')
+                ->when($request->evaluator, function ($query, $evaluator) {
+                    $query->where('project.user_id', $evaluator);
+                })
+                ->when($request->diklat_type, function ($query, $diklatType) {
+                    $query->where('project.diklat_type_id', $diklatType);
+                });
 
+            $projects = $projectsQuery->orderByDesc('project.id');
 
             return DataTables::of($projects)
                 ->addIndexColumn()
@@ -125,18 +92,42 @@ class HasilEvaluasiController extends Controller implements HasMiddleware
                         ? asset("storage/uploads/avatars/{$row->user_avatar}")
                         : "https://www.gravatar.com/avatar/" . md5(strtolower(trim($row->user_email))) . "&s=450";
                     return '<div class="d-flex align-items-center">
-                                <img src="' . e($avatar) . '" class="img-thumbnail" style="width: 50px; height: 50px; border-radius: 5%; margin-right: 10px;">
-                                <span>' . e($row->user_name) . '</span>
-                            </div>';
+                            <img src="' . e($avatar) . '" class="img-thumbnail" style="width: 50px; height: 50px; border-radius: 5%; margin-right: 10px;">
+                            <span>' . e($row->user_name) . '</span>
+                        </div>';
                 })
-                ->addColumn('avg_skor_level_3', fn($row) => '<a href="' . e(url("/hasil-evaluasi/level-3/{$row->id}")) . '"  class="btn btn-link">' . e(number_format($row->avg_skor_level_3, 2)) . '</a>')
-                ->addColumn('avg_skor_level_4', fn($row) => '<a href="' . e(url("/hasil-evaluasi/level-4/{$row->id}")) . '"  class="btn btn-link">' . e(number_format($row->avg_skor_level_4, 2)) . '</a>')
+                ->addColumn('avg_skor_level_3', fn($row) => '<a href="' . e(url("/hasil-evaluasi/level-3/{$row->id}")) . '" class="btn btn-link">' . e(number_format($row->avg_skor_level_3, 2)) . '</a>')
+                ->addColumn('avg_skor_level_4', fn($row) => '<a href="' . e(url("/hasil-evaluasi/level-4/{$row->id}")) . '" class="btn btn-link">' . e(number_format($row->avg_skor_level_4, 2)) . '</a>')
                 ->addColumn('kriteria_dampak_level_3', fn($row) => e($row->kriteria_dampak_level_3 ?? '-'))
                 ->addColumn('kriteria_dampak_level_4', fn($row) => e($row->kriteria_dampak_level_4 ?? '-'))
                 ->rawColumns(['user', 'avg_skor_level_3', 'avg_skor_level_4'])
                 ->toJson();
         }
-        return view('hasil-evaluasi.index', compact('unitKerjaList'));
+
+        $unitKerjaList = DB::table('project_data_sekunder')
+            ->select('unit_kerja')
+            ->whereNotNull('unit_kerja')
+            ->where('unit_kerja', '!=', '')
+            ->distinct()
+            ->orderBy('unit_kerja')
+            ->pluck('unit_kerja');
+
+        $evaluators = DB::table('users')
+            ->select('id', 'name')
+            ->whereExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('project')
+                    ->whereColumn('project.user_id', 'users.id');
+            })
+            ->orderBy('name')
+            ->get();
+
+        $diklatTypes = DB::table('diklat_type')
+            ->select('id', 'nama_diklat_type')
+            ->orderBy('nama_diklat_type')
+            ->get();
+
+        return view('hasil-evaluasi.index', compact('unitKerjaList', 'evaluators', 'diklatTypes'));
     }
 
     public function showLevel3($id)
