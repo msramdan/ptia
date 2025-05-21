@@ -284,6 +284,7 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
             'id' => 'required|exists:project_responden,id',
             'telepon' => 'required|string|min:10|max:15',
             'remark' => 'required|in:Alumni,Atasan',
+            'nama_atasan' => 'required_if:remark,Atasan|string|max:255',
         ]);
 
         if ($validator->fails()) {
@@ -295,15 +296,22 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
         }
 
         try {
-            $fieldToUpdate = $request->remark === 'Alumni' ? 'telepon' : 'telepon_atasan';
+            $updateData = [];
+
+            if ($request->remark === 'Alumni') {
+                $updateData['telepon'] = $request->telepon;
+            } else {
+                $updateData['telepon_atasan'] = $request->telepon;
+                $updateData['nama_atasan'] = $request->nama_atasan; // ✅ update nama_atasan juga
+            }
 
             DB::table('project_responden')
                 ->where('id', $request->id)
-                ->update([$fieldToUpdate => $request->telepon]);
+                ->update($updateData);
 
             return response()->json([
                 'success' => true,
-                'message' => 'Nomor telepon berhasil diperbarui!',
+                'message' => 'Data berhasil diperbarui!',
             ]);
         } catch (\Exception $e) {
             return response()->json([
@@ -312,6 +320,7 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
             ], 500);
         }
     }
+
 
     public function updateDeadline(Request $request)
     {

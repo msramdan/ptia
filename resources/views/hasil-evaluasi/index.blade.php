@@ -54,6 +54,7 @@
                                         <tr>
                                             <th>No</th>
                                             <th>{{ __('Evaluator') }}</th>
+                                            <th>{{ __('Tgl Generate') }}</th>
                                             <th>{{ __('Kode Project') }}</th>
                                             <th>{{ __('Nama Project') }}</th>
                                             <th>{{ __('Jenis Diklat') }}</th>
@@ -129,6 +130,10 @@
                         {
                             data: 'user',
                             name: 'users.name'
+                        },
+                        {
+                            data: 'created_at',
+                            name: 'created_at'
                         },
                         {
                             data: 'kode_project',

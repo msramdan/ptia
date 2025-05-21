@@ -2,8 +2,8 @@
 
     <a href="#" class="btn btn-warning btn-sm edit-telepon-btn" data-id="{{ $model->id }}"
         data-telepon="{{ $model->telepon_atasan }}" data-nama="{{ $model->nama_atasan }}"
-        title="Edit No. Telepon Atasan Langsung">
-        <i class="fas fa-phone"></i>
+        title="Edit Data Atasan Langsung">
+        <i class="fas fa-pencil"></i>
     </a>
 
     <a href="#" class="btn btn-sm edit-deadline-btn"

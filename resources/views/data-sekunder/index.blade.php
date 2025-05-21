@@ -54,10 +54,10 @@
                                         <tr>
                                             <th>No</th>
                                             <th>{{ __('Evaluator') }}</th>
+                                            <th>{{ __('Tgl Generate') }}</th>
                                             <th>{{ __('Kode Diklat') }}</th>
                                             <th>{{ __('Nama Diklat') }}</th>
                                             <th>{{ __('Jenis Diklat') }}</th>
-                                            <th>{{ __('Tgl Generate') }}</th>
                                             <th class="text-center">{{ __('Data Sekunder') }}</th>
                                             <th class="text-center">{{ __('Berkas') }}</th>
                                             <th class="text-center">{{ __('Aksi') }}</th>
@@ -131,6 +131,10 @@
                             name: 'users.name'
                         },
                         {
+                            data: 'created_at',
+                            name: 'project.created_at'
+                        },
+                        {
                             data: 'kaldikID',
                             name: 'project.kaldikID'
                         },
@@ -141,10 +145,6 @@
                         {
                             data: 'nama_diklat_type',
                             name: 'diklat_type.nama_diklat_type'
-                        },
-                        {
-                            data: 'created_at',
-                            name: 'project.created_at'
                         },
                         {
                             data: 'data_sekunder',

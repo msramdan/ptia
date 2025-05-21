@@ -63,10 +63,10 @@
                                         <tr>
                                             <th>No</th>
                                             <th>{{ __('Evaluator') }}</th>
+                                            <th>{{ __('Tgl Generate') }}</th>
                                             <th>{{ __('Kode Diklat') }}</th>
                                             <th>{{ __('Nama Diklat') }}</th>
                                             <th>{{ __('Jenis Diklat') }}</th>
-                                            <th>{{ __('Tgl Generate') }}</th>
                                             <th class="text-center">{{ __('Responden') }}</th>
                                             <th class="text-center">{{ __('Bobot') }}</th>
                                             <th class="text-center">{{ __('Pesan WA') }}</th>
@@ -119,6 +119,7 @@
                 });
             @endif
             var dataTable;
+
             function loadDataTable() {
                 var evaluator = $('#filter_evaluator').val();
                 var diklatType = $('#filter_diklat_type').val();
@@ -148,6 +149,10 @@
                         {
                             data: 'user',
                             name: 'user',
+                        },
+                        {
+                            data: 'created_at',
+                            name: 'created_at',
                         },
                         {
                             data: 'kaldikID',

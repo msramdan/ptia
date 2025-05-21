@@ -54,10 +54,10 @@
                                         <tr>
                                             <th>No</th>
                                             <th>{{ __('Evaluator') }}</th>
+                                            <th>{{ __('Tgl Generate') }}</th>
                                             <th>{{ __('Kode Diklat') }}</th>
                                             <th>{{ __('Nama Diklat') }}</th>
                                             <th>{{ __('Jenis Diklat') }}</th>
-                                            <th>{{ __('Tgl Generate') }}</th>
                                             <th class="text-center">{{ __('Keterisian Alumni') }}</th>
                                             <th class="text-center">{{ __('Data Alumni') }}</th>
                                             <th class="text-center">{{ __('Keterisian Atasan') }}</th>
@@ -132,6 +132,10 @@
                             name: 'users.name'
                         },
                         {
+                            data: 'created_at',
+                            name: 'project.created_at'
+                        },
+                        {
                             data: 'kaldikID',
                             name: 'project.kaldikID'
                         },
@@ -142,10 +146,6 @@
                         {
                             data: 'nama_diklat_type',
                             name: 'diklat_type.nama_diklat_type'
-                        },
-                        {
-                            data: 'created_at',
-                            name: 'project.created_at'
                         },
                         {
                             data: 'keterisian_alumni',

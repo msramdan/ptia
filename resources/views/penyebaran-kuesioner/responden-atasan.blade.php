@@ -8,16 +8,21 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="editTeleponLabel">Update No.Telepon - <span id="namaResponden"></span></h5>
+                    <h5 class="modal-title" id="editTeleponLabel">Update Data - <span id="namaResponden"></span></h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <input type="hidden" id="responden_id">
                     <div class="mb-3">
-                        <label for="telepon" class="form-label">No.Telepon</label>
+                        <label for="nama_atasan" class="form-label">Nama Atasan Langsung</label>
+                        <input type="text" class="form-control" id="nama_atasan" autocomplete="off">
+                    </div>
+                    <div class="mb-3">
+                        <label for="telepon" class="form-label">No. Telepon</label>
                         <input type="hidden" class="form-control" id="remark" value="Atasan" autocomplete="off">
                         <input type="text" class="form-control" id="telepon" autocomplete="off">
                     </div>
+
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
@@ -26,6 +31,7 @@
             </div>
         </div>
     </div>
+
 
     {{-- Modal update deadline --}}
     <div class="modal fade" id="editDeadlineModal" tabindex="-1" aria-labelledby="editDeadlineLabel" aria-hidden="true">
@@ -472,6 +478,7 @@
 
             $("#responden_id").val(id);
             $("#telepon").val(telepon);
+            $("#nama_atasan").val(nama);
             $("#namaResponden").text(nama);
             $("#editTeleponModal").modal("show");
         });
@@ -480,6 +487,7 @@
         $("#saveTeleponBtn").on("click", function() {
             let id = $("#responden_id").val();
             let telepon = $("#telepon").val();
+            let nama_atasan = $("#nama_atasan").val();
             let remark = $("#remark").val();
 
             $.ajax({
@@ -489,6 +497,7 @@
                     _token: "{{ csrf_token() }}",
                     id: id,
                     telepon: telepon,
+                    nama_atasan: nama_atasan,
                     remark: remark,
                 },
                 success: function(response) {
@@ -501,8 +510,7 @@
                             showConfirmButton: false
                         }).then(() => {
                             $("#editTeleponModal").modal("hide");
-                            $("#data-table").DataTable().ajax.reload(null,
-                                false); // 🔄 Refresh DataTables tanpa reload halaman
+                            $("#data-table").DataTable().ajax.reload(null, false);
                         });
                     } else {
                         Swal.fire({
