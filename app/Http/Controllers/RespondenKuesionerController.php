@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Validation\ValidationException;
+use Carbon\Carbon;
 
 class RespondenKuesionerController extends Controller
 {
@@ -100,7 +101,8 @@ class RespondenKuesionerController extends Controller
             $deadline = $target === 'Alumni' ? $responden->deadline_pengisian_alumni : $responden->deadline_pengisian_atasan;
 
             // Cek apakah sudah lewat deadline
-            $isExpired = $deadline && now()->gt($deadline);
+            $isExpired = $deadline && now()->startOfDay()->gt(\Carbon\Carbon::parse($deadline)->endOfDay());
+
 
             // Cek apakah kuesioner sudah diisi
             $statusPengisian = ($target === 'Alumni') ?
