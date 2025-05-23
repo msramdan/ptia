@@ -55,8 +55,8 @@
                                             <th>No</th>
                                             <th>{{ __('Evaluator') }}</th>
                                             <th>{{ __('Tgl Generate') }}</th>
-                                            <th>{{ __('Kode Project') }}</th>
-                                            <th>{{ __('Nama Project') }}</th>
+                                            <th>{{ __('Kode Diklat') }}</th>
+                                            <th>{{ __('Nama Diklat') }}</th>
                                             <th>{{ __('Jenis Diklat') }}</th>
                                             <th>{{ __('Skor Level 3') }}</th>
                                             <th>{{ __('Kriteria Dampak Level 3') }}</th>
@@ -136,8 +136,8 @@
                             name: 'created_at'
                         },
                         {
-                            data: 'kode_project',
-                            name: 'project.kode_project'
+                            data: 'kaldikID',
+                            name: 'project.kaldikID'
                         },
                         {
                             data: 'nama_project',
