@@ -64,6 +64,7 @@
                                             <th>No</th>
                                             <th>{{ __('Evaluator') }}</th>
                                             <th>{{ __('Tgl Generate') }}</th>
+                                            <th>{{ __('Tgl Selesai Diklat') }}</th>
                                             <th>{{ __('Kode Diklat') }}</th>
                                             <th>{{ __('Nama Diklat') }}</th>
                                             <th>{{ __('Jenis Diklat') }}</th>
@@ -153,6 +154,10 @@
                         {
                             data: 'created_at',
                             name: 'created_at',
+                        },
+                        {
+                            data: 'tanggal_selesai',
+                            name: 'project.tanggal_selesai',
                         },
                         {
                             data: 'kaldikID',

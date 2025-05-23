@@ -208,12 +208,25 @@
                                     kaldikDesc: item.kaldikDesc,
                                     biayaName: item.biayaName,
                                     diklatTypeName: item.diklatTypeName,
+                                    startDate: item.startDate,
+                                    endDate: item.endDate,
                                     dateRange: formatDuration(item.endDate),
                                     statusGenerate: `<button class="btn ${statusGenerateClass} btn-sm">${statusGenerateText}</button>`,
                                     actions: `<td class="text-center">
-                                        <a href="javascript:" onclick="generateProject(${item.kaldikID},'${item.diklatTypeName}', '${item.kaldikDesc.replace(/'/g, "\\'")}')" data-bs-toggle="tooltip" data-bs-placement="top" title="Generate Project" class="btn btn-sm btn-icon btn-success mr-1">
-                                            <i class="fas fa-cogs"></i>
-                                        </a>
+                                    <a href="javascript:"
+                                    onclick="generateProject(
+                                        ${item.kaldikID},
+                                        '${item.diklatTypeName}',
+                                        '${item.kaldikDesc.replace(/'/g, "\\'")}',
+                                        '${item.startDate}',
+                                        '${item.endDate}'
+                                    )"
+                                    data-bs-toggle="tooltip"
+                                    data-bs-placement="top"
+                                    title="Generate Project"
+                                    class="btn btn-sm btn-icon btn-success mr-1">
+                                        <i class="fas fa-cogs"></i>
+                                    </a>
                                         <a href="javascript:" onclick="modalDetail(${item.kaldikID})" data-bs-toggle="tooltip" data-bs-placement="top" title="Lihat Data Diklat" class="btn btn-sm btn-icon btn-primary mr-1">
                                             <i class="fas fa-info-circle"></i>
                                         </a>
@@ -282,7 +295,7 @@
             loadDataTablePembuatanProject();
         });
 
-        function generateProject(kaldikID, diklatTypeName, kaldikDesc) {
+        function generateProject(kaldikID, diklatTypeName, kaldikDesc, startDate, endDate) {
             Swal.fire({
                 title: "Konfirmasi",
                 text: "Apakah Anda yakin ingin membuat project untuk Diklat ini?",
@@ -317,7 +330,9 @@
                         data: {
                             kaldikID: kaldikID,
                             diklatTypeName: diklatTypeName,
-                            kaldikDesc: kaldikDesc
+                            kaldikDesc: kaldikDesc,
+                            startDate: startDate,
+                            endDate: endDate
                         },
                         headers: {
                             'X-CSRF-TOKEN': "{{ csrf_token() }}"

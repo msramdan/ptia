@@ -36,6 +36,7 @@ class HasilEvaluasiController extends Controller implements HasMiddleware
                     'project.kaldikDesc',
                     'project.diklat_type_id',
                     'project.created_at',
+                    'project.tanggal_selesai',
                     'diklat_type.nama_diklat_type',
                     'users.name as user_name',
                     'users.avatar as user_avatar',

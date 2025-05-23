@@ -42,6 +42,7 @@ class DataSekunderController extends Controller implements HasMiddleware
                     'project.kaldikID',
                     'project.kaldikDesc',
                     'project.created_at',
+                    'project.tanggal_selesai',
                     'users.name as user_name',
                     'users.email',
                     'users.avatar',

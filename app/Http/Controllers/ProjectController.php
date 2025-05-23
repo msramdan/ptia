@@ -150,6 +150,8 @@ class ProjectController extends Controller implements HasMiddleware
             'kaldikID'          => 'required|numeric',
             'diklatTypeName'   => 'required|string',
             'kaldikDesc' => 'required|string',
+            'startDate' => 'required',
+            'endDate' => 'required',
         ]);
         DB::beginTransaction();
         try {
@@ -175,6 +177,8 @@ class ProjectController extends Controller implements HasMiddleware
                 'diklatTypeName'    => $data['diklatTypeName'],
                 'kaldikDesc'        => $data['kaldikDesc'],
                 'user_id'           => null,
+                'tanggal_mulai'     => $data['startDate'],
+                'tanggal_selesai'   => $data['endDate'],
                 'created_at'        => now(),
                 'updated_at'        => now(),
             ]);
