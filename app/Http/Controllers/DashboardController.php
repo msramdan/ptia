@@ -39,7 +39,7 @@ class DashboardController extends Controller
                     DB::raw('COALESCE(avg_scores.final_avg_skor_level_4, 0) AS avg_skor_level_4'),
                     DB::raw("COALESCE(indikator_3.kriteria_dampak, '-') AS kriteria_dampak_level_3"),
                     DB::raw("COALESCE(indikator_4.kriteria_dampak, '-') AS kriteria_dampak_level_4"),
-                    'project.created_at'
+                    'project.tanggal_selesai'
                 )
                 ->leftJoinSub(
                     DB::table('project_skor_responden')
@@ -102,7 +102,7 @@ class DashboardController extends Controller
                     ');
                 })
                 ->where('project.status', 'Pelaksanaan')
-                ->whereYear('project.created_at', $tahun);
+                ->whereYear('project.tanggal_selesai', $tahun);
 
             // Filter Triwulan
             if ($selectedTriwulan && $selectedTriwulan != 'all') {
@@ -123,7 +123,7 @@ class DashboardController extends Controller
                         $endDate = Carbon::createFromDate($tahun, 12, 1)->endOfMonth()->endOfDay();
                         break;
                 }
-                $projectsQuery->whereBetween('project.created_at', [$startDate, $endDate]);
+                $projectsQuery->whereBetween('project.tanggal_selesai', [$startDate, $endDate]);
             }
 
             $projects = $projectsQuery->orderByDesc('project.id');
@@ -157,7 +157,7 @@ class DashboardController extends Controller
 
         $statsQuery = DB::table('project')
             ->where('status', 'Pelaksanaan')
-            ->whereYear('created_at', $tahun);
+            ->whereYear('tanggal_selesai', $tahun);
 
         if ($selectedTriwulan && $selectedTriwulan != 'all') {
             $startDate = Carbon::createFromDate($tahun, 1, 1)->startOfDay();
@@ -176,14 +176,14 @@ class DashboardController extends Controller
                     $endDate = Carbon::createFromDate($tahun, 12, 1)->endOfMonth()->endOfDay();
                     break;
             }
-            $statsQuery->whereBetween('project.created_at', [$startDate, $endDate]);
+            $statsQuery->whereBetween('project.tanggal_selesai', [$startDate, $endDate]);
         }
         $jumlahProject = $statsQuery->count();
 
         $respondenQuery = DB::table('project_responden')
             ->join('project', 'project_responden.project_id', '=', 'project.id')
             ->where('project.status', 'Pelaksanaan')
-            ->whereYear('project.created_at', $tahun);
+            ->whereYear('project.tanggal_selesai', $tahun);
         if ($selectedTriwulan && $selectedTriwulan != 'all') {
             $startDate = Carbon::createFromDate($tahun, 1, 1)->startOfDay();
             $endDate = Carbon::createFromDate($tahun, 12, 31)->endOfDay();
@@ -201,14 +201,14 @@ class DashboardController extends Controller
                     $endDate = Carbon::createFromDate($tahun, 12, 1)->endOfMonth()->endOfDay();
                     break;
             }
-            $respondenQuery->whereBetween('project.created_at', [$startDate, $endDate]);
+            $respondenQuery->whereBetween('project.tanggal_selesai', [$startDate, $endDate]);
         }
         $jumlahResponden = $respondenQuery->count();
 
         $sudahAlumniQuery = DB::table('project_responden')
             ->join('project', 'project_responden.project_id', '=', 'project.id')
             ->where('project.status', 'Pelaksanaan')
-            ->whereYear('project.created_at', $tahun)
+            ->whereYear('project.tanggal_selesai', $tahun)
             ->where('project_responden.status_pengisian_kuesioner_alumni', 'sudah');
         if ($selectedTriwulan && $selectedTriwulan != 'all') {
             $startDate = Carbon::createFromDate($tahun, 1, 1)->startOfDay();
@@ -227,7 +227,7 @@ class DashboardController extends Controller
                     $endDate = Carbon::createFromDate($tahun, 12, 1)->endOfMonth()->endOfDay();
                     break;
             }
-            $sudahAlumniQuery->whereBetween('project.created_at', [$startDate, $endDate]);
+            $sudahAlumniQuery->whereBetween('project.tanggal_selesai', [$startDate, $endDate]);
         }
         $sudahAlumni = $sudahAlumniQuery->count();
         $persentaseSudah = $jumlahResponden > 0 ? round(($sudahAlumni / $jumlahResponden) * 100, 2) : 0;
@@ -235,7 +235,7 @@ class DashboardController extends Controller
         $totalAtasanQuery = DB::table('project_responden')
             ->join('project', 'project_responden.project_id', '=', 'project.id')
             ->where('project.status', 'Pelaksanaan')
-            ->whereYear('project.created_at', $tahun)
+            ->whereYear('project.tanggal_selesai', $tahun)
             ->whereNotNull('project_responden.nama_atasan');
         if ($selectedTriwulan && $selectedTriwulan != 'all') {
             $startDate = Carbon::createFromDate($tahun, 1, 1)->startOfDay();
@@ -254,14 +254,14 @@ class DashboardController extends Controller
                     $endDate = Carbon::createFromDate($tahun, 12, 1)->endOfMonth()->endOfDay();
                     break;
             }
-            $totalAtasanQuery->whereBetween('project.created_at', [$startDate, $endDate]);
+            $totalAtasanQuery->whereBetween('project.tanggal_selesai', [$startDate, $endDate]);
         }
         $totalAtasan = $totalAtasanQuery->count();
 
         $sudahAtasanQuery = DB::table('project_responden')
             ->join('project', 'project_responden.project_id', '=', 'project.id')
             ->where('project.status', 'Pelaksanaan')
-            ->whereYear('project.created_at', $tahun)
+            ->whereYear('project.tanggal_selesai', $tahun)
             ->whereNotNull('project_responden.nama_atasan')
             ->where('project_responden.status_pengisian_kuesioner_atasan', 'sudah');
 
@@ -282,7 +282,7 @@ class DashboardController extends Controller
                     $endDate = Carbon::createFromDate($tahun, 12, 1)->endOfMonth()->endOfDay();
                     break;
             }
-            $sudahAtasanQuery->whereBetween('project.created_at', [$startDate, $endDate]);
+            $sudahAtasanQuery->whereBetween('project.tanggal_selesai', [$startDate, $endDate]);
         }
         $sudahAtasan = $sudahAtasanQuery->count();
         $persentaseSudahAtasan = $totalAtasan > 0 ? round(($sudahAtasan / $sudahAlumni) * 100, 2) : 0;
