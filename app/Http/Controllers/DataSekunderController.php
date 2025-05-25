@@ -58,6 +58,15 @@ class DataSekunderController extends Controller implements HasMiddleware
                 ->when(request('diklat_type'), function ($query, $diklatType) {
                     $query->where('project.diklat_type_id', $diklatType);
                 })
+                ->when(request('status_data_sekunder'), function ($query, $status) {
+                    if ($status === 'Meningkat') {
+                        $query->whereRaw('project_data_sekunder.nilai_kinerja_akhir > project_data_sekunder.nilai_kinerja_awal');
+                    } elseif ($status === 'Tetap') {
+                        $query->whereRaw('project_data_sekunder.nilai_kinerja_akhir = project_data_sekunder.nilai_kinerja_awal');
+                    } elseif ($status === 'Menurun') {
+                        $query->whereRaw('project_data_sekunder.nilai_kinerja_akhir < project_data_sekunder.nilai_kinerja_awal');
+                    }
+                })
                 ->orderBy('project.id', 'desc');
 
             return DataTables::of($projects)

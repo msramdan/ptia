@@ -52,7 +52,6 @@
         </div>
     </div>
 
-    <!-- Modal Log Pengiriman -->
     <div class="modal fade" id="logWaModal" tabindex="-1" aria-labelledby="logWaModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
@@ -126,13 +125,11 @@
                         <div class="card-body">
                             <h5>Daftar Responden Alumni</h5>
 
-                            <!-- Button untuk Update Deadline -->
                             <button id="update-deadline-btn" class="btn mb-3"
                                 style="background-color: #C0C0C0; color: black; border-color: #C0C0C0;" disabled>
                                 <i class="fas fa-calendar-alt"></i> Update Deadline
                             </button>
 
-                            <!-- Modal Bootstrap 5 -->
                             <div class="modal fade" id="updateDeadlineModal" tabindex="-1"
                                 aria-labelledby="updateDeadlineModalLabel" aria-hidden="true">
                                 <div class="modal-dialog">
@@ -162,7 +159,6 @@
                                 </div>
                             </div>
 
-                            <!-- Tabel -->
                             <div class="table-responsive p-1">
                                 <table class="table table-striped" id="data-table" width="100%">
                                     <thead>
@@ -176,6 +172,7 @@
                                             <th>{{ __('Unit') }}</th>
                                             <th>{{ __('Nilai Pre Test') }}</th>
                                             <th>{{ __('Nilai Post Post') }}</th>
+                                            <th>{{ __('Notif Aktif?') }}</th> {{-- Kolom baru --}}
                                             <th>{{ __('Deadline') }}</th>
                                             <th>{{ __('Aksi') }}</th>
                                         </tr>
@@ -200,6 +197,12 @@
         crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs5/dt-1.12.0/datatables.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    <style>
+        .form-switch .form-check-input {
+            width: 3em;
+            height: 1.5em;
+        }
+    </style>
 @endpush
 
 @push('js')
@@ -295,6 +298,13 @@
                     {
                         data: 'nilai_post_test',
                         name: 'nilai_post_test'
+                    },
+                    { // Kolom baru untuk switch notifikasi
+                        data: 'send_notif_alumni_switch',
+                        name: 'send_notif_alumni',
+                        orderable: false,
+                        searchable: false,
+                        className: 'text-center'
                     },
                     {
                         data: 'deadline_pengisian_alumni',
@@ -453,7 +463,7 @@
                                 $('#updateDeadlineModal').modal(
                                     'hide'); // Sembunyikan modal
                                 $('#deadline-date').val(''); // Reset input tanggal
-                                table.draw(false); // Refresh tabel
+                                table.ajax.reload(null, false); // Refresh tabel
                             });
                         } else {
                             // Jika gagal, tampilkan SweetAlert error
@@ -472,6 +482,41 @@
                             text: 'Terjadi kesalahan. Silakan coba lagi.',
                         });
                     }
+                });
+            });
+
+            // Handle switch toggle notifikasi responden
+            $('#data-table tbody').on('change', '.toggle-notif-responden', function() {
+                let id = $(this).data('id');
+                let remark = $(this).data('remark');
+                let status = $(this).is(':checked') ? 'Yes' : 'No';
+
+                $.ajax({
+                    url: "{{ route('penyebaran-kuesioner.update.send-notif-responden') }}",
+                    method: 'POST',
+                    data: {
+                        id: id,
+                        remark: remark,
+                        status: status,
+                        _token: "{{ csrf_token() }}"
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            toastr.success(response.message, 'Success');
+                        } else {
+                            toastr.error(response.message, 'Error');
+                            // Kembalikan switch ke posisi semula jika gagal
+                            $(this).prop('checked', !$(this).is(':checked'));
+                        }
+                        $('#data-table').DataTable().ajax.reload(null,
+                        false); // Refresh tabel tanpa reset pagination
+                    }.bind(this), // Bind 'this' agar tetap merujuk ke elemen switch
+                    error: function(xhr) {
+                        toastr.error('Error updating status notifikasi.', 'Error');
+                        // Kembalikan switch ke posisi semula jika gagal
+                        $(this).prop('checked', !$(this).is(':checked'));
+                        $('#data-table').DataTable().ajax.reload(null, false);
+                    }.bind(this) // Bind 'this'
                 });
             });
         });

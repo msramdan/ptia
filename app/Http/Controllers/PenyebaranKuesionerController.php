@@ -27,6 +27,8 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
         return [
             'auth',
             new Middleware('permission:penyebaran kuesioner view', only: ['index']),
+            // Tambahkan permission jika diperlukan untuk update status notifikasi
+            // new Middleware('permission:penyebaran kuesioner edit', only: ['updateSendNotifResponden']),
         ];
     }
 
@@ -43,6 +45,9 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
                     'project.kaldikDesc',
                     'project.created_at',
                     'project.tanggal_selesai',
+                    // Ambil field baru dari tabel project
+                    'project.send_notif_project_alumni',
+                    'project.send_notif_project_atasan',
                     'users.name as user_name',
                     'users.email',
                     'users.avatar',
@@ -59,11 +64,25 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
                 ->when(request('diklat_type'), function ($query, $diklatType) {
                     $query->where('project.diklat_type_id', $diklatType);
                 })
-                ->groupBy('project.id', 'users.name', 'users.email', 'users.avatar')
+                ->groupBy('project.id', 'users.name', 'users.email', 'users.avatar', 'project.send_notif_project_alumni', 'project.send_notif_project_atasan') // Tambahkan field baru ke groupBy
                 ->orderBy('project.id', 'desc');
 
             return DataTables::of($projects)
                 ->addIndexColumn()
+                ->addColumn('send_notif_project_alumni_switch', function ($row) {
+                    $checked = $row->send_notif_project_alumni === 'Yes' ? 'checked' : '';
+                    $disabled = false; // Ganti dengan logika permission jika ada
+                    return '<div class="form-check form-switch d-flex justify-content-center">
+                                <input class="form-check-input toggle-notif-project-alumni" type="checkbox" data-id="' . $row->id . '" ' . $checked . ' ' . ($disabled ? 'disabled' : '') . '>
+                            </div>';
+                })
+                ->addColumn('send_notif_project_atasan_switch', function ($row) {
+                    $checked = $row->send_notif_project_atasan === 'Yes' ? 'checked' : '';
+                    $disabled = false; // Ganti dengan logika permission jika ada
+                    return '<div class="form-check form-switch d-flex justify-content-center">
+                                <input class="form-check-input toggle-notif-project-atasan" type="checkbox" data-id="' . $row->id . '" ' . $checked . ' ' . ($disabled ? 'disabled' : '') . '>
+                            </div>';
+                })
                 ->addColumn('responden_alumni', function ($row) {
                     $showAlumni = route('penyebaran-kuesioner.responden-alumni.show', ['id' => $row->id]);
                     return '
@@ -112,7 +131,7 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
                     </div>';
                 })
                 ->addColumn('action', 'penyebaran-kuesioner.include.action')
-                ->rawColumns(['action', 'responden_alumni', 'responden_atasan', 'keterisian_alumni', 'keterisian_atasan', 'user'])
+                ->rawColumns(['action', 'send_notif_project_alumni_switch', 'send_notif_project_atasan_switch', 'responden_alumni', 'responden_atasan', 'keterisian_alumni', 'keterisian_atasan', 'user'])
                 ->toJson();
         }
 
@@ -157,12 +176,20 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
                             ->on('pr.telepon', '=', 'log_wa.telepon');
                     }
                 )
-                ->select('pr.*', 'log_wa.status as wa_status')
+                ->select('pr.*', 'log_wa.status as wa_status') // Ambil field send_notif_alumni
                 ->get();
 
 
             return DataTables::of($respondens)
                 ->addIndexColumn()
+                ->addColumn('send_notif_alumni_switch', function ($row) {
+                    $checked = $row->send_notif_alumni === 'Yes' ? 'checked' : '';
+                    // Sesuaikan dengan logika permission jika ada
+                    $disabled = false; // Contoh: auth()->user()->can('edit responden notif status') ? '' : 'disabled';
+                    return '<div class="form-check form-switch d-flex justify-content-center">
+                                <input class="form-check-input toggle-notif-responden" type="checkbox" data-id="' . $row->id . '" data-remark="Alumni" ' . $checked . ' ' . ($disabled ? 'disabled' : '') . '>
+                            </div>';
+                })
                 ->addColumn('telepon', function ($row) {
                     $telepon = $row->telepon ?? '-';
                     $badgeStyle = 'display: inline-block; width: 100px; text-align: center;';
@@ -185,7 +212,7 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
                 })
 
                 ->addColumn('action', 'penyebaran-kuesioner.include.action-responden-alumni')
-                ->rawColumns(['telepon', 'action'])
+                ->rawColumns(['telepon', 'action', 'send_notif_alumni_switch'])
                 ->toJson();
         }
 
@@ -228,12 +255,19 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
                             ->on('pr.telepon_atasan', '=', 'log_wa.telepon');
                     }
                 )
-                ->select('pr.*', 'log_wa.status as wa_status')
+                ->select('pr.*', 'log_wa.status as wa_status') // Ambil field send_notif_atasan
                 ->get();
 
 
             return DataTables::of($respondens)
                 ->addIndexColumn()
+                ->addColumn('send_notif_atasan_switch', function ($row) {
+                    $checked = $row->send_notif_atasan === 'Yes' ? 'checked' : '';
+                    $disabled = false; // Sesuaikan dengan logika permission
+                    return '<div class="form-check form-switch d-flex justify-content-center">
+                                <input class="form-check-input toggle-notif-responden" type="checkbox" data-id="' . $row->id . '" data-remark="Atasan" ' . $checked . ' ' . ($disabled ? 'disabled' : '') . '>
+                            </div>';
+                })
                 ->addColumn('telepon_atasan', function ($row) {
                     $telepon_atasan = $row->telepon_atasan ?? '-';
                     $badgeStyle = 'display: inline-block; width: 100px; text-align: center;';
@@ -256,7 +290,7 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
                 })
 
                 ->addColumn('action', 'penyebaran-kuesioner.include.action-responden-atasan')
-                ->rawColumns(['telepon_atasan', 'action'])
+                ->rawColumns(['telepon_atasan', 'action', 'send_notif_atasan_switch'])
                 ->toJson();
         }
 
@@ -278,6 +312,33 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
 
         return view('penyebaran-kuesioner.responden-atasan', compact('project', 'kriteriaResponden'));
     }
+
+    public function updateSendNotifResponden(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'id' => 'required|exists:project_responden,id',
+            'remark' => 'required|in:Alumni,Atasan',
+            'status' => 'required|in:Yes,No',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['success' => false, 'message' => 'Validasi gagal.', 'errors' => $validator->errors()], 422);
+        }
+
+        try {
+            $fieldToUpdate = $request->remark === 'Alumni' ? 'send_notif_alumni' : 'send_notif_atasan';
+
+            DB::table('project_responden')
+                ->where('id', $request->id)
+                ->update([$fieldToUpdate => $request->status]);
+
+            return response()->json(['success' => true, 'message' => 'Status notifikasi berhasil diperbarui.']);
+        } catch (\Exception $e) {
+            Log::error('Error updating send_notif_responden: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Gagal memperbarui status notifikasi.'], 500);
+        }
+    }
+
 
     public function updateTelepon(Request $request)
     {
@@ -415,6 +476,7 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
                 ->select(
                     'project_responden.*',
                     'project_pesan_wa.text_pesan_alumni',
+                    'project_pesan_wa.text_pesan_atasan', // Tambahkan ini
                     'project.status',
                     'project.kaldikID',
                     'project.kaldikDesc'
@@ -427,6 +489,31 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
                     'message' => 'Data responden tidak ditemukan!',
                 ], 404);
             }
+
+            // --- Cek status notifikasi project ---
+            $projectDetails = DB::table('project')
+                ->select('send_notif_project_alumni', 'send_notif_project_atasan')
+                ->where('id', $notifikasi->project_id)
+                ->first();
+
+            if ($request->remark === 'Alumni' && $projectDetails->send_notif_project_alumni === 'No') {
+                return response()->json(['success' => false, 'message' => 'Pengiriman notifikasi WA untuk Alumni pada project ini dinonaktifkan.']);
+            }
+            if ($request->remark === 'Atasan' && $projectDetails->send_notif_project_atasan === 'No') {
+                return response()->json(['success' => false, 'message' => 'Pengiriman notifikasi WA untuk Atasan pada project ini dinonaktifkan.']);
+            }
+            // --- End Cek status notifikasi project ---
+
+
+            // --- Cek status notifikasi per responden ---
+            if ($request->remark === 'Alumni' && $notifikasi->send_notif_alumni === 'No') {
+                return response()->json(['success' => false, 'message' => 'Pengiriman notifikasi WA untuk alumni ini telah dinonaktifkan.']);
+            }
+            if ($request->remark === 'Atasan' && $notifikasi->send_notif_atasan === 'No') {
+                return response()->json(['success' => false, 'message' => 'Pengiriman notifikasi WA untuk atasan ini telah dinonaktifkan.']);
+            }
+            // --- End Cek status notifikasi per responden ---
+
 
             $telepon = $request->remark === 'Alumni' ? $notifikasi->telepon : $notifikasi->telepon_atasan;
             $try_send_wa = $request->remark === 'Alumni' ? $notifikasi->try_send_wa_alumni : $notifikasi->try_send_wa_atasan;
@@ -447,7 +534,7 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
             if ($status) {
                 $encryptedId = encryptShort($notifikasi->id);
                 $encryptedTarget = encryptShort($request->remark);
-                $url = URL::to(route('responden-kuesioner.index', ['id' => $encryptedId, 'target' => $encryptedTarget]));
+                $url = URL::to(route('responden-kuesioner.index', ['id' => $encryptedId, 'target' => $encryptedTarget, 'token' => $notifikasi->token]));
             }
 
             $message = generateMessage($notifikasi, $status, $url ?? null, $response['message'] ?? null, $request->remark);
@@ -468,16 +555,16 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
             $this->updateStatus($notifikasi->id, $try_send_wa, $request->remark);
             // Insert ke tabel log jika terjadi error
             DB::table('project_log_send_notif')->insert([
-                'telepon' => $telepon,
+                'telepon' => $telepon ?? null, // Pastikan $telepon terdefinisi
                 'remark' => $request->remark,
                 'status' => 'Gagal',
                 'log_pesan' => $e->getMessage(),
-                'project_responden_id' => $notifikasi->id,
+                'project_responden_id' => $notifikasi->id ?? null, // Pastikan $notifikasi terdefinisi
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
 
-            $errorMessage = generateMessage($notifikasi, false, null, $e->getMessage(), $request->remark);
+            $errorMessage = generateMessage($notifikasi ?? null, false, null, $e->getMessage(), $request->remark);
             Log::error($errorMessage);
             if (env('SEND_NOTIF_TELEGRAM', false)) {
                 sendNotifTelegram($errorMessage, $request->remark);
@@ -670,5 +757,31 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
         //     Log::error('Error generating PDF for project ID ' . $id . ': ' . $e->getMessage() . "\n" . $e->getTraceAsString());
         //     return redirect()->route('penyebaran-kuesioner.index')->with('error', 'Gagal membuat PDF: Terjadi kesalahan internal. Silakan cek log.');
         // }
+    }
+
+    public function updateSendNotifProject(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'project_id' => 'required|exists:project,id',
+            'type' => 'required|in:alumni,atasan',
+            'status' => 'required|in:Yes,No',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['success' => false, 'message' => 'Validasi gagal.', 'errors' => $validator->errors()], 422);
+        }
+
+        try {
+            $fieldToUpdate = $request->type === 'alumni' ? 'send_notif_project_alumni' : 'send_notif_project_atasan';
+
+            DB::table('project')
+                ->where('id', $request->project_id)
+                ->update([$fieldToUpdate => $request->status]);
+
+            return response()->json(['success' => true, 'message' => 'Status notifikasi project berhasil diperbarui.']);
+        } catch (\Exception $e) {
+            Log::error('Error updating send_notif_project: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Gagal memperbarui status notifikasi project.'], 500);
+        }
     }
 }
