@@ -72,7 +72,7 @@
             </div>
         </section>
     </div>
-        <!-- Modal Statis untuk Input Data Sekunder -->
+    <!-- Modal Statis untuk Input Data Sekunder -->
     <div class="modal fade" id="createModal" tabindex="-1" aria-labelledby="createModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg"> <!-- Ubah ke modal-lg untuk lebih lebar -->
             <div class="modal-content">
@@ -291,6 +291,40 @@
             });
 
             loadDataTable();
+        });
+
+        $(document).on('click', '.btn-action', function() {
+            var projectId = $(this).data('id');
+            $('#project_id').val(projectId);
+            $.ajax({
+                url: '/data-sekunder/get/' + projectId,
+                type: 'GET',
+                dataType: 'json',
+                success: function(response) {
+                    if (response.success) {
+                        $('#nilai_kinerja_awal').val(response.data.nilai_kinerja_awal);
+                        $('#periode_awal').val(response.data.periode_awal);
+                        $('#nilai_kinerja_akhir').val(response.data.nilai_kinerja_akhir);
+                        $('#periode_akhir').val(response.data.periode_akhir);
+                        $('#sumber_data').val(response.data.sumber_data);
+                        $('#unit_kerja').val(response.data.unit_kerja);
+                        $('#nama_pic').val(response.data.nama_pic);
+                        $('#telpon').val(response.data.telpon);
+                        $('#keterangan').val(response.data.keterangan);
+                        $('#satuan').val(response.data.satuan).change();
+                    } else {
+                        $('#nilai_kinerja_awal, #periode_awal, #nilai_kinerja_akhir, #periode_akhir, #sumber_data, #unit_kerja, #nama_pic, #telpon, #keterangan')
+                            .val('');
+                        $('#satuan').val('').change();
+                    }
+                    $('#createModal').modal('show');
+                }
+            });
+        });
+    </script>
+    <script>
+        $(document).ready(function() {
+            $('[data-bs-toggle="tooltip"]').tooltip();
         });
     </script>
 @endpush
