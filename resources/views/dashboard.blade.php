@@ -245,7 +245,6 @@
                     </div>
                 @endif
 
-                <!-- Modal Pengumuman -->
                 <div class="modal fade" id="announcementModal" tabindex="-1" aria-labelledby="announcementModalLabel"
                     aria-hidden="true" data-bs-backdrop="static">
                     <div class="modal-dialog">
@@ -329,7 +328,7 @@
                                     <div class="card-body">
                                         <i class="fas fa-folder-open fa-2x text-primary mb-2"></i>
                                         <h6 class="card-title">Total Project</h6>
-                                        <p class="card-text fw-bold">{{ $jumlahProject }}</p>
+                                        <p class="card-text fw-bold" id="totalProject">{{ $jumlahProject }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -338,7 +337,7 @@
                                     <div class="card-body">
                                         <i class="fas fa-users fa-2x text-success mb-2"></i>
                                         <h6 class="card-title">Total Responden</h6>
-                                        <p class="card-text fw-bold">{{ $jumlahResponden }}</p>
+                                        <p class="card-text fw-bold" id="totalResponden">{{ $jumlahResponden }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -347,7 +346,8 @@
                                     <div class="card-body">
                                         <i class="fas fa-user-graduate fa-2x text-warning mb-2"></i>
                                         <h6 class="card-title">Keterisian Alumni</h6>
-                                        <p class="card-text fw-bold">({{ $sudahAlumni }}) - {{ $persentaseSudah }} %</p>
+                                        <p class="card-text fw-bold" id="keterisianAlumni">({{ $sudahAlumni }}) -
+                                            {{ $persentaseSudah }} %</p>
                                     </div>
                                 </div>
                             </div>
@@ -356,8 +356,8 @@
                                     <div class="card-body">
                                         <i class="fas fa-user-tie fa-2x text-danger mb-2"></i>
                                         <h6 class="card-title">Keterisian Atasan</h6>
-                                        <p class="card-text fw-bold">({{ $sudahAtasan }}) - {{ $persentaseSudahAtasan }}
-                                            %</p>
+                                        <p class="card-text fw-bold" id="keterisianAtasan">({{ $sudahAtasan }}) -
+                                            {{ $persentaseSudahAtasan }} %</p>
                                     </div>
                                 </div>
                             </div>
@@ -431,10 +431,10 @@
                                             </tbody>
                                             <tfoot>
                                                 <tr>
-                                                    <th colspan="5" style="text-align:right"></th>
-                                                    <th class="text-center"></th>
+                                                    <th colspan="5" style="text-align:right">Rata-rata:</th>
+                                                    <th class="text-center" id="avg_skor_level_3_footer"></th>
                                                     <th></th>
-                                                    <th class="text-center"></th>
+                                                    <th class="text-center" id="avg_skor_level_4_footer"></th>
                                                     <th></th>
                                                 </tr>
                                             </tfoot>
@@ -473,15 +473,54 @@
         var chartLevel3, chartLevel4;
         var dataTable;
 
-        // Fungsi untuk memuat ulang DataTable dan Chart
+        function updateStatistik(data) {
+            $('#totalProject').text(data.jumlahProject);
+            $('#totalResponden').text(data.jumlahResponden);
+            $('#keterisianAlumni').text('(' + data.sudahAlumni + ') - ' + data.persentaseSudah + ' %');
+            $('#keterisianAtasan').text('(' + data.sudahAtasan + ') - ' + data.persentaseSudahAtasan + ' %');
+
+            if (data.summary) {
+                let avgLevel3 = parseFloat(data.summary.avg_skor_level_3) || 0;
+                let avgLevel4 = parseFloat(data.summary.avg_skor_level_4) || 0;
+
+                if (chartLevel3) {
+                    chartLevel3.series[0].points[0].update(avgLevel3);
+                    document.getElementById('current-value').textContent = avgLevel3.toFixed(2) + '%';
+                    $('#current-value').addClass('updated');
+                    setTimeout(() => $('#current-value').removeClass('updated'), 500);
+                }
+                if (chartLevel4) {
+                    chartLevel4.series[0].points[0].update(avgLevel4);
+                    document.getElementById('current-value-level4').textContent = avgLevel4.toFixed(2) + '%';
+                    $('#current-value-level4').addClass('updated');
+                    setTimeout(() => $('#current-value-level4').removeClass('updated'), 500);
+                }
+            }
+        }
+
+
         function reloadDataDashboard() {
             var selectedTahun = $('#filter_tahun').val();
-            var selectedTriwulan = $('#filter_triwulan').val(); // Ambil nilai triwulan
-            var newUrl = "{{ route('dashboard') }}?tahun=" + selectedTahun;
+            var selectedTriwulan = $('#filter_triwulan').val();
+            var ajaxUrl = "{{ route('dashboard') }}?tahun=" + selectedTahun;
 
-            if (selectedTriwulan && selectedTriwulan !== 'all') { // Tambahkan filter triwulan jika bukan 'all'
-                newUrl += "&triwulan=" + selectedTriwulan;
+            if (selectedTriwulan && selectedTriwulan !== 'all') {
+                ajaxUrl += "&triwulan=" + selectedTriwulan;
             }
+
+            // Load statistik via AJAX
+            $.ajax({
+                url: ajaxUrl, // Menggunakan URL yang sama tapi mengharapkan JSON untuk statistik
+                type: 'GET',
+                dataType: 'json', // Penting untuk memastikan respons di-parse sebagai JSON
+                success: function(data) {
+                    updateStatistik(data);
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error fetching stats: ", status, error);
+                }
+            });
+
 
             if ($.fn.DataTable.isDataTable('#data-table')) {
                 dataTable.destroy();
@@ -491,8 +530,11 @@
                 processing: true,
                 serverSide: true,
                 ajax: {
-                    url: newUrl,
-                    data: function(d) {}
+                    url: ajaxUrl, // URL yang sama, DataTables akan menambahkan parameter 'draw'
+                    type: "GET",
+                    data: function(d) {
+                        // Parameter tambahan untuk DataTables jika ada
+                    }
                 },
                 columns: [{
                         data: 'DT_RowIndex',
@@ -518,61 +560,68 @@
                     },
                     {
                         data: 'avg_skor_level_3',
-                        name: 'avg_skor_level_3'
+                        name: 'avg_skor_level_3',
+                        className: 'text-center'
                     },
                     {
                         data: 'kriteria_dampak_level_3',
-                        name: 'kriteria_dampak_level_3'
+                        name: 'kriteria_dampak_level_3',
+                        className: 'text-center'
                     },
                     {
                         data: 'avg_skor_level_4',
-                        name: 'avg_skor_level_4'
+                        name: 'avg_skor_level_4',
+                        className: 'text-center'
                     },
                     {
                         data: 'kriteria_dampak_level_4',
-                        name: 'kriteria_dampak_level_4'
+                        name: 'kriteria_dampak_level_4',
+                        className: 'text-center'
                     }
                 ],
                 footerCallback: function(row, data, start, end, display) {
                     var api = this.api();
-                    var summary = api.ajax.json().summary; // Ambil summary dari respons
+                    var summary = api.ajax.json().summary;
 
                     if (summary) {
                         var avgLevel3 = parseFloat(summary.avg_skor_level_3) || 0;
                         var avgLevel4 = parseFloat(summary.avg_skor_level_4) || 0;
 
-                        $(api.column(5).footer()).html('<strong>' + avgLevel3.toFixed(2) + '</strong>');
-                        $(api.column(7).footer()).html('<strong>' + avgLevel4.toFixed(2) + '</strong>');
+                        $('#avg_skor_level_3_footer').html('<strong>' + avgLevel3.toFixed(2) + '</strong>');
+                        $('#avg_skor_level_4_footer').html('<strong>' + avgLevel4.toFixed(2) + '</strong>');
 
-                        if (chartLevel3) {
+                        // Update chart dari data summary DataTables juga, agar konsisten
+                        if (chartLevel3 && chartLevel3.series && chartLevel3.series[0] && chartLevel3.series[0]
+                            .points && chartLevel3.series[0].points[0]) {
                             chartLevel3.series[0].points[0].update(avgLevel3);
                             document.getElementById('current-value').textContent = avgLevel3.toFixed(2) + '%';
                         }
-                        if (chartLevel4) {
+                        if (chartLevel4 && chartLevel4.series && chartLevel4.series[0] && chartLevel4.series[0]
+                            .points && chartLevel4.series[0].points[0]) {
                             chartLevel4.series[0].points[0].update(avgLevel4);
                             document.getElementById('current-value-level4').textContent = avgLevel4.toFixed(2) +
                                 '%';
                         }
                     } else {
-                        // Fallback jika summary tidak ada
-                        $(api.column(5).footer()).html('<strong>N/A</strong>');
-                        $(api.column(7).footer()).html('<strong>N/A</strong>');
-                        if (chartLevel3) {
+                        $('#avg_skor_level_3_footer').html('<strong>N/A</strong>');
+                        $('#avg_skor_level_4_footer').html('<strong>N/A</strong>');
+                        if (chartLevel3 && chartLevel3.series && chartLevel3.series[0] && chartLevel3.series[0]
+                            .points && chartLevel3.series[0].points[0]) {
                             chartLevel3.series[0].points[0].update(0);
                             document.getElementById('current-value').textContent = '0%';
                         }
-                        if (chartLevel4) {
+                        if (chartLevel4 && chartLevel4.series && chartLevel4.series[0] && chartLevel4.series[0]
+                            .points && chartLevel4.series[0].points[0]) {
                             chartLevel4.series[0].points[0].update(0);
                             document.getElementById('current-value-level4').textContent = '0%';
                         }
                     }
                 },
                 initComplete: function() {
-                    /* ... initComplete ... */
                     this.api().columns().every(function() {
                         var column = this;
                         if (column.index() === 5 || column.index() === 7) {
-                            $(column.footer()).html('<strong>Loading...</strong>');
+                            // $(column.footer()).html('<strong>Loading...</strong>'); // Dihapus karena sudah dihandle footerCallback
                         }
                     });
                 }
@@ -581,7 +630,6 @@
 
         document.addEventListener('DOMContentLoaded', function() {
             chartLevel3 = Highcharts.chart('container', {
-                /* ... konfigurasi chart ... */
                 chart: {
                     type: 'gauge',
                     plotBackgroundColor: null,
@@ -683,7 +731,6 @@
             });
 
             chartLevel4 = Highcharts.chart('container-level4', {
-                /* ... konfigurasi chart ... */
                 chart: {
                     type: 'gauge',
                     plotBackgroundColor: null,
@@ -784,21 +831,18 @@
                 }]
             });
 
-            // Event listener untuk perubahan filter tahun, unit kerja, dan triwulan
-            $('#filter_tahun, #filter_unit_kerja, #filter_triwulan').on('change', function() {
+            $('#filter_tahun, #filter_triwulan').on('change', function() {
                 var selectedTahun = $('#filter_tahun').val();
                 var selectedTriwulan = $('#filter_triwulan').val();
                 var newUrl = "{{ route('dashboard') }}?tahun=" + selectedTahun;
                 if (selectedTriwulan && selectedTriwulan !== 'all') {
                     newUrl += "&triwulan=" + selectedTriwulan;
                 }
-                window.history.pushState({
-                    path: newUrl
-                }, '', newUrl);
+                // Tidak perlu window.history.pushState karena reloadDataDashboard sudah menangani AJAX
                 reloadDataDashboard();
             });
 
-            reloadDataDashboard(); // Panggil saat halaman dimuat
+            reloadDataDashboard();
         });
     </script>
 @endpush
