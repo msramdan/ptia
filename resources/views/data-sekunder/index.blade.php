@@ -25,7 +25,7 @@
                     <div class="card">
                         <div class="card-body">
                             <div class="row mb-3">
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <label for="filter_evaluator" class="form-label">{{ __('Evaluator') }}</label>
                                     <select class="form-select" id="filter_evaluator">
                                         <option value="">{{ __('Semua Evaluator') }}</option>
@@ -36,7 +36,7 @@
                                         @endforeach
                                     </select>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <label for="filter_diklat_type" class="form-label">{{ __('Jenis Diklat') }}</label>
                                     <select class="form-select" id="filter_diklat_type">
                                         <option value="">{{ __('Semua Jenis Diklat') }}</option>
@@ -45,6 +45,22 @@
                                                 {{ request('diklat_type') == $type->id ? 'selected' : '' }}>
                                                 {{ $type->nama_diklat_type }}</option>
                                         @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="filter_status_data_sekunder"
+                                        class="form-label">{{ __('Status Data Sekunder') }}</label>
+                                    <select class="form-select" id="filter_status_data_sekunder">
+                                        <option value="">{{ __('Semua Status') }}</option>
+                                        <option value="Meningkat"
+                                            {{ request('status_data_sekunder') == 'Meningkat' ? 'selected' : '' }}>
+                                            {{ __('Meningkat') }}</option>
+                                        <option value="Tetap"
+                                            {{ request('status_data_sekunder') == 'Tetap' ? 'selected' : '' }}>
+                                            {{ __('Tetap') }}</option>
+                                        <option value="Menurun"
+                                            {{ request('status_data_sekunder') == 'Menurun' ? 'selected' : '' }}>
+                                            {{ __('Menurun') }}</option>
                                     </select>
                                 </div>
                             </div>
@@ -72,9 +88,8 @@
             </div>
         </section>
     </div>
-    <!-- Modal Statis untuk Input Data Sekunder -->
     <div class="modal fade" id="createModal" tabindex="-1" aria-labelledby="createModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg"> <!-- Ubah ke modal-lg untuk lebih lebar -->
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <form action="{{ route('data-sekunder.store') }}" method="POST" enctype="multipart/form-data">
                     @csrf
@@ -109,7 +124,8 @@
                                 <input type="text" class="form-control" id="periode_akhir" name="periode_akhir" required>
                             </div>
                             <div class="col-md-4 mb-3">
-                                <label for="satuan" class="form-label">Satuan <span class="text-danger">*</span></label>
+                                <label for="satuan" class="form-label">Satuan <span
+                                        class="text-danger">*</span></label>
                                 <select class="form-control" id="satuan" name="satuan" required>
                                     <option value="Persentase (%)">Persentase (%)</option>
                                     <option value="Skor">Skor</option>
@@ -201,6 +217,7 @@
             function loadDataTable() {
                 var evaluator = $('#filter_evaluator').val();
                 var diklatType = $('#filter_diklat_type').val();
+                var statusDataSekunder = $('#filter_status_data_sekunder').val(); // Ambil nilai filter status
 
                 if ($.fn.DataTable.isDataTable('#data-table')) {
                     dataTable.destroy();
@@ -216,6 +233,7 @@
                         data: function(d) {
                             d.evaluator = evaluator;
                             d.diklat_type = diklatType;
+                            d.status_data_sekunder = statusDataSekunder; // Kirim parameter status
                         }
                     },
                     columns: [{
@@ -276,17 +294,20 @@
             function updateUrl() {
                 var evaluator = $('#filter_evaluator').val();
                 var diklatType = $('#filter_diklat_type').val();
+                var statusDataSekunder = $('#filter_status_data_sekunder').val();
 
                 var params = new URLSearchParams();
                 if (evaluator) params.append('evaluator', evaluator);
                 if (diklatType) params.append('diklat_type', diklatType);
+                if (statusDataSekunder) params.append('status_data_sekunder', statusDataSekunder);
+
 
                 var newUrl = window.location.pathname + (params.toString() ? '?' + params.toString() : '');
                 history.pushState(null, '', newUrl);
                 loadDataTable();
             }
 
-            $('#filter_evaluator, #filter_diklat_type').on('change', function() {
+            $('#filter_evaluator, #filter_diklat_type, #filter_status_data_sekunder').on('change', function() {
                 updateUrl();
             });
 

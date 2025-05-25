@@ -109,6 +109,12 @@ Route::middleware(['auth', 'web'])->group(function () {
         // Export-pdf
         Route::get('/{id}/export-penyebaran-kuesioner-pdf', 'exportPenyebaranKuesionerPdf')
             ->name('penyebaran-kuesioner.export-pdf');
+
+        // BARU: Route untuk update status notifikasi responden
+        Route::post('/responden/update-send-notif', 'updateSendNotifResponden')->name('penyebaran-kuesioner.update.send-notif-responden');
+
+        // BARU: Route untuk update status notifikasi project
+        Route::post('/project/update-send-notif', 'updateSendNotifProject')->name('penyebaran-kuesioner.update.send-notif-project');
     });
 
 

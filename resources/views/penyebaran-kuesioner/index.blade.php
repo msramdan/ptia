@@ -59,8 +59,12 @@
                                             <th>{{ __('Kode Diklat') }}</th>
                                             <th>{{ __('Nama Diklat') }}</th>
                                             <th>{{ __('Jenis Diklat') }}</th>
+                                            <th class="text-center" style="min-width: 100px;">
+                                                {{ __('Notif Alumni (Project)') }}</th>
                                             <th class="text-center">{{ __('Responden Alumni') }}</th>
                                             <th class="text-center">{{ __('Keterisian Alumni') }}</th>
+                                            <th class="text-center" style="min-width: 100px;">
+                                                {{ __('Notif Atasan (Project)') }}</th>
                                             <th class="text-center">{{ __('Responden Atasan') }}</th>
                                             <th class="text-center">{{ __('Keterisian Atasan') }}</th>
                                             <th class="text-center">{{ __('Aksi') }}</th>
@@ -80,6 +84,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" />
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs5/dt-1.12.0/datatables.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    <style>
+        .form-switch .form-check-input {
+            width: 3em;
+            height: 1.5em;
+        }
+    </style>
 @endpush
 
 @push('js')
@@ -154,6 +164,13 @@
                             name: 'diklat_type.nama_diklat_type'
                         },
                         {
+                            data: 'send_notif_project_alumni_switch', // Kolom baru
+                            name: 'project.send_notif_project_alumni',
+                            className: 'text-center',
+                            orderable: false,
+                            searchable: false
+                        },
+                        {
                             data: 'responden_alumni',
                             name: 'responden_alumni',
                             className: 'text-center',
@@ -163,6 +180,13 @@
                         {
                             data: 'keterisian_alumni',
                             name: 'keterisian_alumni',
+                            className: 'text-center',
+                            orderable: false,
+                            searchable: false
+                        },
+                        {
+                            data: 'send_notif_project_atasan_switch', // Kolom baru
+                            name: 'project.send_notif_project_atasan',
                             className: 'text-center',
                             orderable: false,
                             searchable: false
@@ -210,6 +234,68 @@
             });
 
             loadDataTable();
+
+            // Handle switch toggle notifikasi project alumni
+            $('#data-table').on('change', '.toggle-notif-project-alumni', function() {
+                let projectId = $(this).data('id');
+                let status = $(this).is(':checked') ? 'Yes' : 'No';
+
+                $.ajax({
+                    url: "{{ route('penyebaran-kuesioner.update.send-notif-project') }}",
+                    method: 'POST',
+                    data: {
+                        project_id: projectId,
+                        type: 'alumni',
+                        status: status,
+                        _token: "{{ csrf_token() }}"
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            toastr.success(response.message, 'Success');
+                        } else {
+                            toastr.error(response.message, 'Error');
+                            $(this).prop('checked', !$(this).is(':checked'));
+                        }
+                        dataTable.ajax.reload(null, false); // Refresh tabel
+                    }.bind(this),
+                    error: function(xhr) {
+                        toastr.error('Error updating status notifikasi project.', 'Error');
+                        $(this).prop('checked', !$(this).is(':checked'));
+                        dataTable.ajax.reload(null, false);
+                    }.bind(this)
+                });
+            });
+
+            // Handle switch toggle notifikasi project atasan
+            $('#data-table').on('change', '.toggle-notif-project-atasan', function() {
+                let projectId = $(this).data('id');
+                let status = $(this).is(':checked') ? 'Yes' : 'No';
+
+                $.ajax({
+                    url: "{{ route('penyebaran-kuesioner.update.send-notif-project') }}",
+                    method: 'POST',
+                    data: {
+                        project_id: projectId,
+                        type: 'atasan',
+                        status: status,
+                        _token: "{{ csrf_token() }}"
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            toastr.success(response.message, 'Success');
+                        } else {
+                            toastr.error(response.message, 'Error');
+                            $(this).prop('checked', !$(this).is(':checked'));
+                        }
+                        dataTable.ajax.reload(null, false);
+                    }.bind(this),
+                    error: function(xhr) {
+                        toastr.error('Error updating status notifikasi project.', 'Error');
+                        $(this).prop('checked', !$(this).is(':checked'));
+                        dataTable.ajax.reload(null, false);
+                    }.bind(this)
+                });
+            });
         });
     </script>
 @endpush

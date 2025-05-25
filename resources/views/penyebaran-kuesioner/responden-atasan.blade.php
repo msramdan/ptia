@@ -59,7 +59,6 @@
     </div>
 
 
-    <!-- Modal Log Pengiriman -->
     <div class="modal fade" id="logWaModal" tabindex="-1" aria-labelledby="logWaModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
@@ -132,13 +131,11 @@
                         <div class="card-body">
                             <h5>Daftar Responden Atasan Langsung</h5>
 
-                            <!-- Button untuk Update Deadline -->
                             <button id="update-deadline-btn" class="btn mb-3"
                                 style="background-color: #C0C0C0; color: black; border-color: #C0C0C0;" disabled>
                                 <i class="fas fa-calendar-alt"></i> Update Deadline
                             </button>
 
-                            <!-- Modal Bootstrap 5 -->
                             <div class="modal fade" id="updateDeadlineModal" tabindex="-1"
                                 aria-labelledby="updateDeadlineModalLabel" aria-hidden="true">
                                 <div class="modal-dialog">
@@ -179,6 +176,7 @@
                                             <th>{{ __('NIP') }}</th>
                                             <th>{{ __('Nama atasan langsung') }}</th>
                                             <th>{{ __('No.Telepon atasan langsung') }}</th>
+                                            <th>{{ __('Notif Aktif?') }}</th> {{-- Kolom baru --}}
                                             <th>{{ __('Deadline') }}</th>
                                             <th>{{ __('Aksi') }}</th>
                                         </tr>
@@ -204,6 +202,12 @@
         crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs5/dt-1.12.0/datatables.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    <style>
+        .form-switch .form-check-input {
+            width: 3em;
+            height: 1.5em;
+        }
+    </style>
 @endpush
 
 @push('js')
@@ -286,6 +290,13 @@
                     {
                         data: 'telepon_atasan',
                         name: 'telepon_atasan',
+                        className: 'text-center'
+                    },
+                    { // Kolom baru untuk switch notifikasi
+                        data: 'send_notif_atasan_switch',
+                        name: 'send_notif_atasan',
+                        orderable: false,
+                        searchable: false,
                         className: 'text-center'
                     },
                     {
@@ -445,7 +456,7 @@
                                 $('#updateDeadlineModal').modal(
                                     'hide'); // Sembunyikan modal
                                 $('#deadline-date').val(''); // Reset input tanggal
-                                table.draw(false); // Refresh tabel
+                                table.ajax.reload(null, false); // Refresh tabel
                             });
                         } else {
                             // Jika gagal, tampilkan SweetAlert error
@@ -464,6 +475,38 @@
                             text: 'Terjadi kesalahan. Silakan coba lagi.',
                         });
                     }
+                });
+            });
+
+            // Handle switch toggle notifikasi responden
+            $('#data-table tbody').on('change', '.toggle-notif-responden', function() {
+                let id = $(this).data('id');
+                let remark = $(this).data('remark');
+                let status = $(this).is(':checked') ? 'Yes' : 'No';
+
+                $.ajax({
+                    url: "{{ route('penyebaran-kuesioner.update.send-notif-responden') }}",
+                    method: 'POST',
+                    data: {
+                        id: id,
+                        remark: remark,
+                        status: status,
+                        _token: "{{ csrf_token() }}"
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            toastr.success(response.message, 'Success');
+                        } else {
+                            toastr.error(response.message, 'Error');
+                            $(this).prop('checked', !$(this).is(':checked'));
+                        }
+                        $('#data-table').DataTable().ajax.reload(null, false);
+                    }.bind(this),
+                    error: function(xhr) {
+                        toastr.error('Error updating status notifikasi.', 'Error');
+                        $(this).prop('checked', !$(this).is(':checked'));
+                        $('#data-table').DataTable().ajax.reload(null, false);
+                    }.bind(this)
                 });
             });
         });
