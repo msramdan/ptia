@@ -15,50 +15,102 @@ class DashboardController extends Controller
         $tahun = $request->input('tahun', date('Y'));
         $selectedTriwulan = $request->input('triwulan', 'all');
 
-        // Logika untuk menghitung statistik
-        $statsQuery = DB::table('project')
+        // Fungsi untuk menentukan tanggal mulai dan selesai berdasarkan triwulan
+        $getDatesBasedOnTriwulan = function ($tahunInput, $triwulanInput) {
+            $startDate = Carbon::createFromDate($tahunInput, 1, 1)->startOfDay(); // Selalu mulai dari awal tahun
+            $endDate = Carbon::createFromDate($tahunInput, 12, 31)->endOfDay(); // Default akhir tahun
+
+            if ($triwulanInput != 'all') {
+                switch ($triwulanInput) {
+                    case '1':
+                        $endDate = Carbon::createFromDate($tahunInput, 3, 1)->endOfMonth()->endOfDay();
+                        break;
+                    case '2':
+                        $endDate = Carbon::createFromDate($tahunInput, 6, 1)->endOfMonth()->endOfDay();
+                        break;
+                    case '3':
+                        $endDate = Carbon::createFromDate($tahunInput, 9, 1)->endOfMonth()->endOfDay();
+                        break;
+                    case '4':
+                        // Untuk triwulan 4, endDate tetap akhir Desember
+                        break;
+                }
+            }
+            return ['start' => $startDate, 'end' => $endDate];
+        };
+
+        $dates = $getDatesBasedOnTriwulan($tahun, $selectedTriwulan);
+        $startDate = $dates['start'];
+        $endDate = $dates['end'];
+
+        // Query dasar untuk statistik dan DataTables
+        $baseProjectsQuery = DB::table('project')
             ->where('status', 'Pelaksanaan')
-            ->whereYear('tanggal_selesai', $tahun);
+            ->whereYear('tanggal_selesai', $tahun)
+            ->whereBetween('project.tanggal_selesai', [$startDate, $endDate]); // Filter berdasarkan rentang tanggal triwulan
 
-        $respondenBaseQuery = DB::table('project_responden')
-            ->join('project', 'project_responden.project_id', '=', 'project.id')
-            ->where('project.status', 'Pelaksanaan')
-            ->whereYear('project.tanggal_selesai', $tahun);
 
-        if ($selectedTriwulan && $selectedTriwulan != 'all') {
-            $startDate = Carbon::createFromDate($tahun, ($selectedTriwulan - 1) * 3 + 1, 1)->startOfQuarter();
-            $endDate = Carbon::createFromDate($tahun, ($selectedTriwulan - 1) * 3 + 1, 1)->endOfQuarter();
+        if ($request->ajax() && !$request->has('draw')) { // Permintaan AJAX untuk statistik
+            $statsQuery = clone $baseProjectsQuery;
+            $respondenBaseQuery = DB::table('project_responden')
+                ->join('project', 'project_responden.project_id', '=', 'project.id')
+                ->where('project.status', 'Pelaksanaan')
+                ->whereYear('project.tanggal_selesai', $tahun)
+                ->whereBetween('project.tanggal_selesai', [$startDate, $endDate]);
 
-            $statsQuery->whereBetween('project.tanggal_selesai', [$startDate, $endDate]);
-            $respondenBaseQuery->whereBetween('project.tanggal_selesai', [$startDate, $endDate]);
-        }
+            $jumlahProject = $statsQuery->count();
+            $jumlahResponden = (clone $respondenBaseQuery)->count();
 
-        // Clone query untuk statistik spesifik
-        $jumlahProject = (clone $statsQuery)->count();
-        $jumlahResponden = (clone $respondenBaseQuery)->count();
+            $sudahAlumni = (clone $respondenBaseQuery)
+                ->where('project_responden.status_pengisian_kuesioner_alumni', 'sudah')
+                ->count();
+            $persentaseSudah = $jumlahResponden > 0 ? round(($sudahAlumni / $jumlahResponden) * 100, 2) : 0;
 
-        $sudahAlumniQuery = (clone $respondenBaseQuery)
-            ->where('project_responden.status_pengisian_kuesioner_alumni', 'sudah');
-        $sudahAlumni = $sudahAlumniQuery->count();
-        $persentaseSudah = $jumlahResponden > 0 ? round(($sudahAlumni / $jumlahResponden) * 100, 2) : 0;
+            $totalAtasan = (clone $respondenBaseQuery)
+                ->whereNotNull('project_responden.nama_atasan')
+                ->count();
+            $sudahAtasan = (clone $respondenBaseQuery)
+                ->whereNotNull('project_responden.nama_atasan')
+                ->where('project_responden.status_pengisian_kuesioner_atasan', 'sudah')
+                ->count();
+            $persentaseSudahAtasan = $totalAtasan > 0 ? round(($sudahAtasan / $totalAtasan) * 100, 2) : 0;
 
-        $totalAtasanQuery = (clone $respondenBaseQuery)
-            ->whereNotNull('project_responden.nama_atasan');
-        $totalAtasan = $totalAtasanQuery->count();
+            // Query untuk summary DataTables (rata-rata skor)
+            $summaryProjectsQuery = DB::table('project')
+                ->select(DB::raw('COALESCE(avg_scores.avg_skor_level_3, 0) AS avg_skor_level_3'), DB::raw('COALESCE(avg_scores.final_avg_skor_level_4, 0) AS avg_skor_level_4'))
+                ->leftJoinSub(
+                    DB::table('project_skor_responden')
+                        ->select(
+                            'project_skor_responden.project_id',
+                            DB::raw("LEAST(100, COALESCE(ROUND(AVG((COALESCE(skor_level_3_alumni, 0) + COALESCE(skor_level_3_atasan, 0))), 2), 0)) AS avg_skor_level_3"),
+                            DB::raw(
+                                "LEAST(100,
+                                (COALESCE(ROUND(AVG((COALESCE(skor_level_4_alumni, 0) + COALESCE(skor_level_4_atasan, 0))), 2), 0) +
+                                COALESCE((
+                                    SELECT bobot_aspek_sekunder
+                                    FROM project_bobot_aspek_sekunder
+                                    WHERE project_bobot_aspek_sekunder.project_id = project_skor_responden.project_id
+                                    AND EXISTS (
+                                        SELECT 1
+                                        FROM project_data_sekunder
+                                        WHERE project_data_sekunder.project_id = project_skor_responden.project_id
+                                        AND project_data_sekunder.nilai_kinerja_awal < project_data_sekunder.nilai_kinerja_akhir
+                                    )
+                                ), 0))
+                            ) AS final_avg_skor_level_4"
+                            )
+                        )
+                        ->groupBy('project_skor_responden.project_id'),
+                    'avg_scores',
+                    'project.id',
+                    '=',
+                    'avg_scores.project_id'
+                )
+                ->where('project.status', 'Pelaksanaan')
+                ->whereYear('project.tanggal_selesai', $tahun)
+                ->whereBetween('project.tanggal_selesai', [$startDate, $endDate]);
 
-        $sudahAtasanQuery = (clone $respondenBaseQuery)
-            ->whereNotNull('project_responden.nama_atasan')
-            ->where('project_responden.status_pengisian_kuesioner_atasan', 'sudah');
-        $sudahAtasan = $sudahAtasanQuery->count();
-        // Perbaikan: Persentase keterisian atasan seharusnya dibagi dengan total responden yang memiliki atasan,
-        // atau jika dibagi dengan alumni yang sudah mengisi, pastikan logikanya sesuai.
-        // Jika $sudahAlumni adalah jumlah alumni yang sudah mengisi dan menjadi basis untuk atasan, maka $totalAtasan yang relevan.
-        // Atau jika ingin membandingkan dengan total alumni yang memiliki atasan:
-        $persentaseSudahAtasan = $totalAtasan > 0 ? round(($sudahAtasan / $totalAtasan) * 100, 2) : 0;
-        // Jika ingin membandingkan dengan jumlah alumni yang sudah mengisi:
-        // $persentaseSudahAtasan = $sudahAlumni > 0 ? round(($sudahAtasan / $sudahAlumni) * 100, 2) : 0; // Pilih salah satu logika yang paling sesuai
 
-        if ($request->ajax() && !$request->has('draw')) { // Tambahkan cek !$request->has('draw') untuk membedakan dari DataTables
             return response()->json([
                 'jumlahProject' => $jumlahProject,
                 'jumlahResponden' => $jumlahResponden,
@@ -66,90 +118,18 @@ class DashboardController extends Controller
                 'persentaseSudah' => $persentaseSudah,
                 'sudahAtasan' => $sudahAtasan,
                 'persentaseSudahAtasan' => $persentaseSudahAtasan,
-                'summary' => [ // Pastikan summary juga dikirim untuk chart jika diperlukan
-                    'avg_skor_level_3' => (clone $statsQuery)->leftJoinSub( /* ... subquery avg_scores ... */DB::table('project_skor_responden')
-                        ->select(
-                            'project_skor_responden.project_id',
-                            DB::raw("LEAST(100, COALESCE(ROUND(AVG((COALESCE(skor_level_3_alumni, 0) + COALESCE(skor_level_3_atasan, 0))), 2), 0)) AS avg_skor_level_3"),
-                            DB::raw("LEAST(100, COALESCE(ROUND(AVG((COALESCE(skor_level_4_alumni, 0) + COALESCE(skor_level_4_atasan, 0))), 2), 0)) AS base_avg_skor_level_4"),
-                            DB::raw(
-                                "COALESCE((
-                                SELECT bobot_aspek_sekunder
-                                FROM project_bobot_aspek_sekunder
-                                WHERE project_bobot_aspek_sekunder.project_id = project_skor_responden.project_id
-                                AND EXISTS (
-                                    SELECT 1
-                                    FROM project_data_sekunder
-                                    WHERE project_data_sekunder.project_id = project_skor_responden.project_id
-                                    AND project_data_sekunder.nilai_kinerja_awal < project_data_sekunder.nilai_kinerja_akhir
-                                )
-                            ), 0) AS bobot_aspek_sekunder"
-                            ),
-                            DB::raw(
-                                "LEAST(100,
-                                (COALESCE(ROUND(AVG((COALESCE(skor_level_4_alumni, 0) + COALESCE(skor_level_4_atasan, 0))), 2), 0) +
-                                COALESCE((
-                                    SELECT bobot_aspek_sekunder
-                                    FROM project_bobot_aspek_sekunder
-                                    WHERE project_bobot_aspek_sekunder.project_id = project_skor_responden.project_id
-                                    AND EXISTS (
-                                        SELECT 1
-                                        FROM project_data_sekunder
-                                        WHERE project_data_sekunder.project_id = project_skor_responden.project_id
-                                        AND project_data_sekunder.nilai_kinerja_awal < project_data_sekunder.nilai_kinerja_akhir
-                                    )
-                                ), 0))
-                            ) AS final_avg_skor_level_4"
-                            )
-                        )
-                        ->groupBy('project_skor_responden.project_id'), 'avg_scores', 'project.id', '=', 'avg_scores.project_id')
-                        ->avg('avg_scores.avg_skor_level_3'),
-                    'avg_skor_level_4' => (clone $statsQuery)->leftJoinSub( /* ... subquery avg_scores ... */DB::table('project_skor_responden')
-                        ->select(
-                            'project_skor_responden.project_id',
-                            DB::raw("LEAST(100, COALESCE(ROUND(AVG((COALESCE(skor_level_3_alumni, 0) + COALESCE(skor_level_3_atasan, 0))), 2), 0)) AS avg_skor_level_3"),
-                            DB::raw("LEAST(100, COALESCE(ROUND(AVG((COALESCE(skor_level_4_alumni, 0) + COALESCE(skor_level_4_atasan, 0))), 2), 0)) AS base_avg_skor_level_4"),
-                            DB::raw(
-                                "COALESCE((
-                                SELECT bobot_aspek_sekunder
-                                FROM project_bobot_aspek_sekunder
-                                WHERE project_bobot_aspek_sekunder.project_id = project_skor_responden.project_id
-                                AND EXISTS (
-                                    SELECT 1
-                                    FROM project_data_sekunder
-                                    WHERE project_data_sekunder.project_id = project_skor_responden.project_id
-                                    AND project_data_sekunder.nilai_kinerja_awal < project_data_sekunder.nilai_kinerja_akhir
-                                )
-                            ), 0) AS bobot_aspek_sekunder"
-                            ),
-                            DB::raw(
-                                "LEAST(100,
-                                (COALESCE(ROUND(AVG((COALESCE(skor_level_4_alumni, 0) + COALESCE(skor_level_4_atasan, 0))), 2), 0) +
-                                COALESCE((
-                                    SELECT bobot_aspek_sekunder
-                                    FROM project_bobot_aspek_sekunder
-                                    WHERE project_bobot_aspek_sekunder.project_id = project_skor_responden.project_id
-                                    AND EXISTS (
-                                        SELECT 1
-                                        FROM project_data_sekunder
-                                        WHERE project_data_sekunder.project_id = project_skor_responden.project_id
-                                        AND project_data_sekunder.nilai_kinerja_awal < project_data_sekunder.nilai_kinerja_akhir
-                                    )
-                                ), 0))
-                            ) AS final_avg_skor_level_4"
-                            )
-                        )
-                        ->groupBy('project_skor_responden.project_id'), 'avg_scores', 'project.id', '=', 'avg_scores.project_id')
-                        ->avg('avg_scores.final_avg_skor_level_4'),
+                'summary' => [
+                    'avg_skor_level_3' => $summaryProjectsQuery->avg('avg_skor_level_3'),
+                    'avg_skor_level_4' => $summaryProjectsQuery->avg('final_avg_skor_level_4'),
                 ]
             ]);
         }
 
-        if (request()->ajax() && $request->has('draw')) { // Ini adalah request DataTables
+
+        if (request()->ajax() && $request->has('draw')) { // Permintaan DataTables
             $projectsQuery = DB::table('project')
                 ->select(
                     'project.id',
-                    // 'project.kode_project', // tidak ada di view
                     'project.kaldikID',
                     'project.kaldikDesc',
                     'project.diklat_type_id',
@@ -168,20 +148,6 @@ class DashboardController extends Controller
                         ->select(
                             'project_skor_responden.project_id',
                             DB::raw("LEAST(100, COALESCE(ROUND(AVG((COALESCE(skor_level_3_alumni, 0) + COALESCE(skor_level_3_atasan, 0))), 2), 0)) AS avg_skor_level_3"),
-                            DB::raw("LEAST(100, COALESCE(ROUND(AVG((COALESCE(skor_level_4_alumni, 0) + COALESCE(skor_level_4_atasan, 0))), 2), 0)) AS base_avg_skor_level_4"),
-                            DB::raw(
-                                "COALESCE((
-                                SELECT bobot_aspek_sekunder
-                                FROM project_bobot_aspek_sekunder
-                                WHERE project_bobot_aspek_sekunder.project_id = project_skor_responden.project_id
-                                AND EXISTS (
-                                    SELECT 1
-                                    FROM project_data_sekunder
-                                    WHERE project_data_sekunder.project_id = project_skor_responden.project_id
-                                    AND project_data_sekunder.nilai_kinerja_awal < project_data_sekunder.nilai_kinerja_akhir
-                                )
-                            ), 0) AS bobot_aspek_sekunder"
-                            ),
                             DB::raw(
                                 "LEAST(100,
                                 (COALESCE(ROUND(AVG((COALESCE(skor_level_4_alumni, 0) + COALESCE(skor_level_4_atasan, 0))), 2), 0) +
@@ -224,13 +190,8 @@ class DashboardController extends Controller
                     ');
                 })
                 ->where('project.status', 'Pelaksanaan')
-                ->whereYear('project.tanggal_selesai', $tahun);
-
-            if ($selectedTriwulan && $selectedTriwulan != 'all') {
-                $startDate = Carbon::createFromDate($tahun, ($selectedTriwulan - 1) * 3 + 1, 1)->startOfQuarter();
-                $endDate = Carbon::createFromDate($tahun, ($selectedTriwulan - 1) * 3 + 1, 1)->endOfQuarter();
-                $projectsQuery->whereBetween('project.tanggal_selesai', [$startDate, $endDate]);
-            }
+                ->whereYear('project.tanggal_selesai', $tahun)
+                ->whereBetween('project.tanggal_selesai', [$startDate, $endDate]); // Filter DataTables juga
 
             $projects = $projectsQuery->orderByDesc('project.id');
             $avgSkorLevel3All = (clone $projectsQuery)->avg('avg_scores.avg_skor_level_3');
@@ -255,22 +216,44 @@ class DashboardController extends Controller
                 ->addColumn('kriteria_dampak_level_4', fn($row) => e($row->kriteria_dampak_level_4 ?? '-'))
                 ->rawColumns(['user', 'avg_skor_level_3', 'avg_skor_level_4'])
                 ->with([
-                    'summary' => [
+                    'summary' => [ // summary ini digunakan oleh footerCallback DataTables
                         'avg_skor_level_3' => $avgSkorLevel3All,
                         'avg_skor_level_4' => $avgSkorLevel4All,
-                        'count' => $projects->count() // Mungkin tidak perlu jika sudah dihandle di luar
                     ]
                 ])
                 ->toJson();
         }
 
-        $unitKerjaList = DB::table('project_data_sekunder')
+        $unitKerjaList = DB::table('project_data_sekunder') // Ini tetap, tidak perlu difilter triwulan di sini
             ->select('unit_kerja')
             ->whereNotNull('unit_kerja')
             ->where('unit_kerja', '!=', '')
             ->distinct()
             ->orderBy('unit_kerja')
             ->pluck('unit_kerja');
+
+        // Data statistik untuk pemuatan halaman awal
+        $statsQueryInitial = clone $baseProjectsQuery;
+        $respondenBaseQueryInitial = DB::table('project_responden')
+            ->join('project', 'project_responden.project_id', '=', 'project.id')
+            ->where('project.status', 'Pelaksanaan')
+            ->whereYear('project.tanggal_selesai', $tahun)
+            ->whereBetween('project.tanggal_selesai', [$startDate, $endDate]);
+
+        $jumlahProject = $statsQueryInitial->count();
+        $jumlahResponden = (clone $respondenBaseQueryInitial)->count();
+        $sudahAlumni = (clone $respondenBaseQueryInitial)
+            ->where('project_responden.status_pengisian_kuesioner_alumni', 'sudah')
+            ->count();
+        $persentaseSudah = $jumlahResponden > 0 ? round(($sudahAlumni / $jumlahResponden) * 100, 2) : 0;
+        $totalAtasan = (clone $respondenBaseQueryInitial)
+            ->whereNotNull('project_responden.nama_atasan')
+            ->count();
+        $sudahAtasan = (clone $respondenBaseQueryInitial)
+            ->whereNotNull('project_responden.nama_atasan')
+            ->where('project_responden.status_pengisian_kuesioner_atasan', 'sudah')
+            ->count();
+        $persentaseSudahAtasan = $totalAtasan > 0 ? round(($sudahAtasan / $totalAtasan) * 100, 2) : 0;
 
 
         return view('dashboard', compact(
