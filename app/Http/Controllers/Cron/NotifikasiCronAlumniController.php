@@ -42,6 +42,8 @@ class NotifikasiCronAlumniController extends Controller
             ->join('project_pesan_wa', 'project_responden.project_id', '=', 'project_pesan_wa.project_id')
             ->join('project', 'project_responden.project_id', '=', 'project.id')
             ->where('project.status', 'Pelaksanaan')
+            ->where('project.send_notif_project_atasan', 'Yes')
+            ->where('project_responden.send_notif_atasan', 'Yes')
             ->where('project_responden.status_pengisian_kuesioner_alumni', 'Belum')
             ->where('project_responden.try_send_wa_alumni', '<', 7)
             ->where(function ($query) {
