@@ -13,21 +13,143 @@ class DashboardController extends Controller
     public function index(Request $request)
     {
         $tahun = $request->input('tahun', date('Y'));
-        $selectedTriwulan = $request->input('triwulan', 'all'); // Default ke 'all'
+        $selectedTriwulan = $request->input('triwulan', 'all');
 
-        $unitKerjaList = DB::table('project_data_sekunder')
-            ->select('unit_kerja')
-            ->whereNotNull('unit_kerja')
-            ->where('unit_kerja', '!=', '')
-            ->distinct()
-            ->orderBy('unit_kerja')
-            ->pluck('unit_kerja');
+        // Logika untuk menghitung statistik
+        $statsQuery = DB::table('project')
+            ->where('status', 'Pelaksanaan')
+            ->whereYear('tanggal_selesai', $tahun);
 
-        if (request()->ajax()) {
+        $respondenBaseQuery = DB::table('project_responden')
+            ->join('project', 'project_responden.project_id', '=', 'project.id')
+            ->where('project.status', 'Pelaksanaan')
+            ->whereYear('project.tanggal_selesai', $tahun);
+
+        if ($selectedTriwulan && $selectedTriwulan != 'all') {
+            $startDate = Carbon::createFromDate($tahun, ($selectedTriwulan - 1) * 3 + 1, 1)->startOfQuarter();
+            $endDate = Carbon::createFromDate($tahun, ($selectedTriwulan - 1) * 3 + 1, 1)->endOfQuarter();
+
+            $statsQuery->whereBetween('project.tanggal_selesai', [$startDate, $endDate]);
+            $respondenBaseQuery->whereBetween('project.tanggal_selesai', [$startDate, $endDate]);
+        }
+
+        // Clone query untuk statistik spesifik
+        $jumlahProject = (clone $statsQuery)->count();
+        $jumlahResponden = (clone $respondenBaseQuery)->count();
+
+        $sudahAlumniQuery = (clone $respondenBaseQuery)
+            ->where('project_responden.status_pengisian_kuesioner_alumni', 'sudah');
+        $sudahAlumni = $sudahAlumniQuery->count();
+        $persentaseSudah = $jumlahResponden > 0 ? round(($sudahAlumni / $jumlahResponden) * 100, 2) : 0;
+
+        $totalAtasanQuery = (clone $respondenBaseQuery)
+            ->whereNotNull('project_responden.nama_atasan');
+        $totalAtasan = $totalAtasanQuery->count();
+
+        $sudahAtasanQuery = (clone $respondenBaseQuery)
+            ->whereNotNull('project_responden.nama_atasan')
+            ->where('project_responden.status_pengisian_kuesioner_atasan', 'sudah');
+        $sudahAtasan = $sudahAtasanQuery->count();
+        // Perbaikan: Persentase keterisian atasan seharusnya dibagi dengan total responden yang memiliki atasan,
+        // atau jika dibagi dengan alumni yang sudah mengisi, pastikan logikanya sesuai.
+        // Jika $sudahAlumni adalah jumlah alumni yang sudah mengisi dan menjadi basis untuk atasan, maka $totalAtasan yang relevan.
+        // Atau jika ingin membandingkan dengan total alumni yang memiliki atasan:
+        $persentaseSudahAtasan = $totalAtasan > 0 ? round(($sudahAtasan / $totalAtasan) * 100, 2) : 0;
+        // Jika ingin membandingkan dengan jumlah alumni yang sudah mengisi:
+        // $persentaseSudahAtasan = $sudahAlumni > 0 ? round(($sudahAtasan / $sudahAlumni) * 100, 2) : 0; // Pilih salah satu logika yang paling sesuai
+
+        if ($request->ajax() && !$request->has('draw')) { // Tambahkan cek !$request->has('draw') untuk membedakan dari DataTables
+            return response()->json([
+                'jumlahProject' => $jumlahProject,
+                'jumlahResponden' => $jumlahResponden,
+                'sudahAlumni' => $sudahAlumni,
+                'persentaseSudah' => $persentaseSudah,
+                'sudahAtasan' => $sudahAtasan,
+                'persentaseSudahAtasan' => $persentaseSudahAtasan,
+                'summary' => [ // Pastikan summary juga dikirim untuk chart jika diperlukan
+                    'avg_skor_level_3' => (clone $statsQuery)->leftJoinSub( /* ... subquery avg_scores ... */DB::table('project_skor_responden')
+                        ->select(
+                            'project_skor_responden.project_id',
+                            DB::raw("LEAST(100, COALESCE(ROUND(AVG((COALESCE(skor_level_3_alumni, 0) + COALESCE(skor_level_3_atasan, 0))), 2), 0)) AS avg_skor_level_3"),
+                            DB::raw("LEAST(100, COALESCE(ROUND(AVG((COALESCE(skor_level_4_alumni, 0) + COALESCE(skor_level_4_atasan, 0))), 2), 0)) AS base_avg_skor_level_4"),
+                            DB::raw(
+                                "COALESCE((
+                                SELECT bobot_aspek_sekunder
+                                FROM project_bobot_aspek_sekunder
+                                WHERE project_bobot_aspek_sekunder.project_id = project_skor_responden.project_id
+                                AND EXISTS (
+                                    SELECT 1
+                                    FROM project_data_sekunder
+                                    WHERE project_data_sekunder.project_id = project_skor_responden.project_id
+                                    AND project_data_sekunder.nilai_kinerja_awal < project_data_sekunder.nilai_kinerja_akhir
+                                )
+                            ), 0) AS bobot_aspek_sekunder"
+                            ),
+                            DB::raw(
+                                "LEAST(100,
+                                (COALESCE(ROUND(AVG((COALESCE(skor_level_4_alumni, 0) + COALESCE(skor_level_4_atasan, 0))), 2), 0) +
+                                COALESCE((
+                                    SELECT bobot_aspek_sekunder
+                                    FROM project_bobot_aspek_sekunder
+                                    WHERE project_bobot_aspek_sekunder.project_id = project_skor_responden.project_id
+                                    AND EXISTS (
+                                        SELECT 1
+                                        FROM project_data_sekunder
+                                        WHERE project_data_sekunder.project_id = project_skor_responden.project_id
+                                        AND project_data_sekunder.nilai_kinerja_awal < project_data_sekunder.nilai_kinerja_akhir
+                                    )
+                                ), 0))
+                            ) AS final_avg_skor_level_4"
+                            )
+                        )
+                        ->groupBy('project_skor_responden.project_id'), 'avg_scores', 'project.id', '=', 'avg_scores.project_id')
+                        ->avg('avg_scores.avg_skor_level_3'),
+                    'avg_skor_level_4' => (clone $statsQuery)->leftJoinSub( /* ... subquery avg_scores ... */DB::table('project_skor_responden')
+                        ->select(
+                            'project_skor_responden.project_id',
+                            DB::raw("LEAST(100, COALESCE(ROUND(AVG((COALESCE(skor_level_3_alumni, 0) + COALESCE(skor_level_3_atasan, 0))), 2), 0)) AS avg_skor_level_3"),
+                            DB::raw("LEAST(100, COALESCE(ROUND(AVG((COALESCE(skor_level_4_alumni, 0) + COALESCE(skor_level_4_atasan, 0))), 2), 0)) AS base_avg_skor_level_4"),
+                            DB::raw(
+                                "COALESCE((
+                                SELECT bobot_aspek_sekunder
+                                FROM project_bobot_aspek_sekunder
+                                WHERE project_bobot_aspek_sekunder.project_id = project_skor_responden.project_id
+                                AND EXISTS (
+                                    SELECT 1
+                                    FROM project_data_sekunder
+                                    WHERE project_data_sekunder.project_id = project_skor_responden.project_id
+                                    AND project_data_sekunder.nilai_kinerja_awal < project_data_sekunder.nilai_kinerja_akhir
+                                )
+                            ), 0) AS bobot_aspek_sekunder"
+                            ),
+                            DB::raw(
+                                "LEAST(100,
+                                (COALESCE(ROUND(AVG((COALESCE(skor_level_4_alumni, 0) + COALESCE(skor_level_4_atasan, 0))), 2), 0) +
+                                COALESCE((
+                                    SELECT bobot_aspek_sekunder
+                                    FROM project_bobot_aspek_sekunder
+                                    WHERE project_bobot_aspek_sekunder.project_id = project_skor_responden.project_id
+                                    AND EXISTS (
+                                        SELECT 1
+                                        FROM project_data_sekunder
+                                        WHERE project_data_sekunder.project_id = project_skor_responden.project_id
+                                        AND project_data_sekunder.nilai_kinerja_awal < project_data_sekunder.nilai_kinerja_akhir
+                                    )
+                                ), 0))
+                            ) AS final_avg_skor_level_4"
+                            )
+                        )
+                        ->groupBy('project_skor_responden.project_id'), 'avg_scores', 'project.id', '=', 'avg_scores.project_id')
+                        ->avg('avg_scores.final_avg_skor_level_4'),
+                ]
+            ]);
+        }
+
+        if (request()->ajax() && $request->has('draw')) { // Ini adalah request DataTables
             $projectsQuery = DB::table('project')
                 ->select(
                     'project.id',
-                    'project.kode_project',
+                    // 'project.kode_project', // tidak ada di view
                     'project.kaldikID',
                     'project.kaldikDesc',
                     'project.diklat_type_id',
@@ -104,29 +226,16 @@ class DashboardController extends Controller
                 ->where('project.status', 'Pelaksanaan')
                 ->whereYear('project.tanggal_selesai', $tahun);
 
-            // Filter Triwulan
             if ($selectedTriwulan && $selectedTriwulan != 'all') {
-                $startDate = Carbon::createFromDate($tahun, 1, 1)->startOfDay();
-                $endDate = Carbon::createFromDate($tahun, 12, 31)->endOfDay();
-
-                switch ($selectedTriwulan) {
-                    case '1':
-                        $endDate = Carbon::createFromDate($tahun, 3, 1)->endOfMonth()->endOfDay();
-                        break;
-                    case '2':
-                        $endDate = Carbon::createFromDate($tahun, 6, 1)->endOfMonth()->endOfDay();
-                        break;
-                    case '3':
-                        $endDate = Carbon::createFromDate($tahun, 9, 1)->endOfMonth()->endOfDay();
-                        break;
-                    case '4':
-                        $endDate = Carbon::createFromDate($tahun, 12, 1)->endOfMonth()->endOfDay();
-                        break;
-                }
+                $startDate = Carbon::createFromDate($tahun, ($selectedTriwulan - 1) * 3 + 1, 1)->startOfQuarter();
+                $endDate = Carbon::createFromDate($tahun, ($selectedTriwulan - 1) * 3 + 1, 1)->endOfQuarter();
                 $projectsQuery->whereBetween('project.tanggal_selesai', [$startDate, $endDate]);
             }
 
             $projects = $projectsQuery->orderByDesc('project.id');
+            $avgSkorLevel3All = (clone $projectsQuery)->avg('avg_scores.avg_skor_level_3');
+            $avgSkorLevel4All = (clone $projectsQuery)->avg('avg_scores.final_avg_skor_level_4');
+
 
             return DataTables::of($projects)
                 ->addIndexColumn()
@@ -147,145 +256,22 @@ class DashboardController extends Controller
                 ->rawColumns(['user', 'avg_skor_level_3', 'avg_skor_level_4'])
                 ->with([
                     'summary' => [
-                        'avg_skor_level_3' => $projects->avg('avg_scores.avg_skor_level_3'),
-                        'avg_skor_level_4' => $projects->avg('avg_scores.final_avg_skor_level_4'),
-                        'count' => $projects->count()
+                        'avg_skor_level_3' => $avgSkorLevel3All,
+                        'avg_skor_level_4' => $avgSkorLevel4All,
+                        'count' => $projects->count() // Mungkin tidak perlu jika sudah dihandle di luar
                     ]
                 ])
                 ->toJson();
         }
 
-        $statsQuery = DB::table('project')
-            ->where('status', 'Pelaksanaan')
-            ->whereYear('tanggal_selesai', $tahun);
+        $unitKerjaList = DB::table('project_data_sekunder')
+            ->select('unit_kerja')
+            ->whereNotNull('unit_kerja')
+            ->where('unit_kerja', '!=', '')
+            ->distinct()
+            ->orderBy('unit_kerja')
+            ->pluck('unit_kerja');
 
-        if ($selectedTriwulan && $selectedTriwulan != 'all') {
-            $startDate = Carbon::createFromDate($tahun, 1, 1)->startOfDay();
-            $endDate = Carbon::createFromDate($tahun, 12, 31)->endOfDay();
-            switch ($selectedTriwulan) {
-                case '1':
-                    $endDate = Carbon::createFromDate($tahun, 3, 1)->endOfMonth()->endOfDay();
-                    break;
-                case '2':
-                    $endDate = Carbon::createFromDate($tahun, 6, 1)->endOfMonth()->endOfDay();
-                    break;
-                case '3':
-                    $endDate = Carbon::createFromDate($tahun, 9, 1)->endOfMonth()->endOfDay();
-                    break;
-                case '4':
-                    $endDate = Carbon::createFromDate($tahun, 12, 1)->endOfMonth()->endOfDay();
-                    break;
-            }
-            $statsQuery->whereBetween('project.tanggal_selesai', [$startDate, $endDate]);
-        }
-        $jumlahProject = $statsQuery->count();
-
-        $respondenQuery = DB::table('project_responden')
-            ->join('project', 'project_responden.project_id', '=', 'project.id')
-            ->where('project.status', 'Pelaksanaan')
-            ->whereYear('project.tanggal_selesai', $tahun);
-        if ($selectedTriwulan && $selectedTriwulan != 'all') {
-            $startDate = Carbon::createFromDate($tahun, 1, 1)->startOfDay();
-            $endDate = Carbon::createFromDate($tahun, 12, 31)->endOfDay();
-            switch ($selectedTriwulan) {
-                case '1':
-                    $endDate = Carbon::createFromDate($tahun, 3, 1)->endOfMonth()->endOfDay();
-                    break;
-                case '2':
-                    $endDate = Carbon::createFromDate($tahun, 6, 1)->endOfMonth()->endOfDay();
-                    break;
-                case '3':
-                    $endDate = Carbon::createFromDate($tahun, 9, 1)->endOfMonth()->endOfDay();
-                    break;
-                case '4':
-                    $endDate = Carbon::createFromDate($tahun, 12, 1)->endOfMonth()->endOfDay();
-                    break;
-            }
-            $respondenQuery->whereBetween('project.tanggal_selesai', [$startDate, $endDate]);
-        }
-        $jumlahResponden = $respondenQuery->count();
-
-        $sudahAlumniQuery = DB::table('project_responden')
-            ->join('project', 'project_responden.project_id', '=', 'project.id')
-            ->where('project.status', 'Pelaksanaan')
-            ->whereYear('project.tanggal_selesai', $tahun)
-            ->where('project_responden.status_pengisian_kuesioner_alumni', 'sudah');
-        if ($selectedTriwulan && $selectedTriwulan != 'all') {
-            $startDate = Carbon::createFromDate($tahun, 1, 1)->startOfDay();
-            $endDate = Carbon::createFromDate($tahun, 12, 31)->endOfDay();
-            switch ($selectedTriwulan) {
-                case '1':
-                    $endDate = Carbon::createFromDate($tahun, 3, 1)->endOfMonth()->endOfDay();
-                    break;
-                case '2':
-                    $endDate = Carbon::createFromDate($tahun, 6, 1)->endOfMonth()->endOfDay();
-                    break;
-                case '3':
-                    $endDate = Carbon::createFromDate($tahun, 9, 1)->endOfMonth()->endOfDay();
-                    break;
-                case '4':
-                    $endDate = Carbon::createFromDate($tahun, 12, 1)->endOfMonth()->endOfDay();
-                    break;
-            }
-            $sudahAlumniQuery->whereBetween('project.tanggal_selesai', [$startDate, $endDate]);
-        }
-        $sudahAlumni = $sudahAlumniQuery->count();
-        $persentaseSudah = $jumlahResponden > 0 ? round(($sudahAlumni / $jumlahResponden) * 100, 2) : 0;
-
-        $totalAtasanQuery = DB::table('project_responden')
-            ->join('project', 'project_responden.project_id', '=', 'project.id')
-            ->where('project.status', 'Pelaksanaan')
-            ->whereYear('project.tanggal_selesai', $tahun)
-            ->whereNotNull('project_responden.nama_atasan');
-        if ($selectedTriwulan && $selectedTriwulan != 'all') {
-            $startDate = Carbon::createFromDate($tahun, 1, 1)->startOfDay();
-            $endDate = Carbon::createFromDate($tahun, 12, 31)->endOfDay();
-            switch ($selectedTriwulan) {
-                case '1':
-                    $endDate = Carbon::createFromDate($tahun, 3, 1)->endOfMonth()->endOfDay();
-                    break;
-                case '2':
-                    $endDate = Carbon::createFromDate($tahun, 6, 1)->endOfMonth()->endOfDay();
-                    break;
-                case '3':
-                    $endDate = Carbon::createFromDate($tahun, 9, 1)->endOfMonth()->endOfDay();
-                    break;
-                case '4':
-                    $endDate = Carbon::createFromDate($tahun, 12, 1)->endOfMonth()->endOfDay();
-                    break;
-            }
-            $totalAtasanQuery->whereBetween('project.tanggal_selesai', [$startDate, $endDate]);
-        }
-        $totalAtasan = $totalAtasanQuery->count();
-
-        $sudahAtasanQuery = DB::table('project_responden')
-            ->join('project', 'project_responden.project_id', '=', 'project.id')
-            ->where('project.status', 'Pelaksanaan')
-            ->whereYear('project.tanggal_selesai', $tahun)
-            ->whereNotNull('project_responden.nama_atasan')
-            ->where('project_responden.status_pengisian_kuesioner_atasan', 'sudah');
-
-        if ($selectedTriwulan && $selectedTriwulan != 'all') {
-            $startDate = Carbon::createFromDate($tahun, 1, 1)->startOfDay();
-            $endDate = Carbon::createFromDate($tahun, 12, 31)->endOfDay();
-            switch ($selectedTriwulan) {
-                case '1':
-                    $endDate = Carbon::createFromDate($tahun, 3, 1)->endOfMonth()->endOfDay();
-                    break;
-                case '2':
-                    $endDate = Carbon::createFromDate($tahun, 6, 1)->endOfMonth()->endOfDay();
-                    break;
-                case '3':
-                    $endDate = Carbon::createFromDate($tahun, 9, 1)->endOfMonth()->endOfDay();
-                    break;
-                case '4':
-                    $endDate = Carbon::createFromDate($tahun, 12, 1)->endOfMonth()->endOfDay();
-                    break;
-            }
-            $sudahAtasanQuery->whereBetween('project.tanggal_selesai', [$startDate, $endDate]);
-        }
-        $sudahAtasan = $sudahAtasanQuery->count();
-        $persentaseSudahAtasan = $totalAtasan > 0 ? round(($sudahAtasan / $sudahAlumni) * 100, 2) : 0;
 
         return view('dashboard', compact(
             'tahun',
