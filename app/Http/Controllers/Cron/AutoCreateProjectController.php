@@ -71,6 +71,8 @@ class AutoCreateProjectController extends Controller
                     'diklatTypeName' => $row['diklatTypeName'],
                     'kaldikDesc'     => $row['kaldikDesc'],
                     'user_id'        => null,
+                    'tanggal_mulai'     => $row['startDate'],
+                    'tanggal_selesai'   => $row['endDate'],
                     'created_at'     => now(),
                     'updated_at'     => now(),
                 ]);

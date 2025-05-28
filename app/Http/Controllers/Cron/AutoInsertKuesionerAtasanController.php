@@ -36,9 +36,9 @@ class AutoInsertKuesionerAtasanController extends Controller
                 ->where('remark', 'Atasan')
                 ->get();
 
-            $isRespondenSuccess = true; // Track if all inserts for this responden succeed
+            $isRespondenSuccess = true;
 
-            DB::beginTransaction(); // Start the transaction
+            DB::beginTransaction();
 
             try {
                 foreach ($kuesionerList as $kuesioner) {
@@ -76,7 +76,6 @@ class AutoInsertKuesionerAtasanController extends Controller
                     }
                 }
 
-                // If all inserts for this responden were successful, update the status
                 if ($isRespondenSuccess) {
                     DB::table('project_responden')
                         ->where('id', $responden->id)
@@ -86,11 +85,10 @@ class AutoInsertKuesionerAtasanController extends Controller
                     $failCount++;
                 }
 
-                DB::commit(); // Commit the transaction
+                DB::commit();
             } catch (\Exception $e) {
-                DB::rollBack(); // Rollback the transaction if there is an error
-                $failCount++; // Mark this responden as failed
-                // Log the error for debugging purposes
+                DB::rollBack();
+                $failCount++;
                 \Log::error("Error processing responden {$responden->id}: " . $e->getMessage());
             }
         }
