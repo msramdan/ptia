@@ -176,8 +176,9 @@
                                             <th>{{ __('NIP') }}</th>
                                             <th>{{ __('Nama atasan langsung') }}</th>
                                             <th>{{ __('No.Telepon atasan langsung') }}</th>
-                                            <th>{{ __('Notif Aktif?') }}</th> {{-- Kolom baru --}}
+                                            <th>{{ __('Notif Aktif?') }}</th>
                                             <th>{{ __('Deadline') }}</th>
+                                            <th>{{ __('From Cron ?') }}</th>
                                             <th>{{ __('Aksi') }}</th>
                                         </tr>
                                     </thead>
@@ -302,6 +303,10 @@
                     {
                         data: 'deadline_pengisian_atasan',
                         name: 'deadline_pengisian_atasan'
+                    },
+                    {
+                        data: 'insert_from_cron',
+                        name: 'insert_from_cron'
                     },
                     {
                         data: 'action',
