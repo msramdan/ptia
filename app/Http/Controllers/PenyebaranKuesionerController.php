@@ -270,10 +270,11 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
                         return '-';
                     }
 
-                    if ($row->insert_from_cron === 'No' && $ $$row->status_pengisian_kuesioner_atasan === 'Sudah') {
+                    if ($row->insert_from_cron === 'No' && $row->status_pengisian_kuesioner_atasan === 'Sudah') {
                         return 'No';
                     }
                 })
+
 
                 ->addColumn('send_notif_atasan_switch', function ($row) {
                     $checked = $row->send_notif_atasan === 'Yes' ? 'checked' : '';
