@@ -178,7 +178,7 @@
                                             <th>{{ __('No.Telepon atasan langsung') }}</th>
                                             <th>{{ __('Notif Aktif?') }}</th>
                                             <th>{{ __('Deadline') }}</th>
-                                            <th>{{ __('From Cron ?') }}</th>
+                                            <th>{{ __('From Cron?') }}</th>
                                             <th>{{ __('Aksi') }}</th>
                                         </tr>
                                     </thead>

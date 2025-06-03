@@ -261,6 +261,20 @@ class PenyebaranKuesionerController extends Controller implements HasMiddleware
 
             return DataTables::of($respondens)
                 ->addIndexColumn()
+                ->addColumn('insert_from_cron', function ($row) {
+                    if ($row->insert_from_cron === 'Yes') {
+                        return 'Yes';
+                    }
+
+                    if ($row->status_pengisian_kuesioner_atasan === 'Belum') {
+                        return '-';
+                    }
+
+                    if ($row->insert_from_cron === 'No' && $ $$row->status_pengisian_kuesioner_atasan === 'Sudah') {
+                        return 'No';
+                    }
+                })
+
                 ->addColumn('send_notif_atasan_switch', function ($row) {
                     $checked = $row->send_notif_atasan === 'Yes' ? 'checked' : '';
                     $disabled = false; // Sesuaikan dengan logika permission
