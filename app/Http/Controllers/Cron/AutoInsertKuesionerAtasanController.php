@@ -87,8 +87,10 @@ class AutoInsertKuesionerAtasanController extends Controller
                     // Update status responden
                     DB::table('project_responden')
                         ->where('id', $responden->id)
-                        ->update(['status_pengisian_kuesioner_atasan' => 'Sudah']);
-
+                        ->update([
+                            'status_pengisian_kuesioner_atasan' => 'Sudah',
+                            'insert_from_cron' => 'Yes',
+                        ]);
                     // Proses untuk project_skor_responden
                     $diklatTypeId = DB::table('project')
                         ->where('id', $responden->project_id)
