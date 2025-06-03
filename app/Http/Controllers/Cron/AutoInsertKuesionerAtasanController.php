@@ -41,6 +41,7 @@ class AutoInsertKuesionerAtasanController extends Controller
             DB::beginTransaction();
 
             try {
+                // Insert jawaban kuesioner atasan (copy dari alumni)
                 foreach ($kuesionerList as $kuesioner) {
                     $jawabanAlumni = DB::table('project_jawaban_kuesioner')
                         ->join('project_kuesioner', 'project_kuesioner.id', '=', 'project_jawaban_kuesioner.project_kuesioner_id')
@@ -77,9 +78,40 @@ class AutoInsertKuesionerAtasanController extends Controller
                 }
 
                 if ($isRespondenSuccess) {
+                    // Update status responden
                     DB::table('project_responden')
                         ->where('id', $responden->id)
                         ->update(['status_pengisian_kuesioner_atasan' => 'Sudah']);
+
+                    // Ambil data skor alumni
+                    $skorAlumni = DB::table('project_skor_responden')
+                        ->where('project_id', $responden->project_id)
+                        ->where('project_responden_id', $responden->id)
+                        ->first();
+
+                    if ($skorAlumni) {
+                        // Jika data sudah ada, update bagian atasan dengan data alumni
+                        DB::table('project_skor_responden')
+                            ->where('id', $skorAlumni->id)
+                            ->update([
+                                'log_data_atasan' => $skorAlumni->log_data_alumni,
+                                'skor_level_3_atasan' => $skorAlumni->skor_level_3_alumni,
+                                'skor_level_4_atasan' => $skorAlumni->skor_level_4_alumni,
+                                'updated_at' => now(),
+                            ]);
+                    } else {
+                        // Jika data belum ada, buat baru dengan data alumni untuk bagian atasan
+                        DB::table('project_skor_responden')->insert([
+                            'project_id' => $responden->project_id,
+                            'project_responden_id' => $responden->id,
+                            'log_data_atasan' => null, // Tidak ada data alumni untuk dicopy
+                            'skor_level_3_atasan' => 0,
+                            'skor_level_4_atasan' => 0,
+                            'created_at' => now(),
+                            'updated_at' => now(),
+                        ]);
+                    }
+
                     $successCount++;
                 } else {
                     $failCount++;
