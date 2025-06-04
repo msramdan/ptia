@@ -5,13 +5,24 @@ namespace App\Http\Controllers\Cron;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use App\Http\Controllers\Controller;
-
+use App\Models\Setting;
+use Illuminate\Support\Facades\Log;
 
 class AutoInsertKuesionerAtasanController extends Controller
 {
 
     public function insertData()
     {
+        $setting = Setting::first();
+
+        if (!$setting) {
+            Log::error("Pengaturan CRON tidak ditemukan di database.");
+            return response()->json(['message' => 'Pengaturan CRON tidak ditemukan.'], 404);
+        }
+        if ($setting->cron_auto_insert_expired_atasan !== 'Yes') {
+            sendNotifTelegram("❌ Cron auto insert expired atasan dinonaktifkan di pengaturan.", 'Cron');
+            return response()->json(['message' => 'Cron auto insert expired atasan dinonaktifkan di pengaturan.'], 200);
+        }
         $startTime = now();
         sendNotifTelegram("🚀 Cron Job Auto Insert Kuesioner Atasan Expired Dimulai\n📅 Waktu Mulai: {$startTime}", 'Cron');
 

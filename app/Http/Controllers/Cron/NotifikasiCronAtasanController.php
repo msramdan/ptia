@@ -23,6 +23,12 @@ class NotifikasiCronAtasanController extends Controller
             Log::error("Pengaturan CRON tidak ditemukan di database.");
             return response()->json(['message' => 'Pengaturan CRON tidak ditemukan.'], 404);
         }
+
+        if ($setting->cron_notif_atasan !== 'Yes') {
+            sendNotifTelegram("❌ Notifikasi atasan dinonaktifkan di pengaturan.", $type);
+            return response()->json(['message' => 'Notifikasi atasan dinonaktifkan di pengaturan.'], 200);
+        }
+
         $workStartHour = Carbon::createFromFormat('H:i:s', $setting->jam_mulai)->hour;
         $workEndHour = Carbon::createFromFormat('H:i:s', $setting->jam_selesai)->hour;
         $activeDays = is_string($setting->hari_jalan_cron)

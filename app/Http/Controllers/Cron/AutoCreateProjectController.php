@@ -3,18 +3,28 @@
 namespace App\Http\Controllers\Cron;
 
 use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\URL;
 use App\Http\Controllers\Controller;
-use App\Models\User;
 use Illuminate\Support\Str;
+use App\Models\Setting;
+use Illuminate\Support\Facades\Log;
 
 class AutoCreateProjectController extends Controller
 {
 
     public function autoCreate()
     {
+        $setting = Setting::first();
+
+        if (!$setting) {
+            Log::error("Pengaturan CRON tidak ditemukan di database.");
+            return response()->json(['message' => 'Pengaturan CRON tidak ditemukan.'], 404);
+        }
+        if ($setting->cron_auto_insert_expired_atasan !== 'Yes') {
+            sendNotifTelegram("❌ Cron auto create project dinonaktifkan di pengaturan.", 'Cron');
+            return response()->json(['message' => 'Cron auto create project dinonaktifkan di pengaturan.'], 200);
+        }
+
         $startTime = now();
         sendNotifTelegram("🚀 Cron Job Auto Create Project Dimulai\n📅 Waktu Mulai: {$startTime}", 'Cron');
 
