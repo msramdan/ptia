@@ -33,12 +33,21 @@ class Setting extends Model
         'jam_selesai',
         'hari_jalan_cron',
         'deadline_pengisian',
+        'cron_notif_alumni',
+        'cron_notif_atasan',
+        'cron_auto_insert_expired_atasan',
+        'cron_auto_create_project',
     ];
 
     protected $casts = [
-        'hari_jalan_cron' => 'array', // Cast kolom JSON ke array
+        'hari_jalan_cron' => 'array',
         'deadline_pengisian' => 'integer',
+        'cron_notif_alumni' => 'string',
+        'cron_notif_atasan' => 'string',
+        'cron_auto_insert_expired_atasan' => 'string',
+        'cron_auto_create_project' => 'string',
     ];
+
     /**
      * Get the attributes that should be cast.
      *
@@ -46,6 +55,21 @@ class Setting extends Model
      */
     protected function casts(): array
     {
-        return ['nama_aplikasi' => 'string', 'tentang_aplikasi' => 'string', 'logo' => 'string', 'logo_login' => 'string', 'favicon' => 'string', 'pengumuman' => 'string', 'created_at' => 'datetime:Y-m-d H:i:s', 'updated_at' => 'datetime:Y-m-d H:i:s', 'deadline_pengisian' => 'integer'];
+        return [
+            'nama_aplikasi' => 'string',
+            'tentang_aplikasi' => 'string',
+            'logo' => 'string',
+            'logo_login' => 'string',
+            'favicon' => 'string',
+            'pengumuman' => 'string',
+            'created_at' => 'datetime:Y-m-d H:i:s',
+            'updated_at' => 'datetime:Y-m-d H:i:s',
+            'deadline_pengisian' => 'integer',
+            'hari_jalan_cron' => 'array',
+            'cron_notif_alumni' => 'string',
+            'cron_notif_atasan' => 'string',
+            'cron_auto_insert_expired_atasan' => 'string',
+            'cron_auto_create_project' => 'string',
+        ];
     }
 }

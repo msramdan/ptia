@@ -32,6 +32,10 @@ class UpdateSettingRequest extends FormRequest
             'hari_jalan_cron' => ['required', 'array', 'min:1'],
             'hari_jalan_cron.*' => ['integer', 'in:0,1,2,3,4,5,6'],
             'deadline_pengisian' => 'required|integer|min:1',
+            'cron_notif_alumni' => 'nullable',
+            'cron_notif_atasan' => 'nullable',
+            'cron_auto_insert_expired_atasan' => 'nullable',
+            'cron_auto_create_project' => 'nullable',
         ];
     }
 

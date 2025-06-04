@@ -46,24 +46,54 @@ class SettingController extends Controller implements HasMiddleware
 
     public function update(UpdateSettingRequest $request): RedirectResponse
     {
+        // Pastikan nilai default untuk checkbox/switch
+        $request->merge([
+            'cron_notif_alumni' => $request->has('cron_notif_alumni') ? 'Yes' : 'No',
+            'cron_notif_atasan' => $request->has('cron_notif_atasan') ? 'Yes' : 'No',
+            'cron_auto_insert_expired_atasan' => $request->has('cron_auto_insert_expired_atasan') ? 'Yes' : 'No',
+            'cron_auto_create_project' => $request->has('cron_auto_create_project') ? 'Yes' : 'No',
+        ]);
+
         $validated = $request->validated();
-
         $setting = Setting::first();
-        $validated['logo'] = $this->imageService->upload(name: 'logo', path: $this->logoPath, defaultImage: $setting ? $setting->logo : null);
-        $validated['logo_login'] = $this->imageService->upload(name: 'logo_login', path: $this->logoLoginPath, defaultImage: $setting ? $setting->logo_login : null);
-        $validated['favicon'] = $this->imageService->upload(name: 'favicon', path: $this->faviconPath, defaultImage: $setting ? $setting->favicon : null);
+        // Handle upload gambar
+        $validated['logo'] = $this->imageService->upload(
+            name: 'logo',
+            path: $this->logoPath,
+            defaultImage: $setting->logo ?? null
+        );
 
-        if ($request->has('jam_mulai')) {
-            $validated['jam_mulai'] = Carbon::parse($validated['jam_mulai'])->format('H:i');
-        }
-        if ($request->has('jam_selesai')) {
-            $validated['jam_selesai'] = Carbon::parse($validated['jam_selesai'])->format('H:i');
+        $validated['logo_login'] = $this->imageService->upload(
+            name: 'logo_login',
+            path: $this->logoLoginPath,
+            defaultImage: $setting->logo_login ?? null
+        );
+
+        $validated['favicon'] = $this->imageService->upload(
+            name: 'favicon',
+            path: $this->faviconPath,
+            defaultImage: $setting->favicon ?? null
+        );
+
+        // Format waktu
+        if (!empty($validated['jam_mulai'])) {
+            $validated['jam_mulai'] = Carbon::parse($validated['jam_mulai'])->format('H:i:s');
         }
 
-        if ($request->has('hari_jalan_cron')) {
-            $validated['hari_jalan_cron'] = array_map('intval', $validated['hari_jalan_cron']);
+        if (!empty($validated['jam_selesai'])) {
+            $validated['jam_selesai'] = Carbon::parse($validated['jam_selesai'])->format('H:i:s');
         }
 
+        // Handle hari cron - pastikan sebagai array dan simpan sebagai JSON
+        if (!empty($validated['hari_jalan_cron'])) {
+            $validated['hari_jalan_cron'] = json_encode(
+                array_map('intval', (array)$validated['hari_jalan_cron'])
+            );
+        } else {
+            $validated['hari_jalan_cron'] = json_encode([]);
+        }
+
+        // Update atau create setting
         if ($setting) {
             $setting->update($validated);
         } else {
