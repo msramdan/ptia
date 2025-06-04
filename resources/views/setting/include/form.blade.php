@@ -384,3 +384,119 @@
         </div>
     </div>
 </div>
+
+<!-- Manual Trigger Cron Jobs -->
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title">{{ __('Manual Trigger Cron Jobs') }}</h4>
+                <p class="card-subtitle">{{ __('Jalankan cron job secara manual') }}</p>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        <button type="button" class="btn btn-success w-100" onclick="triggerCron('notif-alumni')">
+                            <i class="fas fa-bell me-2"></i> CRON NOTIF PTIA ALUMNI
+                        </button>
+                    </div>
+                    <div class="col-md-3">
+                        <button type="button" class="btn btn-success w-100" onclick="triggerCron('notif-atasan')">
+                            <i class="fas fa-bell me-2"></i> CRON NOTIF PTIA ATASAN
+                        </button>
+                    </div>
+                    <div class="col-md-3">
+                        <button type="button" class="btn btn-success w-100" onclick="triggerCron('auto-project')">
+                            <i class="fas fa-plus-circle me-2"></i> CRON AUTO CREATE PROJECT
+                        </button>
+                    </div>
+                    <div class="col-md-3">
+                        <button type="button" class="btn btn-success w-100" onclick="triggerCron('auto-atasan')">
+                            <i class="fas fa-sync-alt me-2"></i> CRON INSERT EXPIRED ATASAN
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@push('js')
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function triggerCron(type) {
+            let path, title, text;
+
+            switch (type) {
+                case 'notif-alumni':
+                    path = '/kirim-notifikasi-alumni';
+                    title = 'Kirim Notifikasi Alumni';
+                    text = 'Anda yakin ingin menjalankan CRON NOTIF PTIA ALUMNI?';
+                    break;
+                case 'notif-atasan':
+                    path = '/kirim-notifikasi-atasan';
+                    title = 'Kirim Notifikasi Atasan';
+                    text = 'Anda yakin ingin menjalankan CRON NOTIF PTIA ATASAN?';
+                    break;
+                case 'auto-project':
+                    path = '/auto-create-project';
+                    title = 'Buat Project Otomatis';
+                    text = 'Anda yakin ingin menjalankan CRON AUTO CREATE PROJECT?';
+                    break;
+                case 'auto-atasan':
+                    path = '/auto-insert-kuesiober-atasan';
+                    title = 'Insert Kuesioner Atasan Expired';
+                    text = 'Anda yakin ingin menjalankan CRON INSERT EXPIRED ATASAN?';
+                    break;
+            }
+
+            const url = '{{ url('') }}' + path;
+
+            Swal.fire({
+                title: title,
+                text: text,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Ya, Jalankan!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        title: 'Sedang memproses...',
+                        html: 'Silakan tunggu sebentar',
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+
+                    fetch(url, {
+                            method: 'GET',
+                            headers: {
+                                'Accept': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            Swal.fire(
+                                'Berhasil!',
+                                data.message || 'Cron job berhasil dijalankan',
+                                'success'
+                            );
+                        })
+                        .catch(error => {
+                            Swal.fire(
+                                'Error!',
+                                'Terjadi kesalahan saat menjalankan cron job',
+                                'error'
+                            );
+                            console.error('Error:', error);
+                        });
+                }
+            });
+        }
+    </script>
+@endpush
