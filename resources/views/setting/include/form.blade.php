@@ -375,7 +375,7 @@
                                 </label>
                             </div>
                             <div class="form-text">
-                                {{ __('Sistem akan otomatis membuat proyek baru jika tanggal selesai pelaksanaan siklat melebihi 90 hari.') }}
+                                {{ __('Sistem akan otomatis membuat proyek baru jika tanggal selesai pelaksanaan diklat melebihi 90 hari.') }}
                             </div>
                         </div>
                     </div>
