@@ -81,10 +81,9 @@ class RespondenKuesionerController extends Controller
                         ->where('pj.project_responden_id', $id)
                         ->where('pj.remark', $target);
                 })
-                ->join('aspek', 'pk.aspek_id', '=', 'aspek.id')
+                 ->join('aspek', 'pk.aspek_id', '=', 'aspek.id') // Join ke tabel aspek
                 ->where('pk.remark', $target)
                 ->where('pk.project_id', $responden->project_id)
-                ->orderBy('pk.aspek_id')
                 ->select(
                     'pk.id',
                     'pk.aspek_id',
@@ -97,7 +96,7 @@ class RespondenKuesionerController extends Controller
                     'pj.nilai_sesudah',
                     'pj.catatan'
                 )
-                ->orderBy('aspek.urutan', 'asc')
+                ->orderBy('aspek.urutan', 'asc') // Order berdasarkan urutan aspek
                 ->get();
 
             // Tentukan deadline berdasarkan target
