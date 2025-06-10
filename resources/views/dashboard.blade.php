@@ -479,7 +479,7 @@
                 </div>
 
                 <!-- New Row for Impact Percentage Charts -->
-                <div class="row mt-4">
+                <div class="row">
                     <div class="col-md-6">
                         <div class="card impact-chart-card">
                             <div class="card-body impact-chart-card-body">
@@ -531,7 +531,7 @@
                 </div>
 
                 <section class="section">
-                    <div class="row">
+                    <div class="row mt-4">
                         <div class="col-md-12">
                             <div class="card">
                                 <div class="card-body">
