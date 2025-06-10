@@ -1014,6 +1014,9 @@
                     backgroundColor: 'transparent',
                     height: '80%'
                 },
+                exporting: {
+                    enabled: false
+                },
                 title: {
                     text: null
                 },
@@ -1061,6 +1064,9 @@
                     type: 'pie',
                     backgroundColor: 'transparent',
                     height: '80%'
+                },
+                exporting: {
+                    enabled: false
                 },
                 title: {
                     text: null
