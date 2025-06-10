@@ -402,7 +402,7 @@
                                 <div class="card text-center shadow-sm border-0">
                                     <div class="card-body">
                                         <i class="fas fa-folder-open fa-2x text-primary mb-2"></i>
-                                        <h6 class="card-title">Total Project</h6>
+                                        <h6 class="card-title">Total Diklat</h6>
                                         <p class="card-text fw-bold" id="totalProject">{{ $jumlahProject }}</p>
                                     </div>
                                 </div>
@@ -489,16 +489,16 @@
                                     <div class="impact-percentage-value" id="impact-level3-value">
                                         {{ round($percentageLevel3, 2) }}%
                                     </div>
-                                    <div class="impact-percentage-label">Dari Total {{ $totalProjects }} Project</div>
+                                    <div class="impact-percentage-label">Dari Total {{ $totalProjects }} Diklat</div>
                                 </div>
                                 <div class="impact-stats-container">
                                     <div class="impact-stat-item">
                                         <div class="impact-stat-value">{{ $impactfulLevel3 }}</div>
-                                        <div class="impact-stat-label">Project Berdampak</div>
+                                        <div class="impact-stat-label">Diklat Berdampak</div>
                                     </div>
                                     <div class="impact-stat-item">
                                         <div class="impact-stat-value">{{ $totalProjects - $impactfulLevel3 }}</div>
-                                        <div class="impact-stat-label">Project Tidak Berdampak</div>
+                                        <div class="impact-stat-label">Diklat Tidak Berdampak</div>
                                     </div>
                                 </div>
                             </div>
@@ -513,16 +513,16 @@
                                     <div class="impact-percentage-value" id="impact-level4-value">
                                         {{ round($percentageLevel4, 2) }}%
                                     </div>
-                                    <div class="impact-percentage-label">Dari Total {{ $totalProjects }} Project</div>
+                                    <div class="impact-percentage-label">Dari Total {{ $totalProjects }} Diklat</div>
                                 </div>
                                 <div class="impact-stats-container">
                                     <div class="impact-stat-item">
                                         <div class="impact-stat-value">{{ $impactfulLevel4 }}</div>
-                                        <div class="impact-stat-label">Project Berdampak</div>
+                                        <div class="impact-stat-label">Diklat Berdampak</div>
                                     </div>
                                     <div class="impact-stat-item">
                                         <div class="impact-stat-value">{{ $totalProjects - $impactfulLevel4 }}</div>
-                                        <div class="impact-stat-label">Project Tidak Berdampak</div>
+                                        <div class="impact-stat-label">Diklat Tidak Berdampak</div>
                                     </div>
                                 </div>
                             </div>
@@ -637,7 +637,7 @@
                 // Update displayed values
                 $('#impact-level3-value').text(level3Percentage.toFixed(2) + '%');
                 $('#impact-level4-value').text(level4Percentage.toFixed(2) + '%');
-                $('.impact-percentage-label').text('Dari Total ' + totalProjects + ' Project');
+                $('.impact-percentage-label').text('Dari Total ' + totalProjects + ' Diklat');
 
                 // Update charts
                 if (impactChartLevel3) {

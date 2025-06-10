@@ -18,7 +18,7 @@ return new class extends Migration {
             $table->integer('nilai_sebelum')->default(0);
             $table->integer('nilai_sesudah')->default(0);
             $table->integer('nilai_delta')->default(0);
-            $table->string('catatan')->nullable();
+            $table->text('catatan')->nullable();
             $table->enum('remark', ['Alumni', 'Atasan']);
             $table->timestamps();
         });
