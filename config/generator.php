@@ -336,7 +336,8 @@ return [
             'permissions' => [
                 'user view',
                 'role & permission view',
-                'setting view'
+                'setting view',
+                'backup-database view'
             ],
             'menus' => [
                 [
@@ -345,12 +346,14 @@ return [
                     'route' => [
                         'users*',
                         'roles*',
-                        'setting*'
+                        'setting*',
+                        'backup*'
                     ],
                     'permissions' => [
                         'user view',
                         'role & permission view',
-                        'setting view'
+                        'setting view',
+                        'backup database view'
                     ],
                     'submenus' => [
                         [
@@ -367,6 +370,11 @@ return [
                             'title' => 'Roles & permissions',
                             'route' => '/roles',
                             'permission' => 'role & permission view'
+                        ],
+                        [
+                            'title' => 'Backup Database',
+                            'route' => '/backup',
+                            'permission' => 'backup database view'
                         ]
                     ]
                 ]

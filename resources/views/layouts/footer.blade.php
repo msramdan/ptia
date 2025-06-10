@@ -36,6 +36,7 @@
         attempts = 0;
     });
 </script>
+<script src="{{ asset('mazer/extensions/sweetalert2/sweetalert2.min.js') }}"></script>
 @stack('js')
 </body>
 
