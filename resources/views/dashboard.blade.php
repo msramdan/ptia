@@ -96,6 +96,72 @@
             animation: pulse 0.5s ease-in-out;
         }
 
+        /* New styles for impact percentage charts */
+        .impact-chart-container {
+            height: 300px;
+            min-height: 300px;
+            position: relative;
+        }
+
+        .impact-chart-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .impact-percentage-value {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2rem;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .impact-percentage-label {
+            position: absolute;
+            top: 65%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.9rem;
+            color: #6c757d;
+            text-align: center;
+            width: 100%;
+        }
+
+        .impact-chart-card {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .impact-chart-card-body {
+            flex: 1;
+            position: relative;
+        }
+
+        .impact-stats-container {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 1rem;
+        }
+
+        .impact-stat-item {
+            text-align: center;
+        }
+
+        .impact-stat-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .impact-stat-label {
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+
         @media (max-width: 48rem) {
             .heading-with-logo {
                 flex-direction: column;
@@ -120,6 +186,15 @@
             }
 
             .gauge-current-value {
+                font-size: 1.5rem;
+            }
+
+            .impact-chart-container {
+                height: 250px;
+                min-height: 250px;
+            }
+
+            .impact-percentage-value {
                 font-size: 1.5rem;
             }
         }
@@ -402,6 +477,59 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- New Row for Impact Percentage Charts -->
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <div class="card impact-chart-card">
+                            <div class="card-body impact-chart-card-body">
+                                <div class="impact-chart-title">Persentase Dampak Level 3 (≥50)</div>
+                                <div class="impact-chart-container">
+                                    <div id="impact-level3-chart" style="height: 100%; width: 100%;"></div>
+                                    <div class="impact-percentage-value" id="impact-level3-value">
+                                        {{ round($percentageLevel3, 2) }}%
+                                    </div>
+                                    <div class="impact-percentage-label">Dari Total {{ $totalProjects }} Project</div>
+                                </div>
+                                <div class="impact-stats-container">
+                                    <div class="impact-stat-item">
+                                        <div class="impact-stat-value">{{ $impactfulLevel3 }}</div>
+                                        <div class="impact-stat-label">Project Berdampak</div>
+                                    </div>
+                                    <div class="impact-stat-item">
+                                        <div class="impact-stat-value">{{ $totalProjects - $impactfulLevel3 }}</div>
+                                        <div class="impact-stat-label">Project Tidak Berdampak</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card impact-chart-card">
+                            <div class="card-body impact-chart-card-body">
+                                <div class="impact-chart-title">Persentase Dampak Level 4 (≥50)</div>
+                                <div class="impact-chart-container">
+                                    <div id="impact-level4-chart" style="height: 100%; width: 100%;"></div>
+                                    <div class="impact-percentage-value" id="impact-level4-value">
+                                        {{ round($percentageLevel4, 2) }}%
+                                    </div>
+                                    <div class="impact-percentage-label">Dari Total {{ $totalProjects }} Project</div>
+                                </div>
+                                <div class="impact-stats-container">
+                                    <div class="impact-stat-item">
+                                        <div class="impact-stat-value">{{ $impactfulLevel4 }}</div>
+                                        <div class="impact-stat-label">Project Berdampak</div>
+                                    </div>
+                                    <div class="impact-stat-item">
+                                        <div class="impact-stat-value">{{ $totalProjects - $impactfulLevel4 }}</div>
+                                        <div class="impact-stat-label">Project Tidak Berdampak</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <section class="section">
                     <div class="row">
                         <div class="col-md-12">
@@ -471,6 +599,7 @@
     <script type="text/javascript" src="https://cdn.datatables.net/v/bs5/dt-1.12.0/datatables.min.js"></script>
     <script>
         var chartLevel3, chartLevel4;
+        var impactChartLevel3, impactChartLevel4;
         var dataTable;
 
         function updateStatistik(data) {
@@ -496,8 +625,55 @@
                     setTimeout(() => $('#current-value-level4').removeClass('updated'), 500);
                 }
             }
-        }
 
+            // **UPDATE IMPACT PERCENTAGE DATA**
+            if (data.impact_percentage) {
+                let level3Percentage = parseFloat(data.impact_percentage.level_3) || 0;
+                let level4Percentage = parseFloat(data.impact_percentage.level_4) || 0;
+                let totalProjects = parseInt(data.jumlahProject) || 0;
+                let impactfulLevel3 = Math.round((level3Percentage / 100) * totalProjects);
+                let impactfulLevel4 = Math.round((level4Percentage / 100) * totalProjects);
+
+                // Update displayed values
+                $('#impact-level3-value').text(level3Percentage.toFixed(2) + '%');
+                $('#impact-level4-value').text(level4Percentage.toFixed(2) + '%');
+                $('.impact-percentage-label').text('Dari Total ' + totalProjects + ' Project');
+
+                // Update charts
+                if (impactChartLevel3) {
+                    impactChartLevel3.series[0].setData([{
+                            name: 'Berdampak',
+                            y: level3Percentage,
+                            color: '#2ecc71'
+                        },
+                        {
+                            name: 'Tidak Berdampak',
+                            y: 100 - level3Percentage,
+                            color: '#e74c3c'
+                        }
+                    ]);
+                }
+                if (impactChartLevel4) {
+                    impactChartLevel4.series[0].setData([{
+                            name: 'Berdampak',
+                            y: level4Percentage,
+                            color: '#2ecc71'
+                        },
+                        {
+                            name: 'Tidak Berdampak',
+                            y: 100 - level4Percentage,
+                            color: '#e74c3c'
+                        }
+                    ]);
+                }
+
+                // Update stat boxes
+                $('.impact-stat-value').eq(0).text(impactfulLevel3);
+                $('.impact-stat-value').eq(1).text(totalProjects - impactfulLevel3);
+                $('.impact-stat-value').eq(2).text(impactfulLevel4);
+                $('.impact-stat-value').eq(3).text(totalProjects - impactfulLevel4);
+            }
+        }
 
         function reloadDataDashboard() {
             var selectedTahun = $('#filter_tahun').val();
@@ -510,9 +686,9 @@
 
             // Load statistik via AJAX
             $.ajax({
-                url: ajaxUrl, // Menggunakan URL yang sama tapi mengharapkan JSON untuk statistik
+                url: ajaxUrl,
                 type: 'GET',
-                dataType: 'json', // Penting untuk memastikan respons di-parse sebagai JSON
+                dataType: 'json',
                 success: function(data) {
                     updateStatistik(data);
                 },
@@ -520,7 +696,6 @@
                     console.error("Error fetching stats: ", status, error);
                 }
             });
-
 
             if ($.fn.DataTable.isDataTable('#data-table')) {
                 dataTable.destroy();
@@ -530,7 +705,7 @@
                 processing: true,
                 serverSide: true,
                 ajax: {
-                    url: ajaxUrl, // URL yang sama, DataTables akan menambahkan parameter 'draw'
+                    url: ajaxUrl,
                     type: "GET",
                     data: function(d) {
                         // Parameter tambahan untuk DataTables jika ada
@@ -629,6 +804,7 @@
         }
 
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize gauge charts
             chartLevel3 = Highcharts.chart('container', {
                 chart: {
                     type: 'gauge',
@@ -831,14 +1007,104 @@
                 }]
             });
 
-            $('#filter_tahun, #filter_triwulan').on('change', function() {
-                var selectedTahun = $('#filter_tahun').val();
-                var selectedTriwulan = $('#filter_triwulan').val();
-                var newUrl = "{{ route('dashboard') }}?tahun=" + selectedTahun;
-                if (selectedTriwulan && selectedTriwulan !== 'all') {
-                    newUrl += "&triwulan=" + selectedTriwulan;
+            // Initialize impact percentage charts
+            impactChartLevel3 = Highcharts.chart('impact-level3-chart', {
+                chart: {
+                    type: 'pie',
+                    backgroundColor: 'transparent',
+                    height: '80%'
+                },
+                title: {
+                    text: null
+                },
+                tooltip: {
+                    pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+                },
+                accessibility: {
+                    point: {
+                        valueSuffix: '%'
+                    }
+                },
+                plotOptions: {
+                    pie: {
+                        allowPointSelect: true,
+                        cursor: 'pointer',
+                        dataLabels: {
+                            enabled: false
+                        },
+                        showInLegend: false,
+                        size: '100%',
+                        innerSize: '70%',
+                        colors: ['#2ecc71', '#e74c3c']
+                    }
+                },
+                series: [{
+                    name: 'Persentase',
+                    colorByPoint: true,
+                    data: [{
+                        name: 'Berdampak',
+                        y: {{ $percentageLevel3 }},
+                        sliced: true,
+                        selected: true
+                    }, {
+                        name: 'Tidak Berdampak',
+                        y: {{ 100 - $percentageLevel3 }}
+                    }]
+                }],
+                credits: {
+                    enabled: false
                 }
-                // Tidak perlu window.history.pushState karena reloadDataDashboard sudah menangani AJAX
+            });
+
+            impactChartLevel4 = Highcharts.chart('impact-level4-chart', {
+                chart: {
+                    type: 'pie',
+                    backgroundColor: 'transparent',
+                    height: '80%'
+                },
+                title: {
+                    text: null
+                },
+                tooltip: {
+                    pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+                },
+                accessibility: {
+                    point: {
+                        valueSuffix: '%'
+                    }
+                },
+                plotOptions: {
+                    pie: {
+                        allowPointSelect: true,
+                        cursor: 'pointer',
+                        dataLabels: {
+                            enabled: false
+                        },
+                        showInLegend: false,
+                        size: '100%',
+                        innerSize: '70%',
+                        colors: ['#2ecc71', '#e74c3c']
+                    }
+                },
+                series: [{
+                    name: 'Persentase',
+                    colorByPoint: true,
+                    data: [{
+                        name: 'Berdampak',
+                        y: {{ $percentageLevel4 }},
+                        sliced: true,
+                        selected: true
+                    }, {
+                        name: 'Tidak Berdampak',
+                        y: {{ 100 - $percentageLevel4 }}
+                    }]
+                }],
+                credits: {
+                    enabled: false
+                }
+            });
+
+            $('#filter_tahun, #filter_triwulan').on('change', function() {
                 reloadDataDashboard();
             });
 
