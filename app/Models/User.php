@@ -29,7 +29,8 @@ class User extends Authenticatable
         'jabatan',
         'kode_unit',
         'nama_unit',
-        'avatar'
+        'avatar',
+
     ];
 
 
@@ -41,6 +42,7 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+
     ];
 
     /**

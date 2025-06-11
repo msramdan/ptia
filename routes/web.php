@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Mail;
 use App\Http\Controllers\Cron\{
     AutoCreateProjectController,
     NotifikasiCronAlumniController,
@@ -31,11 +32,30 @@ use App\Http\Controllers\{
     DataSekunderController,
     HasilEvaluasiController,
     DataInterviewController,
-    BackupController
+    BackupController,
 };
+
+use App\Http\Controllers\Auth\VerifyOtpController;
 
 Route::get('/', function () {
     return view('welcome');
+});
+
+Route::get('/test-email', function () {
+    try {
+        // Ganti email tujuan dengan email lain yang bisa Anda akses untuk tes
+        $tujuan = 'spotifyfarhan13@gmail.com';
+
+        Mail::raw('Ini adalah isi email tes dari aplikasi Laravel Anda.', function ($message) use ($tujuan) {
+            $message->to($tujuan)
+                ->subject('Tes Koneksi Email SMTP');
+        });
+
+        return 'Berhasil mengirim email tes! Silakan periksa inbox (dan folder spam) di ' . $tujuan;
+    } catch (\Exception $e) {
+        // Tampilkan pesan error yang lebih detail
+        return '<h1>Gagal Mengirim Email</h1><p>Pesan Error:</p><pre>' . $e->getMessage() . '</pre>';
+    }
 });
 
 // CRON Notifikasi
@@ -48,6 +68,10 @@ Route::get('/auto-insert-kuesiober-atasan', [AutoInsertKuesionerAtasanController
 Route::get('/responden-kuesioner/{id}/{target}', [RespondenKuesionerController::class, 'index'])->name('responden-kuesioner.index');
 Route::get('/hasil-evaluasi-responden/{id}', [RespondenKuesionerController::class, 'hasilEvaluasi'])->name('hasil-evaluasi-responden.index');
 Route::post('/responden-kuesioner', [RespondenKuesionerController::class, 'store'])->name('responden-kuesioner.store');
+
+// OTP
+Route::post('/verify-otp-modal', [VerifyOtpController::class, 'verify'])->name('otp.verify.modal');
+Route::post('/resend-otp-modal', [VerifyOtpController::class, 'resend'])->name('otp.resend.modal');
 
 Route::middleware(['auth', 'web'])->group(function () {
     Route::get('/dashboard', function () {
