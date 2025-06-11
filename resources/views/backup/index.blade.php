@@ -33,16 +33,12 @@
             @endif
 
             <div class="card">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">Tindakan</h5>
-                </div>
                 <div class="card-body">
-                    <p>Klik tombol di bawah untuk membuat file cadangan (backup) baru. Proses ini mungkin memerlukan
-                        beberapa waktu.</p>
+                    <p>Klik tombol di bawah untuk membuat file cadangan (backup) database baru. Proses ini mungkin memerlukan beberapa waktu.</p>
                     <form action="{{ route('backup.create') }}" method="POST" id="backup-form">
                         @csrf
                         <button type="submit" class="btn btn-primary">
-                            <i class="fa fa-plus-circle"></i> Buat Backup Baru
+                            <i class="fa fa-database"></i> Buat Backup Database
                         </button>
                     </form>
                 </div>
@@ -53,46 +49,44 @@
                     <h5 class="card-title mb-0">Riwayat Backup Tersedia</h5>
                 </div>
                 <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-striped table-hover">
-                            <thead>
-                                <tr>
-                                    <th>Nama File</th>
-                                    <th>Ukuran</th>
-                                    <th>Tanggal Dibuat</th>
-                                    <th class="text-center">Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @forelse ($backups as $backup)
+                    @if($backups->isEmpty())
+                        <div class="alert alert-info">
+                            <i class="fa fa-info-circle"></i> Belum ada file backup yang tersedia.
+                        </div>
+                    @else
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead>
                                     <tr>
-                                        <td>
-                                            <i class="fa fa-database me-2"></i>
-                                            {{ $backup['file_name'] }}
-                                        </td>
-                                        <td>
-                                            @if (is_numeric($backup['file_size']))
-                                                {{ number_format($backup['file_size'] / 1024, 2) }} KB
-                                            @else
-                                                Ukuran tidak valid
-                                            @endif
-                                        </td>
-                                        <td>{{ date('d M Y, H:i:s', $backup['last_modified']) }}</td>
-                                        <td class="text-center">
-                                            <a href="{{ route('backup.download', $backup['file_name']) }}"
-                                                class="btn btn-sm btn-success">
-                                                <i class="fa fa-download"></i> Download
-                                            </a>
-                                        </td>
+                                        <th>Nama File</th>
+                                        <th>Ukuran</th>
+                                        <th>Tanggal Dibuat</th>
+                                        <th class="text-center">Aksi</th>
                                     </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="4" class="text-center">Belum ada file backup yang tersedia.</td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-                    </div>
+                                </thead>
+                                <tbody>
+                                    @foreach ($backups as $backup)
+                                        <tr>
+                                            <td>
+                                                <i class="fa fa-file-archive me-2"></i>
+                                                {{ $backup['file_name'] }}
+                                            </td>
+                                            <td>
+                                                {{ formatBytes($backup['file_size']) }}
+                                            </td>
+                                            <td>{{ date('d M Y, H:i:s', $backup['last_modified']) }}</td>
+                                            <td class="text-center">
+                                                <a href="{{ route('backup.download', $backup['file_name']) }}"
+                                                    class="btn btn-sm btn-success">
+                                                    <i class="fa fa-download"></i> Download
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>
@@ -101,64 +95,46 @@
 
 @push('js')
     <script>
-        // 1. Script untuk konfirmasi SweetAlert2 sebelum membuat backup
+        // Konfirmasi sebelum membuat backup
         document.getElementById('backup-form').addEventListener('submit', function(e) {
-            e.preventDefault(); // Mencegah form langsung dikirim
+            e.preventDefault();
 
             Swal.fire({
-                title: 'Konfirmasi Proses',
-                text: "Apakah Anda yakin ingin membuat backup baru? Proses ini akan berjalan di latar belakang.",
+                title: 'Konfirmasi Backup',
+                text: "Apakah Anda yakin ingin membuat backup database sekarang?",
                 icon: 'question',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
                 cancelButtonColor: '#d33',
-                confirmButtonText: 'Ya, Lanjutkan!',
+                confirmButtonText: 'Ya, Buat Backup',
                 cancelButtonText: 'Batal'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // Tampilkan pesan loading
                     Swal.fire({
-                        title: 'Memproses...',
-                        html: 'Sedang membuat file backup, mohon tunggu.',
+                        title: 'Sedang Memproses',
+                        html: 'Membuat backup database, mohon tunggu...',
                         allowOutsideClick: false,
                         didOpen: () => {
-                            Swal.showLoading()
+                            Swal.showLoading();
+                            e.target.submit();
                         }
                     });
-                    // Jika user menekan "Ya", kirim form-nya
-                    e.target.submit();
                 }
-            })
-        });
-
-        // 2. Script untuk otomatis download setelah backup selesai dibuat
-        @if (session('download_file'))
-            document.addEventListener('DOMContentLoaded', function() {
-                // Beri sedikit jeda agar user bisa melihat halaman refresh
-                setTimeout(() => {
-                    const fileName = "{{ session('download_file') }}";
-                    const downloadUrl = "{{ route('backup.download', ['fileName' => 'PLACEHOLDER']) }}"
-                        .replace('PLACEHOLDER', fileName);
-
-                    // Buat link tersembunyi dan klik secara otomatis
-                    const a = document.createElement('a');
-                    a.style.display = 'none';
-                    a.href = downloadUrl;
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-
-                    // Tampilkan notifikasi bahwa download telah dimulai
-                    Swal.fire({
-                        title: 'Download Dimulai!',
-                        text: `File ${fileName} sedang diunduh.`,
-                        icon: 'success',
-                        timer: 3500,
-                        showConfirmButton: false
-                    });
-
-                }, 1000); // Jeda 1 detik
             });
-        @endif
+        });
     </script>
 @endpush
+
+@php
+    function formatBytes($bytes, $precision = 2) {
+        $units = ['B', 'KB', 'MB', 'GB', 'TB'];
+
+        $bytes = max($bytes, 0);
+        $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
+        $pow = min($pow, count($units) - 1);
+
+        $bytes /= pow(1024, $pow);
+
+        return round($bytes, $precision) . ' ' . $units[$pow];
+    }
+@endphp

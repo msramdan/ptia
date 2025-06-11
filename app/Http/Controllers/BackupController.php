@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Routing\Controllers\Middleware;
 use Exception;
+use Illuminate\Support\Str;
 
 class BackupController extends Controller
 {
@@ -13,90 +14,96 @@ class BackupController extends Controller
     {
         return [
             'auth',
-            new Middleware('permission:backup database view', only: ['index', 'create', 'download']),
+            new Middleware('permission:backup database view', only: ['index'])
         ];
     }
 
-    /**
-     * Menampilkan halaman backup dengan daftar file yang sudah ada.
-     */
     public function index()
     {
-        $backups = collect();
         try {
             $disk = Storage::disk(config('backup.backup.destination.disks')[0]);
-            $files = $disk->files(config('app.name'));
+            $backupName = config('backup.backup.name');
+            $files = $disk->files($backupName);
 
             $backups = collect($files)
-                ->map(function ($file) {
-                    $disk = Storage::disk(config('backup.backup.destination.disks')[0]);
+                ->filter(fn($file) => Str::endsWith($file, '.zip'))
+                ->map(function ($file) use ($disk) {
                     return [
+                        'file_name' => basename($file),
                         'file_path' => $file,
-                        'file_name' => str_replace(config('app.name') . '/', '', $file),
                         'file_size' => $disk->size($file),
                         'last_modified' => $disk->lastModified($file),
                     ];
                 })
                 ->sortByDesc('last_modified');
-        } catch (Exception $e) {
-            session()->flash('error', 'Disk penyimpanan backup sepertinya belum terkonfigurasi. Cek file config/backup.php dan config/filesystems.php');
-        }
 
-        return view('backup.index', compact('backups'));
+            return view('backup.index', compact('backups'));
+        } catch (Exception $e) {
+            return redirect()->back()->with('error', 'Gagal mengakses direktori backup: ' . $e->getMessage());
+        }
     }
 
-    /**
-     * Membuat file backup baru dan memicu unduhan di frontend.
-     */
     public function create()
     {
         try {
-            // Jalankan perintah backup seperti sebelumnya
+            set_time_limit(300);
+
             Artisan::call('backup:run', [
                 '--only-db' => true,
                 '--disable-notifications' => true,
             ]);
 
-            // Ambil file terbaru yang baru saja dibuat
-            $disk = Storage::disk(config('backup.backup.destination.disks')[0]);
-            $files = $disk->files(config('app.name'));
+            $output = Artisan::output();
 
-            $latestFile = collect($files)->sortByDesc(function ($file) use ($disk) {
-                return $disk->lastModified($file);
-            })->first();
+            \Log::info('Backup Output: ' . $output); // Log output
 
-            // Jika file ditemukan, kirim namanya kembali ke view untuk diunduh
-            if ($latestFile) {
-                $latestFileName = str_replace(config('app.name') . '/', '', $latestFile);
-
+            if (Str::contains($output, 'Backup completed!')) {
                 return redirect()->route('backup.index')
-                    ->with('success', 'File backup baru berhasil dibuat.')
-                    ->with('download_file', $latestFileName); // "Pesan rahasia"
+                    ->with('success', 'Backup database berhasil dibuat!');
             }
 
-            return back()->with('error', 'Backup berhasil dibuat, namun file tidak ditemukan.');
+            return redirect()->route('backup.index')
+                ->with('error', 'Backup gagal: ' . $output);
         } catch (Exception $e) {
-            return back()->with('error', 'Gagal membuat backup: ' . $e->getMessage());
+            \Log::error('Backup Error: ' . $e->getMessage());
+            return redirect()->route('backup.index')
+                ->with('error', 'Gagal membuat backup: ' . $e->getMessage());
         }
     }
 
-    /**
-     * Mengunduh file backup yang sudah ada.
-     */
-    public function download(string $fileName)
+    public function download($fileName)
     {
         try {
             $disk = Storage::disk(config('backup.backup.destination.disks')[0]);
-            $filePath = config('app.name') . '/' . $fileName;
+            $backupName = config('backup.backup.name');
+            $filePath = $backupName . '/' . $fileName;
 
-            // Keamanan: pastikan file benar-benar ada sebelum diunduh
-            if ($disk->exists($filePath)) {
-                return $disk->download($filePath);
+            if (!$disk->exists($filePath)) {
+                throw new Exception('File backup tidak ditemukan.');
             }
 
-            return back()->with('error', 'File backup tidak ditemukan.');
+            return $disk->download($filePath);
         } catch (Exception $e) {
-            return back()->with('error', 'Gagal mengunduh file: ' . $e->getMessage());
+            return redirect()->route('backup.index')->with('error', 'Gagal mengunduh file: ' . $e->getMessage());
+        }
+    }
+
+    public function clean()
+    {
+        try {
+            Artisan::call('backup:clean', [
+                '--disable-notifications' => true,
+            ]);
+
+            $output = Artisan::output();
+
+            if (Str::contains($output, 'Cleanup completed!')) {
+                return redirect()->route('backup.index')->with('success', 'Pembersihan backup lama berhasil!');
+            }
+
+            return redirect()->route('backup.index')->with('error', 'Pembersihan gagal: ' . $output);
+        } catch (Exception $e) {
+            return redirect()->route('backup.index')->with('error', 'Gagal membersihkan backup lama: ' . $e->getMessage());
         }
     }
 }
