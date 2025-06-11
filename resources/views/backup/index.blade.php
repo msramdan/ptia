@@ -34,7 +34,8 @@
 
             <div class="card">
                 <div class="card-body">
-                    <p>Klik tombol di bawah untuk membuat file cadangan (backup) database baru. Proses ini mungkin memerlukan beberapa waktu.</p>
+                    <p>Klik tombol di bawah untuk membuat file cadangan (backup) database baru. Proses ini mungkin
+                        memerlukan beberapa waktu.</p>
                     <form action="{{ route('backup.create') }}" method="POST" id="backup-form">
                         @csrf
                         <button type="submit" class="btn btn-primary">
@@ -49,7 +50,7 @@
                     <h5 class="card-title mb-0">Riwayat Backup Tersedia</h5>
                 </div>
                 <div class="card-body">
-                    @if($backups->isEmpty())
+                    @if ($backups->isEmpty())
                         <div class="alert alert-info">
                             <i class="fa fa-info-circle"></i> Belum ada file backup yang tersedia.
                         </div>
@@ -80,6 +81,11 @@
                                                     class="btn btn-sm btn-success">
                                                     <i class="fa fa-download"></i> Download
                                                 </a>
+
+                                                <button class="btn btn-sm btn-danger delete-btn"
+                                                    data-file="{{ $backup['file_name'] }}">
+                                                    <i class="fa fa-trash"></i> Hapus
+                                                </button>
                                             </td>
                                         </tr>
                                     @endforeach
@@ -122,11 +128,53 @@
                 }
             });
         });
+
+        // Delete backup confirmation
+        document.querySelectorAll('.delete-btn').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                const fileName = this.getAttribute('data-file');
+
+                Swal.fire({
+                    title: 'Konfirmasi Hapus',
+                    text: "Apakah Anda yakin ingin menghapus backup " + fileName + "?",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Ya, Hapus!',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Create a form and submit it
+                        const form = document.createElement('form');
+                        form.method = 'POST';
+                        form.action = '/backup/delete/' + fileName;
+
+                        const csrf = document.createElement('input');
+                        csrf.type = 'hidden';
+                        csrf.name = '_token';
+                        csrf.value = document.querySelector('meta[name="csrf-token"]').content;
+
+                        const method = document.createElement('input');
+                        method.type = 'hidden';
+                        method.name = '_method';
+                        method.value = 'DELETE';
+
+                        form.appendChild(csrf);
+                        form.appendChild(method);
+                        document.body.appendChild(form);
+                        form.submit();
+                    }
+                });
+            });
+        });
     </script>
 @endpush
 
 @php
-    function formatBytes($bytes, $precision = 2) {
+    function formatBytes($bytes, $precision = 2)
+    {
         $units = ['B', 'KB', 'MB', 'GB', 'TB'];
 
         $bytes = max($bytes, 0);

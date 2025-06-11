@@ -206,4 +206,5 @@ Route::middleware(['auth', 'web'])->group(function () {
     Route::get('/backup', [BackupController::class, 'index'])->name('backup.index');
     Route::post('/backup/create', [BackupController::class, 'create'])->name('backup.create');
     Route::get('/backup/download/{fileName}', [BackupController::class, 'download'])->name('backup.download');
+    Route::delete('/backup/delete/{fileName}', [BackupController::class, 'destroy'])->name('backup.destroy');
 });

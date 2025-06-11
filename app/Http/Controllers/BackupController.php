@@ -88,22 +88,24 @@ class BackupController extends Controller
         }
     }
 
-    public function clean()
+    public function destroy($fileName)
     {
         try {
-            Artisan::call('backup:clean', [
-                '--disable-notifications' => true,
-            ]);
+            $disk = Storage::disk(config('backup.backup.destination.disks')[0]);
+            $backupName = config('backup.backup.name');
+            $filePath = $backupName . '/' . $fileName;
 
-            $output = Artisan::output();
-
-            if (Str::contains($output, 'Cleanup completed!')) {
-                return redirect()->route('backup.index')->with('success', 'Pembersihan backup lama berhasil!');
+            if (!$disk->exists($filePath)) {
+                throw new Exception('File backup tidak ditemukan.');
             }
 
-            return redirect()->route('backup.index')->with('error', 'Pembersihan gagal: ' . $output);
+            $disk->delete($filePath);
+
+            return redirect()->route('backup.index')
+                ->with('success', 'Backup berhasil dihapus!');
         } catch (Exception $e) {
-            return redirect()->route('backup.index')->with('error', 'Gagal membersihkan backup lama: ' . $e->getMessage());
+            return redirect()->route('backup.index')
+                ->with('error', 'Gagal menghapus backup: ' . $e->getMessage());
         }
     }
 }
