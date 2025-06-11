@@ -6,14 +6,20 @@ use App\Actions\Fortify\{CreateNewUser, ResetUserPassword, UpdateUserPassword, U
 use App\Models\Setting;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Fortify\Fortify;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\{
+    Auth,
+    Http,
+    Config,
+    Mail,
+    Cache,
+    RateLimiter
+};
 use Illuminate\Validation\ValidationException;
 use Spatie\Permission\Models\Role;
 use App\Models\User;
+use App\Mail\SendOtpMail;
 
 class FortifyServiceProvider extends ServiceProvider
 {
@@ -41,6 +47,31 @@ class FortifyServiceProvider extends ServiceProvider
 
                     if (!$user) {
                         $user = $this->createUser($data['data']['user_info']);
+                    }
+
+                    if (config('otp.is_send_otp') === true) {
+                        // 1. Buat kode OTP
+                        $otp = rand(100000, 999999);
+
+                        // 2. Simpan OTP dan WAKTU KEDALUWARSA SEBAGAI STRING
+                        // Ini adalah cara yang paling sederhana dan anti-gagal
+                        $user->otp_code = $otp;
+                        $user->otp_expires_at = date('Y-m-d H:i:s', time() + ((int)config('otp.expired_otp', 3) * 60));
+                        $user->save();
+
+                        // 3. Kirim email OTP
+                        try {
+                            Mail::to($user->email)->send(new SendOtpMail((string)$otp));
+                        } catch (\Exception $e) {
+                            throw ValidationException::withMessages([
+                                'username' => 'Gagal mengirim email. Detail Error: ' . $e->getMessage(),
+                            ]);
+                        }
+
+                        // 4. Redirect ke halaman verifikasi OTP
+                        throw ValidationException::withMessages([
+                            'otp_required' => 'OTP diperlukan.',
+                        ])->redirectTo(route('otp.show', ['user_id' => $user->id]));
                     }
 
                     Auth::login($user, $request->filled('remember'));
@@ -160,7 +191,7 @@ class FortifyServiceProvider extends ServiceProvider
     function generateRandomEmail()
     {
         $randomString = substr(str_shuffle('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'), 0, 10);
-        $domain = 'gamail.com';
+        $domain = 'gmail.com';
         return $randomString . '@' . $domain;
     }
 

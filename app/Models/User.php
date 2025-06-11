@@ -29,7 +29,9 @@ class User extends Authenticatable
         'jabatan',
         'kode_unit',
         'nama_unit',
-        'avatar'
+        'avatar',
+        'otp_code',
+        'otp_expires_at',
     ];
 
 
@@ -41,6 +43,7 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'otp_code',
     ];
 
     /**
@@ -48,9 +51,17 @@ class User extends Authenticatable
      *
      * @var array
      */
-    protected $casts = [
-        'email_verified_at' => 'datetime:Y-m-d H:i',
-        'created_at' => 'datetime:Y-m-d H:i',
-        'updated_at' => 'datetime:Y-m-d H:i',
-    ];
+    // protected $casts = [
+    //     'email_verified_at' => 'datetime:Y-m-d H:i',
+    //     'created_at' => 'datetime:Y-m-d H:i',
+    //     'updated_at' => 'datetime:Y-m-d H:i',
+    // ];
+    protected function casts(): array
+    {
+        return [
+            'email_verified_at' => 'datetime',
+            'password'          => 'hashed',
+            // Pastikan baris 'otp_expires_at' => 'datetime' sudah dihapus dari sini
+        ];
+    }
 }
