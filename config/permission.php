@@ -223,5 +223,6 @@ return [
         ['group' => 'Pengumpulan Data', 'access' => ['pengumpulan data view']],
         ['group' => 'Data Sekunder', 'access' => ['data sekunder view', 'data sekunder create']],
         ['group' => 'Hasil Evaluasi', 'access' => ['hasil evaluasi view']],
+        ['group' => 'Backup Database', 'access' => ['backup database view']],
     ],
 ];
