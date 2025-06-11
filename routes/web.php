@@ -30,7 +30,8 @@ use App\Http\Controllers\{
     SettingController,
     DataSekunderController,
     HasilEvaluasiController,
-    DataInterviewController
+    DataInterviewController,
+    BackupController
 };
 
 Route::get('/', function () {
@@ -177,4 +178,9 @@ Route::middleware(['auth', 'web'])->group(function () {
         // Export PDF
         Route::get('/{id}/export-pdf', 'exportPdf')->name('project.exportPdf');
     });
+
+
+    Route::get('/backup', [BackupController::class, 'index'])->name('backup.index');
+    Route::post('/backup/create', [BackupController::class, 'create'])->name('backup.create');
+    Route::get('/backup/download/{fileName}', [BackupController::class, 'download'])->name('backup.download');
 });

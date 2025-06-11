@@ -13,6 +13,7 @@
         <link rel="shortcut icon" href="{{ asset('storage/uploads/favicons/' . $settingApp->favicon) }}"
             type="image/x-icon">
     @endif
+    <link rel="stylesheet" href="{{ asset('mazer/extensions/sweetalert2/sweetalert2.min.css') }}">
     <link rel="stylesheet" href="{{ asset('mazer') }}/compiled/css/app.css" />
     <link rel="stylesheet" href="{{ asset('mazer') }}/compiled/css/app-dark.css" />
     <link rel="stylesheet" href="{{ asset('assets/font-awesome/css/all.min.css') }}" />
