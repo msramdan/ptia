@@ -20,10 +20,29 @@ use Illuminate\Validation\ValidationException;
 use Spatie\Permission\Models\Role;
 use App\Models\User;
 use App\Mail\SendOtpMail;
+use Laravel\Fortify\Contracts\LoginResponse as LoginResponseContract;
+
 
 class FortifyServiceProvider extends ServiceProvider
 {
-    public function register(): void {}
+    public function register(): void
+    {
+        $this->app->singleton(LoginResponseContract::class, function ($app) {
+            return new class implements LoginResponseContract {
+                public function toResponse($request)
+                {
+                    // Jika ada session 'otp_user_id', berarti user harus verifikasi OTP
+                    if (config('otp.is_send_otp') && session()->has('otp_user_id')) {
+                        // Arahkan ke halaman verifikasi OTP
+                        return redirect()->route('otp.show');
+                    }
+
+                    // Jika tidak, arahkan ke dashboard seperti biasa
+                    return redirect()->intended(config('fortify.home'));
+                }
+            };
+        });
+    }
 
     public function boot(): void
     {
@@ -34,7 +53,10 @@ class FortifyServiceProvider extends ServiceProvider
                 'g-recaptcha-response' => 'required|captcha',
             ]);
 
+            // Selalu bersihkan session OTP lama saat mencoba login baru
+            session()->forget('otp_user_id');
 
+            // Logika login Anda ke API Stara...
             if (config('stara.is_hit')) {
                 $response = Http::post(config('stara.endpoint') . '/auth/login', [
                     'username' => $request->username,
@@ -49,39 +71,16 @@ class FortifyServiceProvider extends ServiceProvider
                         $user = $this->createUser($data['data']['user_info']);
                     }
 
+                    // --- LOGIKA OTP YANG DISEMPURNAKAN ---
                     if (config('otp.is_send_otp') === true) {
-                        // 1. Buat kode OTP
-                        $otp = rand(100000, 999999);
-
-                        // 2. Simpan OTP dan WAKTU KEDALUWARSA SEBAGAI STRING
-                        // Ini adalah cara yang paling sederhana dan anti-gagal
-                        $user->otp_code = $otp;
-                        $user->otp_expires_at = date('Y-m-d H:i:s', time() + ((int)config('otp.expired_otp', 3) * 60));
-                        $user->save();
-
-                        // 3. Kirim email OTP
-                        try {
-                            Mail::to($user->email)->send(new SendOtpMail((string)$otp));
-                        } catch (\Exception $e) {
-                            throw ValidationException::withMessages([
-                                'username' => 'Gagal mengirim email. Detail Error: ' . $e->getMessage(),
-                            ]);
-                        }
-
-                        // 4. Redirect ke halaman verifikasi OTP
-                        throw ValidationException::withMessages([
-                            'otp_required' => 'OTP diperlukan.',
-                        ])->redirectTo(route('otp.show', ['user_id' => $user->id]));
+                        $this->sendOtp($user); // Panggil fungsi helper untuk mengirim OTP
+                        // Kembalikan user object agar Fortify tahu otentikasi password berhasil
+                        // Sisanya akan ditangani oleh LoginResponse di atas
+                        return $user;
                     }
 
+                    // Jika OTP tidak aktif, langsung login
                     Auth::login($user, $request->filled('remember'));
-                    session(['api_token' => $data['data']['token']]);
-
-                    // Cek status pengumuman
-                    $setting = Setting::first();
-                    if ($setting && $setting->is_aktif_pengumuman === 'Yes') {
-                        session(['show_pengumuman' => true]);
-                    }
                     return $user;
                 }
             } else {
@@ -131,6 +130,28 @@ class FortifyServiceProvider extends ServiceProvider
         Fortify::resetPasswordView(function (Request $request) {
             return view('auth.reset-password', ['request' => $request]);
         });
+    }
+
+    /**
+     * Fungsi helper untuk mengirim OTP (meniru referensi Anda)
+     */
+    private function sendOtp(User $user): void
+    {
+        $otp = rand(100000, 999999);
+        $otpExpiration = (int)config('otp.expired_otp', 3);
+
+        // Simpan OTP di Cache, bukan di database
+        Cache::put('otp_' . $user->id, $otp, now()->addMinutes($otpExpiration));
+
+        try {
+            Mail::to($user->email)->send(new SendOtpMail((string)$otp));
+        } catch (\Exception $e) {
+            // Jika gagal, gagalkan dengan pesan yang jelas
+            throw ValidationException::withMessages(['username' => 'Gagal mengirim OTP: ' . $e->getMessage()]);
+        }
+
+        // Simpan ID user di session untuk halaman verifikasi
+        session(['otp_user_id' => $user->id]);
     }
 
     private function createUser(array $userInfo): User

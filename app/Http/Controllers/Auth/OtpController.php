@@ -6,42 +6,39 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 
 class OtpController extends Controller
 {
     public function showVerifyForm()
     {
-        if (!request()->query('user_id')) {
-            return redirect()->route('login')->withErrors('Sesi verifikasi tidak valid. Silakan login kembali.');
+        if (!session()->has('otp_user_id')) {
+            return redirect()->route('login')->withErrors(['username' => 'Sesi verifikasi tidak valid. Silakan login kembali.']);
         }
         return view('auth.verify-otp');
     }
 
     public function verify(Request $request)
     {
-        $request->validate([
-            'user_id' => 'required|exists:users,id',
-            'otp'     => 'required|numeric|digits:6',
-        ]);
+        $request->validate(['otp' => 'required|numeric|digits:6']);
 
-        $user = User::find($request->user_id);
-
-        if (!$user || !$user->otp_code || !$user->otp_expires_at) {
-            return back()->withErrors(['otp' => 'Sesi OTP tidak valid atau kedaluwarsa.']);
+        $userId = session('otp_user_id');
+        if (!$userId) {
+            return back()->withErrors(['otp' => 'Sesi Anda telah berakhir.']);
         }
 
-        // --- PERBANDINGAN STRING DENGAN STRING (PALING AMAN & SEDERHANA) ---
-        $isExpired = date('Y-m-d H:i:s') > $user->otp_expires_at;
+        $otpKey = 'otp_' . $userId;
+        $storedOtp = Cache::get($otpKey);
 
-        if ($user->otp_code !== $request->otp || $isExpired) {
-            return back()->withErrors(['otp' => 'Kode OTP tidak valid atau sudah kedaluwarsa.']);
+        if ($storedOtp != $request->otp) {
+            return back()->withErrors(['otp' => 'Kode OTP yang Anda masukkan salah.']);
         }
 
+        $user = User::find($userId);
         Auth::login($user);
 
-        $user->otp_code = null;
-        $user->otp_expires_at = null;
-        $user->save();
+        Cache::forget($otpKey);
+        session()->forget('otp_user_id');
 
         return redirect()->intended(config('fortify.home'));
     }

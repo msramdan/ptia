@@ -35,6 +35,8 @@ use App\Http\Controllers\{
     BackupController,
 };
 
+use App\Http\Controllers\Auth\VerifyOtpController;
+
 Route::get('/', function () {
     return view('welcome');
 });
@@ -67,8 +69,9 @@ Route::get('/responden-kuesioner/{id}/{target}', [RespondenKuesionerController::
 Route::get('/hasil-evaluasi-responden/{id}', [RespondenKuesionerController::class, 'hasilEvaluasi'])->name('hasil-evaluasi-responden.index');
 Route::post('/responden-kuesioner', [RespondenKuesionerController::class, 'store'])->name('responden-kuesioner.store');
 
-Route::get('/verify-otp', [App\Http\Controllers\Auth\OtpController::class, 'showVerifyForm'])->name('otp.show');
-Route::post('/verify-otp', [App\Http\Controllers\Auth\OtpController::class, 'verify'])->name('otp.verify');
+// OTP
+Route::post('/verify-otp-modal', [VerifyOtpController::class, 'verify'])->name('otp.verify.modal');
+Route::post('/resend-otp-modal', [VerifyOtpController::class, 'resend'])->name('otp.resend.modal');
 
 Route::middleware(['auth', 'web'])->group(function () {
     Route::get('/dashboard', function () {

@@ -7,9 +7,9 @@
         ## {{ $otp }}
     </x-mail::panel>
 
-    Kode ini akan kedaluwarsa dalam beberapa menit.
+    Kode ini akan kedaluwarsa dalam **{{ (int) config('otp.expired_otp', 3) }} menit**.
 
-    Jika Anda tidak meminta kode verifikasi, Anda bisa mengabaikan email ini.
+    Jika Anda tidak merasa meminta kode ini, Anda bisa mengabaikan email ini dengan aman.
 
     Terima kasih,<br>
     {{ config('app.name') }}
