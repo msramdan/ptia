@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Yajra\DataTables\DataTables;
 use Illuminate\Support\Facades\DB;
@@ -10,6 +11,11 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controllers\{HasMiddleware, Middleware};
 use App\Exports\RekapHasilEvaluasiExport;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Models\Project;
+use Barryvdh\DomPDF\Facade\Pdf as FacadePdf;
+use App\Models\Setting;
+use Carbon\Carbon;
+
 
 
 class HasilEvaluasiController extends Controller implements HasMiddleware
@@ -101,7 +107,13 @@ class HasilEvaluasiController extends Controller implements HasMiddleware
                 ->addColumn('avg_skor_level_4', fn($row) => '<a href="' . e(url("/hasil-evaluasi/level-4/{$row->id}")) . '" class="btn btn-link">' . e(number_format($row->avg_skor_level_4, 2)) . '</a>')
                 ->addColumn('kriteria_dampak_level_3', fn($row) => e($row->kriteria_dampak_level_3 ?? '-'))
                 ->addColumn('kriteria_dampak_level_4', fn($row) => e($row->kriteria_dampak_level_4 ?? '-'))
-                ->rawColumns(['user', 'avg_skor_level_3', 'avg_skor_level_4'])
+                ->addColumn('action', function ($row) {
+                    $pdfUrl = route('hasil-evaluasi.export-pdf-item', $row->id);
+                    return '<a href="' . e($pdfUrl) . '" class="btn btn-outline-secondary btn-sm" target="_blank">
+                    <i class="fas fa-print"></i> PDF
+                </a>';
+                })
+                ->rawColumns(['user', 'avg_skor_level_3', 'avg_skor_level_4', 'action'])
                 ->toJson();
         }
 
@@ -640,5 +652,93 @@ class HasilEvaluasiController extends Controller implements HasMiddleware
     public function exportExcel()
     {
         return Excel::download(new RekapHasilEvaluasiExport(), 'rekap-hasil-evaluasi.xlsx');
+    }
+
+    public function exportPdfPerItem(Project $project)
+    {
+        // === BAGIAN 1: Mengambil Rangkuman Hasil Evaluasi ===
+        $hasilEvaluasi = DB::table('project')
+            ->select(
+                'project.id',
+                'project.kode_project',
+                'project.kaldikID',
+                'project.kaldikDesc',
+                'project.diklat_type_id',
+                'project.created_at',
+                'project.tanggal_selesai',
+                'diklat_type.nama_diklat_type',
+                'users.name as user_name',
+                DB::raw('COALESCE(avg_scores.avg_skor_level_3, 0) AS avg_skor_level_3'),
+                DB::raw('COALESCE(avg_scores.final_avg_skor_level_4, 0) AS avg_skor_level_4'),
+                DB::raw("COALESCE(i3.kriteria_dampak, '-') AS kriteria_dampak_level_3"),
+                DB::raw("COALESCE(i4.kriteria_dampak, '-') AS kriteria_dampak_level_4")
+            )
+            ->leftJoinSub(
+                DB::table('project_skor_responden')->select('project_id', DB::raw("LEAST(100, COALESCE(ROUND(AVG((COALESCE(skor_level_3_alumni, 0) + COALESCE(skor_level_3_atasan, 0))), 2), 0)) AS avg_skor_level_3"), DB::raw("LEAST(100, (COALESCE(ROUND(AVG((COALESCE(skor_level_4_alumni, 0) + COALESCE(skor_level_4_atasan, 0))), 2), 0) + COALESCE((SELECT bobot_aspek_sekunder FROM project_bobot_aspek_sekunder WHERE project_bobot_aspek_sekunder.project_id = project_skor_responden.project_id AND EXISTS (SELECT 1 FROM project_data_sekunder WHERE project_data_sekunder.project_id = project_skor_responden.project_id AND project_data_sekunder.nilai_kinerja_awal < project_data_sekunder.nilai_kinerja_akhir)), 0))) AS final_avg_skor_level_4"))->groupBy('project_id'),
+                'avg_scores',
+                'project.id',
+                '=',
+                'avg_scores.project_id'
+            )
+            ->leftJoin('diklat_type', 'project.diklat_type_id', '=', 'diklat_type.id')
+            ->leftJoin('users', 'project.user_id', '=', 'users.id')
+            ->leftJoin('indikator_dampak AS i3', function ($join) {
+                $join->on('project.diklat_type_id', '=', 'i3.diklat_type_id')->whereRaw('COALESCE(avg_scores.avg_skor_level_3, 0) > i3.nilai_minimal AND COALESCE(avg_scores.avg_skor_level_3, 0) <= i3.nilai_maksimal');
+            })
+            ->leftJoin('indikator_dampak AS i4', function ($join) {
+                $join->on('project.diklat_type_id', '=', 'i4.diklat_type_id')->whereRaw('COALESCE(avg_scores.final_avg_skor_level_4, 0) > i4.nilai_minimal AND COALESCE(avg_scores.final_avg_skor_level_4, 0) <= i4.nilai_maksimal');
+            })
+            ->where('project.status', 'Pelaksanaan')->where('project.id', $project->id)
+            ->first();
+
+        if (!$hasilEvaluasi) {
+            abort(404, 'Data Evaluasi Project tidak ditemukan.');
+        }
+
+        // === BAGIAN 2: Mengambil Semua Data Pendukung ===
+        $setting = Setting::first();
+        $logoUrl = $setting?->logo_login ? public_path('storage/uploads/logo-logins/' . $setting->logo_login) : null;
+
+        $alumni = DB::table('project_responden')->where('project_id', $project->id)->get();
+        $atasan = DB::table('project_responden')->select('nama_atasan', 'telepon_atasan')->where('project_id', $project->id)->whereNotNull('nama_atasan')->where('nama_atasan', '!=', '')->get();
+
+        $bobotAspek = DB::table('project_bobot_aspek')->leftJoin('aspek', 'project_bobot_aspek.aspek_id', '=', 'aspek.id')->select('project_bobot_aspek.*', 'aspek.aspek')->where('project_bobot_aspek.project_id', $project->id)->orderBy('project_bobot_aspek.level')->orderBy('project_bobot_aspek.id')->get();
+        $bobotLevel3 = $bobotAspek->where('level', 3);
+        $bobotLevel4 = $bobotAspek->where('level', 4);
+        $bobotSekunder = DB::table('project_bobot_aspek_sekunder')->where('project_id', $project->id)->first();
+
+        $dataSekunder = DB::table('project_data_sekunder')->where('project_id', $project->id)->first();
+
+        // Logika untuk status Data Sekunder
+        $statusDataSekunder = '-';
+        if ($dataSekunder && isset($dataSekunder->nilai_kinerja_awal) && isset($dataSekunder->nilai_kinerja_akhir)) {
+            if ($dataSekunder->nilai_kinerja_akhir > $dataSekunder->nilai_kinerja_awal) {
+                $statusDataSekunder = 'Meningkat';
+            } elseif ($dataSekunder->nilai_kinerja_akhir < $dataSekunder->nilai_kinerja_awal) {
+                $statusDataSekunder = 'Menurun';
+            } else {
+                $statusDataSekunder = 'Tetap';
+            }
+        }
+
+        $data = [
+            'project'            => $project,
+            'hasilEvaluasi'      => $hasilEvaluasi,
+            'alumni'             => $alumni,
+            'atasan'             => $atasan,
+            'bobotLevel3'        => $bobotLevel3,
+            'bobotLevel4'        => $bobotLevel4,
+            'bobotSekunder'      => $bobotSekunder,
+            'dataSekunder'       => $dataSekunder,
+            'statusDataSekunder' => $statusDataSekunder,
+            'logoUrl'            => $logoUrl,
+            'namaPembuat'        => auth()->user()->name,
+            'tanggalCetak'       => formatTanggalIndonesia(Carbon::now()),
+            'title'              => 'Laporan Lengkap Hasil Evaluasi',
+        ];
+
+        $pdf = Pdf::loadView('hasil-evaluasi.export-laporan-lengkap', $data);
+        $pdf->setPaper('a4', 'portrait');
+        return $pdf->stream('laporan-lengkap-' . $hasilEvaluasi->kode_project . '.pdf');
     }
 }

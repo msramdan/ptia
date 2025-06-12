@@ -106,6 +106,7 @@ Route::middleware(['auth', 'web'])->group(function () {
         Route::get('/detail-level-3', 'getDetailSkorLevel3')->name('detail-level-3.responden');
         Route::get('/detail-level-4', 'getDetailSkorLevel4')->name('detail-level-4.responden');
         Route::get('/export-excel', 'exportExcel')->name('hasil-evaluasi.export-excel');
+        Route::get('/{project}/export-pdf', 'exportPdfPerItem')->name('hasil-evaluasi.export-pdf-item');
     });
 
     Route::prefix('penyebaran-kuesioner')->controller(PenyebaranKuesionerController::class)->group(function () {
