@@ -52,6 +52,34 @@
                     style="width:100%;height:100%;z-index:0;top:0;left:0;position:fixed;background:url('{{ asset('assets/temalogin/images/pattern-3.svg') }}') no-repeat center bottom fixed;background-size: cover;">
                 </div>
             </div>
+
+            <div class="modal fade" id="otp-modal" tabindex="-1" aria-labelledby="otpModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="otpModalLabel">Verifikasi Kode OTP</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div id="otp-error-alert" class="alert alert-danger d-none"></div>
+                            <p>Kami telah mengirimkan kode OTP ke email Anda. Silakan masukkan di bawah ini.</p>
+                            <form id="otp-form" action="{{ route('login.verify_otp') }}" method="POST">
+                                @csrf
+                                <input type="hidden" name="user_id" id="otp-user-id">
+                                <div class="mb-3">
+                                    <label for="otp-input" class="form-label">Kode OTP</label>
+                                    <input type="text" class="form-control" id="otp-input" name="otp" required
+                                        maxlength="6">
+                                </div>
+                                <button type="submit" class="btn btn-primary">Verifikasi</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
             <div class="col-md-6 form-holder">
                 <div class="form-content">
                     <div class="form-items p-4" style="border-radius:10px;">
@@ -61,7 +89,7 @@
                                     class="img-fluid" alt="{{ $settingApp->nama_aplikasi }}">
                             @endif
                         </div>
-                        <form method="POST" action="{{ route('login') }}" id="login-form" class="mt-3">
+                        <form method="POST" action="{{ route('login.send_otp') }}" id="login-form" class="mt-3">
                             @csrf
                             <div class="mb-3">
                                 <input type="text" class="form-control" id="username" placeholder="Username"
@@ -90,128 +118,106 @@
         </div>
     </div>
 
+
+
     <script src="{{ asset('assets/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ asset('assets/temalogin/js/jquery.min.js') }}"></script>
     <script src="{{ asset('assets/toastr/js/toastr.min.js') }}"></script>
     {{-- Tambahkan JS SweetAlert dari template Mazer --}}
     <script src="{{ asset('mazer/extensions/sweetalert2/sweetalert2.min.js') }}"></script>
+
     <script>
         $(document).ready(function() {
-            @if ($errors->any())
-                @foreach ($errors->all() as $error)
-                    toastr.error("{{ $error }}", "Error");
-                @endforeach
-            @endif
-
-            $('.toggle-password').on('click', function() {
-                const passwordField = $('#password');
-                const type = passwordField.attr('type') === 'password' ? 'text' : 'password';
-                passwordField.attr('type', type);
-                $(this).toggleClass('fa-eye fa-eye-slash');
-            });
-
-            // LOGIKA AJAX BARU
+            // 1. Tangani pengiriman form login
             $('#login-form').on('submit', function(e) {
-                e.preventDefault();
-                const form = $(this);
-                const submitButton = form.find('button[type="submit"]');
-                const originalButtonText = submitButton.html();
-                submitButton.html(
-                    '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...'
-                    ).prop('disabled', true);
+                e.preventDefault(); // Mencegah form dikirim secara normal
+
+                var form = $(this);
+                var url = form.attr('action');
+                var submitButton = form.find('button[type="submit"]');
+                submitButton.prop('disabled', true).text('Loading...');
 
                 $.ajax({
-                    type: "POST",
-                    url: form.attr('action'),
+                    type: 'POST',
+                    url: url,
                     data: form.serialize(),
                     success: function(response) {
-                        if (response.otp_required) {
-                            submitButton.html(originalButtonText).prop('disabled', false);
-                            showOtpModal(response.user_id, response.email);
-                        } else {
-                            window.location.href = "{{ config('fortify.home') }}";
+                        if (response.success) {
+                            // Simpan user_id dan tampilkan modal
+                            $('#otp-user-id').val(response.user_id);
+                            var otpModal = new bootstrap.Modal(document.getElementById(
+                                'otp-modal'));
+                            otpModal.show();
                         }
                     },
                     error: function(xhr) {
-                        submitButton.html(originalButtonText).prop('disabled', false);
-                        const errors = xhr.responseJSON.errors || {
-                            general: [xhr.responseJSON.message ||
-                                'Terjadi kesalahan tidak diketahui.'
-                            ]
-                        };
-                        for (const key in errors) {
-                            toastr.error(errors[key][0]);
-                        }
-                        grecaptcha.reset();
+                        // Tampilkan error jika login gagal
+                        var error = xhr.responseJSON.message || 'Terjadi kesalahan.';
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Login Gagal',
+                            text: error,
+                            confirmButtonColor: '#435ebe' // Sesuaikan dengan warna tema Anda
+                        });
+                    },
+                    complete: function() {
+                        submitButton.prop('disabled', false).text('Log in');
                     }
                 });
             });
 
-            function showOtpModal(userId, userEmail) {
-                Swal.fire({
-                    title: 'Verifikasi Dua Langkah',
-                    html: `<p class="text-center text-muted fs-6">Kami telah mengirimkan kode 6 digit ke email Anda:<br><b>${userEmail}</b></p>`,
-                    input: 'text',
-                    inputPlaceholder: 'Masukkan kode OTP',
-                    inputAttributes: {
-                        autocapitalize: 'off',
-                        maxlength: 6,
-                        inputmode: 'numeric',
-                        pattern: '[0-9]*'
-                    },
-                    showCancelButton: true,
-                    confirmButtonText: 'Verifikasi',
-                    cancelButtonText: 'Batal',
-                    footer: '<a href="#" id="resend-otp-link">Tidak menerima kode? Kirim ulang</a>',
-                    showLoaderOnConfirm: true,
-                    preConfirm: (otp) => {
-                        if (!otp || !/^\d{6}$/.test(otp)) {
-                            Swal.showValidationMessage('Harap masukkan 6 digit kode OTP');
-                            return false;
-                        }
-                        return $.ajax({
-                            type: "POST",
-                            url: "{{ route('otp.verify.modal') }}",
-                            data: {
-                                _token: "{{ csrf_token() }}",
-                                user_id: userId,
-                                otp: otp
-                            }
-                        }).catch(xhr => Swal.showValidationMessage(
-                            `Gagal: ${xhr.responseJSON.message}`));
-                    },
-                    allowOutsideClick: () => !Swal.isLoading()
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        Swal.fire({
-                            title: 'Berhasil!',
-                            text: 'Login berhasil, mengarahkan ke dashboard.',
-                            icon: 'success'
-                        });
-                        window.location.href = result.value.redirect_url;
-                    }
-                });
-            }
+            // 2. Tangani pengiriman form OTP dari modal
+            $('#otp-form').on('submit', function(e) {
+                e.preventDefault(); // Mencegah form dikirim secara normal
 
-            // Event listener untuk link "kirim ulang" di dalam modal
-            $(document).on('click', '#resend-otp-link', function(e) {
-                e.preventDefault();
+                var form = $(this);
+                var url = form.attr('action');
+                var submitButton = form.find('button[type="submit"]');
+                submitButton.prop('disabled', true).text('Memverifikasi...');
+
+                $('#otp-error-alert').addClass('d-none'); // Sembunyikan alert error
+
                 $.ajax({
-                    type: "POST",
-                    url: "{{ route('otp.resend.modal') }}",
-                    data: {
-                        _token: "{{ csrf_token() }}"
-                    },
+                    type: 'POST',
+                    url: url,
+                    data: form.serialize(),
                     success: function(response) {
-                        toastr.success(response.message);
+                        if (response.success) {
+                            // 1. Dapatkan instance modal OTP yang sedang aktif
+                            var otpModalElement = document.getElementById('otp-modal');
+                            var otpModal = bootstrap.Modal.getInstance(otpModalElement);
+
+                            // 2. Tutup modal OTP
+                            otpModal.hide();
+
+                            // 3. Tampilkan notifikasi sukses dengan SweetAlert2
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Login Berhasil!',
+                                text: 'Anda akan diarahkan ke dashboard dalam beberapa saat.',
+                                timer: 2000, // Notifikasi akan hilang setelah 2 detik
+                                showConfirmButton: false, // Sembunyikan tombol "OK"
+                                allowOutsideClick: false // Mencegah user menutup notifikasi
+                            }).then(() => {
+                                // 4. Arahkan ke dashboard setelah notifikasi ditutup
+                                window.location.href = response.redirect_url;
+                            });
+                        }
                     },
                     error: function(xhr) {
-                        toastr.error(xhr.responseJSON.message);
+                        // Tampilkan error di dalam modal
+                        var error = xhr.responseJSON.message || 'Terjadi kesalahan.';
+
+                        $('#otp-error-alert').text(error).removeClass('d-none');
+                    },
+                    complete: function() {
+                        submitButton.prop('disabled', false).text('Verifikasi');
                     }
                 });
             });
         });
     </script>
+
 </body>
 
 </html>
