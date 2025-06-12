@@ -12,24 +12,39 @@ class SendOtpMail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public string $otp;
+    public $otpCode;
+    public $expireInMinutes;
 
-    public function __construct(string $otp)
+    /**
+     * Create a new message instance.
+     *
+     * @param string $otpCode
+     * @param int $expireInMinutes
+     */
+    public function __construct($otpCode, $expireInMinutes)
     {
-        $this->otp = $otp;
+        $this->otpCode = $otpCode;
+        $this->expireInMinutes = $expireInMinutes;
     }
 
+    /**
+     * Get the message envelope.
+     */
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Kode Verifikasi Anda',
+            subject: 'Kode Verifikasi untuk ' . config('app.name'),
         );
     }
 
+    /**
+     * Get the message content definition.
+     */
     public function content(): Content
     {
+
         return new Content(
-            markdown: 'emails.send-otp', // Menggunakan template markdown
+            view: 'emails.send-otp',
         );
     }
 }
