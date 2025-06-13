@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 class Project extends Model
 {
     use HasFactory;
-    use HasUuids;
+
 
     /**
      * The table associated with the model.
@@ -23,7 +23,7 @@ class Project extends Model
      *
      * @var string[]
      */
-    protected $fillable = ['kode_project', 'kaldikID', 'kaldikDesc'];
+    protected $fillable = ['user_id', 'kode_project', 'kaldikID', 'kaldikDesc'];
 
     /**
      * Get the attributes that should be cast.
@@ -35,5 +35,11 @@ class Project extends Model
         return ['kode_project' => 'string', 'kaldikDesc' => 'string', 'created_at' => 'datetime:Y-m-d H:i:s', 'updated_at' => 'datetime:Y-m-d H:i:s'];
     }
 
-
+    /**
+     * Mendapatkan user (evaluator) yang memiliki project.
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
 }

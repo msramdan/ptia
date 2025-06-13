@@ -63,6 +63,7 @@
                                             <th>{{ __('Kriteria Dampak Level 3') }}</th>
                                             <th>{{ __('Skor Level 4') }}</th>
                                             <th>{{ __('Kriteria Dampak Level 4') }}</th>
+                                            <th>{{ __('Aksi') }}</th>
                                         </tr>
                                     </thead>
                                 </table>
@@ -172,6 +173,11 @@
                             name: 'kriteria_dampak_level_4',
                             className: 'text-center'
                         },
+                        {
+                            data: 'action',
+                            name: 'action',
+                            className: 'text-center'
+                        }
                     ]
                 });
             }
