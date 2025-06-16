@@ -7,40 +7,57 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kode Verifikasi Anda</title>
     <style>
+        /* Gaya dasar yang ramah untuk email */
         body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+            background-color: #f7fafc;
+            color: #718096;
             margin: 0;
             padding: 0;
-            word-spacing: normal;
-            background-color: #f4f4f7;
+            width: 100% !important;
+            -webkit-text-size-adjust: 100%;
         }
 
         .container {
             width: 100%;
             max-width: 600px;
-            margin: 0 auto;
-            background-color: #ffffff;
-        }
-
-        .content-cell {
+            margin: 20px auto;
             padding: 35px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
         }
 
-        h1 {
-            margin-top: 0;
-            margin-bottom: 16px;
-            color: #1a202c;
-            font-size: 28px;
-            font-weight: 700;
+        .header {
+            text-align: center;
+            padding-bottom: 25px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .header img {
+            max-height: 55px;
+            /* Disesuaikan agar logo terlihat baik */
+            width: auto;
+        }
+
+        .content {
+            padding: 30px 0;
             text-align: center;
         }
 
-        p {
+        .content h1 {
+            font-size: 24px;
+            font-weight: 600;
+            color: #2d3748;
             margin-top: 0;
-            margin-bottom: 16px;
-            color: #4a5568;
+            margin-bottom: 15px;
+        }
+
+        .content p {
             font-size: 16px;
-            line-height: 1.625;
-            text-align: center;
+            line-height: 1.6;
+            margin-bottom: 20px;
         }
 
         .otp-code {
@@ -56,9 +73,11 @@
         }
 
         .footer {
+            text-align: center;
+            padding-top: 25px;
+            border-top: 1px solid #e2e8f0;
             font-size: 12px;
             color: #a0aec0;
-            text-align: center;
         }
 
         .footer a {
@@ -70,8 +89,7 @@
 
 <body style="margin: 0; padding: 0; word-spacing: normal; background-color: #f4f4f7;">
     @php
-        $settingApp = get_setting();
-        $appName = $settingApp->nama_aplikasi ?? config('app.name');
+        $appName = config('app.name');
         $appUrl = url('/');
     @endphp
 
@@ -90,13 +108,10 @@
                         <tr>
                             <td align="center">
                                 <a href="{{ $appUrl }}" style="text-decoration: none;">
-                                    @if ($settingApp?->logo_login)
-                                        <img src="{{ url('storage/uploads/logo-logins/' . $settingApp->logo_login) }}"
-                                            alt="{{ $appName }} Logo" width="180"
-                                            style="max-width: 180px; height: auto; border: 0;">
-                                    @else
-                                        <h2 style="color: #2d3748; margin: 0;">{{ $appName }}</h2>
-                                    @endif
+                                    {{-- Menggunakan URL statis untuk logo BPKP --}}
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/1/11/BPKP_Logo.png"
+                                        alt="{{ $appName }} Logo" width="180"
+                                        style="max-width: 180px; height: auto; border: 0;">
                                 </a>
                             </td>
                         </tr>

@@ -53,7 +53,7 @@ class LoginController extends Controller
             // Buat dan simpan OTP ke cache
             $otpCode = rand(100000, 999999);
             $cacheKey = 'otp_for_user_' . $user->id;
-            $expireInMinutes = config('otp.expired_otp', 5); // Menggunakan expired_otp dari config
+            $expireInMinutes = (int) config('otp.expired_otp', 5); // Menggunakan expired_otp dari config
             Cache::put($cacheKey, $otpCode, now()->addMinutes($expireInMinutes));
 
             // Kirim email
