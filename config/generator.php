@@ -347,12 +347,14 @@ return [
                         'users*',
                         'roles*',
                         'setting*',
+                        'log-activities*',
                         'backup*'
                     ],
                     'permissions' => [
                         'user view',
                         'role & permission view',
                         'setting view',
+                        'log activity view',
                         'backup database view'
                     ],
                     'submenus' => [
@@ -370,6 +372,11 @@ return [
                             'title' => 'Roles & permissions',
                             'route' => '/roles',
                             'permission' => 'role & permission view'
+                        ],
+                        [
+                            'title' => 'Log Aktivitas',
+                            'route' => '/log-activities',
+                            'permission' => 'log activity view'
                         ],
                         [
                             'title' => 'Backup Database',

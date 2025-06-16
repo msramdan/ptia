@@ -209,7 +209,7 @@ return [
         ['group' => 'indikator persepsi', 'access' => ['indikator persepsi view']],
         ['group' => 'pesan wa', 'access' => ['pesan wa view', 'pesan wa edit']],
         ['group' => 'bobot aspek', 'access' => ['bobot aspek view', 'bobot aspek edit']],
-        ['group' => 'kriteria respondens', 'access' => ['kriteria responden view','kriteria responden edit']],
+        ['group' => 'kriteria respondens', 'access' => ['kriteria responden view', 'kriteria responden edit']],
         ['group' => 'wa blast', 'access' => ['wa blast view', 'wa blast create', 'wa blast delete']],
         ['group' => 'single sender', 'access' => ['single sender view', 'single sender create']],
         ['group' => 'indikator dampak', 'access' => ['indikator dampak view', 'indikator dampak create', 'indikator dampak edit', 'indikator dampak delete']],
@@ -224,5 +224,6 @@ return [
         ['group' => 'Data Sekunder', 'access' => ['data sekunder view', 'data sekunder create']],
         ['group' => 'Hasil Evaluasi', 'access' => ['hasil evaluasi view']],
         ['group' => 'Backup Database', 'access' => ['backup database view']],
+        ['group' => 'Log Activity', 'access' => ['log activity view']],
     ],
 ];

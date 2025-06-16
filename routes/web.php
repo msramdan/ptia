@@ -33,29 +33,13 @@ use App\Http\Controllers\{
     HasilEvaluasiController,
     DataInterviewController,
     BackupController,
+    LogActivityController
 };
 
 use App\Http\Controllers\Auth\LoginController;
 
 Route::get('/', function () {
     return view('welcome');
-});
-
-Route::get('/test-email', function () {
-    try {
-        // Ganti email tujuan dengan email lain yang bisa Anda akses untuk tes
-        $tujuan = 'spotifyfarhan13@gmail.com';
-
-        Mail::raw('Ini adalah isi email tes dari aplikasi Laravel Anda.', function ($message) use ($tujuan) {
-            $message->to($tujuan)
-                ->subject('Tes Koneksi Email SMTP');
-        });
-
-        return 'Berhasil mengirim email tes! Silakan periksa inbox (dan folder spam) di ' . $tujuan;
-    } catch (\Exception $e) {
-        // Tampilkan pesan error yang lebih detail
-        return '<h1>Gagal Mengirim Email</h1><p>Pesan Error:</p><pre>' . $e->getMessage() . '</pre>';
-    }
 });
 
 // CRON Notifikasi
@@ -210,4 +194,7 @@ Route::middleware(['auth', 'web'])->group(function () {
     Route::post('/backup/create', [BackupController::class, 'create'])->name('backup.create');
     Route::get('/backup/download/{fileName}', [BackupController::class, 'download'])->name('backup.download');
     Route::delete('/backup/delete/{fileName}', [BackupController::class, 'destroy'])->name('backup.destroy');
+
+    // Log Activity
+    Route::get('/log-activities', [LogActivityController::class, 'index'])->name('log-activities.index');
 });

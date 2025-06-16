@@ -4,10 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
+use Illuminate\Support\Facades\Auth;
+
 
 class Setting extends Model
 {
-    use HasFactory;
+    use HasFactory, LogsActivity;
 
     /**
      * The table associated with the model.
@@ -71,5 +75,22 @@ class Setting extends Model
             'cron_auto_insert_expired_atasan' => 'string',
             'cron_auto_create_project' => 'string',
         ];
+    }
+
+    // Tambahkan method ini untuk konfigurasi log
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->useLogName('Setting') // Nama log
+            ->logFillable() // Catat semua atribut di $fillable
+            ->logOnlyDirty() // Hanya catat jika ada perubahan
+            ->dontSubmitEmptyLogs(); // Jangan buat log jika tidak ada perubahan
+    }
+
+    // Tambahkan method ini untuk deskripsi custom
+    public function getDescriptionForEvent(string $eventName): string
+    {
+        $userName = Auth::user()->name ?? 'System';
+        return "Pengaturan telah di-{$eventName} oleh {$userName}";
     }
 }

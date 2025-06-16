@@ -5,10 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 
 class Project extends Model
 {
-    use HasFactory;
+    use HasFactory, LogsActivity;
 
 
     /**
@@ -41,5 +43,22 @@ class Project extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    // Tambahkan method ini untuk konfigurasi log
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->useLogName('Setting') // Nama log
+            ->logFillable() // Catat semua atribut di $fillable
+            ->logOnlyDirty() // Hanya catat jika ada perubahan
+            ->dontSubmitEmptyLogs(); // Jangan buat log jika tidak ada perubahan
+    }
+
+    // Tambahkan method ini untuk deskripsi custom
+    public function getDescriptionForEvent(string $eventName): string
+    {
+        $userName = Auth::user()->name ?? 'System';
+        return "Pengaturan telah di-{$eventName} oleh {$userName}";
     }
 }
