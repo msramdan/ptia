@@ -56,13 +56,20 @@ class User extends Authenticatable
         'created_at' => 'datetime:Y-m-d H:i',
         'updated_at' => 'datetime:Y-m-d H:i',
     ];
+    // Tambahkan method ini untuk konfigurasi log
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->useLogName('Setting') // Nama log
+            ->logFillable() // Catat semua atribut di $fillable
+            ->logOnlyDirty() // Hanya catat jika ada perubahan
+            ->dontSubmitEmptyLogs(); // Jangan buat log jika tidak ada perubahan
+    }
 
-    protected static $logAttributes = ['name', 'email']; // Atribut yang ingin dilog
-    protected static $logOnlyDirty = true; // Hanya log jika ada perubahan
-    protected static $submitEmptyLogs = false; // Jangan buat log jika tidak ada perubahan
-
+    // Tambahkan method ini untuk deskripsi custom
     public function getDescriptionForEvent(string $eventName): string
     {
-        return "User {$this->name} has been {$eventName}";
+        $userName = Auth::user()->name ?? 'System';
+        return "Pengaturan telah di-{$eventName} oleh {$userName}";
     }
 }
