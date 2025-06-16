@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\indikatorPersepsi;
+namespace App\Http\Requests\IndikatorPersepsis;
 
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -21,8 +21,8 @@ class UpdateIndikatorPersepsiRequest extends FormRequest
     {
         return [
             'aspek_id' => 'required|exists:App\Models\Aspek,id',
-			'indikator_persepsi' => 'required|in:1,2,3,4',
-			'kriteria_persepsi' => 'required|in:Sangat tidak setuju,Tidak setuju,Setuju,Sangat setuju',
+            'indikator_persepsi' => 'required|in:1,2,3,4',
+            'kriteria_persepsi' => 'required|in:Sangat tidak setuju,Tidak setuju,Setuju,Sangat setuju',
         ];
     }
 }

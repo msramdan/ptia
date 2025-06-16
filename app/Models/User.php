@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Spatie\Permission\Traits\HasRoles;
+use Spatie\Activitylog\LogOptions;
 
 class User extends Authenticatable
 {
@@ -55,4 +56,13 @@ class User extends Authenticatable
         'created_at' => 'datetime:Y-m-d H:i',
         'updated_at' => 'datetime:Y-m-d H:i',
     ];
+
+    protected static $logAttributes = ['name', 'email']; // Atribut yang ingin dilog
+    protected static $logOnlyDirty = true; // Hanya log jika ada perubahan
+    protected static $submitEmptyLogs = false; // Jangan buat log jika tidak ada perubahan
+
+    public function getDescriptionForEvent(string $eventName): string
+    {
+        return "User {$this->name} has been {$eventName}";
+    }
 }
