@@ -105,4 +105,38 @@ class LoginController extends Controller
             'redirect_url' => route('dashboard')
         ]);
     }
+
+    /**
+     * Menangani permintaan kirim ulang OTP.
+     */
+    public function resendOtp(Request $request)
+    {
+        $request->validate([
+            'user_id' => 'required|exists:users,id',
+        ]);
+
+        $user = User::find($request->user_id);
+
+        if (!$user || !$user->email) {
+            return response()->json(['success' => false, 'message' => 'Tidak dapat mengirim ulang OTP untuk pengguna ini.'], 422);
+        }
+
+        // Buat dan simpan OTP baru
+        $otpCode = rand(100000, 999999);
+        $cacheKey = 'otp_for_user_' . $user->id;
+        $expireInMinutes = config('otp.expire', 5);
+        Cache::put($cacheKey, $otpCode, now()->addMinutes($expireInMinutes));
+
+        // Kirim ulang email
+        try {
+            Mail::to($user->email)->send(new SendOtpMail($otpCode, $expireInMinutes));
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Gagal mengirim email OTP. ' . $e->getMessage()], 500);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'OTP baru telah dikirim ulang ke email Anda.'
+        ]);
+    }
 }
