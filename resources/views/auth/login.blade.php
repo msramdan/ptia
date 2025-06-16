@@ -231,7 +231,7 @@
                 var submitButton = form.find('button[type="submit"]');
                 submitButton.prop('disabled', true).html(
                     '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...'
-                    );
+                );
 
                 $.ajax({
                     type: 'POST',
@@ -239,9 +239,25 @@
                     data: form.serialize(),
                     success: function(response) {
                         if (response.success) {
-                            $('#otp-user-id').val(response.user_id);
-                            if (otpModalInstance) {
-                                otpModalInstance.show();
+                            // Cek jika server mengirim URL redirect (artinya OTP dimatikan)
+                            if (response.redirect_url) {
+                                // Tampilkan notifikasi sukses dan arahkan
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Login Berhasil!',
+                                    text: 'Anda akan diarahkan ke dashboard.',
+                                    timer: 1500,
+                                    showConfirmButton: false,
+                                    allowOutsideClick: false
+                                }).then(() => {
+                                    window.location.href = response.redirect_url;
+                                });
+                            } else {
+                                // Jika tidak ada redirect_url, tampilkan modal OTP seperti biasa
+                                $('#otp-user-id').val(response.user_id);
+                                if (otpModalInstance) {
+                                    otpModalInstance.show();
+                                }
                             }
                         }
                     },
@@ -324,7 +340,7 @@
                     beforeSend: function() {
                         resendLink.addClass('disabled').html(
                             '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>'
-                            );
+                        );
                     },
                     success: function(response) {
                         if (response.success) {
@@ -384,7 +400,7 @@
                 var submitButton = form.find('button[type="submit"]');
                 submitButton.prop('disabled', true).html(
                     '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Memverifikasi...'
-                    );
+                );
 
                 $.ajax({
                     type: 'POST',

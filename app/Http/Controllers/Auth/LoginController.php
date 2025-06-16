@@ -37,38 +37,51 @@ class LoginController extends Controller
             ], 404); // Menggunakan status 404 Not Found lebih tepat
         }
 
-        // Pastikan user punya email untuk dikirimi OTP
-        if (empty($user->email)) {
+        // 1. Periksa konfigurasi dari file .env (via config/otp.php)
+        // Default ke 'true' jika variabel tidak ditemukan
+        if (config('otp.is_send_otp', true)) {
+
+            // --- ALUR JIKA OTP DIAKTIFKAN ---
+
+            if (empty($user->email)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Akun ini tidak memiliki alamat email terdaftar untuk pengiriman OTP.'
+                ], 422);
+            }
+
+            // Buat dan simpan OTP ke cache
+            $otpCode = rand(100000, 999999);
+            $cacheKey = 'otp_for_user_' . $user->id;
+            $expireInMinutes = config('otp.expired_otp', 5); // Menggunakan expired_otp dari config
+            Cache::put($cacheKey, $otpCode, now()->addMinutes($expireInMinutes));
+
+            // Kirim email
+            try {
+                Mail::to($user->email)->send(new SendOtpMail($otpCode, $expireInMinutes));
+            } catch (\Exception $e) {
+                return response()->json(['success' => false, 'message' => 'Gagal mengirim email OTP. ' . $e->getMessage()], 500);
+            }
+
+            // Kirim response untuk menampilkan modal OTP di frontend
             return response()->json([
-                'success' => false,
-                'message' => 'Akun ini tidak memiliki alamat email terdaftar untuk pengiriman OTP.'
-            ], 422);
-        }
+                'success' => true,
+                'message' => 'OTP telah dikirim ke email Anda.',
+                'user_id' => $user->id
+            ]);
+        } else {
 
-        // Buat dan simpan OTP ke cache
-        $otpCode = rand(100000, 999999);
-        // Ganti kunci cache agar lebih sesuai
-        $cacheKey = 'otp_for_user_' . $user->id;
+            // --- ALUR JIKA OTP DIMATIKAN ---
 
-        $expireInMinutes = config('otp.expire', 5);
-        Cache::put($cacheKey, $otpCode, now()->addMinutes($expireInMinutes));
+            // Langsung loginkan user
+            Auth::login($user);
 
-        // Kirim email
-        try {
-            Mail::to($user->email)->send(new SendOtpMail($otpCode, $expireInMinutes));
-        } catch (\Exception $e) {
+            // Kirim response dengan URL redirect agar frontend tahu harus kemana
             return response()->json([
-                'success' => false,
-                'message' => 'Gagal mengirim email OTP. ' . $e->getMessage()
-            ], 500);
+                'success'      => true,
+                'redirect_url' => route('dashboard')
+            ]);
         }
-
-        // Jika berhasil, kirim response sukses
-        return response()->json([
-            'success' => true,
-            'message' => 'OTP telah dikirim ke email Anda.',
-            'user_id' => $user->id
-        ]);
     }
 
     /**

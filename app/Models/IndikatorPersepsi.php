@@ -4,10 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Illuminate\Support\Facades\Auth;
 
 class IndikatorPersepsi extends Model
 {
-    use HasFactory;
+    use HasFactory, LogsActivity;
 
     /**
      * The table associated with the model.
@@ -36,5 +39,20 @@ class IndikatorPersepsi extends Model
     public function aspek()
     {
         return $this->belongsTo(Aspek::class, 'aspek_id');
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->useLogName('Indikator Persepsi')
+            ->logFillable()
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs();
+    }
+
+    public function getDescriptionForEvent(string $eventName): string
+    {
+        $userName = Auth::user()->name ?? 'System';
+        return "Indikator Persepsi {$this->indikator} telah di-{$eventName} oleh {$userName}";
     }
 }
