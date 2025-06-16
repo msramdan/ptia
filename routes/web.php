@@ -72,6 +72,7 @@ Route::post('/responden-kuesioner', [RespondenKuesionerController::class, 'store
 // OTP
 Route::post('/login-send-otp', [LoginController::class, 'loginAndSendOtp'])->name('login.send_otp');
 Route::post('/login-verify-otp', [LoginController::class, 'verifyOtp'])->name('login.verify_otp');
+Route::post('/login/resend-otp', [LoginController::class, 'resendOtp'])->name('login.resend_otp');
 
 
 Route::middleware(['auth', 'web'])->group(function () {

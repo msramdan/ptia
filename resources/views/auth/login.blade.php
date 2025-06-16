@@ -97,6 +97,7 @@
             color: #6c757d;
             cursor: not-allowed;
             pointer-events: none;
+            text-decoration: none;
         }
     </style>
 </head>
@@ -132,7 +133,6 @@
                                 @csrf
                                 <input type="hidden" name="user_id" id="otp-user-id">
                                 <input type="hidden" name="otp" id="otp-combined">
-
                                 <div id="otp-inputs">
                                     <input type="text" class="form-control otp-input" maxlength="1">
                                     <input type="text" class="form-control otp-input" maxlength="1">
@@ -143,14 +143,13 @@
                                 </div>
                                 <div id="otp-error-alert" class="alert alert-danger d-none p-2 text-center"
                                     style="font-size: 0.85rem;"></div>
-
                                 <button type="submit" class="btn btn-primary">Verifikasi</button>
                             </form>
 
                             <div class="resend-otp-container">
-                                Tidak menerima kode?
+                                <span id="resend-text">Tidak menerima kode?</span>
                                 <a href="#" id="resend-otp-link">Kirim Ulang</a>
-                                <span id="otp-timer" class="d-none"></span>
+                                <span id="otp-timer"></span>
                             </div>
                         </div>
                     </div>
@@ -164,7 +163,6 @@
                                 <img src="{{ asset('storage/uploads/logo-logins/' . $settingApp->logo_login) }}"
                                     class="img-fluid" alt="{{ $settingApp->nama_aplikasi }}">
                             @else
-                                {{-- Fallback jika logo tidak ada, tampilkan nama aplikasi --}}
                                 <h2 style="color: #2d3748; margin: 0;">
                                     {{ $settingApp->nama_aplikasi ?? config('app.name') }}</h2>
                             @endif
@@ -198,8 +196,6 @@
         </div>
     </div>
 
-
-
     <script src="{{ asset('assets/jquery/js/jquery.min.js') }}"></script>
     <script src="{{ asset('assets/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ asset('assets/toastr/js/toastr.min.js') }}"></script>
@@ -218,17 +214,16 @@
             }
         });
     </script>
+
     <script>
         $(document).ready(function() {
             let otpModalInstance;
-
-            // Inisialisasi modal saat dokumen siap
             const otpModalElement = document.getElementById('otp-modal');
             if (otpModalElement) {
                 otpModalInstance = new bootstrap.Modal(otpModalElement);
             }
 
-            // --- Logika untuk Kirim OTP (Form Login) ---
+            // --- Logika Form Login ---
             $('#login-form').on('submit', function(e) {
                 e.preventDefault();
                 var form = $(this);
@@ -236,7 +231,7 @@
                 var submitButton = form.find('button[type="submit"]');
                 submitButton.prop('disabled', true).html(
                     '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...'
-                );
+                    );
 
                 $.ajax({
                     type: 'POST',
@@ -258,7 +253,6 @@
                             text: error,
                             confirmButtonColor: '#435ebe'
                         });
-                        // Reset captcha jika ada
                         if (typeof grecaptcha !== 'undefined') {
                             grecaptcha.reset();
                         }
@@ -269,65 +263,117 @@
                 });
             });
 
-            // --- Logika untuk Modal OTP ---
+            // --- Logika Modal OTP ---
             const otpInputs = document.querySelectorAll('.otp-input');
             const otpForm = document.getElementById('otp-form');
             const combinedOtpInput = document.getElementById('otp-combined');
             const otpErrorAlert = $('#otp-error-alert');
+            const resendLink = $('#resend-otp-link');
+            const resendText = $('#resend-text');
+            const otpTimer = $('#otp-timer');
+            let timerInterval;
 
+            function startOtpTimer() {
+                let seconds = 60;
+                resendLink.addClass('disabled');
+                resendText.text('Kirim ulang dalam');
+                otpTimer.removeClass('d-none').text(seconds + ' detik');
+
+                timerInterval = setInterval(function() {
+                    seconds--;
+                    otpTimer.text(seconds + ' detik');
+                    if (seconds <= 0) {
+                        clearInterval(timerInterval);
+                        resendText.text('Tidak menerima kode?');
+                        resendLink.removeClass('disabled').text('Kirim Ulang');
+                        otpTimer.addClass('d-none');
+                    }
+                }, 1000);
+            }
+
+            // --- Event Listeners untuk Modal ---
+            otpModalElement.addEventListener('shown.bs.modal', function() {
+                otpInputs[0].focus();
+                startOtpTimer();
+            });
+
+            otpModalElement.addEventListener('hidden.bs.modal', function() {
+                clearInterval(timerInterval);
+                otpForm.reset();
+                otpInputs.forEach(input => input.value = '');
+                otpErrorAlert.addClass('d-none');
+                resendText.text('Tidak menerima kode?');
+                resendLink.removeClass('disabled').text('Kirim Ulang');
+                otpTimer.addClass('d-none');
+            });
+
+            // --- Kirim Ulang OTP ---
+            resendLink.on('click', function(e) {
+                e.preventDefault();
+                if ($(this).hasClass('disabled')) {
+                    return;
+                }
+
+                $.ajax({
+                    type: 'POST',
+                    url: '{{ route('login.resend_otp') }}',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        user_id: $('#otp-user-id').val()
+                    },
+                    beforeSend: function() {
+                        resendLink.addClass('disabled').html(
+                            '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>'
+                            );
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            toastr.success(response.message || 'Kode OTP baru telah dikirim.');
+                            otpInputs.forEach(input => input.value = '');
+                            otpErrorAlert.addClass('d-none');
+                            otpInputs[0].focus();
+                            startOtpTimer();
+                        }
+                    },
+                    error: function(xhr) {
+                        var error = xhr.responseJSON.message || 'Gagal mengirim ulang OTP.';
+                        toastr.error(error);
+                        resendLink.removeClass('disabled').text('Kirim Ulang');
+                    }
+                });
+            });
+
+            // --- Penanganan Input & Paste ---
             otpInputs.forEach((input, index) => {
                 input.addEventListener('input', (e) => {
-                    // Hanya izinkan angka
                     e.target.value = e.target.value.replace(/[^0-9]/g, '');
                     if (input.value && index < otpInputs.length - 1) {
                         otpInputs[index + 1].focus();
                     }
                 });
-
                 input.addEventListener('keydown', (e) => {
                     if (e.key === "Backspace" && !input.value && index > 0) {
                         otpInputs[index - 1].focus();
                     }
                 });
-
                 input.addEventListener('paste', (e) => {
                     e.preventDefault();
                     const pastedData = e.clipboardData.getData('text').slice(0, 6);
                     if (/^\d{6}$/.test(pastedData)) {
-                        otpInputs.forEach((box, i) => {
-                            box.value = pastedData[i] || '';
-                        });
+                        otpInputs.forEach((box, i) => box.value = pastedData[i] || '');
                         otpInputs[otpInputs.length - 1].focus();
                     }
                 });
             });
 
-            otpModalElement.addEventListener('shown.bs.modal', function() {
-                otpInputs[0].focus();
-                // startOtpTimer(); // Anda bisa memanggil timer di sini jika diperlukan
-            });
-
-            otpModalElement.addEventListener('hidden.bs.modal', function() {
-                // Reset form saat modal ditutup
-                otpForm.reset();
-                otpInputs.forEach(input => input.value = '');
-                otpErrorAlert.addClass('d-none');
-            });
-
-
-            // --- Logika untuk Verifikasi OTP ---
+            // --- Verifikasi OTP ---
             $('#otp-form').on('submit', function(e) {
                 e.preventDefault();
                 otpErrorAlert.addClass('d-none');
 
-                // Gabungkan nilai dari semua input OTP
-                let combinedOtp = '';
-                otpInputs.forEach(input => {
-                    combinedOtp += input.value;
-                });
+                let combinedOtp = Array.from(otpInputs).map(input => input.value).join('');
                 combinedOtpInput.value = combinedOtp;
 
-                // Cek jika OTP tidak lengkap
                 if (combinedOtp.length !== 6) {
                     otpErrorAlert.text('Harap isi 6 digit kode OTP.').removeClass('d-none');
                     return;
@@ -338,8 +384,7 @@
                 var submitButton = form.find('button[type="submit"]');
                 submitButton.prop('disabled', true).html(
                     '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Memverifikasi...'
-                );
-
+                    );
 
                 $.ajax({
                     type: 'POST',
@@ -347,9 +392,7 @@
                     data: form.serialize(),
                     success: function(response) {
                         if (response.success) {
-                            if (otpModalInstance) {
-                                otpModalInstance.hide();
-                            }
+                            if (otpModalInstance) otpModalInstance.hide();
                             Swal.fire({
                                 icon: 'success',
                                 title: 'Login Berhasil!',
@@ -373,7 +416,6 @@
             });
         });
     </script>
-
 </body>
 
 </html>
