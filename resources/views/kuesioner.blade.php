@@ -130,7 +130,7 @@
         @endif
 
         <div class="d-flex flex-column align-items-center text-center" style="padding: 15px;">
-            <img src="https://registrasi.bpkp.go.id/ptia/assets/logo/Post%20Training%20Impact%20Assesment.png"
+            <img src="{{asset('logo.webp')}}"
                 alt="Logo PTIA" class="img-fluid" style="max-height: 80px; width: auto;">
 
             <p class="fw-bold mt-3" style="color: #284D80;">
