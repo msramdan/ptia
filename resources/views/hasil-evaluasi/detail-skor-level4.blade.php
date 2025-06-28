@@ -68,7 +68,7 @@
                                             <th rowspan="2">{{ __('No.Telepon') }}</th>
                                             <th rowspan="2">{{ __('Jabatan') }}</th>
                                             <th rowspan="2">{{ __('Unit') }}</th>
-                                            <th colspan="2" class="text-center">{{ __('Level 3') }}</th>
+                                            <th colspan="2" class="text-center">{{ __('Level 4') }}</th>
                                         </tr>
 
                                         <tr>
