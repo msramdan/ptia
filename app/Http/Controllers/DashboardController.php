@@ -113,14 +113,11 @@ class DashboardController extends Controller
                 ->count();
             $persentaseSudah = $jumlahResponden > 0 ? round(($sudahAlumni / $jumlahResponden) * 100, 2) : 0;
 
-            $totalAtasan = (clone $respondenBaseQuery)
-                ->whereNotNull('project_responden.nama_atasan')
-                ->count();
             $sudahAtasan = (clone $respondenBaseQuery)
                 ->whereNotNull('project_responden.nama_atasan')
                 ->where('project_responden.status_pengisian_kuesioner_atasan', 'sudah')
                 ->count();
-            $persentaseSudahAtasan = $totalAtasan > 0 ? round(($sudahAtasan / $totalAtasan) * 100, 2) : 0;
+            $persentaseSudahAtasan =round(($sudahAtasan / $sudahAlumni) * 100, 2);
 
             // Query untuk summary DataTables (rata-rata skor)
             $summaryProjectsQuery = DB::table('project')
@@ -298,14 +295,11 @@ class DashboardController extends Controller
             ->where('project_responden.status_pengisian_kuesioner_alumni', 'sudah')
             ->count();
         $persentaseSudah = $jumlahResponden > 0 ? round(($sudahAlumni / $jumlahResponden) * 100, 2) : 0;
-        $totalAtasan = (clone $respondenBaseQueryInitial)
-            ->whereNotNull('project_responden.nama_atasan')
-            ->count();
         $sudahAtasan = (clone $respondenBaseQueryInitial)
             ->whereNotNull('project_responden.nama_atasan')
             ->where('project_responden.status_pengisian_kuesioner_atasan', 'sudah')
             ->count();
-        $persentaseSudahAtasan = $totalAtasan > 0 ? round(($sudahAtasan / $totalAtasan) * 100, 2) : 0;
+        $persentaseSudahAtasan = round(($sudahAtasan / $sudahAlumni) * 100, 2);
 
         return view('dashboard', compact(
             'tahun',
