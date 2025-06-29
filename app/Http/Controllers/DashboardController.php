@@ -117,7 +117,8 @@ class DashboardController extends Controller
                 ->whereNotNull('project_responden.nama_atasan')
                 ->where('project_responden.status_pengisian_kuesioner_atasan', 'sudah')
                 ->count();
-            $persentaseSudahAtasan =round(($sudahAtasan / $sudahAlumni) * 100, 2);
+            $persentaseSudahAtasan = $sudahAlumni > 0 ? round(($sudahAtasan / $sudahAlumni) * 100, 2) : 0;
+
 
             // Query untuk summary DataTables (rata-rata skor)
             $summaryProjectsQuery = DB::table('project')
@@ -299,7 +300,8 @@ class DashboardController extends Controller
             ->whereNotNull('project_responden.nama_atasan')
             ->where('project_responden.status_pengisian_kuesioner_atasan', 'sudah')
             ->count();
-        $persentaseSudahAtasan = round(($sudahAtasan / $sudahAlumni) * 100, 2);
+        $persentaseSudahAtasan = $sudahAlumni > 0 ? round(($sudahAtasan / $sudahAlumni) * 100, 2) : 0;
+
 
         return view('dashboard', compact(
             'tahun',
