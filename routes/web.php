@@ -35,11 +35,13 @@ use App\Http\Controllers\{
     BackupController,
     LogActivityController
 };
-
+use App\Http\Controllers\Api\HasilEvaluasiController as ApiHasilEvaluasiController;
 use App\Http\Controllers\Auth\LoginController;
 
-Route::get('/', function () {
-    return view('welcome');
+
+// API
+Route::prefix('api')->group(function () {
+    Route::get('/hasil-evaluasi/{kaldikID}', [ApiHasilEvaluasiController::class, 'getByKaldikID']);
 });
 
 // CRON Notifikasi
