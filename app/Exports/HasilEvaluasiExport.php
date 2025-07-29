@@ -10,6 +10,12 @@ use App\Exports\Sheets\DaftarRespondenSheet;
 use App\Exports\Sheets\TidakTermasukRespondenSheet;
 use App\Exports\Sheets\BobotSheet;
 use App\Exports\Sheets\KuisionerSheet;
+use App\Exports\Sheets\DataSekunderSheet;
+use App\Exports\Sheets\DataInterviewSheet;
+use App\Exports\Sheets\PenyebaranKuisionerSheet;
+use App\Exports\Sheets\RekapKuesionerAlumniSheet;
+use App\Exports\Sheets\RekapKuesionerAtasanSheet;
+use App\Exports\Sheets\LaporanHasilSheet;
 
 class HasilEvaluasiExport implements WithMultipleSheets
 {
@@ -22,9 +28,6 @@ class HasilEvaluasiExport implements WithMultipleSheets
         $this->project = $project;
     }
 
-    /**
-     * @return array
-     */
     public function sheets(): array
     {
         $sheets = [
@@ -33,6 +36,12 @@ class HasilEvaluasiExport implements WithMultipleSheets
             new TidakTermasukRespondenSheet($this->project),
             new BobotSheet($this->project),
             new KuisionerSheet($this->project),
+            new DataSekunderSheet($this->project),
+            new DataInterviewSheet($this->project),
+            new PenyebaranKuisionerSheet($this->project),
+            new RekapKuesionerAlumniSheet($this->project),
+            new RekapKuesionerAtasanSheet($this->project),
+            new LaporanHasilSheet($this->project),
         ];
 
         return $sheets;
