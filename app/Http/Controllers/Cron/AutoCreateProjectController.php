@@ -116,13 +116,13 @@ class AutoCreateProjectController extends Controller
                 $respondenData = $response->json();
 
                 // Validasi struktur data
-                if (
-                    !isset($respondenData['data_include'], $respondenData['data_exclude']) ||
-                    !is_array($respondenData['data_include']) ||
-                    !is_array($respondenData['data_exclude'])
-                ) {
-                    throw new \Exception("⚠️ Format data responden dari API tidak valid.");
-                }
+                // if (
+                //     !isset($respondenData['data_include'], $respondenData['data_exclude']) ||
+                //     !is_array($respondenData['data_include']) ||
+                //     !is_array($respondenData['data_exclude'])
+                // ) {
+                //     throw new \Exception("⚠️ Format data responden dari API tidak valid.");
+                // }
 
                 // Simpan ke project_kriteria_responden
                 DB::table('project_kriteria_responden')->insert([
