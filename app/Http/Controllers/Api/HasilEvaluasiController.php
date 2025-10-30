@@ -101,7 +101,6 @@ class HasilEvaluasiController extends Controller
                 'links' => [
                     'detail_level_3' => url("/hasil-evaluasi/level-3/{$project->id}"),
                     'detail_level_4' => url("/hasil-evaluasi/level-4/{$project->id}"),
-                    'pdf_report' => route('hasil-evaluasi.export-pdf-item', $project->id),
                 ]
             ];
 
