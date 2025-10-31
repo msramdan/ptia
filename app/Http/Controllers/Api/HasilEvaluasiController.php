@@ -12,6 +12,9 @@ class HasilEvaluasiController extends Controller
     public function getByKaldikID(Request $request, $kaldikID): JsonResponse
     {
         try {
+            // Force JSON response
+            $request->headers->set('Accept', 'application/json');
+
             $project = DB::table('project')
                 ->select(
                     'project.id',
@@ -68,7 +71,7 @@ class HasilEvaluasiController extends Controller
                     'success' => false,
                     'message' => 'Data not found',
                     'data' => null
-                ], 404);
+                ], 404, [], JSON_UNESCAPED_SLASHES);
             }
 
             // Format the response data
@@ -108,14 +111,14 @@ class HasilEvaluasiController extends Controller
                 'success' => true,
                 'message' => 'Data retrieved successfully',
                 'data' => $responseData
-            ]);
+            ], 200, [], JSON_UNESCAPED_SLASHES);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to retrieve data: ' . $e->getMessage(),
                 'data' => null
-            ], 500);
+            ], 500, [], JSON_UNESCAPED_SLASHES);
         }
     }
 }
